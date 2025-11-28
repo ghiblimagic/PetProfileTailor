@@ -7,6 +7,8 @@ import LoadingSpinner from "../ui/LoadingSpinner";
 import StyledInput from "../FormComponents/StyledInput";
 import StyledTextarea from "../FormComponents/StyledTextarea";
 import GeneralButton from "../ReusableSmallComponents/buttons/GeneralButton";
+const [formStartTime] = useState(Date.now());
+// for bots that send messages too quickly
 
 import ReCAPTCHA from "react-google-recaptcha";
 import { useGoogleReCaptcha } from "react-google-recaptcha-v3";
@@ -130,6 +132,12 @@ export default function ContactPage() {
           {state?.error && (
             <p className="text-red-600 text-center">{state.error}</p>
           )}
+
+          <input
+            type="hidden"
+            name="formStartTime"
+            value={formStartTime}
+          />
         </form>
       </div>
 
