@@ -15,11 +15,10 @@ class RateLimiter {
     const { windowMs = 60000, maxRequests = 5 } = options;
     const now = Date.now();
 
-    // Clean up old records periodically (every 100 checks)
-    if (Math.random() < 0.01) {
+    // Periodic cleanup to prevent memory leaks (5% chance = runs ~once every 20 requests)
+    if (Math.random() < 0.05) {
       this.cleanup();
     }
-
     const record = this.records.get(identifier);
 
     if (!record || now > record.resetTime) {
@@ -37,16 +36,12 @@ class RateLimiter {
       };
     }
 
-    // Existing window
+    // Always increment, even when blocked to catch severe cases of abuse
     record.count++;
-    this.records.set(identifier, record);
-
-    const allowed = record.count <= maxRequests;
-    const remaining = Math.max(0, maxRequests - record.count);
 
     return {
-      allowed,
-      remaining,
+      allowed: record.count <= maxRequests,
+      remaining: Math.max(0, maxRequests - record.count),
       resetTime: record.resetTime,
     };
   }
@@ -108,10 +103,15 @@ export const rateLimitPresets = {
 
 // Helper function to get client IP
 export function getClientIP(headersList) {
+  const forwarded = headersList.get("x-forwarded-for");
+  const forwardedIP = forwarded?.split(",")[0]?.trim();
+
+  // If x-forwarded-for is an empty string
+  // This is the check for that: forwardedIP && forwardedIP.length > 0
   return (
-    headersList.get("x-forwarded-for")?.split(",")[0].trim() ||
+    (forwardedIP && forwardedIP.length > 0 ? forwardedIP : null) ||
     headersList.get("x-real-ip") ||
-    headersList.get("cf-connecting-ip") || // Cloudflare
+    headersList.get("cf-connecting-ip") ||
     "unknown"
   );
 }

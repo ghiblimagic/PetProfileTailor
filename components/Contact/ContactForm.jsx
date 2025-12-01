@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useActionState } from "react";
 import { sendContactEmail } from "@/app/actions/sendContactEmail";
 import LoadingSpinner from "../ui/LoadingSpinner";
@@ -22,12 +22,34 @@ export default function ContactPage() {
   const { executeRecaptcha } = useGoogleReCaptcha();
   const [showV2, setShowV2] = useState(false);
   const [v2Token, setV2Token] = useState(null);
+  const [recaptchaLoading, setRecaptchaLoading] = useState(true);
+  const [recaptchaFailed, setRecaptchaFailed] = useState(false);
 
   const [state, formAction, isPending] = useActionState(sendContactEmail, {
     success: false,
     error: null,
     email: null,
   });
+
+  // Set recaptcha as loaded when it's ready, with timeout fallback
+  useEffect(() => {
+    if (executeRecaptcha) {
+      setRecaptchaLoading(false);
+      setRecaptchaFailed(false);
+      return;
+    }
+
+    // If recaptcha doesn't load within 10 seconds, show fallback
+    const timeout = setTimeout(() => {
+      if (!executeRecaptcha) {
+        setRecaptchaLoading(false);
+        setRecaptchaFailed(true);
+        setShowV2(true); // Automatically show v2 as fallback
+      }
+    }, 10000); // 10 second timeout
+
+    return () => clearTimeout(timeout);
+  }, [executeRecaptcha]);
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -36,17 +58,17 @@ export default function ContactPage() {
     try {
       let token = null;
 
-      // v3
-      if (executeRecaptcha && !showV2) {
+      // v3 recaptcha
+      if (executeRecaptcha && !showV2 && !recaptchaFailed) {
         token = await executeRecaptcha("contact_form");
 
-        // if token is null show v2
         if (!token) {
           setShowV2(true);
           return;
         }
       }
 
+      // v2 fallback (or if v3 failed to load)
       if (showV2) {
         if (!v2Token) {
           alert("Please complete the CAPTCHA");
@@ -61,6 +83,11 @@ export default function ContactPage() {
       // server errors will appear in state.error since server actions are not promises
     } catch (err) {
       console.error("Client-side error:", err);
+      // If v3 throws an error, fall back to v2
+      if (!showV2) {
+        setShowV2(true);
+        setRecaptchaFailed(true);
+      }
     }
   }
 
@@ -97,9 +124,34 @@ export default function ContactPage() {
             className="bg-secondary mt-3"
           />
 
-          {/* Optional fallback CAPTCHA */}
+          {recaptchaLoading && (
+            <span className="text-center text-sm text-gray-400 mt-2">
+              Loading security verification...
+            </span>
+          )}
+
+          {recaptchaFailed && !showV2 && (
+            <div className="text-center mt-2">
+              <p className="text-yellow-500 text-sm mb-2">
+                Security verification couldn't load.
+              </p>
+              <button
+                type="button"
+                onClick={() => setShowV2(true)}
+                className="text-blue-500 underline text-sm"
+              >
+                Use backup verification instead
+              </button>
+            </div>
+          )}
+          {/* fallback CAPTCHA */}
           {showV2 && (
-            <div className="flex justify-center my-3">
+            <div className="flex flex-col items-center my-3">
+              {recaptchaFailed && (
+                <p className="text-sm text-gray-400 text-center mb-2">
+                  Using backup verification method
+                </p>
+              )}
               <ReCAPTCHA
                 sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_V2_SITE_KEY}
                 onChange={(token) => setV2Token(token)}
@@ -109,7 +161,7 @@ export default function ContactPage() {
 
           <GeneralButton
             type="submit"
-            disabled={isPending}
+            disabled={isPending || recaptchaLoading}
             text={isPending ? "Sending..." : "Submit"}
             className="w-fit mx-auto mt-6"
           />
@@ -137,7 +189,7 @@ export default function ContactPage() {
           <input
             type="hidden"
             name="formStartTime"
-            value={formStartTime}
+            value={formStartTime.current}
           />
         </form>
       </div>
