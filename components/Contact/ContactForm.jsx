@@ -1,19 +1,24 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useActionState } from "react";
 import { sendContactEmail } from "@/app/actions/sendContactEmail";
 import LoadingSpinner from "../ui/LoadingSpinner";
 import StyledInput from "../FormComponents/StyledInput";
 import StyledTextarea from "../FormComponents/StyledTextarea";
 import GeneralButton from "../ReusableSmallComponents/buttons/GeneralButton";
-const [formStartTime] = useState(Date.now());
+
 // for bots that send messages too quickly
 
 import ReCAPTCHA from "react-google-recaptcha";
 import { useGoogleReCaptcha } from "react-google-recaptcha-v3";
 
 export default function ContactPage() {
+  const formStartTime = useRef(Date.now());
+  // useRef so:
+  //  1. a bot can't spoof the date, like they could with useState
+  //  2. It won't rerender and can't accidently change
+  //  3. ideal since we want a timestamp that won't change
   const { executeRecaptcha } = useGoogleReCaptcha();
   const [showV2, setShowV2] = useState(false);
   const [v2Token, setV2Token] = useState(null);
@@ -26,41 +31,36 @@ export default function ContactPage() {
 
   async function handleSubmit(e) {
     e.preventDefault();
-
     const formData = new FormData(e.currentTarget);
 
-    let captchaToken;
-
     try {
-      if (!executeRecaptcha && !v2Token) {
-        alert("reCAPTCHA not ready. Please try again.");
-        return;
-      }
+      let token = null;
 
-      // Try v3 first
-      if (!showV2) {
-        captchaToken = await executeRecaptcha("contact_form");
-        if (!captchaToken) {
-          // fallback to v2 if v3 fails
+      // v3
+      if (executeRecaptcha && !showV2) {
+        token = await executeRecaptcha("contact_form");
+
+        // if token is null show v2
+        if (!token) {
           setShowV2(true);
           return;
         }
-      } else {
-        // fallback v2 token
+      }
+
+      if (showV2) {
         if (!v2Token) {
           alert("Please complete the CAPTCHA");
           return;
         }
-        captchaToken = v2Token;
+        token = v2Token;
       }
 
-      // ✅ Add token to formData
-      formData.append("captchaToken", captchaToken);
-
-      // Submit the action
-      await formAction(formData);
+      formData.append("captchaToken", token);
+      // no await since it does not return a promise, instead react schedules the server action
+      formAction(formData);
+      // server errors will appear in state.error since server actions are not promises
     } catch (err) {
-      console.error("Error getting reCAPTCHA token:", err);
+      console.error("Client-side error:", err);
     }
   }
 
@@ -129,6 +129,7 @@ export default function ContactPage() {
               Message sent successfully!
             </p>
           )}
+
           {state?.error && (
             <p className="text-red-600 text-center">{state.error}</p>
           )}
