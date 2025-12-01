@@ -133,7 +133,7 @@ export default function ContactPage() {
           {recaptchaFailed && !showV2 && (
             <div className="text-center mt-2">
               <p className="text-yellow-500 text-sm mb-2">
-                Security verification couldn't load.
+                Security verification couldn&apos;t load.
               </p>
               <button
                 type="button"
