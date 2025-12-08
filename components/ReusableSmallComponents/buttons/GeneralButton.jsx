@@ -6,6 +6,8 @@ const GeneralButton = ({
   onClick,
   subtle,
   warning,
+  secondary,
+  tertiary,
   plain,
   type,
   active = false,
@@ -20,6 +22,8 @@ const GeneralButton = ({
   // Compute background & border
   let bgClass =
     "bg-yellow-300 border-yellow-700 text-secondary  hover:bg-blue-500 hover:text-subtleWhite hover:border-blue-700";
+  if (secondary) bgClass = "border-t border-x text-subtleWhite";
+  if (tertiary) bgClass = "border-b-0 shadow-none text-subtleWhite";
   if (plain)
     bgClass =
       "bg-transparent border-none text-subtleWhite border-subtleWhite hover:text-subtleWhite hover:border-blue-700 hover:bg-blue-500";

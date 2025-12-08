@@ -16,7 +16,7 @@ EmailFooterTemplate.PreviewProps = {} as EmailFooterTemplateProps;
 
 const footer = {
   color: "white",
-  fontSize: "12px",
+  fontSize: "16px",
   textAlign: "center" as const,
 };
 

@@ -14,6 +14,7 @@ import {
 } from "@/data/ThanksOptions";
 import { useSession } from "next-auth/react";
 import MustLoginMessage from "@components/ui/MustLoginMessage";
+import LoadingSpinner from "../ui/LoadingSpinner";
 
 export default function AddThank({
   dataType,
@@ -24,11 +25,14 @@ export default function AddThank({
   const [selectedThanks, setSelectedThanks] = useState([]);
   const { data: session } = useSession();
   const signedInUser = session?.user?.id;
+  const [loading, setLoading] = useState(false);
 
   const handleSubmitThanks = async (e) => {
     e.preventDefault();
+    setLoading(true);
 
     if (!signedInUser) {
+      setLoading(false);
       toast.error(`Ruh Roh! You must be signed in to thank content`);
       return;
     }
@@ -36,6 +40,7 @@ export default function AddThank({
     let contentCreatedByUserId = contentInfo.createdBy._id;
 
     if (contentCreatedByUserId === signedInUser) {
+      setLoading(false);
       toast.warn(
         `Ruh Roh! Nice try but you can't send thanks to your own content silly goose :)`,
       );
@@ -52,13 +57,13 @@ export default function AddThank({
 
     try {
       const response = await axios.post(apiThanksSubmission, thanksSubmission);
-
+      setLoading(false);
       toast.success(`Thank you! Your thank your note was successfully sent`);
 
       onClose?.();
     } catch (error) {
       console.log("this is an error", error);
-
+      setLoading(false);
       toast.error(
         `Ruh Roh! ${error.message} ${JSON.stringify(
           error?.response?.data?.message,
@@ -106,8 +111,8 @@ export default function AddThank({
               <p className="text-center">
                 {" "}
                 Choose as many options as you like. You can mix and match
-                between the lists. You can send an entire litter worth of thanks
-                if you&apos;re feeling it 🐶🐱!
+                between the lists. Send an entire litter worth of thanks if
+                you&apos;re feeling it 🐶🐱!
               </p>
               <p className="text-center">
                 However to avoid spam, you can only thank a single piece of
@@ -187,9 +192,10 @@ export default function AddThank({
               type="submit"
               text="Submit"
               default
-              disabled={!signedInUser}
+              disabled={!signedInUser || loading}
             />
           </Field>
+          {loading && <LoadingSpinner />}
         </div>
       </div>
     </form>

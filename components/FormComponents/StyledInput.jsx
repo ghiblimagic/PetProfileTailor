@@ -9,6 +9,7 @@ export default function StyledInput({
   id,
   name,
   label,
+  required,
 }) {
   return (
     <>
@@ -29,6 +30,7 @@ export default function StyledInput({
         type={type}
         id={id}
         name={name}
+        required={required}
       />
     </>
   );

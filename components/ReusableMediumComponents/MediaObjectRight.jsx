@@ -40,7 +40,7 @@ const MediaObjectRight = ({
             />
           ) : (
             <LinkButton
-              href={buttonText}
+              href={buttonTextLink}
               text={buttonText}
               defaultStyle
             />

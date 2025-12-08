@@ -10,6 +10,9 @@ import PawPrintIcon from "@components/ReusableSmallComponents/iconsOrSvgImages/P
 import GifHover from "@components/ReusableSmallComponents/GifHover";
 import Link from "next/link";
 import { usePrefersReducedMotion } from "@/hooks/usePrefersReducedMotions";
+import LinkButton from "@/components/ReusableSmallComponents/buttons/LinkButton";
+import GeneralButton from "@/components/ReusableSmallComponents/buttons/GeneralButton";
+import ErrorContactMessage from "@/components/Contact/ErrorContactMessage";
 
 export default function Custom404() {
   //grab data from Session and rename data to session
@@ -56,57 +59,7 @@ export default function Custom404() {
         />
       </div>
 
-      <ul className="text-center text-white bg-secondary max-w-4xl mx-auto h-fit pt-4 sm:px-2">
-        <ListWithPawPrintIcon
-          className="justify-center"
-          text=" You can try to reload the page to see if the error resolves"
-        />
-
-        <li>
-          <h4>
-            <PawPrintIcon /> Or contact me directly:
-          </h4>
-
-          <span className="block">
-            <FontAwesomeIcon
-              icon={faEnvelope}
-              className="mr-2"
-            />
-            <a
-              href="mailto:petprofiletailor@gmail.com"
-              className="underline"
-            >
-              Email
-            </a>
-          </span>
-
-          <span className="block">
-            <a href="https://twitter.com/Janetthedev">
-              <FontAwesomeIcon
-                icon={faMessage}
-                className="mr-2"
-              />
-              Twitter
-            </a>
-          </span>
-        </li>
-
-        <ListWithPawPrintIcon
-          className="mb-6 justify-center"
-          text="Or return to the login or dashboard page"
-        />
-        <li className="h-16">
-          <Link
-            href="/login"
-            className=" bg-yellow-300 text-secondary font-bold py-3 px-4 border-b-4 border-yellow-100    
-          shadow-lg shadow-stone-900/70 rounded-2xl
-          hover:bg-blue-500                            hover:text-white                            hover:border-blue-700 text-base 
-          "
-          >
-            Login/dashboard
-          </Link>
-        </li>
-      </ul>
+      <ErrorContactMessage />
     </>
   );
 }

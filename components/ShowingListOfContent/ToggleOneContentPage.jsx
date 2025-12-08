@@ -15,7 +15,7 @@ export default function ToggleOneContentPage({
 
   return (
     <section>
-      <div className="flex justify-center">
+      <div className="flex justify-center flex-wrap">
         {contentList.map((category) => (
           <GeneralOpenCloseButton
             key={category.value}

@@ -9,6 +9,7 @@ import ClosingXButton from "@components/ReusableSmallComponents/buttons/ClosingX
 import { useReports } from "@context/ReportsContext";
 import { useSession } from "next-auth/react";
 import MustLoginMessage from "@components/ui/MustLoginMessage";
+import LoadingSpinner from "../ui/LoadingSpinner";
 
 export default function AddReport({
   dataType,
@@ -21,6 +22,7 @@ export default function AddReport({
   const { addReport } = useReports();
   const { data: session } = useSession();
   const signedInUser = session?.user?.id;
+  const [loading, setLoading] = useState(false);
 
   const [flagCategoriesState, setFlagCategoriesState] = useState([]);
   const [additionalCommentsState, setAdditionalCommentsState] = useState([]);
@@ -37,6 +39,7 @@ export default function AddReport({
 
   const handleSubmitReport = async (e) => {
     e.preventDefault();
+    setLoading(true);
 
     if (flagCategoriesState.length === 0) {
       toast.error(
@@ -61,6 +64,7 @@ export default function AddReport({
       contentCreatedByUserId === flaggedByUser ||
       profileIsLoggedInUserCheck === flaggedByUser
     ) {
+      setLoading(false);
       toast.warn(
         `Ruh Roh! Nice try but you can't report your own content silly goose :)`,
       );
@@ -89,10 +93,12 @@ export default function AddReport({
       );
 
       addReport(dataType, contentInfo._id, response.data.report._id);
+      setLoading(false);
 
       onClose?.();
     } catch (error) {
       console.log("this is an error", error);
+      setLoading(false);
 
       toast.error(
         `Ruh Roh! ${error.message} ${JSON.stringify(
@@ -250,9 +256,11 @@ export default function AddReport({
               type="submit"
               text="Submit"
               default
-              disabled={!signedInUser}
+              disabled={!signedInUser || loading}
             />
           </Field>
+
+          {loading && <LoadingSpinner />}
         </div>
       </div>
     </form>

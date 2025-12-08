@@ -11,6 +11,8 @@ export async function GET(req, { params }) {
 
   const { content } = await params;
 
+  console.log("content in api/description/check", content);
+
   // 1. Blocklist check
   const blockResult = checkMultipleFieldsBlocklist([
     { value: content, fieldName: "content" },
@@ -33,10 +35,13 @@ export async function GET(req, { params }) {
   // }
 
   try {
-    const existingContentCheck = findStartNormalized(Description, content);
+    const existingContentCheck = await findStartNormalized(
+      Description,
+      content,
+    );
 
-    // find returns an array
-    if (existingContentCheck.length) {
+    // findOne returns an object
+    if (existingContentCheck) {
       return Response.json({
         type: "duplicate",
         data: existingContentCheck,

@@ -218,7 +218,11 @@ export default function TagsSelectAndCheatSheet({
                             <input
                               id={tag._id}
                               type="checkbox"
-                              className={`sr-only peer `}
+                              className="peer fixed top-0 left-0  m-0 h-[1px] w-[1px] overflow-hidden whitespace-nowrap border-0 p-0"
+                              style={{
+                                clip: "rect(0 0 0 0)",
+                                clipPath: "inset(50%)",
+                              }}
                               disabled={isDisabled}
                               checked={checked}
                               onChange={(e) =>

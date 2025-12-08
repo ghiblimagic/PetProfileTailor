@@ -12,6 +12,7 @@ import { useRouter } from "next/navigation";
 import ImageUpload from "@components/AddingNewData/ImageUpload";
 import RegisterInput from "@components/FormComponents/RegisterInput";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
+import SmallCenteredHeading from "@/components/ReusableSmallComponents/TitlesOrHeadings/SmallCenteredheading";
 
 export default function ProfileScreen() {
   const {
@@ -21,6 +22,8 @@ export default function ProfileScreen() {
     setValue,
     formState: { errors },
   } = useForm();
+
+  const [isSaving, setIsSaving] = useState(false);
 
   const { data: session, status } = useSession();
 
@@ -49,6 +52,7 @@ export default function ProfileScreen() {
   }
 
   const submitHandler = async ({ name, email, password, userid }) => {
+    setIsSaving(true);
     try {
       await axios.put("/api/auth/update", {
         name,
@@ -57,8 +61,10 @@ export default function ProfileScreen() {
         userid,
       });
       toast.success("Profile updated successfully");
+      setIsSaving(false);
     } catch (err) {
       toast.error(getError(err));
+      setIsSaving(false);
     }
   };
 
@@ -81,11 +87,12 @@ export default function ProfileScreen() {
       </div>
       <div className=" mx-auto  text-center max-w-3xl">
         <form onSubmit={handleSubmit(submitHandler)}>
-          <h1 className="mb-4 text-xl text-center border-y-2 py-2 bg-violet-700 font-semibold text-white   mx-auto">
-            Update Profile
-          </h1>
+          <SmallCenteredHeading
+            heading="Update Profile"
+            level="1"
+          />
 
-          <p className="text-white text-center pb-2">
+          <p className="text-white text-center py-2">
             You can change your name, email and/or password
           </p>
           <RegisterInput
@@ -96,6 +103,7 @@ export default function ProfileScreen() {
             register={register}
             validation={{ required: "Please enter a name" }}
             error={errors.name}
+            disabled={isSaving}
           />
 
           <RegisterInput
@@ -111,6 +119,7 @@ export default function ProfileScreen() {
               },
             }}
             error={errors.email}
+            disabled={isSaving}
           />
           <RegisterInput
             id="password"
@@ -124,6 +133,7 @@ export default function ProfileScreen() {
               },
             }}
             error={errors.password}
+            disabled={isSaving}
           />
 
           <RegisterInput
@@ -140,10 +150,14 @@ export default function ProfileScreen() {
               },
             }}
             error={errors.confirmPassword}
+            disabled={isSaving}
           />
 
           <div className="mb-4 w-full text-center">
-            <GeneralButton text="Update Profile" />
+            <GeneralButton
+              text="Update Profile"
+              disabled={isSaving}
+            />
           </div>
         </form>
         <ImageUpload />

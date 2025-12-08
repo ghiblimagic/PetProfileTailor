@@ -4,10 +4,13 @@ export const exactWordsBlocked = [
   "arrse",
   "arse",
   "arsehole",
+  "aryan",
+  "Aryan Brotherhood",
 
   "ass",
   "asses",
   "asshole",
+  "alt right",
 
   "bastard",
   "boner",
@@ -28,35 +31,73 @@ export const exactWordsBlocked = [
   "butt",
   "butthole",
 
+  "chink",
+  "Ching chong",
   "cock",
   "cocks",
+  "coon",
+  "cooney",
   "crap",
+  "creampie",
   "crotch",
+  "cunt",
+  "cnut",
 
   "damn",
 
+  "fuck",
+
+  "genital",
+  "gook",
+
+  "intercourse",
+  "indian giver",
+  "injun",
+
+  "jap",
+  "Jiggaboo",
+  "jiggerboo",
+  "jiggabo",
+  "jigarooni",
+  "jijjiboo",
+  "jungle bunny",
+
+  "Ku Klux Klan",
+  "KKK",
+
+  "zigabo",
+
+  "Mayonnaise Monkey",
   "muff",
+  "nazi",
+  "neonazi",
 
   "piss",
+  "Portagee",
   "pussy",
+
+  "retard",
 
   "sex",
   "sexy",
+  "sexual intercourse",
 
   "shit",
+  "slut",
+  "supremacist",
   "spunk",
 
+  "tar baby",
+
+  "White supremacist",
+  "White Aryan Resistance",
+  "wetback",
   "whore",
 ];
 
 export const exactWordsBlockedEverywhere = [
-  "aryan",
-  "cawk",
-  "chink",
   "clit",
   "clits",
-
-  "coon",
 
   "cum",
   "cuming",
@@ -64,8 +105,6 @@ export const exactWordsBlockedEverywhere = [
   "cummer",
   "cums",
 
-  "sexual intercourse",
-  "intercourse",
   "wank",
 ];
 
@@ -109,23 +148,21 @@ export const blocklistSubstrings = [
   "cocksucks",
   "cokmuncher",
   "deepthroat",
+
   "cumshot",
   "cunilingus",
   "cunillingus",
   "cunnilingus",
-  "cunt",
-  "cnut",
+
   "cuntlicker",
   "cuntlicking",
-  "cunts",
 
   "dildo",
   "dyke",
 
   "fag",
-  "fuck",
 
-  "genital",
+  "genitals", //since congential would be blocked with genital
 
   "jizz",
 
@@ -137,10 +174,11 @@ export const blocklistSubstrings = [
   "penis",
 
   "scrotum",
-  "slut",
+
   "smegma",
 
   "vagina",
+  "Westboro",
 
   "2 girls 1 cup",
 ];

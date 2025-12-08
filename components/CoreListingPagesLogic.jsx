@@ -10,8 +10,11 @@ import Pagination from "@components/ShowingListOfContent/pagination";
 import CheckForMoreData from "@components/ReusableSmallComponents/buttons/CheckForMoreDataButton";
 import { useSwrPagination } from "@hooks/useSwrPagination";
 import startCooldown from "@utils/startCooldown";
+import Image from "next/image";
+import LinkButton from "./ReusableSmallComponents/buttons/LinkButton";
 
 import { useSession } from "next-auth/react";
+import LoadingSpinner from "./ui/LoadingSpinner";
 
 export default function CoreListingPageLogic({
   dataType,
@@ -50,7 +53,7 @@ export default function CoreListingPageLogic({
   const [itemsPerUiPage, setItemsPerUiPage] = useState(10);
 
   const [sortingValue, setSortingValue] = useState(-1);
-  const [sortingProperty, setSortingProperty] = useState("_id");
+  const [sortingProperty, setSortingProperty] = useState("likedByCount");
   const [triggerApplyFilters, setTriggerApplyFilters] = useState([]);
 
   const toggleDrawer = (newOpen) => {
@@ -151,105 +154,169 @@ export default function CoreListingPageLogic({
           />
         </section>
       )}
+      {/* *****************  Drawer for filtering options *****************  */}
+      <Drawer
+        open={isOpen}
+        onClose={(event, reason) => {
+          if (reason === "backdropClick") {
+            // prevent closing when clicking on backdrop
+            return;
+          }
+          toggleDrawer(false);
+        }}
+        anchor="left"
+        // gets rid of white background of mui drawer
+        sx={{
+          "& .MuiDrawer-paper": {
+            backgroundColor: "transparent",
+            boxShadow: "none",
+          },
+        }}
+      >
+        <div className="w-full max-w-[451px] h-full  flex flex-col overflow-x-clip">
+          <FilteringSidebar
+            dataType={dataType}
+            handleFilterChange={handleFilterChange}
+            handleApplyFilters={handleApplyFilters}
+            filterTagsIds={filterTagsIds}
+            toggleDrawer={toggleDrawer}
+            isLoading={isLoading}
+            remainingFilterCooldown={remainingFilterCooldown}
+            filterCooldownRef={filterCooldownRef}
+            startCooldown={startCooldown}
+          />
+        </div>
+      </Drawer>
 
-      <div className="flex sm:px-2  mx-auto ">
-        <Drawer
-          open={isOpen}
-          onClose={(event, reason) => {
-            if (reason === "backdropClick") {
-              // prevent closing when clicking on backdrop
-              return;
-            }
-            toggleDrawer(false);
-          }}
-          anchor="left"
-          // gets rid of white background of mui drawer
-          sx={{
-            "& .MuiDrawer-paper": {
-              backgroundColor: "transparent",
-              boxShadow: "none",
-            },
-          }}
-        >
-          <div className="w-full max-w-[451px] h-full  flex flex-col overflow-x-clip">
-            <FilteringSidebar
-              dataType={dataType}
-              handleFilterChange={handleFilterChange}
-              handleApplyFilters={handleApplyFilters}
-              filterTagsIds={filterTagsIds}
-              toggleDrawer={toggleDrawer}
-              isLoading={isLoading}
-              remainingFilterCooldown={remainingFilterCooldown}
-              filterCooldownRef={filterCooldownRef}
-              startCooldown={startCooldown}
-            />
-          </div>
-        </Drawer>
-        {/*################# CONTENT DIV ################### */}
-
-        <div className="grow max-w-5xl mx-auto bg-primary rounded-box place-items-center  ">
-          {/* Button that toggles the filter div */}
+      {content?.length === 0 && !isLoading ? (
+        <div className="text-center my-6 text-subtleWhite">
           <GeneralButton
             text={`${isOpen ? "Close Filters" : "Open Filters"}`}
             onClick={() => setIsOpen(!isOpen)}
           />
+          <p className="mb-4">
+            {`We dug deep but there's no ${
+              restrictSwrToLikedNames
+                ? `liked ${dataType}`
+                : `created ${dataType}`
+            }!`}
+          </p>
+          <p className="mb-4">
+            {`${`Psst, ${
+              restrictSwrToLikedNames ? "like" : "add"
+            } ${dataType} and we'll hide them here, so our pup can dig them up for you! 🐶`}`}
+          </p>
 
-          <Pagination
-            itemsPerPage={itemsPerPage}
-            setItemsPerPageFunction={setItemsPerPageFunction}
-            setPageFunction={setPageFunction}
-            setSize={setSize}
-            size={size}
-            currentUiPage={currentUiPage}
-            setCurrentUiPage={setCurrentUiPage}
-            setSortingLogicFunction={setSortingLogicFunction}
-            totalPagesInDatabase={totalPagesInDatabase}
-            totalItems={totalItems}
-            amountOfDataLoaded={data?.length}
-            remainingSortCooldown={remainingSortCooldown}
-            sortingValue={sortingValue}
-            sortingProperty={sortingProperty}
+          <Image
+            src="/digging-dog.svg"
+            alt="dog digging a hole"
+            width={218}
+            height={150}
+            unoptimized={true}
+            loading="lazy"
+            className="block mx-auto"
+            // Image is wrapped in a span, so we need to change it to block for mx-auto to work
           />
 
-          <section className="w-full">
-            {isLoading && (
-              <div className="flex">
-                <span className="text-white text-3xl my-20 mx-auto">
-                  Fetching data ...
-                </span>
-              </div>
-            )}
+          <a href="https://www.freepik.com/free-vector/dog-digging-dirt-white-background_18973243.htm">
+            <small className="block">
+              {" "}
+              Dog Digging Icon by brgfx on Freepik{" "}
+            </small>
+          </a>
 
-            <section className="whitespace-pre-line ">
-              {content?.length > 0 &&
-                content
-                  .slice(
-                    currentUiPage - 1 == 0
-                      ? 0
-                      : (currentUiPage - 1) * itemsPerPage,
-                    currentUiPage * itemsPerPage,
-                  )
-                  .map((singleContent) => {
-                    return (
-                      <ContentListing
-                        dataType={dataType}
-                        singleContent={singleContent}
-                        key={singleContent._id}
-                        // VITAL for the ui to see the mutation changes, if the key hasn't changed, then react will ignore the updates
-                        signedInUsersId={signedInUsersId}
-                        mutate={mutate}
-                      />
-                    );
-                  })}
+          <section className="border-t my-8">
+            <h4 className="mt-8 text-xl">Do you think this is an error?</h4>
+            <p className="my-4">
+              Ruh Roh! Apologies for that, please use the contact form to let me
+              know.
+            </p>
 
-              {/* <CheckForMoreData
+            <p className="mt-4">I&apos;ll need to know:</p>
+            <ol className="my-4 list-decimal list-inside">
+              <li className="mb-2">
+                It happened on the dashboard page for
+                {` ${
+                  restrictSwrToLikedNames ? "liked" : "created"
+                } ${dataType} `}
+              </li>
+              <li className="mb-2">
+                The email associated with your account, I&apos;ll{" "}
+                <strong className="underline">never</strong> ask for your
+                password
+              </li>
+            </ol>
+
+            <LinkButton
+              href="/contact"
+              text="Contact"
+              className="py-2"
+              subtle
+            />
+          </section>
+        </div>
+      ) : (
+        <div className="flex sm:px-2  mx-auto ">
+          {/*################# CONTENT DIV ################### */}
+
+          <div className="grow max-w-5xl mx-auto bg-primary rounded-box place-items-center  ">
+            {/* Button that toggles the filter div */}
+            <GeneralButton
+              text={`${isOpen ? "Close Filters" : "Open Filters"}`}
+              onClick={() => setIsOpen(!isOpen)}
+            />
+
+            <Pagination
+              itemsPerPage={itemsPerPage}
+              setItemsPerPageFunction={setItemsPerPageFunction}
+              setPageFunction={setPageFunction}
+              setSize={setSize}
+              size={size}
+              currentUiPage={currentUiPage}
+              setCurrentUiPage={setCurrentUiPage}
+              setSortingLogicFunction={setSortingLogicFunction}
+              totalPagesInDatabase={totalPagesInDatabase}
+              totalItems={totalItems}
+              amountOfDataLoaded={data?.length}
+              remainingSortCooldown={remainingSortCooldown}
+              sortingValue={sortingValue}
+              sortingProperty={sortingProperty}
+            />
+
+            <section className="w-full">
+              {isLoading && <LoadingSpinner />}
+
+              <section className="whitespace-pre-line ">
+                {content?.length > 0 &&
+                  content
+                    .slice(
+                      currentUiPage - 1 == 0
+                        ? 0
+                        : (currentUiPage - 1) * itemsPerPage,
+                      currentUiPage * itemsPerPage,
+                    )
+                    .map((singleContent) => {
+                      return (
+                        <ContentListing
+                          dataType={dataType}
+                          singleContent={singleContent}
+                          key={singleContent._id}
+                          // VITAL for the ui to see the mutation changes, if the key hasn't changed, then react will ignore the updates
+                          signedInUsersId={signedInUsersId}
+                          mutate={mutate}
+                        />
+                      );
+                    })}
+
+                {/* <CheckForMoreData
                 filteredListLastPage={filteredListLastPage} //deleted
                 setSize={setSize}
               /> */}
+              </section>
             </section>
-          </section>
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }

@@ -20,10 +20,15 @@ import LinkButton from "@components/ReusableSmallComponents/buttons/LinkButton";
 import { useRouter, useSearchParams } from "next/navigation";
 import { getCsrfToken } from "next-auth/react";
 import LoadingSpinner from "./ui/LoadingSpinner";
+import { useLocalStorageCooldown } from "@/hooks/useLocalStorageCooldown";
 
 export default function Login() {
   const { data: session } = useSession();
-  // const { executeRecaptcha } = useGoogleReCaptcha();
+  const { canClick, formattedTimer, trigger } = useLocalStorageCooldown(
+    `lastRecheck-MagicLink}`,
+    120,
+  );
+
   const [csrfToken, setCsrfToken] = useState("");
   const [redirect, setRedirect] = useState(false);
   const [loadingLogin, setLoadingLogin] = useState(false);
@@ -212,9 +217,24 @@ export default function Login() {
                 className="text-center"
                 onSubmit={async (e) => {
                   e.preventDefault();
-                  const email = e.currentTarget.email.value;
+                  const form = e.currentTarget;
+                  const email = form.email.value;
+                  const honeypot = form.website.value;
+
+                  if (honeypot) {
+                    console.warn("Bot detected — honeypot field was filled.");
+                    return;
+                  }
+
                   if (!email) return toast.error("Please enter your email.");
                   setLoadingMagicLink(true);
+
+                  if (!canClick) {
+                    toast.error(
+                      "Please wait a few seconds before trying again.",
+                    );
+                    return;
+                  }
 
                   try {
                     const result = await signIn("email", {
@@ -229,9 +249,12 @@ export default function Login() {
                       );
                       toast("If this email exists, a magic link will be sent.");
                     }
+                    trigger(); // will start cooldown
                   } catch (error) {
+                    console.log("error in login", error);
                     toast.error("Something went wrong. Please try again.");
-                    setLoadingMagicLink(false); // only stop spinner if there's an error
+                  } finally {
+                    setLoadingMagicLink(false);
                   }
                 }}
               >
@@ -247,12 +270,20 @@ export default function Login() {
                   className="lg:min-w-64 mt-4 "
                 />
 
+                <input
+                  type="text"
+                  name="website"
+                  className="hidden"
+                  tabIndex={-1}
+                  autoComplete="off"
+                />
+
                 <GeneralButton
-                  text="sign in"
+                  text={canClick ? "Sign in" : `Wait ${formattedTimer}`}
                   className="sm:ml-2 sm:mb-2 text-center mt-0"
                   type="submit"
                   subtle
-                  disabled={loadingMagicLink}
+                  disabled={loadingMagicLink || !canClick}
                 />
               </form>
 

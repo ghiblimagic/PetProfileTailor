@@ -6,17 +6,22 @@ import axios from "axios";
 import XSvgIcon from "@components/ReusableSmallComponents/iconsOrSvgImages/XSvgIcon";
 import Image from "next/image";
 import ImageUpload from "@components/AddingNewData/ImageUpload";
+import GeneralButton from "../ReusableSmallComponents/buttons/GeneralButton";
+import StyledInput from "../FormComponents/StyledInput";
+import StyledTextarea from "../FormComponents/StyledTextarea";
 
 export default function EditBioAndProfile({
   setShowProfileEditPage,
   userData,
   sessionFromServer,
   setProfileChange,
+  setBio,
+  bio,
+  setLocation,
+  location,
+  avatar,
+  setAvatar,
 }) {
-  const [bio, setBio] = useState(userData.bio);
-  const [location, setLocation] = useState(userData.location);
-  const [avatar, setAvatar] = useState(userData.profileImage);
-
   const bioSubmission = async () => {
     const bioSubmission = {
       bio: bio,
@@ -32,17 +37,18 @@ export default function EditBioAndProfile({
         //reloads page
         setProfileChange(true);
         setShowProfileEditPage(false);
+        toast.success("Profile successfully updated!");
       })
       .catch((error) => {
         console.log("there was an error when sending your edits", error);
 
-        toast.error(`Ruh Roh! Name not edited`);
+        toast.error(`Ruh Roh! Profile not updated`);
       });
   };
   return (
     <div>
       <div
-        className="relative z-10"
+        className="relative z-50"
         aria-labelledby="modal-title"
         role="dialog"
         aria-modal="true"
@@ -67,18 +73,19 @@ export default function EditBioAndProfile({
                 />
 
                 <div
-                  className="mx-auto flex flex-col font-semibold text-secondary bg-violet-900
+                  className="mx-auto flex flex-col font-semibold text-secondary bg-primary
                  border-2 border-violet-400 border-dotted 
                  p-4 shadow-lg max-w-3xl"
                 >
                   {/* ##### NAME AREA ######*/}
                   <h4 className="text-subtleWhite mt-4"> location </h4>
-                  <input
-                    className="border bg-violet-50  border-violet-200 p-2 mb-4 outline-none placeholder-secondary"
+
+                  <StyledInput
+                    className="bg-secondary"
                     onChange={(e) => setLocation(e.target.value)}
                     value={location}
                     maxLength="70"
-                    type="title"
+                    id="location"
                   />
 
                   <span className="text-subtleWhite">
@@ -90,13 +97,12 @@ export default function EditBioAndProfile({
 
                   <h4 className="text-subtleWhite"> Bio </h4>
 
-                  <textarea
-                    className={`border  bg-violet-50 sec p-3 h-30  outline-none placeholder-secondary`}
+                  <StyledTextarea
                     onChange={(e) => setBio(e.target.value)}
                     required
                     maxLength="400"
                     value={bio}
-                  ></textarea>
+                  />
 
                   <span className="text-subtleWhite">
                     {" "}
@@ -105,20 +111,25 @@ export default function EditBioAndProfile({
 
                   <h4 className="text-subtleWhite mt-2">Current Avatar </h4>
 
-                  <Image
-                    src={avatar}
-                    className="h-28 w-scale mx-auto"
-                    width={100}
-                    height={100}
-                    alt=""
-                    sizes="100vw"
-                    style={{
-                      width: "100%",
-                      height: "auto",
-                    }}
-                  />
+                  <div className="h-28 w-28 flex justify-center items-center mx-auto">
+                    <Image
+                      src={avatar}
+                      className=""
+                      width={60}
+                      height={60}
+                      alt=""
+                      style={{
+                        width: "100%",
+                        height: "auto",
+                      }}
+                    />
+                  </div>
 
-                  <ImageUpload sessionFromServer={sessionFromServer} />
+                  <ImageUpload
+                    sessionFromServer={sessionFromServer}
+                    setAvatar={setAvatar}
+                    setShowDialog={setShowProfileEditPage}
+                  />
                 </div>
               </div>
             </div>
@@ -126,26 +137,23 @@ export default function EditBioAndProfile({
             {/* ###########                       buttons                     ############## */}
             <div
               className="bg-secondary px-4 py-3
-                 sm:px-6 grid grid-cols-2"
+                 sm:px-6 grid grid-cols-2 justify-items-center"
             >
-              <button
+              <GeneralButton
                 type="button"
-                className="justify-center rounded-md border border-transparent bg-emerald-600 px-4 py-2 text-base 
-                 
-                 font-medium text-subtleWhite shadow-sm hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 sm:ml-3 sm:w-auto sm:text-sm"
+                text="save"
+                subtle
                 onClick={() => bioSubmission()}
-              >
-                Save
-              </button>
+                className="justify-center w-28"
+              />
 
-              <button
+              <GeneralButton
                 type="button"
-                className="mt-3 inline-flex justify-center rounded-md bg-red-600 px-4 py-2 text-base font-medium text-subtleWhite shadow-sm hover:bg-red-800 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 
-          sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
+                text="cancel"
+                warning
                 onClick={() => setShowProfileEditPage(false)}
-              >
-                Cancel
-              </button>
+                className="justify-center w-28"
+              />
             </div>
           </div>
         </div>

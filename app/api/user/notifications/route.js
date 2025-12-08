@@ -19,10 +19,10 @@ export async function GET() {
 
     const userId = new mongoose.Types.ObjectId(session.user.id);
 
-    console.log("session user id", session.user.id, typeof session.user.id);
-    console.log("userid mongoose", userId instanceof mongoose.Types.ObjectId);
+    // console.log("session user id", session.user.id, typeof session.user.id);
+    // console.log("userid mongoose", userId instanceof mongoose.Types.ObjectId);
 
-    console.log("userid in api/user/notifications", userId);
+    // console.log("userid in api/user/notifications", userId);
     await db.connect();
 
     //  Fetch in parallel

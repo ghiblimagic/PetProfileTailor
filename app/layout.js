@@ -13,6 +13,8 @@ import NavLayoutwithSettingsMenu from "@/components/NavBar/NavLayoutwithSettings
 import CategTagsWrapper from "@/wrappers/CategTagsWrapper";
 import { Suspense } from "react";
 import LoadingSkeleton from "@/components/LoadingScreen";
+import LinkButton from "@/components/ReusableSmallComponents/buttons/LinkButton";
+import Image from "next/image";
 
 // empty wrappers are needed for the providers, since providers need to be inside a client component to safely run hooks even with having "use client" at the top of the provider
 
@@ -32,12 +34,17 @@ import db from "@/utils/db";
 import NameCategory from "@/models/NameCategory";
 import DescriptionCategory from "@/models/DescriptionCategory";
 import { leanWithStrings } from "@/utils/mongoDataCleanup";
+import Footer from "@/components/footer/Footer";
 
 export const metadata = {
+  metadataBase: new URL("https://homewardtails.com"),
   title:
     "Improve Adoption Rates by Creating Impactful, Fun, and Tailor-Fitted Pet Adoption Profiles!",
   description:
     "Homeward Tails is a community powered database which helps you find the perfect pet name or create pet profiles which are impactful, fun, and tailor fitted. Animal welfare professionals can use the community submitted names or descriptions to create engaging pet profiles to improve adoption rates!",
+  icons: {
+    icon: "/icon.png",
+  },
 };
 
 // 🧠 3-hour TTL cache
@@ -97,7 +104,9 @@ export default async function RootLayout({ children }) {
               <NotificationsWrapper>
                 <ReportsWrapper>
                   <SuggestionsWrapper>
-                    <NavLayoutwithSettingsMenu />
+                    <header>
+                      <NavLayoutwithSettingsMenu />
+                    </header>
                     <Suspense fallback={<LoadingSkeleton />}>
                       <main
                         className="flex-1  sm:px-6 lg:px-8  mx-auto  w-full" // w-full so it the element doesn't start off as collapsed
@@ -113,28 +122,7 @@ export default async function RootLayout({ children }) {
                     <Analytics />
                     <ToastProvider />
 
-                    <footer className="text-white text-sm py-4 px-4 bg-secondary border-t-2 border-violet-400 flex">
-                      <div className="flex flex-col gap-2">
-                        <h6 className="font-semibold">Credits:</h6>
-                        <small>
-                          <a
-                            className="text-xs block"
-                            href="https://www.freepik.com/author/freepik/icons/kawaii-flat_45#from_element=resource_detail"
-                          >
-                            Default user icons created by freepik, Kawaii Flat
-                            family
-                          </a>
-                        </small>
-                        <small>
-                          <a
-                            className="text-xs block"
-                            href="https://thenounproject.com/browse/icons/term/thank-you/"
-                          >
-                            Thank you icon by Arfan Haq from Noun Project
-                          </a>
-                        </small>
-                      </div>
-                    </footer>
+                    <Footer />
                   </SuggestionsWrapper>
                 </ReportsWrapper>
               </NotificationsWrapper>

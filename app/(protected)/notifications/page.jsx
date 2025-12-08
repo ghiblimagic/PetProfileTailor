@@ -35,7 +35,7 @@ export default async function Notifications() {
     { page: 1, limit: 25 },
   );
 
-  console.log("name docs", nameDocs);
+  // console.log("name docs", nameDocs);
 
   const contentList = [
     {

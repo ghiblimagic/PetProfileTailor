@@ -129,6 +129,10 @@ export default function ContentListing({
 
   const userIsTheCreator = singleContent.createdBy._id === signedInUsersId;
 
+  const contentProfileImage = userIsTheCreator
+    ? session.user.profileImage
+    : singleContent.createdBy.profileImage;
+
   const [showLikesSignInMessage, setShowLikesSignInMessage] = useState(false);
 
   //STATE FOR SHOWING SHARE OPTIONS
@@ -147,11 +151,11 @@ export default function ContentListing({
 
   return (
     <div
-      className={`text-base flex border-t border-subtleWhite mb-4 ${className}`}
+      className={`text-base flex border-t border-subtleWhite mb-4 ${className}   bg-primary`}
     >
       <ProfileImage
         divStyling="min-h-10 max-w-12 mr-4 mt-3 min-w-10 max-h-12"
-        profileImage={singleContent.createdBy.profileImage}
+        profileImage={contentProfileImage}
         layout="responsive"
         className="rounded-2xl"
         width={80}
@@ -165,7 +169,6 @@ export default function ContentListing({
                 
            
          
-            bg-primary
                     text-subtleWhite sm:p-2 
                   justify-items-center "
           //  items-center
@@ -295,7 +298,13 @@ export default function ContentListing({
                 onClose={closeDelete}
                 signedInUsersId={signedInUsersId}
                 onConfirm={
-                  () => confirmDelete(apiBaseLink, signedInUsersId, mutate) // passing mutate from useSwrPagination
+                  () =>
+                    confirmDelete(
+                      apiEndPoint,
+                      signedInUsersId,
+                      mode === "swr" ? mutate : undefined,
+                      mode === "local" ? setLocalContent : undefined,
+                    ) // passing mutate from useSwrPagination
                 }
               />
             )}

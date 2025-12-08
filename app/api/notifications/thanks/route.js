@@ -1,4 +1,7 @@
 import db from "@utils/db";
+import Description from "@/models/Description";
+import User from "@/models/User";
+import Name from "@/models/Name";
 import Thank from "@/models/Thank";
 import { getSessionForApis } from "@/utils/api/getSessionForApis";
 import { getPaginatedNotifications } from "@/utils/api/getPaginatedNotifications";
@@ -7,6 +10,8 @@ import mongoose from "mongoose";
 export const GET = async (req) => {
   try {
     const { ok, session, response } = await getSessionForApis({ req });
+
+    console.log("nameNotifs ok", ok, "session", session, "response", response);
 
     if (!ok) return response;
 

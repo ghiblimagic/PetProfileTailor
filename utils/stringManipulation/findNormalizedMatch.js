@@ -22,7 +22,9 @@ export function escapeRegex(str) {
 // no risk of extra cost like mongodb atlas search for fuzzy searching
 
 export async function findStartNormalized(Model, content) {
-  const normalizedString = normalizeString(content).slice(0, 220);
+  const normalizedString = normalizeString(content).slice(0, 400);
+
+  console.log("this is normalizedString", normalizedString);
 
   return await Model.findOne({
     normalizedContent: {
@@ -45,7 +47,7 @@ export async function findStartNormalized(Model, content) {
 
 // Pro: will find partial matches, instead of being stuck at the front
 export async function findPartialMatch(Model, content) {
-  const normalizedString = normalizeString(content).slice(0, 220);
+  const normalizedString = normalizeString(content).slice(0, 400);
 
   return await Model.find({
     normalizedContent: {

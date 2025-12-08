@@ -25,6 +25,7 @@ export default function AddSuggestion({
   const signedInUser = session?.user?.id;
 
   const { addSuggestion } = useSuggestions();
+  const [loading, setLoading] = useState(true);
 
   const [additionalCommentsState, setAdditionalCommentsState] = useState([]);
   const [incorrectTags, setIncorrectTags] = useState([]);
@@ -35,6 +36,7 @@ export default function AddSuggestion({
 
   const handleSubmitSuggestion = async (e) => {
     e.preventDefault();
+    setLoading(true);
 
     if (!suggestionBy) {
       toast.error(`Ruh Roh! You must be signed in to suggestion content`);
@@ -47,6 +49,7 @@ export default function AddSuggestion({
       toast.warn(
         `Ruh Roh! Nice try but you can't suggestion your own content silly goose :)`,
       );
+      setLoading(false);
       return;
     }
 
@@ -68,6 +71,7 @@ export default function AddSuggestion({
         apisuggestionSubmission,
         suggestionSubmission,
       );
+      setLoading(false);
 
       toast.success(
         `Thank you for your suggestion! Suggestion successfully sent`,
@@ -78,7 +82,7 @@ export default function AddSuggestion({
       onClose?.();
     } catch (error) {
       console.log("this is an error", error);
-
+      setLoading(false);
       toast.error(
         `Ruh Roh! ${error.message} ${JSON.stringify(
           error?.response?.data?.message,
@@ -140,7 +144,7 @@ export default function AddSuggestion({
                 Select the incorrect tags and then please comment why the tags
                 are incorrect in the textbox at the bottom. Thank you!
               </p>
-              <div className="flex flex-col justify-center gap-4 ">
+              <div className="flex  flex-col gap-4 justify-center flex-wrap">
                 {contentInfo.tags && contentInfo.tags.length > 0 ? (
                   contentInfo.tags.map((tag) => (
                     <StyledCheckbox

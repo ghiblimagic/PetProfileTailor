@@ -12,16 +12,13 @@ So I was inspired to create this site which empowers animal lovers to help adopt
 
 ## How It's Made:
 
-Next.js, React, Next-Auth, JavaScript, Tailwindcss, CSS, HTML5, MongoDB, Mongoose, Cloudinary, Node Mailer, SWR
+Next.js, React, Next-Auth, JavaScript, TypeScript, Tailwindcss, CSS, HTML5, MongoDB, Mongoose, Cloudinary, ReSend, SWR
 
 ##Optimizations:
 
 ## Potential Future Optimizations:
 
-1. Add SWR to the profile pages
-2. Although it currently works for keyboard users, I want to improve the accessiblity for screenreaders
-3. Add BYTE, a virtual chat gpt dog that helps people find names or built pet profiles
-4. Add a messaging feature
+1. Although it currently works for keyboard users, I want to improve the accessiblity for screenreaders
 
 ## Lessons Learned
 

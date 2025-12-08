@@ -163,13 +163,13 @@ function EditReport({
   }
 
   return (
-    <div className=" mx-auto bg-primary rounded-lg  border border-subtleWhite ">
+    <div className=" mx-auto bg-primary rounded-lg  border border-subtleWhite max-w-4xl">
       {loading ? (
         <LoadingSpinner />
       ) : (
         <>
           <form onSubmit={handleSubmitEdit}>
-            <div className="flex items-center justify-end py-2   bg-secondary max-w-4xl">
+            <div className="flex items-center justify-end py-2   bg-secondary ">
               <ClosingXButton
                 onClick={cancelFlagFormAndRevertFlagState}
                 className="mr-5"

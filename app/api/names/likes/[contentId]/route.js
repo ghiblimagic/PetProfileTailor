@@ -8,7 +8,7 @@ export async function GET(req, { params }) {
 
   const { id } = await params;
 
-  console.log("GET individual name id:", id);
+  // console.log("GET individual name id:", id);
 
   try {
     const individualName = await Names.findOne({ _id: id });

@@ -14,8 +14,6 @@ import StyledTextarea from "@components/FormComponents/StyledTextarea";
 import { useSession } from "next-auth/react";
 
 import CheckIfContentExists from "./CheckIfContentExists";
-import CheckboxWithLabelAndDescription from "../FormComponents/CheckboxWithLabelAndDescription";
-import StyledCheckbox from "../FormComponents/StyledCheckbox";
 import PreserveTextAfterSubmission from "./preserveTextAfterSubmission";
 import ToggeableAlert from "../ReusableMediumComponents/ToggeableAlert";
 
@@ -29,6 +27,7 @@ function NewNameWithTagsData() {
   const [resetCheckContent, setResetCheckContent] = useState(false);
 
   const [newNameInvalidInput, setNewNameInvalidInput] = useState(null);
+  const [checkIsProcessing, setCheckIsProcessing] = useState(false);
 
   const { data: session, status } = useSession();
 
@@ -45,7 +44,6 @@ function NewNameWithTagsData() {
   const { tagsToSubmit, handleSelectChange, handleCheckboxChange, clearTags } =
     useTags();
 
-  //   try {
   //     let nameResponse = await fetch("/api/names/check-if-content-exists/" + nameCheck);
   //     let nameData = await nameResponse.json();
   //     setNameCheckFunctionRun(true);
@@ -176,12 +174,6 @@ function NewNameWithTagsData() {
           <li className="my-2">somewhat negative or slightly controversial </li>
           <li>slightly suggestive </li>
         </ul>{" "}
-        <CheckIfContentExists
-          apiString="/api/names/check-if-content-exists/"
-          disabled={disabled}
-          contentType="names"
-          resetTrigger={resetCheckContent}
-        />
         <hr className="mt-4" />
         <form
           onSubmit={handleNameSubmission}
@@ -193,7 +185,7 @@ function NewNameWithTagsData() {
           {/* needs label and value for Select to work  */}
 
           <label
-            className="font-bold block mt-4 mb-2 text-xl "
+            className="font-bold block mt-8 mb-4 text-xl "
             htmlFor="nameInput"
           >
             New Name
@@ -213,6 +205,7 @@ function NewNameWithTagsData() {
             maxLength="50"
             disabled={disabled}
           ></input>
+
           {newNameInvalidInput !== null && (
             <WarningMessage
               message={`${newNameInvalidInput} is not a valid character`}
@@ -221,9 +214,22 @@ function NewNameWithTagsData() {
           <span className="block my-3">
             {`${50 - newName.length}/50 characters left`}
           </span>
+
+          <CheckIfContentExists
+            apiString="/api/names/check-if-content-exists/"
+            disabled={disabled}
+            contentType="names"
+            resetTrigger={resetCheckContent}
+            addNamesPage={true}
+            value={newName}
+            checkIsProcessing={checkIsProcessing}
+            setCheckIsProcessing={setCheckIsProcessing}
+            invalidInput={newNameInvalidInput}
+          />
+
           {/* setNote */}
           <label
-            className="font-bold block mt-4 mb-2 text-xl "
+            className="font-bold block mb-4 text-xl "
             htmlFor="nameNote"
           >
             Note (optional)
@@ -253,6 +259,12 @@ function NewNameWithTagsData() {
             <p>
               Examples: the name&apos;s meaning, popular fictional or historical
               figures with this name.
+            </p>
+            <p className="block mb-2">
+              {" "}
+              If you found it on a shelter/rescue&apos;s listing for a pet
+              please mention the organization&apos;s name so people can send
+              some love their way 😉
             </p>
           </div>
           <TagsSelectAndCheatSheet

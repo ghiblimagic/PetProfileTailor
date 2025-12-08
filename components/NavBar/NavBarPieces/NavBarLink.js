@@ -15,7 +15,7 @@ export default function NavBarLink(props) {
 
   return (
     <li
-      className="inline-flex px-2 py-2 text-xs font-bold text-subtleWhite 
+      className="inline-flex px-2 py-2 text-sm font-bold text-subtleWhite 
  
             
    

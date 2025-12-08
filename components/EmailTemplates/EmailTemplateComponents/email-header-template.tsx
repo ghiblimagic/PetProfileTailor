@@ -20,19 +20,20 @@ export const EmailHeaderTemplate = ({
     >
       Homeward Tails
     </Heading>
-
-    <Img
-      src={imgLink}
-      height={140}
-      alt={imgAltText}
-      style={{
-        margin: "0 auto",
-        border: "2px solid white",
-        //horizontally centers alt text
-        textAlign: "center",
-        color: "white",
-      }}
-    />
+    {imgLink && (
+      <Img
+        src={imgLink}
+        height={140}
+        alt={imgAltText}
+        style={{
+          margin: "0 auto",
+          border: "2px solid white",
+          //horizontally centers alt text
+          textAlign: "center",
+          color: "white",
+        }}
+      />
+    )}
 
     <Heading style={heading}> {headerText} </Heading>
   </Container>

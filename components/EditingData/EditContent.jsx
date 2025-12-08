@@ -55,7 +55,8 @@ export default function EditContent({
   return (
     <Dialog
       open={open}
-      onClose={onClose} // Esc key will work
+      onClose={() => {}}
+      // this way the form won't close when the user clicks on the backdrop
       className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto"
       initialFocus={panelRef} // optional, for focusing panel for keyboard scroll
     >
@@ -131,7 +132,7 @@ export default function EditContent({
         <div className="mt-6 flex justify-evenly px-8">
           <GeneralButton
             text="Cancel"
-            warning
+            secondary
             onClick={onClose}
             className="w-44"
           />

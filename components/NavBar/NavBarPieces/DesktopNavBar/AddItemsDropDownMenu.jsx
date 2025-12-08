@@ -10,7 +10,7 @@ export default function DropDownMenu() {
       as="div"
       className="relative inline-block text-left z-30"
     >
-      <MenuButton className="inline-flex justify-center px-4 py-2 text-xs font-medium text-subtleWhite hover:border-b-4 focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75">
+      <MenuButton className="inline-flex justify-center px-4 py-2 text-sm font-medium text-subtleWhite hover:border-b-4 focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75">
         Add
         <ChevronDownIcon
           aria-hidden="true"
@@ -24,7 +24,7 @@ export default function DropDownMenu() {
             {({ focus }) => (
               <Link
                 href="/addnames"
-                className={`flex items-center px-4 py-2 text-xs text-subtleWhite ${
+                className={`flex items-center px-4 py-2 text-sm text-subtleWhite ${
                   focus ? "bg-white/10 text-subtleWhite" : ""
                 }`}
               >
@@ -39,7 +39,7 @@ export default function DropDownMenu() {
 
               <Link
                 href="/adddescriptions"
-                className={`flex items-center px-4 py-2 text-xs text-subtleWhite ${
+                className={`flex items-center px-4 py-2 text-sm text-subtleWhite ${
                   focus ? "bg-white/10 text-subtleWhite" : ""
                 }`}
               >

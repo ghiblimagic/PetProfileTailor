@@ -29,7 +29,7 @@ export default function MobileNavBar() {
             {({ focus }) => (
               <Link
                 href="/"
-                className={`flex items-center px-4 py-2 text-xs text-subtleWhite ${
+                className={`flex items-center px-4 py-2 text-sm text-subtleWhite ${
                   focus ? "bg-white/10 text-subtleWhite" : ""
                 }`}
               >
@@ -40,7 +40,7 @@ export default function MobileNavBar() {
 
           <MenuItem disabled>
             <button
-              className="text-subtleWhite w-full text-left rounded-md px-2 py-2 text-xs font-bold bg-secondary cursor-not-allowed ml-2"
+              className="text-subtleWhite w-full text-left rounded-md px-2 py-2 text-sm font-bold bg-secondary cursor-not-allowed ml-2"
               disabled
             >
               Fetch/Find
@@ -51,7 +51,7 @@ export default function MobileNavBar() {
             {({ focus }) => (
               <Link
                 href="/fetchnames"
-                className={`flex items-center px-4 py-2 text-xs text-subtleWhite ${
+                className={`flex items-center px-4 py-2 text-sm text-subtleWhite ${
                   focus ? "bg-white/10 text-subtleWhite" : ""
                 }`}
               >
@@ -63,8 +63,20 @@ export default function MobileNavBar() {
           <MenuItem>
             {({ focus }) => (
               <Link
+                href="/fetchname"
+                className={`flex items-center px-4 py-2 text-sm text-subtleWhite ${
+                  focus ? "bg-white/10 text-subtleWhite" : ""
+                }`}
+              >
+                A Name
+              </Link>
+            )}
+          </MenuItem>
+          <MenuItem>
+            {({ focus }) => (
+              <Link
                 href="/fetchdescriptions"
-                className={`flex items-center px-4 py-2 text-xs text-subtleWhite ${
+                className={`flex items-center px-4 py-2 text-sm text-subtleWhite ${
                   focus ? "bg-white/10 text-subtleWhite" : ""
                 }`}
               >
@@ -75,7 +87,7 @@ export default function MobileNavBar() {
 
           <MenuItem disabled>
             <button
-              className="text-subtleWhite w-full text-left rounded-md px-2 py-2 text-xs font-bold bg-secondary cursor-not-allowed ml-2"
+              className="text-subtleWhite w-full text-left rounded-md px-2 py-2 text-sm font-bold bg-secondary cursor-not-allowed ml-2"
               disabled
             >
               Add
@@ -93,7 +105,7 @@ export default function MobileNavBar() {
             {({ focus }) => (
               <Link
                 href="/addnames"
-                className={`flex items-center px-4 py-2 text-xs text-subtleWhite ${
+                className={`flex items-center px-4 py-2 text-sm text-subtleWhite ${
                   focus ? "bg-white/10 text-subtleWhite" : ""
                 }`}
               >
@@ -107,7 +119,7 @@ export default function MobileNavBar() {
             {({ focus }) => (
               <Link
                 href="/adddescriptions"
-                className={`flex items-center px-4 py-2 text-xs text-subtleWhite ${
+                className={`flex items-center px-4 py-2 text-sm text-subtleWhite ${
                   focus ? "bg-white/10 text-subtleWhite" : ""
                 }`}
               >

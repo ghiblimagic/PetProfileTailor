@@ -30,6 +30,11 @@ async function handleRequest(req) {
       // If parsing fails (empty body), treat as GET
       source = {};
     }
+    //  Merge in query parameters too (so ?page=2 still works, otherwise you'll get page 1 over and over again because it won't see the page 2, 3, ect from the params)
+    const { searchParams } = new URL(req.url);
+    searchParams.forEach((value, key) => {
+      if (!source[key]) source[key] = value;
+    });
   } else if (method === "GET") {
     const { searchParams } = new URL(req.url);
     searchParams.forEach((value, key) => {
@@ -70,7 +75,7 @@ async function handleRequest(req) {
 
   const page = parseInt(source.page) || 1;
   const sortingValue = parseInt(source.sortingvalue) || -1;
-  const sortingProperty = source.sortingproperty || "createdAt";
+  const sortingProperty = source.sortingproperty || "likedByCount";
   const tags = source.tags;
   const profileUserId = source.profileUserId;
   const likedIds = source.likedIds;
@@ -81,8 +86,10 @@ async function handleRequest(req) {
   let filter = {};
 
   if (tags?.length) {
+    // console.log("tags in swr", tags);
     const tagIds = tags.map((id) => new mongoose.Types.ObjectId(id));
     filter.tags = { $all: tagIds };
+    // console.log("tag ids in swr", tagIds);
   }
 
   if (profileUserId) {
@@ -99,10 +106,25 @@ async function handleRequest(req) {
   try {
     const totalDocs = await Names.countDocuments(filter);
     const totalPagesInDatabase = Math.ceil(totalDocs / limit);
+    // console.log("filter in swr", filter);
+
+    // console.log(
+    //   "sortLogic",
+    //   sortLogic,
+    //   "page",
+    //   page,
+    //   "skip",
+    //   (page - 1) * limit,
+    // );
 
     const names = await Names.aggregate([
       { $match: filter },
-      { $sort: sortLogic },
+      {
+        $sort:
+          sortingProperty === "_id"
+            ? sortLogic // If sorting by _id, don't add tiebreaker
+            : { ...sortLogic, _id: 1 }, // Otherwise, add _id as tiebreaker
+      }, // _id in ascending order  *** notes below for tiebreaker
       { $skip: (page - 1) * limit },
       { $limit: limit },
 
@@ -177,166 +199,47 @@ async function handleRequest(req) {
   }
 }
 
-// import dbConnect from "@utils/db.js";
-// import Names from "@models/Name.js";
-// import mongoose from "mongoose";
+//################ NOTES FOR TIEBREAKER LOGIC ###########################
 
-// export default async function handler(req, res) {
-//   await dbConnect.connect();
+// each time the swr request is made, when items both have likedByCount = 0, the sort can return the items in different orders
+// by adding _id, its telling them to sort the items by _id too. This avoids duplicates entirely because it ensures the items on page 2, page 3 aren't sorted in a different order when they have the same likedByCount number.
 
-//   const limit = 50;
+// The Problem Without a Tiebreaker
 
-//   const method = req.method;
-//   const {
-//     page = 1,
-//     sortingvalue = -1,
-//     sortingproperty = "createdAt",
-//     tags,
-//     profileUserId,
-//   } = req.query;
-//   //https://stackoverflow.com/questions/70751313/how-can-i-pass-a-variable-in-sort-funtcion-of-mongobd
-//   let sortLogic = {};
-//   sortLogic[sortingproperty] = parseInt(sortingvalue);
+// The key insight: Without a unique field in your sort, documents with the same sortLogic value (like the same likedByCount) can be returned in non-deterministic order across different pages, causing duplicates or missing items.
 
-//   // console.log(
-//   //   "sortLogic",
-//   //   sortLogic,
-//   //   "sortingproperty",
-//   //   sortingproperty,
-//   //   "sortingvalue",
-//   //   sortingvalue,
-//   // );
-//   // console.log("tags", tags);
+// Let's say you have 3 documents with the same likedByCount:
 
-//   if (method === "DELETE" || method === "PUT") {
-//     res.status(405).json({ error: "Method not allowed" });
-//   }
+// { _id: "abc", content: "Name A", likedByCount: 5 }
+// { _id: "def", content: "Name B", likedByCount: 5 }
+// { _id: "xyz", content: "Name C", likedByCount: 5 }
 
-//   try {
-//     let source;
-//     if (method === "POST" && req.body && Object.keys(req.body).length > 0) {
-//       source = req.body; // POST with body
-//     } else if (method === "GET") {
-//       source = req.query; // regular GET
-//     } else {
-//       source = {}; // POST with empty body → treat as GET
-//     }
+// With only { likedByCount: -1 }, MongoDB doesn't guarantee which order these 3 documents will be returned in. On page 1 you might get ABC, but on page 2 (after skip), you might get documents in a different order like BAC, causing "Name B" to appear on both pages.
 
-//     // Merge query (for pagination/sorting) + body (for filters)
-//     const { tags, profileUserId, likedIds } = source;
+// why I saw only 2 items duplicate out of the 185
 
-//     console.log("req.body in api", req.body, "req.query in api", req.query);
-//     // filtering by tags logic
-//     let filter = {};
+// Items that don't duplicate:
 
-//     if (tags?.length) {
-//       const tagIds = tags.map((id) => new mongoose.Types.ObjectId(id));
-//       filter.tags = { $all: tagIds };
-//     }
+// ✅ Items with unique sort values (only one item has likedByCount = 7)
+// ✅ Items within the same page boundary (items 5-10 all on page 1)
+// ✅ Items where the "tie group" doesn't cross a page boundary
 
-//     // Filter by user ID if provided
-//     if (profileUserId) {
-//       // Ensure it’s a valid ObjectId
-//       filter.createdBy = new mongoose.Types.ObjectId(profileUserId);
-//     }
+// Items that can duplicate:
 
-//     if (likedIds?.length) {
-//       const likedObjectIds = likedIds.map(
-//         (id) => new mongoose.Types.ObjectId(id),
-//       );
-//       filter._id = { $in: likedObjectIds };
-//     }
+// ❌ Multiple items with the same sort value that happen to fall right at a page boundary (like positions 48-52 when limit is 50)
 
-//     const totalDocs = await Names.countDocuments(filter);
-//     const totalPagesInDatabase = Math.ceil(totalDocs / parseInt(limit));
+// The 50 vs 200 Item Mystery
+// You mentioned there were no duplicates at limit 200. This makes perfect sense!
+// With limit 50:
 
-//     const names = await Names.aggregate([
-//       // $match is at the top of the aggregation, so it’s efficient. Aka Mongo filters before doing $lookup or pagination
-//       { $match: filter },
+// More page boundaries = more chances for "tie groups" to be split across pages
+// Your duplicates were probably around items 48-52 or 98-102
 
-//       // Pagination
-//       { $sort: sortLogic },
-//       { $skip: (parseInt(page) - 1) * parseInt(limit) },
-//       { $limit: parseInt(limit) },
+// With limit 200:
 
-//       // Lookups
-//       {
-//         $lookup: {
-//           from: "users",
-//           localField: "createdBy",
-//           foreignField: "_id",
-//           as: "createdBy",
-//         },
-//       },
-//       { $unwind: "$createdBy" },
+// Fewer page boundaries = less chance a "tie group" gets split
+// The items that would duplicate at 50 per page are now safely within a single page
 
-//       {
-//         // will fill out the tags data from the objectIds stored in the name, but lookup will reorder the tags
-//         $lookup: {
-//           from: "nametags",
-//           localField: "tags",
-//           foreignField: "_id",
-//           as: "tagsLookup",
-//         },
-//       }, // Preserve original order of tags, so users see the tags in the order they added them // so when we mutate() following a name being edited, the newest tags show up at the end
-//       {
-//         $addFields: {
-//           // replacing the tags field with a reordered array based on tagsLookup
-//           tags: {
-//             $map: {
-//               input: "$tags",
-//               // we're looking at the original tags array of tag ObjectIds, before it was fleshed out with tags information in the lookup
-//               as: "tagId",
-//               in: {
-//                 // in expression determines what value goes into the new array
-//                 $arrayElemAt: [
-//                   // arrayElemAt picks the first (and only) element from the filtered array that passes
-//                   {
-//                     $filter: {
-//                       // Filters the $tagsLookup array (the joined full tag documents) for the tag._id that matches the current tagId Object Id
-//                       input: "$tagsLookup",
-//                       // the fleshed out but reordered tags array from lookup
-//                       as: "t",
-//                       cond: { $eq: ["$$t._id", "$$tagId"] }, //$$tagId current ObjectId from the original tags array
-//                     },
-//                   },
-//                   0,
-//                 ],
-//               },
-//             },
-//           },
-//         },
-//       },
-
-//       // Final projection
-//       {
-//         $project: {
-//           _id: 1,
-//           content: 1,
-//           notes: 1,
-//           tags: { tag: 1, _id: 1 },
-//           createdBy: {
-//             name: 1,
-//             profileName: 1,
-//             profileImage: 1,
-//             _id: 1,
-//           },
-//           likedByCount: 1, // use precomputed field
-//           updatedAt: 1,
-//           //vital for swr edit to work, its used as part of the content key
-//           // the key needs to change, or react won't render the edit updates, so we need a field thats always different, which updatedAt is perfect for
-//         },
-//       },
-//     ]);
-
-//     res.status(200).json({
-//       data: names,
-//       totalPagesInDatabase,
-//       currentPage: parseInt(page),
-//       totalDocs,
-//     });
-//   } catch (err) {
-//     console.error("API error:", err);
-//     res.status(500).json({ error: "Server error" });
-//   }
-// }
+// The Real Pattern
+// You likely have several items with likedByCount: 0 (or whatever your sort property is), and only the ones that were unlucky enough to be positioned right at a 50-item boundary got duplicated. The other 183 items either had unique values or weren't near boundaries.
+// That's why adding _id as a tiebreaker fixes it universally - even items with identical sort values now have a consistent, deterministic order regardless of where the page boundary falls!

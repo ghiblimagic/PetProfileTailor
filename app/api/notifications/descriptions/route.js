@@ -1,6 +1,6 @@
 import db from "@utils/db";
 // necessary for populate
-import Name from "@/models/Name";
+import Description from "@/models/Description";
 import User from "@/models/User";
 import DescriptionLike from "@/models/DescriptionLike";
 import { getSessionForApis } from "@/utils/api/getSessionForApis";

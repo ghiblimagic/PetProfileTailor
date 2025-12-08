@@ -21,6 +21,7 @@ function NewDescriptionWithTagsData() {
   const [submissionMessage, setSubmissionMessage] = useState("");
   const [descriptionAlreadyExists, setDescriptionExists] = useState(false);
   const [resetCheckContent, setResetCheckContent] = useState(false);
+  const [checkIsProcessing, setCheckIsProcessing] = useState(false);
 
   const { data: session } = useSession();
 
@@ -105,13 +106,6 @@ function NewDescriptionWithTagsData() {
           </li>
         </ul>
 
-        <CheckIfContentExists
-          apiString="/api/description/check-if-content-exists/"
-          disabled={disabled}
-          contentType="descriptions"
-          resetTrigger={resetCheckContent}
-        />
-
         <form onSubmit={handleDescriptionSubmission}>
           {!session && (
             <span className="mt-4 bg-red-800 p-2 text-subtleWhite font-bold border-2 border-yellow-300 block text-center">
@@ -134,7 +128,7 @@ function NewDescriptionWithTagsData() {
 disabled:text-errorTextColor "
             value={newDescription}
             onChange={(e) => {
-              setNewDescription(e.target.value.trimStart().toLowerCase());
+              setNewDescription(e.target.value.trimStart());
               if (submissionMessage !== "") {
                 setSubmissionMessage("");
               }
@@ -156,6 +150,17 @@ disabled:text-errorTextColor "
             </p>
           )}
 
+          <CheckIfContentExists
+            apiString="/api/description/check-if-content-exists/"
+            disabled={disabled}
+            contentType="descriptions"
+            resetTrigger={resetCheckContent}
+            addNamesPage={true}
+            value={newDescription}
+            checkIsProcessing={checkIsProcessing}
+            setCheckIsProcessing={setCheckIsProcessing}
+          />
+
           {/* NOTES SECTION           */}
 
           <label
@@ -164,11 +169,17 @@ disabled:text-errorTextColor "
           >
             Notes
           </label>
-          <span className="block mb-2">
+          <p className="block mb-2">
             {" "}
             Enter any notes to add. For example, explaining if it has any
             references to shows/popular culture, ect
-          </span>
+          </p>
+
+          <p className="block mb-2">
+            If you found it on a shelter/rescue&apos;s listing for a pet please
+            mention the organization&apos;s name so people can send some love
+            their way 😉
+          </p>
           <textarea
             type="text"
             id="noteinput"
@@ -177,7 +188,7 @@ disabled:text-errorTextColor rounded-2xl"
             value={notes}
             maxLength="800"
             onChange={(e) => {
-              setNotes(e.target.value.trimStart().toLowerCase());
+              setNotes(e.target.value.trimStart());
               if (submissionMessage !== "") {
                 setSubmissionMessage("");
               }

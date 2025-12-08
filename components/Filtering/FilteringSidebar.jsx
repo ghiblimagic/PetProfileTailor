@@ -37,7 +37,7 @@ function FilteringSidebar({
         <h4 className="text-subtleWhite text-center pl-4 ">All Filters </h4>
         <ClosingXButton
           onClick={() => toggleDrawer(false)}
-          className="mr-5"
+          className="mr-5 shadow-none"
         />
       </div>
       {/* scrollable content */}

@@ -69,6 +69,7 @@ export default function ToggleOneNotificationPage({
 
   // Extract notifications if SWR exists
   const thankDocs = thanksSWR?.SWRNotifications || [];
+  console.log("this is thank docs", thankDocs);
   const nameDocs = namesSWR?.SWRNotifications || [];
   const descDocs = descriptionsSWR?.SWRNotifications || [];
 

@@ -37,7 +37,7 @@ export default function StyledCheckbox({
         // clip + clip-path combo makes it truly invisible.
         // This is the same underlying technique used by modern screen-reader-only utilities like sr-only, but avoids the position: absolute; left: 0 that can misbehave in specific mobile browsers
 
-        className="peer absolute m-0 h-[1px] w-[1px] overflow-hidden whitespace-nowrap border-0 p-0"
+        className="peer fixed top-0 left-0  m-0 h-[1px] w-[1px] overflow-hidden whitespace-nowrap border-0 p-0"
         style={{ clip: "rect(0 0 0 0)", clipPath: "inset(50%)" }}
         disabled={disabled}
       />

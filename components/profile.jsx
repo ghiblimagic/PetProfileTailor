@@ -34,6 +34,9 @@ export default function Profile({
 
   const [showProfileEditPage, setShowProfileEditPage] = useState(false);
   const [profileChanged, setProfileChange] = useState(false);
+  const [location, setLocation] = useState(userData.location);
+  const [bio, setBio] = useState(userData.bio);
+  const [avatar, setAvatar] = useState(userData.profileImage);
 
   // const [showFollowersList, setShowFollowersListPage] = useState(false);
 
@@ -87,7 +90,7 @@ export default function Profile({
                     <div className="relative">
                       <ProfileImage
                         divStyling="min-h-20 max-w-20 mr-4 mt-3 min-w-10 max-h-12"
-                        profileImage={userData.profileImage}
+                        profileImage={avatar}
                         layout="responsive"
                         className="rounded-2xl"
                         width={100}
@@ -144,14 +147,14 @@ export default function Profile({
                     />
                   )}
 
-                  {userData.location && (
+                  {location && (
                     <div className="text-sm leading-normal mt-4 mb-2 font-bold ">
                       <FontAwesomeIcon
                         icon={faLocationDot}
                         className="mr-2 text-lg "
                       />
 
-                      <span className="mr-2 text-lg">{userData.location}</span>
+                      <span className="mr-2 text-lg">{location}</span>
                     </div>
                   )}
                 </div>
@@ -162,7 +165,7 @@ export default function Profile({
                       <span className="text-lg font-bold">About:</span>
 
                       <p className="leading-relaxed">
-                        {userData.bio || "No bio written yet"}
+                        {bio || "No bio written yet"}
                       </p>
                     </div>
                   </div>
@@ -198,6 +201,12 @@ export default function Profile({
                 sessionFromServer={session}
                 setShowProfileEditPage={updateSetShowProfileEditPage}
                 setProfileChange={updateSetProfileChange}
+                setLocation={setLocation}
+                location={location}
+                setBio={setBio}
+                bio={bio}
+                avatar={avatar}
+                setAvatar={setAvatar}
               />
             )}
 

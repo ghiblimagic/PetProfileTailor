@@ -128,9 +128,7 @@ export default function EditSuggestion({
         suggestionSubmission,
       );
 
-      toast.success(
-        `Thank you for your suggestion! Suggestion successfully sent`,
-      );
+      toast.success(`Suggestion successfully edited!`);
 
       addSuggestion(
         dataType,
@@ -178,7 +176,7 @@ export default function EditSuggestion({
   };
 
   return (
-    <div className=" mx-auto bg-primary rounded-lg  border border-subtleWhite ">
+    <div className=" mx-auto bg-primary rounded-lg  border border-subtleWhite max-w-4xl ">
       {loading ? (
         <LoadingSpinner />
       ) : (
@@ -194,21 +192,21 @@ export default function EditSuggestion({
             <div className={` mb-4`}>
               <div className=" mb-2 text-subtleWhite sm:px-4 ">
                 <section className="my-6">
-                  <p className="text-center mb-3">
-                    suggestions can be edited{" "}
-                    <strong>until they are being reviewed</strong>
-                  </p>
-                  <p>
-                    {" "}
-                    To prevent harrassment, the submissions will be sent to an
-                    admin not the original poster
-                  </p>
-
                   {!session && (
                     <MustLoginMessage text="edit or delete a suggestion" />
                   )}
 
                   <h2 className="text-center  text-2xl ">Edit Suggestion</h2>
+
+                  <p className="text-center mb-3">
+                    Suggestions can be edited{" "}
+                    <strong>until they are being reviewed</strong>
+                  </p>
+                  <p className="text-center mb-3">
+                    {" "}
+                    To prevent harrassment, the submissions will be sent to an
+                    admin not the original poster
+                  </p>
 
                   <p className="text-center mb-3">
                     ❗ Note:{" "}
@@ -230,7 +228,7 @@ export default function EditSuggestion({
                       tags are incorrect in the textbox at the bottom. Thank
                       you!
                     </p>
-                    <div className="flex justify-center flex-wrap">
+                    <div className="flex  flex-col gap-4 justify-center flex-wrap">
                       {contentInfo.tags && contentInfo.tags.length > 0 ? (
                         contentInfo.tags.map((tag) => (
                           <StyledCheckbox

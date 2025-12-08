@@ -15,8 +15,8 @@ export default function DeleteContentNotification({
     >
       <div className="fixed inset-0 bg-secondary bg-opacity-75 transition-opacity"></div>
 
-      <div className="fixed inset-0 z-10 overflow-y-auto">
-        <div className="p-4 text-center sm:items-center sm:p-0 max-w-3xl mx-auto my-2">
+      <div className="fixed inset-0 z-10 flex items-center justify-center overflow-y-auto">
+        <div className="p-4 text-center sm:p-0 max-w-3xl mx-auto">
           <div
             className="mx-auto flex flex-col font-semibold text-secondary bg-primary
               border-2 border-violet-400 border-dotted 
@@ -44,10 +44,13 @@ export default function DeleteContentNotification({
                 />
               </svg>
 
-              <p className="mb-4 text-subtleWhite  p-5  ">
+              <p className="mb-4 text-subtleWhite  pt-5  ">
                 Are you sure you want to delete this?
               </p>
 
+              <p className="mb-4 text-subtleWhite pb-4 ">
+                This cannot be undone.
+              </p>
               <div className="flex justify-center items-center space-x-6">
                 <GeneralButton
                   warning
@@ -55,7 +58,7 @@ export default function DeleteContentNotification({
                   text="Yes, I'm sure"
                 />
                 <GeneralButton
-                  subtle
+                  tertiary
                   onClick={() => setShowDeleteConfirmation(false)}
                   text="No, cancel"
                 />

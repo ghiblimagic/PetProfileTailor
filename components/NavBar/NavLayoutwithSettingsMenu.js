@@ -2,6 +2,7 @@
 
 import { useSession, signOut } from "next-auth/react";
 import { useEffect } from "react";
+import Image from "next/image";
 import Link from "next/link";
 // //Special jsx code that allows us to build links. Allows us to keep everything on a single page (makes it a SPA), rather than using a href="page link", which would make us lose any state and require that we get a new file sent from the server
 
@@ -31,7 +32,7 @@ export default function NavLayoutwithSettingsMenu() {
     "absolute right-0 mt-2 w-56 origin-top-right rounded-md bg-primary shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none";
 
   const menuItemStyling = function (focus) {
-    return `block px-4 py-2 text-xs text-gray-300 ${
+    return `block px-4 py-2 text-sm text-gray-300 ${
       focus ? "bg-white/10 text-white" : ""
     }`;
   };
@@ -58,17 +59,31 @@ export default function NavLayoutwithSettingsMenu() {
     <>
       <div className="flex flex-col justify-between bg-primary">
         <header className="my-1">
-          <nav className="flex h-12 items-center pl-2 justify-between  bg-primary">
+          <nav
+            className="flex h-12 items-center pl-2 justify-between  bg-primary"
+            role="navigation"
+            aria-label="Primary navigation"
+          >
             {/* HAMBURGER MENU BUTTON */}
 
             <MobileNavBar />
 
             <LinkButton
-              className="text-lg font-extrabold text-yellow-300 
-              hidden lg:block
-              mx-auto ml-2 hover:text-subtleWhite"
+              className="text-center gap-2 text-lg font-extrabold text-yellow-300 
+             hidden lg:flex mx-auto ml-2 hover:text-subtleWhite"
               href="/"
               text="HomewardTails"
+              icon={
+                <Image
+                  src="/icon.png"
+                  width="28"
+                  height="28"
+                  priority
+                  unoptimized
+                  style={{ objectPosition: "center", objectFit: "scale-down" }}
+                  alt=""
+                />
+              }
             />
 
             <NavBarNames />
@@ -106,7 +121,7 @@ export default function NavLayoutwithSettingsMenu() {
                       {({ focus }) => (
                         <Link
                           href="/dashboard"
-                          className={`flex items-center px-4 py-2 text-xs text-subtleWhite ${
+                          className={`flex items-center px-4 py-2 text-sm text-subtleWhite ${
                             focus ? "bg-white/10 text-subtleWhite" : ""
                           }`}
                         >
@@ -122,7 +137,7 @@ export default function NavLayoutwithSettingsMenu() {
                             href={`${
                               process.env.NEXT_PUBLIC_BASE_FETCH_URL
                             }profile/${session.user.profileName.toLowerCase()}`}
-                            className={`flex items-center px-4 py-2 text-xs text-subtleWhite ${
+                            className={`flex items-center px-4 py-2 text-sm text-subtleWhite ${
                               focus ? "bg-white/10 text-subtleWhite" : ""
                             }`}
                           >
@@ -136,11 +151,24 @@ export default function NavLayoutwithSettingsMenu() {
                       {({ focus }) => (
                         <Link
                           href={`/editsettings`}
-                          className={`flex items-center px-4 py-2 text-xs text-subtleWhite ${
+                          className={`flex items-center px-4 py-2 text-sm text-subtleWhite ${
                             focus ? "bg-white/10 text-subtleWhite" : ""
                           }`}
                         >
                           Settings
+                        </Link>
+                      )}
+                    </MenuItem>
+
+                    <MenuItem>
+                      {({ focus }) => (
+                        <Link
+                          href={`/contact`}
+                          className={`flex items-center px-4 py-2 text-sm text-subtleWhite ${
+                            focus ? "bg-white/10 text-subtleWhite" : ""
+                          }`}
+                        >
+                          Contact
                         </Link>
                       )}
                     </MenuItem>
@@ -165,13 +193,13 @@ export default function NavLayoutwithSettingsMenu() {
                     basic
                     href="/login"
                     text="login"
-                    className="text-xs"
+                    className="text-sm"
                   />
                   <LinkButton
                     defaultStyle
                     href="/register"
                     text="register"
-                    className="text-xs"
+                    className="text-sm"
                   />
                 </div>
               )}

@@ -18,7 +18,7 @@ export function checkMultipleFieldsBlocklist(fields) {
 export function respondIfBlocked(blockResult) {
   if (!blockResult) return null;
 
-  const { value, blockedBy, blockType } = blockResult;
+  const { value, fieldName, blockedBy, blockType } = blockResult;
   return Response.json(
     {
       message: bannedWordsMessage(value, fieldName, blockedBy, blockType),
