@@ -28,6 +28,11 @@ export async function sendContactEmail(prevState, formData) {
     return { success: false, error: "Invalid form submission." };
   }
 
+  const honeypot = formData.get("website");
+  if (honeypot) {
+    return { success: false, error: "Invalid form submission." };
+  }
+
   //  ********************  Validation  ********************
   if (!name || !email || !message || !captchaToken) {
     return { success: false, error: "All fields are required." };
