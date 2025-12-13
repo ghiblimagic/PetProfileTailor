@@ -98,6 +98,34 @@ export default function ContactPage() {
           onSubmit={handleSubmit}
           className="flex flex-col max-w-md w-full rounded-2xl shadow-lg"
         >
+          {/* 2 HONEYPOT FIELDS - Hidden from humans, filled by bots */}
+          <input
+            type="text"
+            name="website"
+            tabIndex="-1"
+            autoComplete="off"
+            style={{
+              position: "absolute",
+              left: "-9999px",
+              width: "1px",
+              height: "1px",
+            }}
+            aria-hidden="true"
+          />
+          <input
+            type="text"
+            name="phone"
+            tabIndex="-1"
+            autoComplete="off"
+            style={{
+              position: "absolute",
+              left: "-9999px",
+              width: "1px",
+              height: "1px",
+            }}
+            aria-hidden="true"
+          />
+
           <StyledInput
             name="name"
             placeholder="Name"

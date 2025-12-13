@@ -9,6 +9,10 @@ import {
 } from "@/utils/api/rateLimiter";
 import ContactEmailCopy from "@/components/EmailTemplates/contact-copy-to-submitter";
 import ContactNotification from "@/components/EmailTemplates/contact-notification";
+import {
+  detectBotPatterns,
+  hasRealisticContent,
+} from "@utils/api/detectBotPatterns";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
@@ -18,14 +22,42 @@ export async function sendContactEmail(prevState, formData) {
   const message = formData.get("message");
   const captchaToken = formData.get("captchaToken");
 
+  // HONEYPOT CHECK - if filled, it's a bot
+  const honeypotWebsite = formData.get("website");
+  const honeypotPhone = formData.get("phone");
+  if (honeypotWebsite || honeypotPhone) {
+    console.log("Bot detected: Honeypot filled", {
+      honeypotWebsite,
+      honeypotPhone,
+    });
+    return { success: false, error: "Invalid form submission." };
+  }
+
   // Get client IP early for logging and rate limiting
   const headersList = await headers();
   const clientIP = getClientIP(headersList);
 
-  //  ********************  kick out requests from bots, who will usually submit quickly  ********************
+  //  Time-based checks,  kick out requests from bots, who will usually submit quickly
   const formStartTime = parseInt(formData.get("formStartTime"));
   if (!formStartTime || isNaN(formStartTime)) {
     return { success: false, error: "Invalid form submission." };
+  }
+
+  const submissionTime = Date.now();
+  const timeSpent = submissionTime - formStartTime;
+
+  if (timeSpent < 3000) {
+    // Less than 3 seconds
+    console.log("Bot detected: Too fast", { timeSpent, ip: clientIP });
+    return { success: false, error: "Form submitted too quickly." };
+  }
+
+  if (timeSpent > 3600000) {
+    // 1 hour
+    return {
+      success: false,
+      error: "Form session expired. Please refresh and try again.",
+    };
   }
 
   //  ********************  Validation  ********************
@@ -42,20 +74,24 @@ export async function sendContactEmail(prevState, formData) {
     return { success: false, error: "Input too long." };
   }
 
-  const submissionTime = Date.now();
-  const timeSpent = submissionTime - formStartTime;
+  // BOT PATTERN DETECTION
 
-  if (timeSpent < 3000) {
-    // Less than 3 seconds
-    return { success: false, error: "Form submitted too quickly." };
+  if (detectBotPatterns(message)) {
+    console.log("Bot detected: Suspicious message pattern", {
+      message: message.substring(0, 50),
+      ip: clientIP,
+    });
+    return { success: false, error: "Message contains invalid content." };
   }
 
-  if (timeSpent > 3600000) {
-    // 1 hour
-    return {
-      success: false,
-      error: "Form session expired. Please refresh and try again.",
-    };
+  // REALISTIC CONTENT CHECK
+  if (!hasRealisticContent(name, message)) {
+    console.log("Bot detected: Unrealistic content", {
+      name,
+      messagePreview: message.substring(0, 50),
+      ip: clientIP,
+    });
+    return { success: false, error: "Please enter a valid message." };
   }
 
   //  ********************  Recaptcha  ********************
