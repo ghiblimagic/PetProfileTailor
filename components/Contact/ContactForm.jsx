@@ -152,6 +152,15 @@ export default function ContactPage() {
             className="bg-secondary mt-3"
           />
 
+          <input
+            type="text"
+            name="website"
+            tabIndex="-1"
+            autoComplete="off"
+            style={{ position: "absolute", left: "-9999px" }}
+            aria-hidden="true"
+          />
+
           {recaptchaLoading && (
             <span className="text-center text-sm text-gray-400 mt-2">
               Loading security verification...
