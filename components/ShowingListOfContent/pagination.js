@@ -59,17 +59,50 @@ export default function Pagination({
   }, [windowStart, windowEnd, totalLoadedPages]);
   // useMemo only recalculates when the dependencies actually change, not on every render
 
-  const preLoadNextPage = () => {
+  const preLoadNextPage = (overrides = {}) => {
+    // called when:
+    // 1. When clicking the next arrow (lastPageHandler)
+    // 2. When changing items per page (resetItemsPerPage)
+
+    // Solves bug:
+    // overrides handle a timing bug where preLoadNextPage was using the old totalLoadedPages state value since react updates are asynchronous. Instead the function that calls preLoadNextPage calculates what this value will be and passes it as overrides
+    // Behavior of bug: when there was 72 items and 50 items per page were selected, but only 1 page icon had shown and the next page icon was greyed out.  It had given a false sense of having more pages we actually had with the new items-per-page.
+
+    // Using buggy OLD state values:
+    //currentPage + 2 >= totalLoadedPages  // State value = 5
+    //1 + 2 >= 5
+    //3 >= 5  // FALSE ❌
+    //Why it failed: The old totalLoadedPages of 5 made it think "we have 5 pages loaded, you're on page 1, that's plenty of buffer!" So it didn't preload.
+
+    // Using overrides solution:
+    // const newTotalLoadedPages = Math.ceil(50 / 50) = 1
+    // currentPage + 2 >= loadedPages  // Calculated value = 1
+    // 1 + 2 >= 1
+    // 3 >= 1  // TRUE ✅
+
+    // Why it works: With 50 per page, those same 50 items only make 1 page, so we're at the edge and need to preload!
+
+    const currentPage = overrides.currentPage ?? currentUiPage;
+    const loadedPages = overrides.totalLoadedPages ?? totalLoadedPages;
+    const skipCooldown = overrides.skipCooldown ?? false; // Add flag
+
     // If we're at the last loaded page and there's more data to fetch
     if (
       // we're going to pretend we're 2 pages ahead, so we can have the next pages loaded ahead of time
       // so theres no flicker of the pagination > button being greyed out
-      currentUiPage + 2 >= totalLoadedPages &&
-      totalLoadedPages < totalPagesInDatabase
+      currentPage + 2 >= loadedPages &&
+      loadedPages < totalPagesInDatabase
     ) {
       // Trigger SWR to fetch next chunk
       setSize(size + 1);
-      startCooldown(paginationCooldownRef, setRemainingPaginationCooldown, 15);
+      if (!skipCooldown) {
+        // Only cooldown for manual clicks
+        startCooldown(
+          paginationCooldownRef,
+          setRemainingPaginationCooldown,
+          15,
+        );
+      }
       return;
     }
   };
@@ -80,19 +113,29 @@ export default function Pagination({
     // move user back to page 1 visually and through swr, since we're changing how we're switching to new database logic
     setCurrentUiPage(1);
     setWindowStart(1); // reset visible pagination window, so we're seeing items 1-50 instead of being stuck at 150 of 233 ect
-    preLoadNextPage();
+
+    // Calculate what totalLoadedPages WILL BE with the new itemsPerPage
+    const newTotalLoadedPages = Math.ceil(amountOfDataLoaded / newPerPage);
+
+    // Pass the future values!
+    preLoadNextPage({
+      currentPage: 1,
+      totalLoadedPages: newTotalLoadedPages,
+      skipCooldown: true, // Don't show cooldown for automatic preload
+    });
   };
 
   const lastPageHandler = () => {
+    if (remainingPaginationCooldown > 0) {
+      return;
+    }
+
     // If we have more pages loaded, just move to the next UI page
 
     if (currentUiPage < totalLoadedPages) {
       updateWindow(currentUiPage + 1);
       setCurrentUiPage(currentUiPage + 1);
     }
-
-    if ((remainingPaginationCooldown > 0) & (currentUiPage > totalLoadedPages))
-      return;
 
     // If we're at the last loaded page and there's more data to fetch
     preLoadNextPage();
@@ -179,13 +222,12 @@ export default function Pagination({
       </div>
 
       {/* PAGINATION ARROWS */}
-      {remainingPaginationCooldown !== 0 &&
-        currentUiPage === totalLoadedPages && (
-          <p className="text-subtleWhite mx-auto">
-            {" "}
-            {`Please wait ${remainingPaginationCooldown} secs`}
-          </p>
-        )}
+      {remainingPaginationCooldown !== 0 && (
+        <p className="text-subtleWhite mx-auto">
+          {" "}
+          {`Please wait ${remainingPaginationCooldown} secs`}
+        </p>
+      )}
 
       <div className="flex flex-wrap gap-2 justify-center my-auto items-center ">
         <button
