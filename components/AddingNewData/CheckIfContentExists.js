@@ -108,7 +108,9 @@ export default function CheckIfContentExists({
     <section className="text-center  pb-4 m-6">
       <h4 className="font-bold block pt-4 m-4 text-xl ">
         {" "}
-        {`Check if ${contentType === "names" ? "name" : "description"} exists:`}
+        {`Check if a ${
+          contentType === "names" ? "name" : "description"
+        } exists:`}
       </h4>
 
       <button
