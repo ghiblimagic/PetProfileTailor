@@ -9,7 +9,7 @@ export default function Footer() {
     <footer className="text-subtleWhite text-sm py-4 px-4 bg-secondary border-t-2 border-violet-400 ">
       {/* we want the footer to be as large as the screen, while the content is max-w-7xl */}
       {/* **************** LOGO *************** */}
-      <section className="max-w-7xl grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6 items-start justify-items-center md:justify-items-center ml-2 md:mx-auto ">
+      <section className="max-w-7xl grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6 items-start justify-items-start md:justify-items-center ml-2 md:mx-auto ">
         <div className="text-left  mt-2  ">
           <Link
             href="/"
