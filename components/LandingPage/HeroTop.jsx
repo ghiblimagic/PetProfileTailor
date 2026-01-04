@@ -42,6 +42,7 @@ const HeroTop = ({
           src={imageSrc}
           fill
           priority
+          unoptimized
           className="opacity-80"
           style={{ objectPosition: "center", objectFit: "cover" }}
           alt=""

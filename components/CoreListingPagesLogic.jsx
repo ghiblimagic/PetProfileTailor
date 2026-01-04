@@ -129,6 +129,7 @@ export default function CoreListingPageLogic({
       toggleDrawer(false);
     }
     setCurrentUiPage(1);
+
     setSize(1);
   };
 
@@ -281,6 +282,7 @@ export default function CoreListingPageLogic({
               remainingSortCooldown={remainingSortCooldown}
               sortingValue={sortingValue}
               sortingProperty={sortingProperty}
+              isValidating={isValidating}
             />
 
             <section className="w-full">

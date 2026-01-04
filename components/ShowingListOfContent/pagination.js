@@ -19,6 +19,7 @@ export default function Pagination({
   remainingSortCooldown,
   sortingValue,
   sortingProperty,
+  isValidating,
 }) {
   const paginationCooldownRef = useRef(null);
   const [remainingPaginationCooldown, setRemainingPaginationCooldown] =
@@ -43,7 +44,34 @@ export default function Pagination({
     );
 
     setTotalLoadedPages(calculatedTotalLoadedPages);
-  }, [amountOfDataLoaded, size, itemsPerPage]);
+
+    // handles edge case where we're at the exact boundary after filters change, we're reached the edge of the data from that chunk (50 items for chunk 1, when we select 50 items per page)
+
+    // unfortunately needed because of this bug:
+    // bug: even if we did tell CoreListingsPageLogic to load 2 chunks when
+    // 1. 50 items per page
+    // 2. just applied new filters, the 2nd chunk doesn't load in time
+    // result would be: render with only the page 1 button, no page 2. Even though chunk 2 DOES have that data
+
+    // so this useEffect is necessary so it knows to preload the next 2 page worth of chunks if we're reached the end of the chunks data (50 items)
+    if (
+      currentUiPage + 1 >= calculatedTotalLoadedPages &&
+      calculatedTotalLoadedPages < totalPagesInDatabase &&
+      remainingPaginationCooldown === 0
+    ) {
+      preLoadNextPage({
+        currentPage: currentUiPage,
+        totalLoadedPages: calculatedTotalLoadedPages,
+        skipCooldown: true,
+      });
+    }
+  }, [
+    amountOfDataLoaded,
+    itemsPerPage,
+    currentUiPage,
+    totalPagesInDatabase,
+    remainingPaginationCooldown,
+  ]);
 
   const windowEnd = Math.min(windowStart + windowSize - 1, totalLoadedPages);
 
@@ -56,13 +84,21 @@ export default function Pagination({
     }
 
     return numbers;
-  }, [windowStart, windowEnd, totalLoadedPages]);
+  }, [windowStart, windowEnd, totalLoadedPages, isValidating]);
   // useMemo only recalculates when the dependencies actually change, not on every render
 
   const preLoadNextPage = (overrides = {}) => {
     // called when:
     // 1. When clicking the next arrow (lastPageHandler)
-    // 2. When changing items per page (resetItemsPerPage)
+    // 2. When changing items per page (resetItemsPerPage), if we keep the current filters and select 60 items per pages which is equal to the chunk from the database, it will update correctly
+
+    // DOESN"T WORK WHEN
+    // 1. if we have 60 items per page AND select new filters, since thats the amount we get from the database.
+    // Solution: only let users select 1-50 items per page
+    // why: users don't need 60 items per page and fixing it would require either
+    // 1. adding another useEffect in this component to detect when we're at the exact edge (60 items) and to preload more
+    // 2. callback ref from coreListingPage to pagination, which triggers preload when filters are applied after a brief delay with setTimeOut
+    // 3. in coreListingPage have handleApplyFIlters check if they're looking for 60 items per page and click apply filters, it will load an entire extra chunk (so 120 items)
 
     // Solves bug:
     // overrides handle a timing bug where preLoadNextPage was using the old totalLoadedPages state value since react updates are asynchronous. Instead the function that calls preLoadNextPage calculates what this value will be and passes it as overrides
@@ -130,6 +166,10 @@ export default function Pagination({
       return;
     }
 
+    if (isValidating) {
+      return;
+    }
+
     // If we have more pages loaded, just move to the next UI page
 
     if (currentUiPage < totalLoadedPages) {
@@ -177,6 +217,14 @@ export default function Pagination({
             <option value="30">30</option>
             <option value="40">40</option>
             <option value="50">50</option>
+            {/* don't give an option 60 since it leads to an edge case since 60 is the amount of items we grab from the database each time (the chunk size)
+              edge case:
+                    if you search by 60 items per page and apply a new filter, pagination will show:
+                        only the page 1 button, the next page button is greyed out as if theres no more items
+                        but underneath it says 1-60 of 352 Items   
+                
+              otherwise I'd have to add extra logic to the useEffect to detect when data has loaded but w're at the edge and need more data. 
+            */}
           </select>
           <label
             className="text-white ml-2"
@@ -278,7 +326,13 @@ export default function Pagination({
             icon={faChevronCircleRight}
             className="text-[38px]   "
             color={`${
-              currentUiPage < totalLoadedPages ? "rgb(221 214 254)" : "grey" //subtle white or grey
+              (currentUiPage < totalLoadedPages &&
+                remainingPaginationCooldown === 0) ||
+              (totalLoadedPages < totalPagesInDatabase &&
+                !isValidating &&
+                remainingPaginationCooldown === 0)
+                ? "rgb(221 214 254)"
+                : "grey"
             }`}
           />
         </button>
