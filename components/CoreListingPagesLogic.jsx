@@ -185,6 +185,7 @@ export default function CoreListingPageLogic({
             remainingFilterCooldown={remainingFilterCooldown}
             filterCooldownRef={filterCooldownRef}
             startCooldown={startCooldown}
+            setFilterTagsIds={setFilterTagsIds}
           />
         </div>
       </Drawer>

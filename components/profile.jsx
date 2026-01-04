@@ -81,7 +81,7 @@ export default function Profile({
         <section className=" sm:w-80 text-subtleWhite ">
           <div className="px-2 ">
             <div
-              className="relative flex flex-col min-w-0 break-words bg-violet-950 mb-6 shadow-xl rounded-lg mt-16
+              className="relative flex flex-col min-w-0 break-words bg-[#1b1e82] mb-6  rounded-lg mt-16
     shadow-slate-900/70"
             >
               <div className="px-0">

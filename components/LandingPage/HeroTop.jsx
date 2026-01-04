@@ -73,7 +73,7 @@ const HeroTop = ({
               />
 
               <button
-                className="btn btn-primary w-full mt-2 shadow-lg shadow-secondary bg-subtleBackground text-white hover:text-white border-b-4 border-subtleWhite hover:border-blue-700 hover:bg-blue-500 font-black text-sm h-10 rounded-full tracking-widest"
+                className="btn  w-full mt-2 bg-secondary text-white hover:text-white border-b-4 border-subtleWhite hover:border-blue-700 hover:bg-blue-500 font-black text-sm h-10 rounded-full tracking-widest"
                 onClick={updateFunState}
               >
                 Fun
@@ -87,7 +87,7 @@ const HeroTop = ({
               />
 
               <button
-                className="btn btn-primary w-full mt-2 shadow-lg shadow-secondary bg-subtleBackground text-white hover:text-white border-b-4 border-subtleWhite hover:border-blue-700 hover:bg-blue-500 font-black text-sm  h-10 rounded-full tracking-widest focus:ring-white"
+                className="btn w-full mt-2 bg-secondary text-white hover:text-white border-b-4 border-subtleWhite hover:border-blue-700 hover:bg-blue-500 font-black text-sm  h-10 rounded-full tracking-widest focus:ring-white"
                 onClick={updateImpactfulState}
               >
                 Impactful
@@ -101,7 +101,7 @@ const HeroTop = ({
                 color="white"
               />
               <button
-                className="btn btn-primary w-full mt-2 shadow-lg shadow-secondary bg-subtleBackground text-white hover:text-white border-b-4 border-subtleWhite hover:border-blue-700 hover:bg-blue-500 font-black text-sm  h-10 rounded-full tracking-widest px-0"
+                className="btn  w-full mt-2 bg-secondary text-white hover:text-white border-b-4 border-subtleWhite hover:border-blue-700 hover:bg-blue-500 font-black text-sm  h-10 rounded-full tracking-widest px-0"
                 onClick={updateTailorState}
               >
                 Fitting

@@ -50,11 +50,9 @@ export default function Dashboard({
       <div className="container mx-auto px-4 md:px-12 xl:px-32 ">
         <div className="text-center text-subtleWhite bg-primary">
           <div
-            className="block rounded-2xl shadow-lg px-6 py-2 md:py-4 md:px-12"
+            className="block rounded-2xl shadow-lg px-6 py-2 md:py-4 md:px-12 blur-with-color"
             style={{
               marginTop: "-70px",
-              background: "hsla(273, 98%, 35%, 0.4)",
-              backdropFilter: "blur(20px)",
             }}
           >
             {!session ? (

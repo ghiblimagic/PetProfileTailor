@@ -16,7 +16,7 @@ module.exports = {
       },
       colors: {
         secondary2: "#140223",
-        subtleBackground: "rgb(99,64,153)",
+        subtleBackground: "#3154bd", //"rgb(99,64,153)",
         subtleWhite: "rgb(221 214 254 / var(--tw-bg-opacity, 1))",
         accent: {
           DEFAULT: "hsl(var(--accent))",
@@ -37,11 +37,11 @@ module.exports = {
           foreground: "hsl(var(--popover-foreground))",
         },
         primary: {
-          DEFAULT: "#0c0516", //darkest purple
+          DEFAULT: "#050816", //darkest purple //"#0c0516"
           foreground: "hsl(var(--primary-foreground))",
         },
         secondary: {
-          DEFAULT: "#1b073b", // slightly lighter
+          DEFAULT: "#07083b", //"#1b073b", // slightly lighter
           foreground: "hsl(var(--secondary-foreground))",
         },
         muted: {

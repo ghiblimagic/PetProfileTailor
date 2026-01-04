@@ -118,3 +118,8 @@ input::file-selector-button:hover {
     @apply font-sans;
   }
 }
+
+.blur-with-color {
+  background-color: hsla(241, 63%, 49%, 0.5);
+  backdrop-filter: blur(20px);
+}
