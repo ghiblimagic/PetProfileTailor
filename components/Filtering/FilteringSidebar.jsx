@@ -112,6 +112,13 @@ function FilteringSidebar({
       </div>
       <div className="flex justify-evenly p-4 border-t border-white bg-primary">
         <GeneralButton
+          text="reset"
+          active
+          className="text-center bg-subtleWhite"
+          onClick={() => handleApplyFilters("reset")}
+          disabled={isLoading}
+        />
+        <GeneralButton
           text={
             remainingFilterCooldown
               ? `wait ${remainingFilterCooldown} secs`
@@ -120,13 +127,6 @@ function FilteringSidebar({
           className="text-center"
           onClick={() => onApplyClick()}
           disabled={isLoading || remainingFilterCooldown}
-        />
-        <GeneralButton
-          text="reset"
-          active
-          className="text-center bg-subtleWhite"
-          onClick={() => handleApplyFilters("reset")}
-          disabled={isLoading}
         />
       </div>
     </div>
