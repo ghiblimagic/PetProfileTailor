@@ -13,9 +13,6 @@ export default async function Postid({ params }) {
   // decodeURIComponent gets rid of %20, replaces with a space
   //   .replace(/\s+/g, "") takes care of any space/tabs/line breaks in the middle
 
-  console.log("name from params", name, "params", params);
-  console.log(`${spaceAddedBackName} spaceAddedBackName`);
-
   await dbConnect.connect();
 
   const nameData = await leanWithStrings(
@@ -29,8 +26,6 @@ export default async function Postid({ params }) {
       })
       .populate({ path: "tags", select: ["tag"] }),
   );
-
-  console.log("nameData", nameData);
 
   if (!nameData) {
     notFound(); // tells Next.js to show the 404 page
