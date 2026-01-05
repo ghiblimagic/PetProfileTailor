@@ -120,13 +120,13 @@ export default function CoreListingPageLogic({
       : setFilterTagsIds(filterTagsIds.filter((tag) => tag != value));
   };
 
-  const handleApplyFilters = (reset) => {
+  const handleApplyFilters = (reset, quickSearchTags) => {
     if (reset) {
       setFilterTagsIds([]);
+      setTriggerApplyFilters([]);
     } else {
       startCooldown(filterCooldownRef, setRemainingFilterCooldown);
-      setTriggerApplyFilters(filterTagsIds);
-      toggleDrawer(false);
+      setTriggerApplyFilters(quickSearchTags ?? filterTagsIds);
     }
     setCurrentUiPage(1);
 

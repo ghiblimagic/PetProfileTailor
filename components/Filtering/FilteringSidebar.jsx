@@ -31,17 +31,19 @@ function FilteringSidebar({
     if (remainingFilterCooldown > 0 || isLoading) return;
 
     setFilterTagsIds(tagIds);
-    handleApplyFilters(); // just in case
+    handleApplyFilters(false, tagIds);
+    toggleDrawer(false);
   };
 
   const onApplyClick = () => {
     if (remainingFilterCooldown > 0 || isLoading) return;
 
     handleApplyFilters();
+    toggleDrawer(false);
   };
 
   return (
-    <div className="flex flex-col  bg-primary sm:w-96">
+    <div className="flex flex-col  bg-primary sm:w-96 min-h-screen">
       <div className="flex justify-between text-xl items-center border-b border-white">
         <h4 className="text-subtleWhite text-center pl-4 "> Filters </h4>
         <ClosingXButton
@@ -51,23 +53,53 @@ function FilteringSidebar({
       </div>
       {/* scrollable content */}
       {/* **************** Quick filters  **************** */}
-      <div className="px-4 py-3 border-b border-white">
-        <p className="text-subtleWhite text-sm mb-2">Quick filters</p>
+      {dataType === "names" && (
+        <div className="px-4 py-3 border-b border-white">
+          <p className="text-subtleWhite text-lg mb-2">Quick filters</p>
 
-        <div className="flex flex-wrap gap-2">
-          <GeneralButton
-            text="Popular"
-            subtle
-            onClick={() => applyQuickFilter(["68ef04450f2c50aed0721f5a"])}
-          />
+          {remainingFilterCooldown > 0 && (
+            <span className="text-subtleWhite">
+              {" "}
+              Wait {remainingFilterCooldown}s
+            </span>
+          )}
 
-          <GeneralButton
-            text="Human names"
-            subtle
-            onClick={() => applyQuickFilter(["68e037d103ba0c640c8bc35a"])}
-          />
+          <div className="flex flex-wrap gap-x-4">
+            <GeneralButton
+              text="Common Pet Names"
+              subtle
+              disabled={remainingFilterCooldown > 0 || isLoading}
+              onClick={() => applyQuickFilter(["68ef04450f2c50aed0721f5a"])}
+            />
+
+            <GeneralButton
+              text="Human Names"
+              subtle
+              disabled={remainingFilterCooldown > 0 || isLoading}
+              onClick={() => applyQuickFilter(["68e037d103ba0c640c8bc35a"])}
+            />
+
+            <GeneralButton
+              text="Cutesy"
+              subtle
+              disabled={remainingFilterCooldown > 0 || isLoading}
+              onClick={() => applyQuickFilter(["6401efe2d9f774e804cb359f"])}
+            />
+            <GeneralButton
+              text="Spicy, Sassy"
+              subtle
+              disabled={remainingFilterCooldown > 0 || isLoading}
+              onClick={() => applyQuickFilter(["641cc403d235cbd605de96bb"])}
+            />
+            <GeneralButton
+              text="Friendly, Sweet"
+              subtle
+              disabled={remainingFilterCooldown > 0 || isLoading}
+              onClick={() => applyQuickFilter(["6401ef92d9f774e804cb3578"])}
+            />
+          </div>
         </div>
-      </div>
+      )}
       {/* **************** Normal filters  **************** */}
       <div className="  overflow-y-auto bg-primary px-2">
         {/* mapping through categories ex: gender, holidays */}
@@ -143,7 +175,10 @@ function FilteringSidebar({
           text="reset"
           active
           className="text-center bg-subtleWhite"
-          onClick={() => handleApplyFilters("reset")}
+          onClick={() => {
+            handleApplyFilters("reset");
+            toggleDrawer(false);
+          }}
           disabled={isLoading}
         />
         <GeneralButton
