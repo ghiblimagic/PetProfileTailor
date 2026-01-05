@@ -34,10 +34,12 @@ export default function TagsSelectAndCheatSheet({
     control: (provided) => ({
       // is the outer box
       ...provided,
-      backgroundColor: isDisabled ? disabledColor : "rgb(12 5 22)",
+      backgroundColor: isDisabled
+        ? "var(--select-bg-disabled)"
+        : "var(--select-bg-primary)",
       pointerEvents: isDisabled ? "auto" : "auto",
-      borderColor: "rgb(221 214 254)",
-      color: "rgb(221 214 254)",
+      borderColor: "var(--select-border)",
+      color: "var(--select-text)",
       width: "96%",
       borderRadius: "10px",
       marginTop: "1rem",
@@ -54,22 +56,22 @@ export default function TagsSelectAndCheatSheet({
     }),
     dropdownIndicator: (provided, state) => ({
       ...provided,
-      color: "rgb(221 214 254)", // arrow color
+      color: "var(--select-text)", // arrow color
       cursor: isDisabled ? "not-allowed" : "pointer",
       backgroundColor: "transparent",
       "&:hover": {
-        backgroundColor: "rgb(59 130 246)",
-        color: "rgb(221 214 254)",
+        backgroundColor: "var(--select-hover)",
+        color: "var(--select-text)",
       },
     }),
     clearIndicator: (provided, state) => ({
       cursor: isDisabled ? "not-allowed" : "pointer",
       ...provided,
-      color: "rgb(221 214 254)", // x color
+      color: "var(--select-text)", // x color
       backgroundColor: "transparent",
       "&:hover": {
-        backgroundColor: "rgb(59 130 246)",
-        color: "rgb(221 214 254)",
+        backgroundColor: "var(--select-hover)",
+        color: "var(--select-text)",
       },
     }),
     input: (provided) => ({
@@ -81,8 +83,8 @@ export default function TagsSelectAndCheatSheet({
 
       cursor: isDisabled ? "not-allowed" : "pointer",
       background: "transparent",
-      caretColor: "rgb(221 214 254)",
-      color: "rgb(221 214 254)",
+      caretColor: "var(--select-text)",
+      color: "var(--select-text)",
       lineHeight: "1.2",
       minWidth: "1px", // ensures the input isn’t zero-width
       width: "auto", // prevents it from stretching across flex/grid
@@ -102,8 +104,8 @@ export default function TagsSelectAndCheatSheet({
     }),
     menu: (provided) => ({
       ...provided,
-      backgroundColor: "rgb(12 5 22)",
-      color: "rgb(221 214 254)",
+      backgroundColor: "var(--select-bg-primary)",
+      color: "var(--select-text)",
 
       borderRadius: "0.5rem",
     }),
@@ -114,8 +116,10 @@ export default function TagsSelectAndCheatSheet({
     }),
     option: (provided, state) => ({
       ...provided,
-      backgroundColor: state.isFocused ? "#2563EB" : "rgb(12 5 22)",
-      color: "rgb(221 214 254)",
+      backgroundColor: state.isFocused
+        ? "var(--select-hover)"
+        : "var(--select-bg-primary)",
+      color: "var(--select-text)",
       cursor: state.isDisabled ? "not-allowed" : "pointer",
       paddingTop: "0.25rem",
       paddingBottom: "0.25rem",
@@ -124,13 +128,13 @@ export default function TagsSelectAndCheatSheet({
 
     multiValue: (provided) => ({
       ...provided,
-      backgroundColor: "rgb(27 7 59)",
-      color: "rgb(221 214 254)",
+      backgroundColor: "var(--select-bg-secondary)",
+      color: "var(--select-text)",
       borderRadius: "20px",
     }),
     multiValueLabel: (provided) => ({
       ...provided,
-      color: "rgb(221 214 254)",
+      color: "var(--select-text)",
       whiteSpace: "normal", // allow wrapping
       wordBreak: "break-word", // break long words
       overflowWrap: "break-word",
@@ -146,7 +150,7 @@ export default function TagsSelectAndCheatSheet({
     }),
     placeholder: (provided) => ({
       ...provided,
-      color: "rgb(221 214 254)",
+      color: "var(--select-text)",
     }),
   };
 

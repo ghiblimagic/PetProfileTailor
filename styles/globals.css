@@ -56,6 +56,15 @@ input::file-selector-button:hover {
     /* --background: 259, 69%, 35%; */
     /* tailwindcss's background is set to dark purple, aka rgb(76, 29, 149) ≈ hsl(259, 69%, 35%) needed for when text overflows, the background doesn't turn gray
     */
+
+    --select-bg-primary: #050816; /*darkest color*/
+    --select-bg-secondary: #07083b; /*slightly lighter color*/
+    --select-bg-disabled: rgb(30 41 59);
+    --select-border: rgb(221 214 254);
+    --select-text: rgb(221 214 254);
+    --select-hover: rgb(59 130 246);
+
+    /* old information */
     --foreground: 0 0% 3.9%;
     --card: 0 0% 100%;
     --card-foreground: 0 0% 3.9%;

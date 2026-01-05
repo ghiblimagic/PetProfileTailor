@@ -13,6 +13,8 @@ import { findExactNormalized } from "@/utils/stringManipulation/findNormalizedMa
 export async function GET(req) {
   await dbConnect.connect();
 
+  console.log();
+
   try {
     const names = await Names.find()
       .populate({

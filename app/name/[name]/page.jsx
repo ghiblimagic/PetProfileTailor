@@ -9,21 +9,28 @@ import ReturnToPreviousPage from "@/components/ReusableSmallComponents/buttons/R
 
 export default async function Postid({ params }) {
   const { name } = await params;
-  const spaceAddedBackName = decodeURIComponent(name);
-  // gets rid of %20, replaces with a space
+  const spaceAddedBackName = decodeURIComponent(name).replace(/\s+/g, "");
+  // decodeURIComponent gets rid of %20, replaces with a space
+  //   .replace(/\s+/g, "") takes care of any space/tabs/line breaks in the middle
+
+  console.log("name from params", name, "params", params);
+  console.log(`${spaceAddedBackName} spaceAddedBackName`);
 
   await dbConnect.connect();
 
   const nameData = await leanWithStrings(
     Names.findOne({
-      content: { $regex: new RegExp(`^${spaceAddedBackName}$`, "i") }, // case-insensitive exact match
+      normalizedContent: spaceAddedBackName, // Direct match
     })
+      .collation({ locale: "en", strength: 2 }) // strength: 2 = case-insensitive
       .populate({
         path: "createdBy",
         select: ["name", "profileName", "profileImage"],
       })
       .populate({ path: "tags", select: ["tag"] }),
   );
+
+  console.log("nameData", nameData);
 
   if (!nameData) {
     notFound(); // tells Next.js to show the 404 page
