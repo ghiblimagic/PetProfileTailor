@@ -35,7 +35,7 @@ export default function About() {
           {" "}
           To get animals adopted a memorable name and adoption profile is vital.
           However, adoption profiles are often written early in the morning
-          creativity is at an all time low. So it's tempting to just name
+          creativity is at an all time low. So it&apos;s tempting to just name
           everyone bob and bobbett. Additionally, after animal 143 or so you
           start running out of ideas.{" "}
         </p>
