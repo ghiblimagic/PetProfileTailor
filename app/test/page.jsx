@@ -58,7 +58,7 @@ export default function CustomError() {
           </span>
 
           <span className="block">
-            <a href="https://twitter.com/Janetthedev">
+            <a href="https://x.com/ghiblimagicdev">
               <FontAwesomeIcon
                 icon={faMessage}
                 className="mr-2"

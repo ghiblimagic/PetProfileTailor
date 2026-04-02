@@ -15,7 +15,7 @@ export default function PageTitleWithImages({ imgSrc, title, title2 }) {
      mx-auto  h-32
     text-4xl text-white 
     font-semibold
-     absolute inset-0 my-auto blur-with-color w-[600px] rounded-2xl"
+     absolute inset-0 my-auto blur-with-color min-width-400 max-w-[600px] rounded-2xl"
       >
         <h3 className="flex flex-col justify-center items-center h-full ">
           <span> {title} </span>

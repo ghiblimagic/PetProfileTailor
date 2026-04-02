@@ -57,7 +57,7 @@ export default function Footer() {
         {/* ************* ADD ********* */}
 
         <div className="mt-2 w-56">
-          <h7 className="font-extrabold text-base mb-3 inline-block"> Add </h7>
+          <h6 className="font-extrabold text-base mb-3 inline-block"> Add </h6>
           <ul>
             <FooterLink href="/addnames">Names </FooterLink>
             <FooterLink href="/adddescriptions">Descriptions </FooterLink>
@@ -66,9 +66,9 @@ export default function Footer() {
 
         {/* ************* Contact ********* */}
         <div className="mt-2 w-56">
-          <h7 className="font-extrabold text-base mb-3 inline-block">
+          <h6 className="font-extrabold text-base mb-3 inline-block">
             Reach Out
-          </h7>
+          </h6>
           <ul>
             <FooterLink href="/contact"> Contact </FooterLink>
             <a
@@ -103,6 +103,9 @@ export default function Footer() {
           </small>
         </div>
       </section>
+      <small className="flex justify-center my-4">
+        &copy; 2026 Janet Spellman. All rights reserved.
+      </small>
     </footer>
   );
 }

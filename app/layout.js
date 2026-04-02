@@ -109,7 +109,7 @@ export default async function RootLayout({ children }) {
                     </header>
                     <Suspense fallback={<LoadingSkeleton />}>
                       <main
-                        className="flex-1  sm:px-6 lg:px-8  mx-auto  w-full" // w-full so it the element doesn't start off as collapsed
+                        className="flex-1  px-4 sm:px-6 lg:px-8  mx-auto  w-full  flex-grow" // w-full so it the element doesn't start off as collapsed
                         style={{
                           maxWidth: "1280px", // since tailwind is ignoring maxwidth in classNames
                         }}
