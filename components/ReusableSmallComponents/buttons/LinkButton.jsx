@@ -16,7 +16,7 @@ export default function LinkButton({
   classForDiv,
 }) {
   const baseClasses =
-    "font-bold my-3 py-1 px-4 border-b-4 shadow-lg shadow-stone-900/70 rounded-2xl text-base";
+    "font-bold my-3 py-1 px-4 border-b-4 rounded-2xl text-base";
 
   let bgClass = "";
 

@@ -76,7 +76,7 @@ export default function CustomError() {
           <Link
             href="/login"
             className=" bg-yellow-300 text-secondary font-bold py-3 px-4 border-b-4 border-yellow-100    
-                   shadow-lg shadow-stone-900/70 rounded-2xl
+                    rounded-2xl
                    hover:bg-blue-500                            hover:text-white                            hover:border-blue-700 text-base 
                    "
           >

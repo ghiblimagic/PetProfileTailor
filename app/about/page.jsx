@@ -33,9 +33,9 @@ export default function About() {
         <h3 className="font-semibold"> The problem: </h3>
         <p className="my-4 ml-6">
           {" "}
-          To get animals adopted a memorable adoption profile and name is key.
-          However, adoption profiles are usually written at the crack of dawn
-          when creativity is at an all time low! So it's tempting to just name
+          To get animals adopted a memorable name and adoption profile is vital.
+          However, adoption profiles are often written early in the morning
+          creativity is at an all time low. So it's tempting to just name
           everyone bob and bobbett. Additionally, after animal 143 or so you
           start running out of ideas.{" "}
         </p>

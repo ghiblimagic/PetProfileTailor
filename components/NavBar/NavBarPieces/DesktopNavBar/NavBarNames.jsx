@@ -35,6 +35,13 @@ const NavBarNames = () => {
           <FetchDropDownMenu />
           <AddItemsDropDownMenu />
 
+          <NavBarLink
+            href="/about"
+            className=""
+          >
+            About
+          </NavBarLink>
+
           {isAdmin && <AdminDropdownMenu />}
         </ul>
       </section>
