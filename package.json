@@ -2,6 +2,12 @@
   "name": "homeward-tails",
   "version": "0.1.0",
   "private": true,
+  "pnpm": {
+    "overrides": {
+      "prettier": "2.8.4",
+      "@types/bcryptjs": "2.4.6"
+    }
+  },
   "scripts": {
     "dev": "next dev",
     "build": "next build",
