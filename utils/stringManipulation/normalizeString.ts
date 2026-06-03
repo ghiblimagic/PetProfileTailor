@@ -1,4 +1,4 @@
-export default function normalizeString(content) {
+export default function normalizeString(content: string): string {
   const normalized = content
     .trim()
     .replace(/\s+/g, "")

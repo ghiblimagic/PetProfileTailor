@@ -1,21 +1,36 @@
-// utils/blocklistHelpers.js
 import { checkBlocklists } from "@/lib/checkBlocklist";
 import bannedWordsMessage from "@/utils/api/bannedWordsMessage";
-// 1️⃣ Check multiple fields for blocklist violations
-export function checkMultipleFieldsBlocklist(fields) {
-  // fields = [{ value, fieldName }, ...]
-  // value is content not normalizedContent
+
+type FieldToCheck = {
+  value: string;
+  fieldName: string;
+};
+
+type BlockResult = {
+  fieldName: string;
+  value: string;
+  blockedBy: string;
+  blockType: string;
+};
+
+export function checkMultipleFieldsBlocklist(
+  fields: FieldToCheck[],
+): BlockResult | null {
   for (const { value, fieldName } of fields) {
     const { allowed, blockedBy, type: blockType } = checkBlocklists(value);
     if (!allowed) {
-      return { fieldName, value, blockedBy, blockType };
+      return {
+        fieldName,
+        value,
+        blockedBy: blockedBy ?? "",
+        blockType: blockType ?? "banned-everywhere",
+      };
     }
   }
-  return null; // nothing blocked
+  return null;
 }
 
-// 2️⃣ Respond with 403 if a violation exists
-export function respondIfBlocked(blockResult) {
+export function respondIfBlocked(blockResult: BlockResult | null): Response | null {
   if (!blockResult) return null;
 
   const { value, fieldName, blockedBy, blockType } = blockResult;

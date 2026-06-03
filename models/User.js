@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import chooseRandomDefaultAvatar from "../utils/chooseRandomDefaultAvatar.js";
+import chooseRandomDefaultAvatar from "../utils/chooseRandomDefaultAvatar";
 
 const UserSchema = new mongoose.Schema(
   {

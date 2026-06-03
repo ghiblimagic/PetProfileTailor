@@ -11,7 +11,7 @@ import ContactEmailCopy from "@/components/EmailTemplates/contact-copy-to-submit
 import ContactNotification from "@/components/EmailTemplates/contact-notification";
 import {
   detectBotPatterns,
-  hasRealisticContent,
+  hasRealisticContactFields,
 } from "@utils/api/detectBotPatterns";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
@@ -76,16 +76,17 @@ export async function sendContactEmail(prevState, formData) {
 
   // BOT PATTERN DETECTION
 
-  if (detectBotPatterns(message)) {
-    console.log("Bot detected: Suspicious message pattern", {
-      message: message.substring(0, 50),
+  if (detectBotPatterns(name) || detectBotPatterns(message)) {
+    console.log("Bot detected: Suspicious content pattern", {
+      name,
+      messagePreview: message.substring(0, 50),
       ip: clientIP,
     });
     return { success: false, error: "Message contains invalid content." };
   }
 
   // REALISTIC CONTENT CHECK
-  if (!hasRealisticContent(name, message)) {
+  if (!hasRealisticContactFields(name, message)) {
     console.log("Bot detected: Unrealistic content", {
       name,
       messagePreview: message.substring(0, 50),
