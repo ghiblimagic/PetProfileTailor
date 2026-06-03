@@ -3,10 +3,12 @@
   "version": "0.1.0",
   "private": true,
   "pnpm": {
-    "overrides": {
-      "prettier": "2.8.4",
-      "@types/bcryptjs": "2.4.6"
-    }
+    "onlyBuiltDependencies": [
+      "core-js",
+      "esbuild",
+      "sharp",
+      "unrs-resolver"
+    ]
   },
   "scripts": {
     "dev": "next dev",
@@ -96,5 +98,6 @@
     "tailwindcss": "^3.4.17",
     "ts-node": "^10.9.2",
     "typescript": "^5.9.2"
-  }
+  },
+  "packageManager": "pnpm@9.15.9+sha512.68046141893c66fad01c079231128e9afb89ef87e2691d69e4d40eee228988295fd4682181bae55b58418c3a253bde65a505ec7c5f9403ece5cc3cd37dcf2531"
 }
