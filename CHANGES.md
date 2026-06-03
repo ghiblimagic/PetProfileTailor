@@ -209,3 +209,50 @@ Scoring threshold (≥3) left the 19+ letter gibberish rule at score 2, so conta
 ### Verification
 
 - `pnpm test` — detectBotPatterns suite, 14 tests passed
+
+---
+
+## TypeScript migration wave 2 continued (2026-06-02)
+
+### What was built and why
+
+Continued incremental TS conversion for high-traffic API utilities, DB connect helper, and description models. Added tests for `rateLimiter` (contact form dependency). Fixed `checkOwnership` to avoid reading `session.user` when unauthenticated.
+
+### Files created
+
+- `utils/api/rateLimiter.ts`, `utils/api/rateLimiter.test.ts`
+- `utils/api/checkIfAdmin.ts`, `utils/api/checkOwnership.ts`
+- `utils/api/getPaginatedNotifications.ts`
+- `utils/db.ts`
+- `models/DescriptionTag.ts`, `models/DescriptionCategory.ts`
+
+### Files removed
+
+- `utils/api/rateLimiter.js`, `checkIfAdmin.js`, `checkOwnership.js`, `getPaginatedNotifications.js`
+- `utils/db.js`
+- `models/DescriptionTag.js`, `models/DescriptionCategory.js`
+
+### Files modified
+
+- `app/api/names/swr/route.js` — `@utils/db.js` → `@utils/db`
+
+### Problems and fixes
+
+- **Build:** `mongoose.connect` deprecated options removed (`useNewUrlParser` / `useUnifiedTopology` not in Mongoose 6 types).
+- **Build:** NextAuth default `User` type lacks `role`/`status` — narrow with `AppUser` cast in admin/ownership checks.
+- **Bug:** `checkOwnership` used `session.user` before verifying `getSessionForApis` ok.
+
+### Verification
+
+- `pnpm test` — 8 suites, 34 tests passed
+- `pnpm build` — succeeded
+
+### TODOs
+
+- `utils/api/migrateField.js` (migrations only)
+- Larger models: `User`, `Name`, `Description`, etc.
+- Optional: `next-auth` module augmentation for `role` / `status` on `Session.user`
+
+### Next logical step
+
+Convert `mongoDataCleanup.js` or start `lib/auth.js` with tests; expand `next-auth` types when touching auth.

@@ -1,4 +1,4 @@
-import dbConnect from "@utils/db.js";
+import dbConnect from "@utils/db";
 import Names from "@models/Name.js";
 import mongoose from "mongoose";
 
