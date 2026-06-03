@@ -256,3 +256,53 @@ Continued incremental TS conversion for high-traffic API utilities, DB connect h
 ### Next logical step
 
 Convert `mongoDataCleanup.js` or start `lib/auth.js` with tests; expand `next-auth` types when touching auth.
+
+---
+
+## 2026-06-02 — Vercel / pnpm install fix (first production pnpm deploy)
+
+### What was broken and why
+
+pnpm had **never** completed a successful install on Vercel for this repo. Production builds failed at `pnpm install` (exit 1), not at `next build`.
+
+Root cause: **`package.json` and `pnpm-lock.yaml` disagreed on pnpm config.**
+
+- `package.json` declared `pnpm.overrides` pinning `prettier` to `2.8.4` and `@types/bcryptjs` to `2.4.6`.
+- `pnpm-lock.yaml` had **no** matching `settings.overrides` (lockfile was generated without those overrides).
+- Lockfile importers used caret specifiers (e.g. `prettier: ^2.8.4` → resolved `2.8.8`).
+
+Vercel reported `ERR_PNPM_LOCKFILE_CONFIG_MISMATCH` because pnpm requires lockfile `settings` to match `package.json` `pnpm` fields exactly.
+
+Contributing cleanup from the same migration window:
+
+- Stray `package-lock.json` (npm) could confuse tooling — removed in `8ea3dfa`.
+- Empty `pnpm-workspace.yaml` (not a monorepo) — removed in `b3879ed`.
+
+### How we fixed it
+
+1. **Removed `pnpm.overrides`** from `package.json` so devDependencies use normal caret ranges (`^2.8.4`, `^2.4.6`) aligned with the lockfile.
+2. **Synced `pnpm-lock.yaml`** — no `settings.overrides`; importers match `package.json` specifiers.
+3. **Pinned package manager** — added `packageManager: pnpm@9.15.9` so Vercel uses the same pnpm major as CI/local frozen installs (not pnpm 11 from a global install).
+4. **Added `pnpm.onlyBuiltDependencies`** for `core-js`, `esbuild`, `sharp`, `unrs-resolver` so native/postinstall scripts are allowed under pnpm’s build-script policy.
+
+### Files modified
+
+- `package.json` — removed overrides; added `onlyBuiltDependencies` and `packageManager`
+- `pnpm-lock.yaml` — aligned with `package.json` (no override settings)
+
+### Verification
+
+```bash
+CI=true npx pnpm@9.15.9 install --frozen-lockfile
+```
+
+Commit: `2eee3cd` — `bug: pnpm mismatch build bug`
+
+### TODOs
+
+- Confirm first green Vercel deploy after push (install + `next build`).
+- Do **not** re-add `pnpm.overrides` without regenerating the lockfile so `settings.overrides` matches.
+
+### Next logical step
+
+Push to `main`, watch Vercel install logs, then run `npx pnpm@9.15.9 build` locally if build was not verified in the same session.
