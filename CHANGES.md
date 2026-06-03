@@ -143,3 +143,69 @@ Converted remaining small `utils/api` helpers, leaf utils, and the two smallest 
 ### Next logical step
 
 Wave 2 continued: `utils/db.js`, `rateLimiter.js`, `checkIfAdmin.js`, `checkOwnership.js`; then `DescriptionTag` / `DescriptionCategory` models.
+
+---
+
+## Contact spam validation fix (2026-06-02)
+
+### What was built and why
+
+The contact form called `hasRealisticContent(name, message)` but the function only accepted one argument, so **only the name was validated** and gibberish messages slipped through. Split validation into field-specific rules and validate both name and message in the server action.
+
+### Files modified
+
+- `utils/api/detectBotPatterns.ts` — `hasRealisticName`, `hasRealisticMessage`, `hasRealisticContactFields`; shared `hasLongSingleGibberishToken` helper; `hasRealisticContent` kept as alias to `hasRealisticMessage`
+- `utils/api/detectBotPatterns.test.ts` — spam example strings + legitimate name/message cases
+- `app/actions/sendContactEmail.js` — `hasRealisticContactFields(name, message)`; `detectBotPatterns` on name and message
+
+### Problems and fixes
+
+- **Bug:** Second argument to `hasRealisticContent` was ignored at runtime.
+- **Fix:** Explicit two-field API; name allows 1–2 words without 3-word minimum; message keeps 3+ words and avg length cap.
+
+### Verification
+
+- `pnpm test` — 7 suites, 27 tests passed
+- `pnpm build` — succeeded
+
+### TODOs
+
+- None for this fix.
+
+### Next logical step
+
+Continue TS wave 2 (`utils/db.js`, remaining `utils/api/*`).
+
+---
+
+## Contact name validation tweak (2026-06-02)
+
+### What was built and why
+
+Name field no longer uses message-style heuristics (avg word length, 15-char single token). Long legitimate surnames are allowed; gibberish contact names are caught via `detectBotPatterns` (`^[A-Za-z]{19,}$` — sample spam name is 19 chars, so 20+ would not match).
+
+### Files modified
+
+- `utils/api/detectBotPatterns.ts` — `hasRealisticName` is non-empty only; added `^[A-Za-z]{20,}$` pattern
+- `utils/api/detectBotPatterns.test.ts` — spam caught by `detectBotPatterns`; `Wojciechowski` allowed
+
+### Verification
+
+- `pnpm test` — 7 suites, 27 tests passed
+
+---
+
+## detectBotPatterns scoring refactor fix (2026-06-02)
+
+### What was built and why
+
+Scoring threshold (≥3) left the 19+ letter gibberish rule at score 2, so contact spam no longer reached the threshold. Raised gibberish rule to score 3. Removed CJK/Cyrillic rules (legitimate non-English messages). Added tests for lone URL and Chinese text.
+
+### Files modified
+
+- `utils/api/detectBotPatterns.ts`
+- `utils/api/detectBotPatterns.test.ts`
+
+### Verification
+
+- `pnpm test` — detectBotPatterns suite, 14 tests passed

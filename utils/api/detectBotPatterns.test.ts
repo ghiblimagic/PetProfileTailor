@@ -18,22 +18,39 @@ describe("detectBotPatterns", () => {
     expect(detectBotPatterns("buy viagra now")).toBe(true);
   });
 
-  it("allows normal sentences", () => {
+  it("detects long single-token alphanumeric strings (contact spam names)", () => {
+    expect(detectBotPatterns(SPAM_NAME)).toBe(true);
+    expect(detectBotPatterns(SPAM_MESSAGE)).toBe(true);
+  });
+
+  it("allows normal sentences and typical names", () => {
     expect(detectBotPatterns("Hello, this is a normal message.")).toBe(false);
+    expect(detectBotPatterns("Janet Spellman")).toBe(false);
+    expect(detectBotPatterns("Wojciechowski")).toBe(false);
+  });
+
+  it("does not flag a lone URL (low score; needs other signals)", () => {
+    expect(detectBotPatterns("See https://example.com for details")).toBe(
+      false,
+    );
+  });
+
+  it("allows short legitimate Chinese without script-block rules", () => {
+    expect(detectBotPatterns("我想咨询收养流程")).toBe(false);
   });
 });
 
 describe("hasRealisticName", () => {
-  it("rejects spam-style gibberish names", () => {
-    expect(hasRealisticName(SPAM_NAME)).toBe(false);
-  });
-
-  it("accepts a single first name", () => {
+  it("accepts non-empty names including long surnames", () => {
+    expect(hasRealisticName(SPAM_NAME)).toBe(true);
     expect(hasRealisticName("Janet")).toBe(true);
+    expect(hasRealisticName("Janet Spellman")).toBe(true);
+    expect(hasRealisticName("Wojciechowski")).toBe(true);
   });
 
-  it("accepts a full name", () => {
-    expect(hasRealisticName("Janet Spellman")).toBe(true);
+  it("rejects empty or whitespace-only names", () => {
+    expect(hasRealisticName("")).toBe(false);
+    expect(hasRealisticName("   ")).toBe(false);
   });
 });
 
