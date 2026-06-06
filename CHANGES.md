@@ -306,3 +306,81 @@ Commit: `2eee3cd` — `bug: pnpm mismatch build bug`
 ### Next logical step
 
 Push to `main`, watch Vercel install logs, then run `npx pnpm@9.15.9 build` locally if build was not verified in the same session.
+
+---
+
+## 2026-06-06 — TypeScript migration: `mongoDataCleanup`
+
+### What was built and why
+
+Converted `utils/mongoDataCleanup.js` to TypeScript — shared helper used across pages and API routes to run `.lean()` queries and stringify ObjectIds / strip `__v`. Added unit tests with mocked queries (no DB).
+
+### Files created
+
+- `utils/mongoDataCleanup.ts` — `leanWithStrings`, exported `MongoCleanupResult<T>` utility type
+- `utils/mongoDataCleanup.test.ts` — 4 tests (null result, single doc, array, nested ObjectIds + Date)
+
+### Files removed
+
+- `utils/mongoDataCleanup.js`
+
+### Files modified
+
+- `jest.setup.ts` — `TextEncoder` / `TextDecoder` polyfill (required when Jest loads mongoose/mongodb)
+
+### Patterns followed
+
+- Same recursive transform logic as the JS original; `LeanQuery` union accepts real Mongoose queries and test mocks
+- Extensionless imports unchanged (`@/utils/mongoDataCleanup`, `../mongoDataCleanup`)
+
+### Problems and fixes
+
+- **Jest:** Importing mongoose triggered `TextEncoder is not defined` — fixed via `util` polyfill in `jest.setup.ts`
+- **Build:** Mongoose `lean().exec()` return type did not align with `MongoCleanupResult<TReturn>` — explicit casts on return paths (pragmatic, same as other migration files)
+
+### Verification
+
+- `pnpm test` — 9 suites, 38 tests passed
+- `pnpm build` — succeeded
+
+### TODOs
+
+- Larger models still JS: `User`, `Name`, `Description`, etc.
+- `utils/api/migrateField.js` (migrations only)
+- Optional: `next-auth` module augmentation for `role` / `status`
+
+### Next logical step
+
+Convert `lib/auth.js` with tests and expand NextAuth session types when touching auth.
+
+### Follow-up (inline comments)
+
+Added comments in `mongoDataCleanup.ts`, `mongoDataCleanup.test.ts`, and `jest.setup.ts` explaining lean/exec flow, transform rules, test mocks, and the TextEncoder polyfill. Test file uses `@jest-environment node` to avoid mongoose/jsdom warnings.
+
+### Follow-up (manual test checklist)
+
+Added **Manual verification (TypeScript migration)** section to `TESTING.md` — copy-paste checklist for post-migration smoke testing in the running app.
+
+---
+
+## 2026-06-06 — Extract code notes to `docs/notes/`
+
+### What was built and why
+
+Moved heavy learning/design comments out of source files into central markdown so `utils/` stays clean. Each source file keeps a one-line pointer at the top.
+
+### Files created
+
+- `docs/README.md` — conventions and index
+- `docs/notes/utils/mongoDataCleanup.md` — design notes from `mongoDataCleanup.ts`
+- `docs/notes/jest-setup.md` — TextEncoder polyfill notes from `jest.setup.ts`
+
+### Files modified
+
+- `utils/mongoDataCleanup.ts` — trimmed to slim JSDoc + pointer to notes
+- `jest.setup.ts` — trimmed + pointer to notes
+- `TESTING.md` — link to `docs/notes/` under "Where tests live"
+
+### Next logical step
+
+Use the same pattern for future TS conversions (`lib/auth.js`, etc.): notes in `docs/notes/<path>/<module>.md`, pointer in source.
