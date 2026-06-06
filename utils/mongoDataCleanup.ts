@@ -10,6 +10,7 @@ export type MongoCleanupResult<T> = T extends mongoose.Types.ObjectId
   : T extends mongoose.Types.ObjectId[]
     ? string[]
     : T extends Date
+    // Dates aren't transformed at runtime so the type reflects that.
       ? Date
       : T extends readonly (infer U)[]
         ? MongoCleanupResult<U>[]
