@@ -96,13 +96,13 @@ Broad sanity check after early migration waves.
 
 Code touched: `utils/db.ts`, `leanWithStrings`. Regressions: **500**, blank sections, `[object Object]` IDs.
 
-- [ ] `/fetchnames` — list loads; no server error
-- [ ] `/name/[name]` — page renders with related data
-- [ ] `/description/[id]` — content loads
-- [ ] `/profile/[profilename]` — profile, lists, images load
-- [ ] `/dashboard` (logged in) — dashboard data renders
-- [ ] `/notifications` (logged in) — like/thank items show linked content
-- [ ] DevTools → Network → data API responses: `_id` values are **strings**; no `__v` in JSON
+- [x] `/fetchnames` — list loads; no server error
+- [x] `/name/[name]` — page renders with related data
+- [x] `/description/[id]` — content loads
+- [x] `/profile/[profilename]` — profile, lists, images load
+- [x] `/dashboard` (logged in) — dashboard data renders
+- [x] `/notifications` (logged in) — like/thank items show linked content
+- [x] DevTools → Network → data API responses: `_id` values are **strings**; no `__v` in JSON
 
 **Network tip:** string IDs mean `leanWithStrings` is working.
 
@@ -112,11 +112,11 @@ Code touched: `utils/db.ts`, `leanWithStrings`. Regressions: **500**, blank sect
 
 Code touched: `detectBotPatterns`, `rateLimiter` on `/contact`.
 
-- [ ] Happy path — real name + normal message; wait **>3s** before submit → success (or email if Resend configured)
-- [ ] Gibberish name — 19+ letter token (e.g. `abcdefghijklmnopqrst`) → rejected
-- [ ] Gibberish message — long random / spam-like text → rejected
-- [ ] Legitimate long name — e.g. `Wojciechowski` + normal message → allowed
-- [ ] Rate limit — two submits from same IP within preset window → second blocked
+- [x] Happy path — real name + normal message; wait **>3s** before submit → success (or email if Resend configured)
+- [x] Gibberish name — 19+ letter token (e.g. `abcdefghijklmnopqrst`) → rejected
+- [x] Gibberish message — long random / spam-like text → rejected
+- [x] Legitimate long name — e.g. `Wojciechowski` + normal message → allowed
+- [x] Rate limit — two submits from same IP within preset window → second blocked
 - [ ] Non-English message — e.g. Chinese inquiry text → allowed
 
 ---
@@ -186,8 +186,8 @@ Code touched: `getUserByProfileName.ts`, `startCooldown.ts`, `findNormalizedMatc
 
 Code touched: `lib/checkBlocklist.ts`, `checkMultipleBlocklists.ts`, `data/blockList.js`.
 
-- [ ] `/addnames` — submit **`butt`** alone → 403 / blocklist message (`exact-name`)
-- [ ] `/addnames` — submit **`fluffy butt`** → allowed
+- [ ] `/addnames` — submit `**butt`** alone → 403 / blocklist message (`exact-name`)
+- [ ] `/addnames` — submit `**fluffy butt**` → allowed
 - [ ] `/adddescriptions` — substring blocklist hit → 403 with `blockedBy` in message
 - [ ] `/addnames` or `/adddescriptions` — legitimate content → saves successfully
 - [ ] `/register` or `/editsettings` — blocklisted bio (if field checked) → rejected
@@ -236,30 +236,32 @@ Use **two users** for thanks (thank someone else's content).
 
 ### Regression signals (all waves)
 
-| Symptom | Likely cause |
-|---------|----------------|
-| 500 on page load | `db.connect` or `leanWithStrings` on that route |
-| Hydration error / "Objects are not valid as React child" | ObjectId not stringified (`mongoDataCleanup`) |
-| Contact always fails | Rate limiter or bot detection too aggressive |
-| Admin/owner action returns 500 | `checkIfAdmin` / `checkOwnership` session handling |
-| Login succeeds but nav shows logged out | `session` / `jwt` callback or `toTokenUser` |
-| `profileName` or `role` missing in UI | NextAuth augmentation / JWT payload |
-| Profile page 500 for valid user | `getUserByProfileName` or `db.connect` |
-| Duplicate name slips through on submit | `findExactNormalized` |
-| Description check never finds known duplicate | `findStartNormalized` / normalization |
-| Pagination or sort spam works with no delay | `startCooldown` |
-| All names/descriptions rejected | Blocklist Sets / Trie; `data/blockList.js` |
-| `butt` alone allowed | exact-name pass broken or content length ≥ 100 |
-| Obvious substring slips through | Trie or lowercasing on list entries |
-| 500 instead of 403 on block | `respondIfBlocked` / `bannedWordsMessage` |
-| Like toggle 500 | `NameLike` / `DescriptionLike` or toggle route transaction |
-| Count wrong but no error | `likedByCount` out of sync with like collection |
-| Notifications empty after like | `contentCreator` / populate / `getPaginatedNotifications` |
-| Duplicate likes in DB | unique index missing on `namelikes` / `descriptionlikes` |
-| Thank submit 500 | `Thank` model / `ThanksOptions` enum mismatch |
-| Thank notification missing | `contentCreator` index or thanks route populate |
-| Suggestion save 500 | `Suggestion` refs (`NameTag`, `DescriptionTag`) |
-| Report flag 500 | `Report` `contentCopy` or category validation |
+
+| Symptom                                                  | Likely cause                                               |
+| -------------------------------------------------------- | ---------------------------------------------------------- |
+| 500 on page load                                         | `db.connect` or `leanWithStrings` on that route            |
+| Hydration error / "Objects are not valid as React child" | ObjectId not stringified (`mongoDataCleanup`)              |
+| Contact always fails                                     | Rate limiter or bot detection too aggressive               |
+| Admin/owner action returns 500                           | `checkIfAdmin` / `checkOwnership` session handling         |
+| Login succeeds but nav shows logged out                  | `session` / `jwt` callback or `toTokenUser`                |
+| `profileName` or `role` missing in UI                    | NextAuth augmentation / JWT payload                        |
+| Profile page 500 for valid user                          | `getUserByProfileName` or `db.connect`                     |
+| Duplicate name slips through on submit                   | `findExactNormalized`                                      |
+| Description check never finds known duplicate            | `findStartNormalized` / normalization                      |
+| Pagination or sort spam works with no delay              | `startCooldown`                                            |
+| All names/descriptions rejected                          | Blocklist Sets / Trie; `data/blockList.js`                 |
+| `butt` alone allowed                                     | exact-name pass broken or content length ≥ 100             |
+| Obvious substring slips through                          | Trie or lowercasing on list entries                        |
+| 500 instead of 403 on block                              | `respondIfBlocked` / `bannedWordsMessage`                  |
+| Like toggle 500                                          | `NameLike` / `DescriptionLike` or toggle route transaction |
+| Count wrong but no error                                 | `likedByCount` out of sync with like collection            |
+| Notifications empty after like                           | `contentCreator` / populate / `getPaginatedNotifications`  |
+| Duplicate likes in DB                                    | unique index missing on `namelikes` / `descriptionlikes`   |
+| Thank submit 500                                         | `Thank` model / `ThanksOptions` enum mismatch              |
+| Thank notification missing                               | `contentCreator` index or thanks route populate            |
+| Suggestion save 500                                      | `Suggestion` refs (`NameTag`, `DescriptionTag`)            |
+| Report flag 500                                          | `Report` `contentCopy` or category validation              |
+
 
 ---
 
