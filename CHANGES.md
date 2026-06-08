@@ -540,3 +540,27 @@ Moved “which function to use” and a route-level usage map to the top of `fin
 ### Files modified
 
 - `docs/notes/utils/stringManipulation/findNormalizedMatch.md`
+
+---
+
+## 2026-06-07 — TESTING.md: manual checks for auth + wave 3 commits
+
+### What was changed and why
+
+Added a “Recent commits” manual verification section to `TESTING.md` for `b1f0994` (auth/User TS) and `b29c9e7` (utils wave 3) with route-level smoke steps and regression signals.
+
+### Files modified
+
+- `TESTING.md` — new subsection under manual verification; fixed `lib/auth.js` → `lib/auth.ts` in convert-then-test note
+
+---
+
+## 2026-06-07 — TESTING.md: quick-pass checklists for recent commits
+
+### What was changed and why
+
+Replaced detailed tables with checkbox quick-pass lists for `b1f0994` and `b29c9e7` so manual verification can be ticked off action-by-action.
+
+### Files modified
+
+- `TESTING.md`
