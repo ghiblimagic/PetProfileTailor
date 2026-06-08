@@ -459,3 +459,84 @@ Corrected stale references after auth TS migration: test file is `lib/resolveSig
 
 - `CHANGES.md` — auth entry test file names
 - `docs/notes/lib/auth.md` — JWT, credentials, related files sections synced with [`lib/auth.ts`](lib/auth.ts)
+
+---
+
+## 2026-06-07 — TypeScript migration wave 3 (utils batch)
+
+### What was built and why
+
+Converted the next three medium leaf utils from CHANGES “wave 3” plan: profile lookup, pagination cooldown timer, and normalized content duplicate queries. Added tests for `findNormalizedMatch` and `startCooldown`; moved long regex/index notes to `docs/notes/`.
+
+### Files created
+
+- `utils/getUserByProfileName.ts`
+- `utils/startCooldown.ts`
+- `utils/stringManipulation/findNormalizedMatch.ts`
+- `utils/stringManipulation/findNormalizedMatch.test.ts`
+- `utils/startCooldown.test.ts`
+- `docs/notes/utils/stringManipulation/findNormalizedMatch.md`
+
+### Files removed
+
+- `utils/getUserByProfileName.js`
+- `utils/startCooldown.js`
+- `utils/stringManipulation/findNormalizedMatch.js`
+
+### Files modified
+
+- `docs/README.md` — index entry for findNormalizedMatch notes
+
+### Patterns followed
+
+- `Model<T extends NormalizedContentFields>` for Mongoose query helpers (same pragmatic cast style as `mongoDataCleanup.ts`)
+- `IUserDocument | null` return on profile lookup (typed `User.ts` consumer)
+- React `MutableRefObject` / `Dispatch<SetStateAction<number>>` for cooldown hook helper
+- Extensionless imports unchanged for all consumers
+
+### Problems and fixes
+
+- **Build:** Mongoose `populate()` return type did not align with `T | null` — explicit casts on return paths (same as `mongoDataCleanup.ts`).
+
+### Verification
+
+- `pnpm test` — 12 suites, 48 tests passed
+- `pnpm build` — succeeded
+
+### TODOs
+
+- `lib/checkBlocklist.js` — next util (already consumed by typed `checkMultipleBlocklists.ts`)
+- `utils/filevalidation.js` — appears unused; convert or remove when touching uploads
+- Small models: `NameLike`, `DescriptionLike`, `Follow`, etc.
+
+### Next logical step
+
+Convert `lib/checkBlocklist.js` with tests and `docs/notes/lib/checkBlocklist.md`.
+
+---
+
+## 2026-06-07 — findNormalizedMatch docs: code examples
+
+### What was changed and why
+
+Expanded `docs/notes/utils/stringManipulation/findNormalizedMatch.md` with implementation snippets from `findNormalizedMatch.ts` and real call-site examples from names/description API routes.
+
+### Files modified
+
+- `docs/notes/utils/stringManipulation/findNormalizedMatch.md`
+
+### Next logical step
+
+Convert `lib/checkBlocklist.js` with tests and `docs/notes/lib/checkBlocklist.md`.
+
+---
+
+## 2026-06-07 — findNormalizedMatch docs: overview at top
+
+### What was changed and why
+
+Moved “which function to use” and a route-level usage map to the top of `findNormalizedMatch.md` so readers get context (submit vs live check vs substring) before implementation detail.
+
+### Files modified
+
+- `docs/notes/utils/stringManipulation/findNormalizedMatch.md`
