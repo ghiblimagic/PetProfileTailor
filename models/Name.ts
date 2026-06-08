@@ -1,7 +1,23 @@
-import mongoose from "mongoose";
+/**
+ * Collection / unique index notes: docs/notes/models/name-and-description.md
+ */
+import mongoose, { Document, Model } from "mongoose";
 import uniqueValidator from "mongoose-unique-validator";
 
-const NameSchema = new mongoose.Schema(
+export interface IName {
+  content: string;
+  normalizedContent: string;
+  notes?: string;
+  tags: mongoose.Types.ObjectId[];
+  likedByCount: number;
+  createdBy: mongoose.Types.ObjectId;
+  createdAt?: Date;
+  updatedAt?: Date;
+}
+
+export interface INameDocument extends IName, Document {}
+
+const NameSchema = new mongoose.Schema<INameDocument>(
   {
     content: {
       type: String,
@@ -24,7 +40,6 @@ const NameSchema = new mongoose.Schema(
         ref: "NameTag",
       },
     ],
-
     likedByCount: {
       type: Number,
       default: 0,
@@ -40,9 +55,8 @@ const NameSchema = new mongoose.Schema(
 
 NameSchema.plugin(uniqueValidator);
 
-const Name =
-  mongoose.models.Name || mongoose.model("Name", NameSchema, "names");
-// the last one "names" is for when we're doing migration, the migration script we need to explicitly pass the existing colleciton name in mongoDB to the migration script
-// why? since the migration script runs outside the usual app context.
+const Name: Model<INameDocument> =
+  (mongoose.models.Name as Model<INameDocument>) ||
+  mongoose.model<INameDocument>("Name", NameSchema, "names");
 
 export default Name;

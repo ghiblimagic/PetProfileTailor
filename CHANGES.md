@@ -868,3 +868,41 @@ Enforcement is by script (Latin letters + Spanish accents), not ML language dete
 ### Verification
 
 - `pnpm test -- detectBotPatterns`
+
+---
+
+## 2026-06-07 — TypeScript migration: Name and Description (final models)
+
+### What was built and why
+
+Converted the last two Mongoose models — all `models/*` are now TypeScript. Preserved `uniqueValidator` on Name, explicit `names` collection, Description optional `createdBy`.
+
+### Files created
+
+- `models/Name.ts`
+- `models/Description.ts`
+- `docs/notes/models/name-and-description.md`
+
+### Files removed
+
+- `models/Name.js`
+- `models/Description.js`
+
+### Files modified
+
+- `docs/README.md` — index entry
+- `TESTING.md` — §12 core content models
+- `app/api/names/swr/route.js` — `@models/Name.js` → `@models/Name` (build fix)
+
+### Verification
+
+- `pnpm test` — 13 suites, 60 tests passed
+- `pnpm build` — succeeded
+
+### TODOs
+
+- Migration scripts still import `../models/Name.js` / `Description.js` — update paths if re-run with Node
+
+### Next logical step
+
+Model migration complete; convert high-traffic API routes or `sendContactEmail.js` next.

@@ -235,6 +235,19 @@ Use **two users** for thanks (thank someone else's content).
 
 ---
 
+#### 12. Core content models (2026-06-07 — `Name.ts` / `Description.ts`, ~15 min)
+
+Code touched: `models/Name.ts`, `models/Description.ts` — all Mongoose models are now TypeScript.
+
+- [ ] `/fetchnames` and `/fetchdescriptions` — lists load
+- [ ] `/addnames` — create name with tags → appears on `/name/[name]`
+- [ ] `/addnames` — duplicate normalized name → 409
+- [ ] `/adddescriptions` — create description → `/description/[id]` loads
+- [ ] Edit own name/description → saves; `likedByCount` unchanged unless liking
+- [ ] Name unique constraint — same `content` twice → rejected (not 500)
+
+---
+
 ### Regression signals (all waves)
 
 

@@ -1,5 +1,5 @@
 import dbConnect from "@utils/db";
-import Names from "@models/Name.js";
+import Names from "@models/Name";
 import mongoose from "mongoose";
 
 export async function GET(req) {
