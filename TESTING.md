@@ -58,18 +58,90 @@ pnpm dev
 
 Local green + Vercel green means TS modules compile and unit tests pass. Manual checks below cover integration paths Jest does not exercise.
 
-### Recent commits — auth + utils wave 3
+### Manual checks (oldest → newest)
 
-Targeted smoke tests for the last two migration commits. Run **after** the baseline above. Estimated **~25–35 min** if you cover both.
+Work through in order for a **full migration smoke**. For a single PR, jump to the section that matches your change.
 
-| Commit | Summary |
-|--------|---------|
-| `b1f0994` | `lib/auth.ts`, `models/User.ts`, NextAuth type augmentation, `resolveSignInCallback` |
-| `b29c9e7` | `getUserByProfileName`, `startCooldown`, `findNormalizedMatch` (+ unit tests) |
+---
 
-#### Quick pass — `b1f0994` auth + User model (~15 min)
+#### 1. Wave 1 — leaf utils (2026-06-02)
 
-Code touched: `lib/auth.ts`, `models/User.ts`, `types/next-auth.d.ts`, `checkIfAdmin`, `checkOwnership`, `getSessionForApis`.
+Code touched: `fetch`, `error`, `normalizeString`, `debounce`, `checkIfValidContentType`, hooks, etc.
+
+- [ ] `chooseRandomDefaultAvatar` — `/register` new user → default profile avatar assigned
+- [ ] `getError` — `/editsettings` → trigger validation error → message still displays
+- [ ] `useApiRateLimiter` + `debounce` — toggle/cooldown buttons → rapid clicks throttled
+- [ ] `checkIfValidContentType` — `/fetchnames` / `/fetchdescriptions` listing pages load via SWR/API
+
+---
+
+#### 2. Cumulative quick pass (2026-06-03 — general smoke, ~15–20 min)
+
+Broad sanity check after early migration waves.
+
+- [ ] `/fetchnames` — name list loads
+- [ ] One `/name/[name]` page — content, tags, categories render
+- [ ] One `/profile/[profilename]` page — user data and lists load
+- [ ] Log in → `/notifications` — tabs and notification items load
+- [ ] `/contact` — one legitimate submit (wait **>3 seconds** before clicking submit)
+- [ ] `/contact` — one obvious spam submit (gibberish name or message) → rejected
+- [ ] One owner action (edit your own content) — still works
+- [ ] Rapid-click a rate-limited button (like/follow) — throttles, no double submit
+
+---
+
+#### 3. Wave 2 — `mongoDataCleanup` + `db` (2026-06-06)
+
+Code touched: `utils/db.ts`, `leanWithStrings`. Regressions: **500**, blank sections, `[object Object]` IDs.
+
+- [ ] `/fetchnames` — list loads; no server error
+- [ ] `/name/[name]` — page renders with related data
+- [ ] `/description/[id]` — content loads
+- [ ] `/profile/[profilename]` — profile, lists, images load
+- [ ] `/dashboard` (logged in) — dashboard data renders
+- [ ] `/notifications` (logged in) — like/thank items show linked content
+- [ ] DevTools → Network → data API responses: `_id` values are **strings**; no `__v` in JSON
+
+**Network tip:** string IDs mean `leanWithStrings` is working.
+
+---
+
+#### 4. Contact spam + rate limiter (2026-06-02)
+
+Code touched: `detectBotPatterns`, `rateLimiter` on `/contact`.
+
+- [ ] Happy path — real name + normal message; wait **>3s** before submit → success (or email if Resend configured)
+- [ ] Gibberish name — 19+ letter token (e.g. `abcdefghijklmnopqrst`) → rejected
+- [ ] Gibberish message — long random / spam-like text → rejected
+- [ ] Legitimate long name — e.g. `Wojciechowski` + normal message → allowed
+- [ ] Rate limit — two submits from same IP within preset window → second blocked
+- [ ] Non-English message — e.g. Chinese inquiry text → allowed
+
+---
+
+#### 5. Wave 2 — auth guards (2026-06-02)
+
+Code touched: `checkIfAdmin`, `checkOwnership`, `getSessionForApis`. See **§7** for full login/session smoke after `lib/auth.ts`.
+
+- [ ] Admin — edit category/tag as admin → works
+- [ ] Admin — same action as non-admin → 401/403, not 500
+- [ ] Edit own content → saves
+- [ ] Edit others' content → blocked cleanly (403/401, not 500)
+
+---
+
+#### 6. Name normalization (2026-06-02)
+
+Code touched: `normalizeString` (duplicate detection, check-if-exists).
+
+- [ ] Create or search with spaces/punctuation/case variants → same normalized match as before
+- [ ] Duplicate name on `/addnames` → still caught
+
+---
+
+#### 7. Auth + `User` model (2026-06-07 — `b1f0994`, ~15 min)
+
+Code touched: `lib/auth.ts`, `models/User.ts`, `types/next-auth.d.ts`, `resolveSignInCallback`.
 
 - [ ] `/login` — credentials login with valid email + password → nav shows logged-in state
 - [ ] `/login` — wrong password → error message, no session
@@ -89,135 +161,79 @@ Code touched: `lib/auth.ts`, `models/User.ts`, `types/next-auth.d.ts`, `checkIfA
 
 Optional: banned account → ban error on login; or mid-session ban + session refresh → logged out.
 
-#### Quick pass — `b29c9e7` utils wave 3 (~10 min)
+---
 
-Code touched: `getUserByProfileName.ts`, `startCooldown.ts`, `findNormalizedMatch.ts` (used in names/description APIs and listing pagination).
+#### 8. Utils wave 3 (2026-06-07 — `b29c9e7`, ~10 min)
+
+Code touched: `getUserByProfileName.ts`, `startCooldown.ts`, `findNormalizedMatch.ts`.
 
 - [ ] `/profile/[profilename]` — known user's profile loads (avatar, lists; not 404/500)
-- [ ] `getUserByProfileName` — `/register` with taken profile name → rejected (same check as auth pass above)
-- [ ] `findExactNormalized` — `/addnames` submit duplicate name (`Fluffy` when `fluffy` exists) → 409 / “already exists”
-- [ ] `findExactNormalized` — edit a description to text that matches another entry → duplicate blocked
-- [ ] `findStartNormalized` — `/adddescriptions` → “Check if a description exists” → paste **start** of existing description → duplicate message + existing content shown
-- [ ] `findStartNormalized` — same UI, text matching only the **middle** of an existing description → **not** flagged as duplicate
-- [ ] `startCooldown` — `/fetchnames` or `/fetchdescriptions` → spam pagination **next** → ~15s cooldown, cannot instant-click through
-- [ ] `startCooldown` — same pages → rapid sort or filter changes → ~3s cooldown between actions
+- [ ] `/register` with taken profile name → rejected
+- [ ] `/addnames` — duplicate name (`Fluffy` when `fluffy` exists) → 409 / “already exists”
+- [ ] Edit description to text matching another entry → duplicate blocked
+- [ ] `/adddescriptions` → “Check if a description exists” → paste **start** of existing description → duplicate message + existing content shown
+- [ ] Same UI, text matching only **middle** of existing description → **not** flagged as duplicate
+- [ ] `/fetchnames` or `/fetchdescriptions` → spam pagination **next** → ~15s cooldown
+- [ ] Same pages → rapid sort or filter changes → ~3s cooldown
 
-**Note:** Name “check if exists” on `/fetchname` uses its own route, not `findNormalizedMatch`. Description live check on `/adddescriptions` **does** use `findStartNormalized`.
+**Note:** Name “check if exists” on `/fetchname` uses its own route, not `findNormalizedMatch`.
 
-**Regression signals for these commits:**
+---
+
+#### 9. `lib/checkBlocklist` (2026-06-07, ~5 min)
+
+Code touched: `lib/checkBlocklist.ts`, `checkMultipleBlocklists.ts`, `data/blockList.js`.
+
+- [ ] `/addnames` — submit **`butt`** alone → 403 / blocklist message (`exact-name`)
+- [ ] `/addnames` — submit **`fluffy butt`** → allowed
+- [ ] `/adddescriptions` — substring blocklist hit → 403 with `blockedBy` in message
+- [ ] `/addnames` or `/adddescriptions` — legitimate content → saves successfully
+- [ ] `/register` or `/editsettings` — blocklisted bio (if field checked) → rejected
+
+**Note:** `/contact` uses `detectBotPatterns`, not `checkBlocklist`.
+
+---
+
+#### 10. Likes models (2026-06-07 — `NameLike` / `DescriptionLike`, ~10 min)
+
+Code touched: `models/NameLike.ts`, `models/DescriptionLike.ts`. (`Follow.ts` — migrations only.)
+
+Use **two users** (or like another user's content).
+
+- [ ] Name like toggle on `/name/[name]` → like / unlike; count updates
+- [ ] Rapid double-click like → one like only, no 500
+- [ ] Description like toggle on `/description/[id]` → like / unlike works
+- [ ] `/notifications` — names tab shows like from another user
+- [ ] `/notifications` — descriptions tab shows like notification
+- [ ] Mark like notification read → stays read on refresh
+- [ ] User likes list loads (dashboard / likes view if exposed)
+- [ ] Self-like → no notification for yourself
+- [ ] Profile follow / unfollow still works (`User.followers`, not `Follow` model)
+
+---
+
+### Regression signals (all waves)
 
 | Symptom | Likely cause |
 |---------|----------------|
+| 500 on page load | `db.connect` or `leanWithStrings` on that route |
+| Hydration error / "Objects are not valid as React child" | ObjectId not stringified (`mongoDataCleanup`) |
+| Contact always fails | Rate limiter or bot detection too aggressive |
+| Admin/owner action returns 500 | `checkIfAdmin` / `checkOwnership` session handling |
 | Login succeeds but nav shows logged out | `session` / `jwt` callback or `toTokenUser` |
 | `profileName` or `role` missing in UI | NextAuth augmentation / JWT payload |
 | Profile page 500 for valid user | `getUserByProfileName` or `db.connect` |
 | Duplicate name slips through on submit | `findExactNormalized` |
 | Description check never finds known duplicate | `findStartNormalized` / normalization |
 | Pagination or sort spam works with no delay | `startCooldown` |
-
----
-
-### Quick pass (~15–20 min)
-
-- [x] `/fetchnames` — name list loads
-- [x] One `/name/[name]` page — content, tags, categories render
-- [x] One `/profile/[profilename]` page — user data and lists load
-- [x] Log in → `/notifications` — tabs and notification items load
-- [x] `/contact` — one legitimate submit (wait **>3 seconds** before clicking submit)
-- [x] `/contact` — one obvious spam submit (gibberish name or message) → rejected
-- [x] One owner action (edit your own content) — still works
-- [x] Rapid-click a rate-limited button (like/follow) — throttles, no double submit
-
----
-
-### 1. DB + `mongoDataCleanup` (`utils/db.ts`, `leanWithStrings`)
-
-Used across pages and API routes. Regressions often show as **500 errors**, blank sections, or IDs displayed as `[object Object]`.
-
-
-| Check         | Route / action                          | Pass criteria                                  |
-| ------------- | --------------------------------------- | ---------------------------------------------- |
-| Name browse   | `/fetchnames`                           | List loads; no server error                    |
-| Name detail   | `/name/[name]`                          | Page renders with related data                 |
-| Description   | `/description/[id]`                     | Content loads                                  |
-| Profile       | `/profile/[profilename]`                | Profile, lists, images load                    |
-| Dashboard     | `/dashboard` (logged in)                | Dashboard data renders                         |
-| Notifications | `/notifications` (logged in)            | Like/thank items show linked content           |
-| API shape     | DevTools → Network → data API responses | `_id` values are **strings**; no `__v` in JSON |
-
-
-**Network tip:** open Response tab on a data-heavy request. String IDs mean `leanWithStrings` is working.
-
----
-
-### 2. Contact spam + rate limiter (`detectBotPatterns`, `rateLimiter`)
-
-Used in `app/actions/sendContactEmail.js` on `**/contact`**.
-
-
-| Check                | Input                                              | Expected                                     |
-| -------------------- | -------------------------------------------------- | -------------------------------------------- |
-| Happy path           | Real name + normal message; wait >3s before submit | Success (or email sent if Resend configured) |
-| Gibberish name       | 19+ letter token (e.g. `abcdefghijklmnopqrst`)     | Rejected                                     |
-| Gibberish message    | Long random / spam-like text                       | Rejected                                     |
-| Legitimate long name | e.g. `Wojciechowski` + normal message              | Allowed                                      |
-| Rate limit           | Two submits from same IP within preset window      | Second blocked                               |
-| Non-English message  | e.g. Chinese inquiry text                          | Allowed (CJK rules removed)                  |
-
-
----
-
-### 3. Auth guards (`checkIfAdmin`, `checkOwnership`, `getSessionForApis`)
-
-
-| Check                   | Actor      | Expected                  |
-| ----------------------- | ---------- | ------------------------- |
-| Admin category/tag edit | Admin user | Works as before           |
-| Admin category/tag edit | Non-admin  | 401/403, not 500          |
-| Edit own content        | Owner      | Works                     |
-| Edit others' content    | Non-owner  | Blocked cleanly (not 500) |
-
-
-If you lack admin UI handy, hit admin API routes in Network while logged in as a normal user and confirm 401/403.
-
----
-
-### 4. Name normalization (`normalizeString`)
-
-Used in name create/search and check-if-content-exists flows.
-
-
-| Check                                                  | Expected                        |
-| ------------------------------------------------------ | ------------------------------- |
-| Search or create with spaces/punctuation/case variants | Same normalized match as before |
-| Duplicate name detection when adding content           | Still catches duplicates        |
-
-
----
-
-### 5. Smaller converted modules
-
-
-| Module                           | Where to check                                                      |
-| -------------------------------- | ------------------------------------------------------------------- |
-| `chooseRandomDefaultAvatar`      | Register new user → default profile avatar assigned                 |
-| `getError`                       | `/editsettings` — trigger validation error → message still displays |
-| `useApiRateLimiter` + `debounce` | Toggle/cooldown buttons — rapid clicks throttled                    |
-| `checkIfValidContentType`        | Names/descriptions listing pages load via SWR/API                   |
-
-
----
-
-### Regression signals
-
-
-| Symptom                                                  | Likely cause                                       |
-| -------------------------------------------------------- | -------------------------------------------------- |
-| 500 on page load                                         | `db.connect` or `leanWithStrings` on that route    |
-| Hydration error / "Objects are not valid as React child" | ObjectId not stringified (`mongoDataCleanup`)      |
-| Contact always fails                                     | Rate limiter or bot detection too aggressive       |
-| Admin/owner action returns 500                           | `checkIfAdmin` / `checkOwnership` session handling |
-
+| All names/descriptions rejected | Blocklist Sets / Trie; `data/blockList.js` |
+| `butt` alone allowed | exact-name pass broken or content length ≥ 100 |
+| Obvious substring slips through | Trie or lowercasing on list entries |
+| 500 instead of 403 on block | `respondIfBlocked` / `bannedWordsMessage` |
+| Like toggle 500 | `NameLike` / `DescriptionLike` or toggle route transaction |
+| Count wrong but no error | `likedByCount` out of sync with like collection |
+| Notifications empty after like | `contentCreator` / populate / `getPaginatedNotifications` |
+| Duplicate likes in DB | unique index missing on `namelikes` / `descriptionlikes` |
 
 ---
 

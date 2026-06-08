@@ -712,3 +712,27 @@ Expanded `docs/notes/models/likes-and-follows.md` with original index comments, 
 ### Files modified
 
 - `docs/notes/models/likes-and-follows.md`
+
+---
+
+## 2026-06-07 — TESTING.md: manual checks for checkBlocklist + likes models
+
+### What was changed and why
+
+Added checkbox quick-pass sections for `lib/checkBlocklist` and `NameLike` / `DescriptionLike` manual verification under Manual verification (TypeScript migration).
+
+### Files modified
+
+- `TESTING.md`
+
+---
+
+## 2026-06-07 — TESTING.md: chronological manual verification order
+
+### What was changed and why
+
+Reorganized manual verification checklists oldest migration → newest (wave 1 through likes models); merged regression signals into one table at the end.
+
+### Files modified
+
+- `TESTING.md`
