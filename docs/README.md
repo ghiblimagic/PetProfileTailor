@@ -21,4 +21,5 @@ Each source file with notes should have a one-line pointer at the top linking to
 | [`lib/auth.ts`](../lib/auth.ts) | [auth.md](notes/lib/auth.md) |
 | [`lib/checkBlocklist.ts`](../lib/checkBlocklist.ts) | [checkBlocklist.md](notes/lib/checkBlocklist.md) |
 | [`models/NameLike.ts`](../models/NameLike.ts), [`DescriptionLike.ts`](../models/DescriptionLike.ts), [`Follow.ts`](../models/Follow.ts) | [likes-and-follows.md](notes/models/likes-and-follows.md) |
+| [`models/Thank.ts`](../models/Thank.ts), [`Suggestion.ts`](../models/Suggestion.ts), [`Report.ts`](../models/Report.ts) | [moderation-and-thanks.md](notes/models/moderation-and-thanks.md) |
 | [`utils/stringManipulation/findNormalizedMatch.ts`](../utils/stringManipulation/findNormalizedMatch.ts) | [findNormalizedMatch.md](notes/utils/stringManipulation/findNormalizedMatch.md) |

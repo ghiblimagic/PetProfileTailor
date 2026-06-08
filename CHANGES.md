@@ -736,3 +736,68 @@ Reorganized manual verification checklists oldest migration → newest (wave 1 t
 ### Files modified
 
 - `TESTING.md`
+
+---
+
+## 2026-06-07 — TypeScript migration: Thank, Suggestion, Report
+
+### What was built and why
+
+Converted remaining small moderation/thanks models before core `Name` / `Description`. Preserved `fieldDescriptions` statics on Suggestion/Report and explicit `thanks` collection name.
+
+### Files created
+
+- `models/Thank.ts`
+- `models/Suggestion.ts`
+- `models/Report.ts`
+- `docs/notes/models/moderation-and-thanks.md`
+
+### Files removed
+
+- `models/Thank.js`
+- `models/Suggestion.js`
+- `models/Report.js`
+
+### Files modified
+
+- `docs/README.md` — index entry for moderation-and-thanks notes
+
+### Patterns followed
+
+- `as const` status/outcome/priority unions (same as `User.ts`)
+- `ISuggestionModel` / `IReportModel` for `fieldDescriptions` static typing
+- Extensionless `@/models/*` imports unchanged
+
+### Problems and fixes
+
+- **Build:** Mongoose `schema.statics` direct assignment failed type-check — moved `fieldDescriptions` into schema `{ statics: { ... } }` option.
+- **Thank `descriptionId` required:** kept legacy `(contentType as string) === "description"` to match existing API (enum is `"descriptions"`).
+
+### Verification
+
+- `pnpm test` — 13 suites, 56 tests passed
+- `pnpm build` — succeeded
+
+### Files modified (follow-up)
+
+- `TESTING.md` — §11 manual checks for Thank / Suggestion / Report
+
+### TODOs
+
+- Core models: `Name.js`, `Description.js`
+
+### Next logical step
+
+Convert `Name` and `Description` models.
+
+---
+
+## 2026-06-07 — TESTING.md: restore checkbox progress after reorder
+
+### What was changed and why
+
+Chronological reorder reset §2 (formerly “Quick pass”) from `[x]` back to `[ ]`. Restored eight checked items from git history; added note to preserve checkbox state on future edits.
+
+### Files modified
+
+- `TESTING.md`

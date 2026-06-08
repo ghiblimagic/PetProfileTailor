@@ -62,6 +62,8 @@ Local green + Vercel green means TS modules compile and unit tests pass. Manual 
 
 Work through in order for a **full migration smoke**. For a single PR, jump to the section that matches your change.
 
+**Note:** Checkboxes (`[x]` / `[ ]`) are your personal progress — preserve them when adding or reordering sections.
+
 ---
 
 #### 1. Wave 1 — leaf utils (2026-06-02)
@@ -79,14 +81,14 @@ Code touched: `fetch`, `error`, `normalizeString`, `debounce`, `checkIfValidCont
 
 Broad sanity check after early migration waves.
 
-- [ ] `/fetchnames` — name list loads
-- [ ] One `/name/[name]` page — content, tags, categories render
-- [ ] One `/profile/[profilename]` page — user data and lists load
-- [ ] Log in → `/notifications` — tabs and notification items load
-- [ ] `/contact` — one legitimate submit (wait **>3 seconds** before clicking submit)
-- [ ] `/contact` — one obvious spam submit (gibberish name or message) → rejected
-- [ ] One owner action (edit your own content) — still works
-- [ ] Rapid-click a rate-limited button (like/follow) — throttles, no double submit
+- [x] `/fetchnames` — name list loads
+- [x] One `/name/[name]` page — content, tags, categories render
+- [x] One `/profile/[profilename]` page — user data and lists load
+- [x] Log in → `/notifications` — tabs and notification items load
+- [x] `/contact` — one legitimate submit (wait **>3 seconds** before clicking submit)
+- [x] `/contact` — one obvious spam submit (gibberish name or message) → rejected
+- [x] One owner action (edit your own content) — still works
+- [x] Rapid-click a rate-limited button (like/follow) — throttles, no double submit
 
 ---
 
@@ -212,6 +214,26 @@ Use **two users** (or like another user's content).
 
 ---
 
+#### 11. Thank, Suggestion, Report (2026-06-07 — `Thank.ts` / `Suggestion.ts` / `Report.ts`, ~15 min)
+
+Code touched: `models/Thank.ts`, `models/Suggestion.ts`, `models/Report.ts`.
+
+Use **two users** for thanks (thank someone else's content).
+
+- [ ] `/name/[name]` or `/description/[id]` — send thank with preset message → success
+- [ ] Thank same content again → rejected or no duplicate (per route rules)
+- [ ] `/notifications` — thanks tab shows thank from another user
+- [ ] Mark thank notification read → stays read on refresh
+- [ ] Self-thank → no notification for yourself
+- [ ] `/name/[name]` — submit tag suggestion (incorrect + suggested tags) → saved
+- [ ] `/dashboard` or user suggestions list — new suggestion appears
+- [ ] Flag/report flow on name or description → report submitted (not 500)
+- [ ] Admin or owner reports list loads if exposed in UI
+
+**Note:** Thank API uses `contentType === "description"` (singular) for `descriptionId` required check; schema enum is `"descriptions"`.
+
+---
+
 ### Regression signals (all waves)
 
 | Symptom | Likely cause |
@@ -234,6 +256,10 @@ Use **two users** (or like another user's content).
 | Count wrong but no error | `likedByCount` out of sync with like collection |
 | Notifications empty after like | `contentCreator` / populate / `getPaginatedNotifications` |
 | Duplicate likes in DB | unique index missing on `namelikes` / `descriptionlikes` |
+| Thank submit 500 | `Thank` model / `ThanksOptions` enum mismatch |
+| Thank notification missing | `contentCreator` index or thanks route populate |
+| Suggestion save 500 | `Suggestion` refs (`NameTag`, `DescriptionTag`) |
+| Report flag 500 | `Report` `contentCopy` or category validation |
 
 ---
 
