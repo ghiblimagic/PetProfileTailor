@@ -1,11 +1,6 @@
 import { getSessionForApis } from "./getSessionForApis";
 import type { Session } from "next-auth";
 
-type AppUser = Session["user"] & {
-  role?: string;
-  status?: string;
-};
-
 type CheckIfAdminParams = {
   req?: Request;
 };
@@ -24,7 +19,7 @@ export async function checkIfAdmin(
     return auth;
   }
 
-  const { role, status } = (auth.session.user ?? {}) as AppUser;
+  const { role, status } = auth.session.user ?? {};
   const isAdmin = role === "admin" && status === "active";
 
   if (!isAdmin) {

@@ -18,3 +18,4 @@ Each source file with notes should have a one-line pointer at the top linking to
 |--------|-------|
 | [`utils/mongoDataCleanup.ts`](../utils/mongoDataCleanup.ts) | [mongoDataCleanup.md](notes/utils/mongoDataCleanup.md) |
 | [`jest.setup.ts`](../jest.setup.ts) | [jest-setup.md](notes/jest-setup.md) |
+| [`lib/auth.ts`](../lib/auth.ts) | [auth.md](notes/lib/auth.md) |

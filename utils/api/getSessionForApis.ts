@@ -1,5 +1,5 @@
 import { getServerSession } from "next-auth/next";
-import type { AuthOptions, Session } from "next-auth";
+import type { Session } from "next-auth";
 import { serverAuthOptions } from "@/lib/auth";
 
 type GetSessionOptions = {
@@ -15,9 +15,7 @@ export type GetSessionResult = GetSessionSuccess | GetSessionFailure;
 export async function getSessionForApis(
   _options?: GetSessionOptions,
 ): Promise<GetSessionResult> {
-  const session = await getServerSession(
-    serverAuthOptions as AuthOptions,
-  );
+  const session = await getServerSession(serverAuthOptions);
 
   if (!session) {
     return {

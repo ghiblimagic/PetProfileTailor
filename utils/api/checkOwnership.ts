@@ -2,12 +2,6 @@ import type { Session } from "next-auth";
 import type { Types } from "mongoose";
 import { getSessionForApis } from "./getSessionForApis";
 
-type AppUser = Session["user"] & {
-  id: string;
-  role?: string;
-  status?: string;
-};
-
 type CheckOwnershipParams = {
   req?: Request;
   res?: unknown;
@@ -28,7 +22,7 @@ export async function checkOwnership({
     return { ok: false };
   }
 
-  const user = auth.session.user as AppUser;
+  const user = auth.session.user;
   const isTheCreator = resourceCreatorId.toString() === user.id;
   const isActiveAdmin = user.role === "admin" && user.status === "active";
 

@@ -384,3 +384,78 @@ Moved heavy learning/design comments out of source files into central markdown s
 ### Next logical step
 
 Use the same pattern for future TS conversions (`lib/auth.js`, etc.): notes in `docs/notes/<path>/<module>.md`, pointer in source.
+
+---
+
+## 2026-06-06 — TypeScript migration: `lib/auth`
+
+### What was built and why
+
+Converted `lib/auth.js` to TypeScript with NextAuth module augmentation. Extracted `resolveSignInCallback` for unit tests. Moved all original inline comments to `docs/notes/lib/auth.md` (not deleted).
+
+### Files created
+
+- `lib/auth.ts` — `serverAuthOptions`, `toCredentialsUser` / `toTokenUser`
+- `lib/resolveSignInCallback.ts` — pure signIn branching (re-exported from `auth.ts`)
+- `lib/resolveSignInCallback.test.ts` — 4 tests for sign-in branching
+- `types/next-auth.d.ts` — `Session.user`, `User`, `JWT` augmentation (`id`, `role`, `status`, profile fields)
+- `docs/notes/lib/auth.md` — full notes from original `auth.js`
+
+### Files removed
+
+- `lib/auth.js`
+
+### Files modified
+
+- `utils/api/checkIfAdmin.ts`, `checkOwnership.ts` — removed `AppUser` casts (types from augmentation)
+- `utils/api/getSessionForApis.ts` — removed `AuthOptions` cast
+- `docs/README.md` — index entry for auth notes
+
+### Verification
+
+- `pnpm test` — includes `lib/resolveSignInCallback.test.ts`
+- `pnpm build` — succeeded
+- Manual: login (credentials + magic link), protected routes, admin guard
+
+### Next logical step
+
+Medium utils still JS: `getUserByProfileName.js`, `findNormalizedMatch.js`, `startCooldown.js`, `filevalidation.js`.
+
+---
+
+## 2026-06-06 — Type `User` model; tighten `lib/auth` types
+
+### What was built and why
+
+Replaced loose `as string` casts in `lib/auth.ts` by converting `models/User.js` → `User.ts` with `UserStatus`, `UserRole`, and `IUserDocument`. NextAuth augmentation now uses those unions.
+
+### Files created
+
+- `models/User.ts`
+
+### Files removed
+
+- `models/User.js`
+
+### Files modified
+
+- `lib/auth.ts` — `toCredentialsUser` / `toTokenUser` helpers; no field casts
+- `types/next-auth.d.ts` — `role` / `status` use `UserRole` / `UserStatus`
+
+### Verification
+
+- `pnpm exec tsc --noEmit` — clean
+- `pnpm test` / `pnpm build` — run before merge
+
+---
+
+## 2026-06-06 — Auth docs / CHANGES housekeeping
+
+### What was changed and why
+
+Corrected stale references after auth TS migration: test file is `lib/resolveSignInCallback.test.ts`; JWT/credentials notes now describe `toTokenUser` / `toCredentialsUser` and required `user.id`.
+
+### Files modified
+
+- `CHANGES.md` — auth entry test file names
+- `docs/notes/lib/auth.md` — JWT, credentials, related files sections synced with [`lib/auth.ts`](lib/auth.ts)
