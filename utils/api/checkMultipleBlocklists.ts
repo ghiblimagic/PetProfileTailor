@@ -1,4 +1,4 @@
-import { checkBlocklists } from "@/lib/checkBlocklist";
+import { checkBlocklists, type BlocklistType } from "@/lib/checkBlocklist";
 import bannedWordsMessage from "@/utils/api/bannedWordsMessage";
 
 type FieldToCheck = {
@@ -10,7 +10,7 @@ type BlockResult = {
   fieldName: string;
   value: string;
   blockedBy: string;
-  blockType: string;
+  blockType: BlocklistType;
 };
 
 export function checkMultipleFieldsBlocklist(

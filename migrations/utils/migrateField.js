@@ -1,12 +1,11 @@
-// migrations/utils/migrateField.js
 /**
  * Generic migration helper for renaming or adding fields in MongoDB using Mongoose.
  *
- * @param {Mongoose.Model} model - The Mongoose model to update
+ * @param {import("mongoose").Model} model - The Mongoose model to update
  * @param {string|null} oldField - The old field name (null if creating a brand new field)
  * @param {string} newField - The new field name
  * @param {boolean} removeOld - Whether to remove the old field
- * @param {*} defaultValue - Value to use if oldField doesn’t exist
+ * @param {*} defaultValue - Value to use if oldField doesn't exist
  */
 export async function migrateField(
   model,
@@ -21,7 +20,7 @@ export async function migrateField(
     let result;
 
     if (oldField) {
-      // Step 1: Copy values from oldField → newField if newField doesn’t exist
+      // Step 1: Copy values from oldField → newField if newField doesn't exist
       result = await model.updateMany(
         { [oldField]: { $exists: true }, [newField]: { $exists: false } },
         [{ $set: { [newField]: `$${oldField}` } }],

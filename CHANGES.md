@@ -564,3 +564,95 @@ Replaced detailed tables with checkbox quick-pass lists for `b1f0994` and `b29c9
 ### Files modified
 
 - `TESTING.md`
+
+---
+
+## 2026-06-07 — TypeScript migration: `lib/checkBlocklist`
+
+### What was built and why
+
+Converted `lib/checkBlocklist.js` to TypeScript with exported `BlocklistResult` / `BlocklistType`. Added unit tests for the three-pass rules (everywhere, exact-name, substring Trie). Moved Trie design notes to `docs/notes/lib/checkBlocklist.md`.
+
+### Files created
+
+- `lib/checkBlocklist.ts`
+- `lib/checkBlocklist.test.ts`
+- `docs/notes/lib/checkBlocklist.md`
+
+### Files removed
+
+- `lib/checkBlocklist.js`
+
+### Files modified
+
+- `utils/api/checkMultipleBlocklists.ts` — `blockType` uses `BlocklistType`
+- `docs/README.md` — index entry for checkBlocklist notes
+
+### Patterns followed
+
+- Slim source + pointer to `docs/notes/` (same as `mongoDataCleanup`, `auth`)
+- Blocklist Sets built from lowercased list entries so matching aligns with normalized input
+- Co-located `BlocklistResult` type for `checkMultipleBlocklists` consumer
+
+### Verification
+
+- `pnpm test` — 13 suites, 56 tests passed
+- `pnpm build` — succeeded
+
+### TODOs
+
+- Small models: `NameLike`, `DescriptionLike`, `Follow`, `Thank`, `Suggestion`, `Report`
+- `data/blockList.js` — optional TS conversion when touching blocklist data
+- `utils/filevalidation.js` — unused; delete or wire up later
+
+### Next logical step
+
+Convert small models batch (`Follow`, `NameLike`, `DescriptionLike`) following `NameTag.ts` pattern.
+
+---
+
+## 2026-06-07 — checkBlocklist docs: restore original comments
+
+### What was changed and why
+
+Expanded `docs/notes/lib/checkBlocklist.md` with Trie walkthrough, pass-by-pass rules, and design comments from original `checkBlocklist.js`.
+
+### Files modified
+
+- `docs/notes/lib/checkBlocklist.md`
+
+---
+
+## 2026-06-07 — checkBlocklist docs: annotated source
+
+### What was changed and why
+
+Added full annotated `checkBlocklist.ts` source with original inline comments to `docs/notes/lib/checkBlocklist.md`.
+
+### Files modified
+
+- `docs/notes/lib/checkBlocklist.md`
+
+---
+
+## 2026-06-07 — Move `migrateField` into `migrations/utils/`
+
+### What was changed and why
+
+`migrateField` is only used by migration scripts, not runtime app code. Moved from `utils/api/` to `migrations/utils/` so `utils/api` stays app-facing.
+
+### Files created
+
+- `migrations/utils/migrateField.js`
+
+### Files removed
+
+- `utils/api/migrateField.js`
+
+### Files modified
+
+- `migrations/toCamelCase.js` — import `./utils/migrateField.js`
+
+### Next logical step
+
+Convert small models batch (`Follow`, `NameLike`, `DescriptionLike`) following `NameTag.ts` pattern.

@@ -2,7 +2,7 @@
 import "dotenv/config";
 import db from "../utils/db.js";
 import User from "../models/User.js";
-import { migrateField } from "../utils/api/migrateField.js";
+import { migrateField } from "./utils/migrateField.js";
 
 (async () => {
   await db.connect();
