@@ -656,3 +656,59 @@ Added full annotated `checkBlocklist.ts` source with original inline comments to
 ### Next logical step
 
 Convert small models batch (`Follow`, `NameLike`, `DescriptionLike`) following `NameTag.ts` pattern.
+
+---
+
+## 2026-06-07 — TypeScript migration: small models (likes + follow)
+
+### What was built and why
+
+Converted `NameLike`, `DescriptionLike`, and `Follow` to TypeScript following `NameTag.ts` / `User.ts` patterns. Preserved explicit collection names for migration scripts. Moved index learning notes to `docs/notes/models/likes-and-follows.md`.
+
+### Files created
+
+- `models/NameLike.ts`
+- `models/DescriptionLike.ts`
+- `models/Follow.ts`
+- `docs/notes/models/likes-and-follows.md`
+
+### Files removed
+
+- `models/NameLike.js`
+- `models/DescriptionLike.js`
+- `models/Follow.js`
+
+### Files modified
+
+- `docs/README.md` — index entry for likes-and-follows notes
+
+### Patterns followed
+
+- `I*Document` interfaces + `Model<I*Document>` export
+- Explicit collection names (`namelikes`, `descriptionlikes`, `follows`) unchanged
+- Extensionless `@/models/*` imports unchanged for app consumers
+
+### Verification
+
+- `pnpm test` — 13 suites, 56 tests passed
+- `pnpm build` — succeeded
+
+### TODOs
+
+- Remaining models: `Thank`, `Suggestion`, `Report`, `Name`, `Description`
+
+### Next logical step
+
+Convert `Thank`, `Suggestion`, `Report`; then core `Name` / `Description` models.
+
+---
+
+## 2026-06-07 — likes-and-follows docs: annotated source + examples
+
+### What was changed and why
+
+Expanded `docs/notes/models/likes-and-follows.md` with original index comments, field overview, route usage map, and annotated source snippets for all three models.
+
+### Files modified
+
+- `docs/notes/models/likes-and-follows.md`
