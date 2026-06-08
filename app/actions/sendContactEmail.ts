@@ -1,3 +1,6 @@
+/**
+ * Flow notes: docs/notes/app/actions/sendContactEmail.md
+ */
 "use server";
 
 import { Resend } from "resend";
@@ -18,31 +21,51 @@ import {
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
-export async function sendContactEmail(prevState, formData) {
-  const name = formData.get("name");
-  const email = formData.get("email");
-  const message = formData.get("message");
-  const captchaToken = formData.get("captchaToken");
+export type ContactEmailState = {
+  success: boolean;
+  error: string | null;
+  email: string | null;
+};
+
+interface RecaptchaVerifyResponse {
+  success: boolean;
+  score?: number;
+  action?: string;
+  "error-codes"?: string[];
+}
+
+function getFormString(value: FormDataEntryValue | null): string {
+  return typeof value === "string" ? value : "";
+}
+
+export async function sendContactEmail(
+  _prevState: ContactEmailState,
+  formData: FormData,
+): Promise<ContactEmailState> {
+  const name = getFormString(formData.get("name"));
+  const email = getFormString(formData.get("email"));
+  const message = getFormString(formData.get("message"));
+  const captchaToken = getFormString(formData.get("captchaToken"));
 
   // HONEYPOT CHECK - if filled, it's a bot
-  const honeypotWebsite = formData.get("website");
-  const honeypotPhone = formData.get("phone");
+  const honeypotWebsite = getFormString(formData.get("website"));
+  const honeypotPhone = getFormString(formData.get("phone"));
   if (honeypotWebsite || honeypotPhone) {
     console.log("Bot detected: Honeypot filled", {
       honeypotWebsite,
       honeypotPhone,
     });
-    return { success: false, error: "Invalid form submission." };
+    return { success: false, error: "Invalid form submission.", email: null };
   }
 
   // Get client IP early for logging and rate limiting
   const headersList = await headers();
   const clientIP = getClientIP(headersList);
 
-  //  Time-based checks,  kick out requests from bots, who will usually submit quickly
-  const formStartTime = parseInt(formData.get("formStartTime"));
-  if (!formStartTime || isNaN(formStartTime)) {
-    return { success: false, error: "Invalid form submission." };
+  // Time-based checks — kick out requests from bots, who will usually submit quickly
+  const formStartTime = parseInt(getFormString(formData.get("formStartTime")), 10);
+  if (!formStartTime || Number.isNaN(formStartTime)) {
+    return { success: false, error: "Invalid form submission.", email: null };
   }
 
   const submissionTime = Date.now();
@@ -51,7 +74,7 @@ export async function sendContactEmail(prevState, formData) {
   if (timeSpent < 3000) {
     // Less than 3 seconds
     console.log("Bot detected: Too fast", { timeSpent, ip: clientIP });
-    return { success: false, error: "Form submitted too quickly." };
+    return { success: false, error: "Form submitted too quickly.", email: null };
   }
 
   if (timeSpent > 3600000) {
@@ -59,36 +82,40 @@ export async function sendContactEmail(prevState, formData) {
     return {
       success: false,
       error: "Form session expired. Please refresh and try again.",
+      email: null,
     };
   }
 
-  //  ********************  Validation  ********************
+  // ******************** Validation ********************
   if (!name || !email || !message || !captchaToken) {
-    return { success: false, error: "All fields are required." };
+    return { success: false, error: "All fields are required.", email: null };
   }
 
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   if (!emailRegex.test(email)) {
-    return { success: false, error: "Invalid email address." };
+    return { success: false, error: "Invalid email address.", email: null };
   }
 
   if (message.length > 10000 || name.length > 100 || email.length > 254) {
-    return { success: false, error: "Input too long." };
+    return { success: false, error: "Input too long.", email: null };
   }
 
   if (!isEnglishOrSpanishScript(message)) {
-    return { success: false, error: CONTACT_MESSAGE_LANGUAGE_ERROR };
+    return { success: false, error: CONTACT_MESSAGE_LANGUAGE_ERROR, email: null };
   }
 
   // BOT PATTERN DETECTION
-
   if (detectBotPatterns(name) || detectBotPatterns(message)) {
     console.log("Bot detected: Suspicious content pattern", {
       name,
       messagePreview: message.substring(0, 50),
       ip: clientIP,
     });
-    return { success: false, error: "Message contains invalid content." };
+    return {
+      success: false,
+      error: "Message contains invalid content.",
+      email: null,
+    };
   }
 
   // REALISTIC CONTENT CHECK
@@ -98,49 +125,47 @@ export async function sendContactEmail(prevState, formData) {
       messagePreview: message.substring(0, 50),
       ip: clientIP,
     });
-    return { success: false, error: "Please enter a valid message." };
+    return { success: false, error: "Please enter a valid message.", email: null };
   }
 
-  //  ********************  Recaptcha  ********************
+  // ******************** Recaptcha ********************
   try {
     const captchaVerify = await fetch(
-      `https://www.google.com/recaptcha/api/siteverify`,
+      "https://www.google.com/recaptcha/api/siteverify",
       {
         method: "POST",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
         body: new URLSearchParams({
-          secret: process.env.RECAPTCHA_SECRET_KEY,
+          secret: process.env.RECAPTCHA_SECRET_KEY ?? "",
           response: captchaToken,
         }),
       },
     );
     if (!captchaVerify.ok) {
-      return { success: false, error: "Captcha verification failed." };
+      return { success: false, error: "Captcha verification failed.", email: null };
     }
 
-    const captchaData = await captchaVerify.json();
+    const captchaData =
+      (await captchaVerify.json()) as RecaptchaVerifyResponse;
 
     // Detailed logging with all available data
-    // this one
     console.log("reCAPTCHA Details:", {
       type: captchaData.score ? "v3" : "v2",
       success: captchaData.success,
-      ...(captchaData.score && { score: captchaData.score }),
-      // when condition true/ aka if it exists for that version of captcha then use the value to the right
-
-      // if it evaluates to false:
-      // Evaluates to: ...(undefined && { score: undefined })
-      // && short-circuits, returns: ...undefined
-      // Spreading undefined does nothing (ignored), The spread operator ... safely ignores undefined, null, and false values
+      // when score/action exist for that captcha version, include them in the log object
+      ...(captchaData.score !== undefined && { score: captchaData.score }),
       ...(captchaData.action && { action: captchaData.action }),
-      ...(captchaData["error-codes"] && { errors: captchaData["error-codes"] }),
+      ...(captchaData["error-codes"] && {
+        errors: captchaData["error-codes"],
+      }),
+      // Spreading undefined does nothing (ignored)
       ip: clientIP,
       timestamp: new Date().toISOString(),
     });
 
     if (
       !captchaData.success ||
-      (captchaData.score && captchaData.score < 0.7)
+      (captchaData.score !== undefined && captchaData.score < 0.7)
     ) {
       return {
         success: false,
@@ -150,13 +175,10 @@ export async function sendContactEmail(prevState, formData) {
     }
   } catch (error) {
     console.error("Captcha verification error:", error);
-    return { success: false, error: "Could not verify captcha." };
+    return { success: false, error: "Could not verify captcha.", email: null };
   }
 
   // Check rate limit to not punish them for errors (only after validating everything else)
-  // Get client IP for rate limiting
-
-  // Check rate limit
   const rateCheck = rateLimiter.check(clientIP, rateLimitPresets.contact);
 
   if (!rateCheck.allowed) {
@@ -172,10 +194,15 @@ export async function sendContactEmail(prevState, formData) {
     };
   }
 
-  // ******************** Send emails  ********************
+  // ******************** Send emails ********************
   try {
     const from = process.env.RESEND_EMAIL_FROM;
     const adminEmail = process.env.RESEND_FROM_GMAIL;
+
+    if (!from || !adminEmail) {
+      console.error("Missing Resend env: RESEND_EMAIL_FROM or RESEND_FROM_GMAIL");
+      return { success: false, error: "Failed to send email.", email };
+    }
 
     const [userRes, adminRes] = await Promise.all([
       resend.emails.send({

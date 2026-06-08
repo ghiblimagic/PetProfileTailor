@@ -906,3 +906,51 @@ Converted the last two Mongoose models — all `models/*` are now TypeScript. Pr
 ### Next logical step
 
 Model migration complete; convert high-traffic API routes or `sendContactEmail.js` next.
+
+---
+
+## 2026-06-08 — TypeScript migration: sendContactEmail server action
+
+### What was built and why
+
+Converted the contact form server action to TypeScript with exported `ContactEmailState` for `useActionState` typing. Preserved validation order (honeypot → timing → language → bots → captcha → rate limit → Resend).
+
+### Files created
+
+- `app/actions/sendContactEmail.ts`
+- `docs/notes/app/actions/sendContactEmail.md`
+
+### Files removed
+
+- `app/actions/sendContactEmail.js`
+
+### Files modified
+
+- `docs/README.md` — index entry
+
+### Patterns followed
+
+- `getFormString` helper for `FormData` entries
+- `RecaptchaVerifyResponse` interface for siteverify JSON
+- Guard on missing `RESEND_EMAIL_FROM` / `RESEND_FROM_GMAIL` for strict null checks
+
+### Verification
+
+- `pnpm test` — 13 suites, 60 tests passed
+- `pnpm build` — succeeded
+
+### Next logical step
+
+Convert `app/api/names/route.js` or `ContactForm.jsx` to TypeScript.
+
+---
+
+## 2026-06-08 — sendContactEmail.ts: restore inline comments
+
+### What was changed and why
+
+Re-added section headers and at-a-glance comments from the original `.js` file after TS conversion stripped them.
+
+### Files modified
+
+- `app/actions/sendContactEmail.ts`
