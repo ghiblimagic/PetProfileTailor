@@ -2,6 +2,24 @@ const MESSAGE_LONG_SINGLE_TOKEN_MAX_LENGTH = 15;
 const MESSAGE_MIN_WORD_COUNT = 3;
 const MESSAGE_MAX_AVG_WORD_LENGTH = 20;
 
+/** Shown when the message is not English/Spanish (Latin script). */
+export const CONTACT_MESSAGE_LANGUAGE_ERROR =
+  "Please write your message in English or Spanish.";
+
+/** Basic Latin + Latin-1 supplement — covers English and Spanish (including á, ñ, ¿, etc.). */
+const LATIN_LETTER_REGEX = /[A-Za-z\u00C0-\u00FF]/g;
+
+/** English and Spanish both use Latin script; other languages are rejected at the contact form. */
+export function isEnglishOrSpanishScript(text: string): boolean {
+  const nonSpace = text.replace(/\s/g, "");
+  if (!nonSpace) {
+    return false;
+  }
+
+  const latinCount = nonSpace.match(LATIN_LETTER_REGEX)?.length ?? 0;
+  return latinCount / nonSpace.length >= 0.5;
+}
+
 function hasLongSingleGibberishToken(
   text: string,
   maxLength: number,
@@ -12,7 +30,12 @@ function hasLongSingleGibberishToken(
   }
 
   const words = trimmed.split(/\s+/);
-  return words.length === 1 && trimmed.length > maxLength;
+  if (words.length !== 1 || trimmed.length <= maxLength) {
+    return false;
+  }
+
+  // Latin-only long tokens (e.g. contact spam); other scripts often omit spaces.
+  return /^[A-Za-z]+$/.test(trimmed);
 }
 
 export function detectBotPatterns(text: string): boolean {
@@ -68,6 +91,10 @@ export function hasRealisticName(name: string): boolean {
 export function hasRealisticMessage(message: string): boolean {
   const trimmed = message.trim();
   if (!trimmed) {
+    return false;
+  }
+
+  if (!isEnglishOrSpanishScript(trimmed)) {
     return false;
   }
 

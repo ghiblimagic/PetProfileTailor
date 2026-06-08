@@ -117,7 +117,8 @@ Code touched: `detectBotPatterns`, `rateLimiter` on `/contact`.
 - [x] Gibberish message — long random / spam-like text → rejected
 - [x] Legitimate long name — e.g. `Wojciechowski` + normal message → allowed
 - [x] Rate limit — two submits from same IP within preset window → second blocked
-- [ ] Non-English message — e.g. Chinese inquiry text → allowed
+- [ ] Spanish message — e.g. `Hola, quisiera información sobre adopción` → allowed
+- [ ] Non-English/Spanish message — e.g. Japanese or Chinese inquiry → rejected with language error
 
 ---
 

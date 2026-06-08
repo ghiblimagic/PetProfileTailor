@@ -10,8 +10,10 @@ import {
 import ContactEmailCopy from "@/components/EmailTemplates/contact-copy-to-submitter";
 import ContactNotification from "@/components/EmailTemplates/contact-notification";
 import {
+  CONTACT_MESSAGE_LANGUAGE_ERROR,
   detectBotPatterns,
   hasRealisticContactFields,
+  isEnglishOrSpanishScript,
 } from "@utils/api/detectBotPatterns";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
@@ -72,6 +74,10 @@ export async function sendContactEmail(prevState, formData) {
 
   if (message.length > 10000 || name.length > 100 || email.length > 254) {
     return { success: false, error: "Input too long." };
+  }
+
+  if (!isEnglishOrSpanishScript(message)) {
+    return { success: false, error: CONTACT_MESSAGE_LANGUAGE_ERROR };
   }
 
   // BOT PATTERN DETECTION

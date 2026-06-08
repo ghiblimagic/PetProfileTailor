@@ -801,3 +801,70 @@ Chronological reorder reset §2 (formerly “Quick pass”) from `[x]` back to `
 ### Files modified
 
 - `TESTING.md`
+
+---
+
+## 2026-06-07 — contact form: allow Japanese/CJK messages
+
+### What was built and why
+
+`hasRealisticMessage` required 3+ whitespace-separated words — Japanese (and much Chinese) is written without spaces, so legitimate contact submissions failed with “Please enter a valid message.”
+
+### Files modified
+
+- `utils/api/detectBotPatterns.ts` — `isPrimarilyChineseJapaneseKorean` path; Latin-only long single-token check
+- `utils/api/detectBotPatterns.test.ts` — Japanese + Chinese message cases
+
+### Problems and fixes
+
+- **Root cause:** English word-count / avg-length heuristics applied to unsegmented Chinese/Japanese/Korean text.
+- **Fix:** If ≥50% C/J/K characters (hiragana, katakana, hanzi, hangul), require minimum length only; keep Latin gibberish rules for spam tokens.
+
+### Verification
+
+- `pnpm test -- detectBotPatterns` — 17 tests passed
+
+### Next logical step
+
+Re-test §4 “Non-English message” on `/contact`.
+
+---
+
+## 2026-06-07 — contact form: non-Latin messages (Russian, Thai, etc.)
+
+### What was changed and why
+
+C/J/K-only bypass was too narrow. Refactored to `isPrimarilyLatin`: word-count heuristics apply only when ≥50% of letters are Latin; all other scripts (Cyrillic, Arabic, CJK, Thai, …) need minimum length only.
+
+### Files modified
+
+- `utils/api/detectBotPatterns.ts`
+- `utils/api/detectBotPatterns.test.ts` — Russian + Thai cases
+
+### Verification
+
+- `pnpm test -- detectBotPatterns` — all tests passed
+
+---
+
+## 2026-06-07 — contact form: English and Spanish only
+
+### What was built and why
+
+Simplified contact policy for U.S. shelter focus: messages must use Latin script (English or Spanish). Non-Latin text is rejected with an explicit error; form shows the rule before submit.
+
+### Files modified
+
+- `utils/api/detectBotPatterns.ts` — `isEnglishOrSpanishScript`, `CONTACT_MESSAGE_LANGUAGE_ERROR`
+- `utils/api/detectBotPatterns.test.ts`
+- `app/actions/sendContactEmail.js` — language check before bot heuristics
+- `components/Contact/ContactForm.jsx` — helper text under message field
+- `TESTING.md` — §4 Spanish allowed / other languages rejected
+
+### Note
+
+Enforcement is by script (Latin letters + Spanish accents), not ML language detection — other Latin languages may pass; CJK, Cyrillic, Arabic, Thai, etc. are blocked.
+
+### Verification
+
+- `pnpm test -- detectBotPatterns`

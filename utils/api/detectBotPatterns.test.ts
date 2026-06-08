@@ -1,9 +1,11 @@
 import {
+  CONTACT_MESSAGE_LANGUAGE_ERROR,
   detectBotPatterns,
   hasRealisticContactFields,
   hasRealisticContent,
   hasRealisticMessage,
   hasRealisticName,
+  isEnglishOrSpanishScript,
 } from "./detectBotPatterns";
 
 const SPAM_NAME = "pvYPqHYUHlHCZOycCCz";
@@ -34,9 +36,30 @@ describe("detectBotPatterns", () => {
       false,
     );
   });
+});
 
-  it("allows short legitimate Chinese without script-block rules", () => {
-    expect(detectBotPatterns("我想咨询收养流程")).toBe(false);
+describe("isEnglishOrSpanishScript", () => {
+  it("accepts English and Spanish", () => {
+    expect(isEnglishOrSpanishScript("Hello from the shelter")).toBe(true);
+    expect(
+      isEnglishOrSpanishScript(
+        "Buenos días, me gustaría información sobre la adopción.",
+      ),
+    ).toBe(true);
+  });
+
+  it("rejects non-Latin scripts", () => {
+    expect(isEnglishOrSpanishScript("我想咨询收养流程")).toBe(false);
+    expect(
+      isEnglishOrSpanishScript(
+        "日本語の場合はランダムに生成された文章以外に、著作権が切れた小説などが利用されることもある",
+      ),
+    ).toBe(false);
+    expect(
+      isEnglishOrSpanishScript(
+        "Я хотел бы узнать о процедуре усыновления животных",
+      ),
+    ).toBe(false);
   });
 });
 
@@ -63,8 +86,22 @@ describe("hasRealisticMessage", () => {
     expect(hasRealisticMessage("abcdefghijklmnopqrst")).toBe(false);
   });
 
-  it("accepts a short multi-word message", () => {
+  it("accepts English and Spanish multi-word messages", () => {
     expect(hasRealisticMessage("Hello from the shelter")).toBe(true);
+    expect(
+      hasRealisticMessage(
+        "Hola, quisiera información sobre la adopción de mascotas.",
+      ),
+    ).toBe(true);
+  });
+
+  it("rejects non-English/Spanish scripts", () => {
+    expect(hasRealisticMessage("我想咨询收养流程")).toBe(false);
+    expect(
+      hasRealisticMessage(
+        "日本語の場合はランダムに生成された文章以外に、著作権が切れた小説などが利用されることもある",
+      ),
+    ).toBe(false);
   });
 });
 
@@ -80,9 +117,24 @@ describe("hasRealisticContactFields", () => {
     expect(hasRealisticContactFields(SPAM_NAME, SPAM_MESSAGE)).toBe(false);
   });
 
-  it("accepts realistic contact fields", () => {
+  it("accepts realistic English contact fields", () => {
     expect(
       hasRealisticContactFields("Janet Spellman", "Hello from the shelter"),
     ).toBe(true);
+  });
+
+  it("rejects Japanese contact message", () => {
+    expect(
+      hasRealisticContactFields(
+        "normal name",
+        "日本語の場合はランダムに生成された文章以外に、著作権が切れた小説などが利用されることもある",
+      ),
+    ).toBe(false);
+  });
+});
+
+describe("CONTACT_MESSAGE_LANGUAGE_ERROR", () => {
+  it("mentions English and Spanish", () => {
+    expect(CONTACT_MESSAGE_LANGUAGE_ERROR).toMatch(/English or Spanish/i);
   });
 });

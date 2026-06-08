@@ -144,11 +144,14 @@ export default function ContactPage() {
           />
 
           <h4>Message</h4>
+          <p className="text-sm text-gray-400 mt-1">
+            English or Spanish only
+          </p>
           <StyledTextarea
             name="message"
             required
             maxLength={10000}
-            aria-label="type your message"
+            aria-label="Type your message in English or Spanish"
             className="bg-secondary mt-3"
           />
 
