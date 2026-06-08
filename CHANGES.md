@@ -954,3 +954,62 @@ Re-added section headers and at-a-glance comments from the original `.js` file a
 ### Files modified
 
 - `app/actions/sendContactEmail.ts`
+
+---
+
+## 2026-06-08 — TypeScript migration: `app/api/names/route.ts` (first API route)
+
+### What was built and why
+
+Converted the main names CRUD route to TypeScript — first `app/api/*` route in the migration. Typed request bodies; narrowed `getSessionForApis` union; legacy commented Pages-router block moved to notes.
+
+### Files created
+
+- `app/api/names/route.ts`
+- `docs/notes/app/api/names-route.md`
+
+### Files removed
+
+- `app/api/names/route.js`
+
+### Files modified
+
+- `docs/README.md` — index entry
+
+### Patterns followed
+
+- `Request` handler signatures; JSON body interfaces per method
+- Extensionless `@models/Name`, `@utils/db` imports
+- `auth.ok` guard before `auth.session` (discriminated union)
+- `new mongoose.Types.ObjectId(contentId)` for DELETE (TS requires `new`)
+
+### Problems and fixes
+
+- **Build:** destructuring `session` before `ok` check failed strict union — use `auth` variable + narrow first.
+- **Build:** `tags` assignment needed cast to `ObjectId[]`.
+
+### Verification
+
+- `pnpm test` — 13 suites, 60 tests passed
+- `pnpm build` — succeeded
+
+### TODOs
+
+- Remaining names routes: `swr`, `check-if-content-exists`, likes
+
+### Next logical step
+
+Convert `app/api/description/route.js` (mirror of names) or `ContactForm.jsx` to TypeScript.
+
+---
+
+## 2026-06-08 — names route PUT: fix blocklist condition (`||` not `|`)
+
+### What was changed and why
+
+PUT blocklist guard used bitwise `content | notes` (copy-paste error from legacy JS). Restored logical `content || notes` so blocklist runs when either field is present.
+
+### Files modified
+
+- `app/api/names/route.ts`
+- `docs/notes/app/api/names-route.md` — removed obsolete legacy note
