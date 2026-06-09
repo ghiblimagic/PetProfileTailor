@@ -3,38 +3,51 @@
 import React, { useEffect, useState } from "react";
 import { signIn, useSession } from "next-auth/react";
 import { useForm } from "react-hook-form";
-import { getError } from "@utils/error";
 import { toast } from "react-toastify";
 import { useRouter, useSearchParams } from "next/navigation";
-import axios from "axios";
+import axios, { isAxiosError } from "axios";
 import GeneralButton from "@components/ReusableSmallComponents/buttons/GeneralButton";
 import Image from "next/image";
 import "@fortawesome/fontawesome-svg-core/styles.css";
 import { usePrefersReducedMotion } from "@/hooks/usePrefersReducedMotions";
 import ReCAPTCHA from "react-google-recaptcha";
-
 import { useGoogleReCaptcha } from "react-google-recaptcha-v3";
 import {
   E2E_CAPTCHA_BYPASS_TOKEN,
   isE2eClientMode,
 } from "@/utils/api/e2eTestMode";
-
+import type { SignupFieldErrors } from "@/utils/api/validateSignupSubmission";
 import RegisterInput from "@components/FormComponents/RegisterInput";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
+
+type RegisterFormValues = {
+  name: string;
+  email: string;
+  password: string;
+  profilename: string;
+  confirmPassword: string;
+  over13: boolean;
+};
+
+type SignupApiResponse = {
+  captchaLowScore?: boolean;
+  message?: string;
+  errors?: SignupFieldErrors;
+};
 
 export default function RegisterForm() {
   const prefersReducedMotion = usePrefersReducedMotion();
   const isE2eTestMode = isE2eClientMode();
   const { executeRecaptcha } = useGoogleReCaptcha();
   const [showV2, setShowV2] = useState(false);
-  const [v2Token, setV2Token] = useState(null);
+  const [v2Token, setV2Token] = useState<string | null>(null);
 
   const [isLoading, setIsLoading] = useState(false);
 
-  const [namesThatExist, setNamesThatExist] = useState([]);
+  const [namesThatExist, setNamesThatExist] = useState<unknown[] | null>(null);
   const [nameCheck, setNameCheck] = useState("");
   const [nameCheckFunctionRun, setNameCheckFunctionRun] = useState(false);
-  const { data: session } = useSession(); // now client-side
+  const { data: session } = useSession();
 
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -47,20 +60,20 @@ export default function RegisterForm() {
   }, [router, session, redirect]);
 
   const imageSrc = prefersReducedMotion
-    ? "/welcometothepack_static.png" // your static fallback (png, jpg, etc)
-    : "/welcometothepack.webp"; // animated webp
+    ? "/welcometothepack_static.png"
+    : "/welcometothepack.webp";
 
   async function checkIfNameExists() {
-    let nameResponse = await fetch(
+    const nameResponse = await fetch(
       "/api/user/getASpecificUserByProfileName/" + nameCheck,
     );
-    let nameData = await nameResponse.json();
+    const nameData = await nameResponse.json();
 
     setNamesThatExist(nameData);
     setNameCheckFunctionRun(true);
   }
 
-  function resetData(e) {
+  function resetData(e: React.ChangeEvent<HTMLInputElement>) {
     setNameCheck(e.target.value.toLowerCase());
     setNameCheckFunctionRun(false);
     setNamesThatExist(null);
@@ -73,7 +86,7 @@ export default function RegisterForm() {
     setError,
     formState: { errors },
     watch,
-  } = useForm();
+  } = useForm<RegisterFormValues>();
 
   const submitHandler = async ({
     name,
@@ -81,8 +94,8 @@ export default function RegisterForm() {
     password,
     profilename,
     over13,
-  }) => {
-    let captchaToken;
+  }: RegisterFormValues) => {
+    let captchaToken: string | undefined;
     setIsLoading(true);
 
     try {
@@ -101,17 +114,14 @@ export default function RegisterForm() {
         toast.error("reCAPTCHA is not ready. Please try again.");
         return;
       } else if (!showV2) {
-        // Use v3 first
-        captchaToken = await executeRecaptcha("register");
+        captchaToken = await executeRecaptcha!("register");
 
         if (!captchaToken) {
-          // v3 token missing or not generated
-          setShowV2(true); // show v2 fallback
+          setShowV2(true);
           setIsLoading(false);
           return;
         }
       } else {
-        // fallback to v2 token
         if (!v2Token) {
           alert("Please complete the CAPTCHA");
           setIsLoading(false);
@@ -120,8 +130,7 @@ export default function RegisterForm() {
         captchaToken = v2Token;
       }
 
-      console.log("captchaToken", captchaToken);
-      const res = await axios.post("/api/auth/signup", {
+      const res = await axios.post<SignupApiResponse>("/api/auth/signup", {
         name,
         email,
         password,
@@ -129,13 +138,11 @@ export default function RegisterForm() {
         profileName: profilename.toLowerCase(),
         captchaToken,
       });
-      // v3 score too low => show v2 fallback
+
       if (res.data?.captchaLowScore) {
         setShowV2(true);
         return;
       }
-
-      // ###### magic-link signups ######
 
       if (password === "") {
         const magicLinkSignUp = await signIn("email", {
@@ -157,8 +164,6 @@ export default function RegisterForm() {
         return;
       }
 
-      // ###### password signups ######
-
       const result = await signIn("credentials", {
         redirect: false,
         email,
@@ -176,17 +181,24 @@ export default function RegisterForm() {
         router.push("/dashboard");
       }
     } catch (err) {
-      // take the error object from the api, and map it to react-hook-forms error fields
-      const apiErrors = err.response?.data?.errors;
+      if (isAxiosError<{ errors?: SignupFieldErrors; message?: string }>(err)) {
+        const apiErrors = err.response?.data?.errors;
 
-      if (apiErrors) {
-        Object.entries(apiErrors).forEach(([field, message]) => {
-          setError(field, { type: "server", message });
-        });
-        setIsLoading(false);
+        if (apiErrors) {
+          Object.entries(apiErrors).forEach(([field, message]) => {
+            setError(field as keyof RegisterFormValues, {
+              type: "server",
+              message: String(message),
+            });
+          });
+          setIsLoading(false);
+        } else {
+          setIsLoading(false);
+          toast.error(err.response?.data?.message || "Something went wrong");
+        }
       } else {
         setIsLoading(false);
-        toast.error(err.response?.data?.message || "Something went wrong");
+        toast.error("Something went wrong");
       }
     }
   };
@@ -235,7 +247,6 @@ export default function RegisterForm() {
           <strong> you can add a password in settings. </strong>
         </p>
       </section>
-      {/* #################### FORM #########################*/}
       <form
         className="max-w-screen-md text-center mx-auto"
         onSubmit={handleSubmit(submitHandler)}
@@ -288,13 +299,13 @@ export default function RegisterForm() {
           id="profilename"
           label="Profile Name"
           type="text"
-          className="lowercase" // keep lowercase styling
+          className="lowercase"
           maxLength={30}
           autoFocus
           register={register}
           validation={{
             required: "Please enter a profilename",
-            validate: (value) =>
+            validate: (value: string) =>
               value.match(/[^a-z\d&'-]+/) == null ||
               `Invalid characters entered: ${value.match(/[^a-z\d&'-]+/g)}`,
           }}
@@ -340,8 +351,6 @@ export default function RegisterForm() {
           helperText="Recommended but not required for magic link users"
         />
 
-        <span> {console.log(passwordEntered != "")}</span>
-
         <RegisterInput
           id="confirmPassword"
           label="Confirm Password"
@@ -349,8 +358,7 @@ export default function RegisterForm() {
           register={register}
           validation={{
             required: passwordEntered && "This field is required",
-            // if the password field has input in it (its truthy), the confirm password field is required. Because it defaults to true. And the second statement shows
-            validate: (value) =>
+            validate: (value: string) =>
               value === getValues("password") || "Passwords do not match",
             minLength: {
               value: 6,
@@ -371,7 +379,7 @@ export default function RegisterForm() {
         {showV2 && (
           <div className="flex justify-center mb-4">
             <ReCAPTCHA
-              sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_V2_SITE_KEY}
+              sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_V2_SITE_KEY!}
               onChange={(token) => setV2Token(token)}
             />
           </div>

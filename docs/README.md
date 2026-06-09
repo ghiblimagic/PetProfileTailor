@@ -23,6 +23,7 @@ Each source file with notes should have a one-line pointer at the top linking to
 | [`app/actions/sendContactEmail.ts`](../app/actions/sendContactEmail.ts) | [sendContactEmail.md](notes/app/actions/sendContactEmail.md) |
 | [`app/api/names/route.ts`](../app/api/names/route.ts) | [names-route.md](notes/app/api/names-route.md) |
 | [`app/api/description/route.ts`](../app/api/description/route.ts) | [description-route.md](notes/app/api/description-route.md) |
+| [`app/api/auth/signup/route.ts`](../app/api/auth/signup/route.ts) | [signup-route.md](notes/app/api/signup-route.md) |
 | [`models/NameLike.ts`](../models/NameLike.ts), [`DescriptionLike.ts`](../models/DescriptionLike.ts), [`Follow.ts`](../models/Follow.ts) | [likes-and-follows.md](notes/models/likes-and-follows.md) |
 | [`models/Thank.ts`](../models/Thank.ts), [`Suggestion.ts`](../models/Suggestion.ts), [`Report.ts`](../models/Report.ts) | [moderation-and-thanks.md](notes/models/moderation-and-thanks.md) |
 | [`models/Name.ts`](../models/Name.ts), [`Description.ts`](../models/Description.ts) | [name-and-description.md](notes/models/name-and-description.md) |

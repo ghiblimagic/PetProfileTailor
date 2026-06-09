@@ -1191,6 +1191,37 @@ Removed manual checklist items now covered by Playwright. Manual section reorgan
 
 ---
 
+## 2026-06-08 — TypeScript migration: `app/api/auth/signup/route.ts`
+
+### What was built and why
+
+Converted signup API to TypeScript; extracted pure field validation to `validateSignupSubmission` (unit tested). Uses shared `isE2eCaptchaBypass`; removed dead `createSecretKey` import from legacy JS.
+
+### Files created
+
+- `app/api/auth/signup/route.ts`
+- `utils/api/validateSignupSubmission.ts`, `validateSignupSubmission.test.ts`
+- `docs/notes/app/api/signup-route.md`
+
+### Files modified
+
+- `docs/README.md`
+
+### Files removed
+
+- `app/api/auth/signup/route.js`
+
+### Verification
+
+- `pnpm test` — 98 passed
+- `pnpm build` — OK
+
+### Next logical step
+
+Convert `app/api/names/swr/route.js` or `RegisterForm.jsx` to TypeScript.
+
+---
+
 ## 2026-06-08 — Restore `.gitattributes` (LF line endings)
 
 ### What was changed and why
@@ -1323,3 +1354,38 @@ Gibberish contact message and duplicate `PLAYWRIGHT_TEST_PROFILENAME` on registe
 ### Files modified
 
 - `e2e/contact.spec.ts`, `TESTING.md`
+
+---
+
+## 2026-06-09 — TypeScript: `RegisterForm`
+
+### What was changed and why
+
+Converted the register form to TypeScript as part of the signup-route migration. Typed `react-hook-form` values, signup API response/errors (`SignupFieldErrors`), captcha flow, and axios error handling. Removed leftover debug `console.log` / render-side logging.
+
+### Files created
+
+- `components/Register/RegisterForm.tsx`
+- `components/FormComponents/RegisterInput.d.ts`
+- `components/ReusableSmallComponents/buttons/GeneralButton.d.ts`
+
+### Files removed
+
+- `components/Register/RegisterForm.jsx`
+
+### Files modified
+
+- `docs/notes/app/api/signup-route.md`
+
+### Verification
+
+- `pnpm build` — OK
+
+### TODOs
+
+- `checkIfNameExists` / `resetData` state helpers are still unused in the JSX (pre-existing).
+- `RegisterInput.jsx` / `GeneralButton.jsx` still JS; `.d.ts` stubs only unblock TS consumers.
+
+### Next logical step
+
+Run `pnpm test:e2e e2e/register.spec.ts` or convert `app/api/names/swr/route.js` next.
