@@ -5,6 +5,7 @@ import NameTag from "@models/NameTag";
 import Descriptions from "@/models/Description";
 import DescriptionTag from "@/models/DescriptionTag";
 import User from "@models/User";
+import { getUserFollowers } from "@/utils/api/getUserFollowers";
 import Profile from "@/components/profile";
 import { getServerSession } from "next-auth";
 import { serverAuthOptions } from "@/lib/auth";
@@ -24,15 +25,15 @@ export default async function ProfilePage({ params }) {
   // ############# FIND A  USER ##################
   const userData = await leanWithStrings(
     User.findOne({ profileName: usersProfileName }).select(
-      "name followers profileImage profileName bio location",
+      "name profileImage profileName bio location",
     ),
   );
-
-  // console.log("userData", userData);
 
   if (!userData) {
     return <div>User not found</div>;
   }
+
+  userData.followers = await getUserFollowers(userData._id);
   const userId = userData._id.toString();
 
   // ########## grab created names #############

@@ -1,47 +1,69 @@
 import dbConnect from "@utils/db";
 import mongoose from "mongoose";
-import DescriptionTag from "@/models/DescriptionTag";
 import Description from "@/models/Description";
 import { checkOwnership } from "@/utils/api/checkOwnership";
 import { getSessionForApis } from "@/utils/api/getSessionForApis";
-import { checkMultipleFieldsBlocklist } from "@/utils/api/checkMultipleBlocklists";
-import { respondIfBlocked } from "@/utils/api/checkMultipleBlocklists";
+import {
+  checkMultipleFieldsBlocklist,
+  respondIfBlocked,
+} from "@/utils/api/checkMultipleBlocklists";
 import normalizeString from "@/utils/stringManipulation/normalizeString";
 import { findExactNormalized } from "@/utils/stringManipulation/findNormalizedMatch";
+import {
+  duplicateDescriptionConflict,
+  shouldCheckDescriptionDuplicate,
+} from "@/utils/api/descriptionDuplicateCheck";
+type DescriptionContentRef = {
+  content?: string | null;
+};
 
-async function checkDuplicateDescription(content, existingDescription) {
+type DescriptionCreateBody = {
+  content: string;
+  notes?: string;
+  tags?: mongoose.Types.ObjectId[] | string[];
+};
+
+type DescriptionUpdateSubmission = {
+  contentId: string;
+  content?: string;
+  notes?: string;
+  tags?: mongoose.Types.ObjectId[] | string[];
+};
+
+type DescriptionUpdateBody = {
+  submission: DescriptionUpdateSubmission;
+};
+
+type DescriptionDeleteBody = {
+  contentId: string;
+};
+
+async function checkDuplicateDescription(
+  content: string,
+  existingDescription: DescriptionContentRef | null,
+): Promise<Response | null> {
   if (
-    content?.toLowerCase() &&
-    content !== existingDescription.content?.toLowerCase()
-    // ? handles when content is null
+    shouldCheckDescriptionDuplicate(
+      content,
+      existingDescription?.content,
+    )
   ) {
     const existingDescriptionCheck = await findExactNormalized(
       Description,
       content,
     );
 
-    return returnExistingMessage(existingDescriptionCheck);
-  }
-  return null;
-}
-
-function returnExistingMessage(existingDescriptionCheck) {
-  if (existingDescriptionCheck) {
-    // existing description check is an object or null
-    return Response.json(
-      {
-        message: "Ruh Roh! This description already exists!",
-        existingDescription: existingDescriptionCheck,
-      },
-      { status: 409 },
-    );
+    const conflict = duplicateDescriptionConflict(existingDescriptionCheck);
+    if (conflict) {
+      return Response.json(conflict, { status: 409 });
+    }
   }
   return null;
 }
 
 // ############################ GET ################################################### //
 
-export async function GET(req) {
+export async function GET(_req: Request) {
   await dbConnect.connect();
 
   try {
@@ -54,26 +76,27 @@ export async function GET(req) {
 
     return Response.json(descriptions);
   } catch (err) {
-    return Response.json({ error: err.message }, { status: 500 });
+    const message = err instanceof Error ? err.message : "Server error";
+    return Response.json({ error: message }, { status: 500 });
   }
 }
 
 // ############################ POST ################################################### //
 
-export async function POST(req) {
+export async function POST(req: Request) {
   await dbConnect.connect();
 
-  const body = await req.json();
+  const body = (await req.json()) as DescriptionCreateBody;
   const { content, notes } = body;
 
-  const { ok, session } = await getSessionForApis({ req });
-  if (!ok) {
+  const auth = await getSessionForApis({ req });
+  if (!auth.ok) {
     return new Response("Unauthorized", { status: 401 });
   }
 
   const blockResult = checkMultipleFieldsBlocklist([
     { value: content, fieldName: "content" },
-    { value: notes, fieldName: "notes" },
+    { value: notes ?? "", fieldName: "notes" },
   ]);
 
   const errorResponse = respondIfBlocked(blockResult);
@@ -90,21 +113,22 @@ export async function POST(req) {
     const newDescription = await Description.create({
       ...body,
       normalizedContent: normalizeString(content).slice(0, 400),
-      createdBy: session.user.id,
+      createdBy: auth.session.user.id,
     });
 
     return Response.json(newDescription, { status: 201 });
   } catch (err) {
-    return Response.json({ error: err.message }, { status: 500 });
+    const message = err instanceof Error ? err.message : "Server error";
+    return Response.json({ error: message }, { status: 500 });
   }
 }
 
 // ############################ PUT ################################################### //
 
-export async function PUT(req) {
+export async function PUT(req: Request) {
   await dbConnect.connect();
 
-  const body = await req.json();
+  const body = (await req.json()) as DescriptionUpdateBody;
   const { notes, content, tags, contentId } = body.submission;
   const existingDescription = await Description.findById(contentId);
 
@@ -112,15 +136,15 @@ export async function PUT(req) {
 
   if (content || notes) {
     const blockResult = checkMultipleFieldsBlocklist([
-      { value: content, fieldName: "content" },
-      { value: notes, fieldName: "notes" },
+      { value: content ?? "", fieldName: "content" },
+      { value: notes ?? "", fieldName: "notes" },
     ]);
 
     const errorResponse = respondIfBlocked(blockResult);
     if (errorResponse) return errorResponse;
 
     const existingMessage = await checkDuplicateDescription(
-      content,
+      content ?? "",
       existingDescription,
     );
     if (existingMessage) return existingMessage;
@@ -130,22 +154,22 @@ export async function PUT(req) {
 
   const { ok } = await checkOwnership({
     req,
-    resourceCreatorId: existingDescription.createdBy,
+    resourceCreatorId: existingDescription!.createdBy!,
   });
   if (!ok) return new Response("Unauthorized", { status: 401 });
 
   try {
-    if (notes) existingDescription.notes = notes;
+    if (notes) existingDescription!.notes = notes;
     if (content) {
-      (existingDescription.content = content.trim()),
-        (existingDescription.normalizedContent = normalizeString(content).slice(
+      (existingDescription!.content = content.trim()),
+        (existingDescription!.normalizedContent = normalizeString(content).slice(
           0,
           400,
         ));
     }
-    existingDescription.tags = tags;
+    existingDescription!.tags = tags as mongoose.Types.ObjectId[];
 
-    await existingDescription.save();
+    await existingDescription!.save();
 
     const updatedDescription = await Description.findById(contentId)
       .populate({
@@ -159,26 +183,27 @@ export async function PUT(req) {
       message: "Description Updated",
     });
   } catch (err) {
-    return Response.json({ error: err.message }, { status: 500 });
+    const message = err instanceof Error ? err.message : "Server error";
+    return Response.json({ error: message }, { status: 500 });
   }
 }
 
 // ############################ DELETE ################################################### //
 
-export async function DELETE(req) {
+export async function DELETE(req: Request) {
   await dbConnect.connect();
 
-  const body = await req.json();
+  const body = (await req.json()) as DescriptionDeleteBody;
   const contentId = body.contentId;
 
   try {
     const nameToBeDeleted = await Description.findById(
-      mongoose.Types.ObjectId(contentId),
+      new mongoose.Types.ObjectId(contentId),
     );
 
     const { ok } = await checkOwnership({
       req,
-      resourceCreatorId: nameToBeDeleted.createdBy,
+      resourceCreatorId: nameToBeDeleted!.createdBy!,
     });
     if (!ok) return new Response("Unauthorized", { status: 401 });
 
@@ -186,6 +211,7 @@ export async function DELETE(req) {
 
     return Response.json({ success: true, msg: `Description Deleted` });
   } catch (err) {
-    return Response.json({ error: err.message }, { status: 500 });
+    const message = err instanceof Error ? err.message : "Server error";
+    return Response.json({ error: message }, { status: 500 });
   }
 }

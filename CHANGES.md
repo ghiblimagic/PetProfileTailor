@@ -1013,3 +1013,297 @@ PUT blocklist guard used bitwise `content | notes` (copy-paste error from legacy
 
 - `app/api/names/route.ts`
 - `docs/notes/app/api/names-route.md` — removed obsolete legacy note
+
+---
+
+## 2026-06-08 — TypeScript migration: `app/api/description/route.ts`
+
+### What was built and why
+
+Converted descriptions CRUD route to TypeScript, mirroring `names/route.ts`. Typed helpers (`checkDuplicateDescription`, `returnExistingMessage`) and request bodies; preserved `new Response("Unauthorized")` and `{ error: err.message }` response shapes from the JS version.
+
+### Files created
+
+- `app/api/description/route.ts`
+- `docs/notes/app/api/description-route.md`
+
+### Files removed
+
+- `app/api/description/route.js`
+
+### Files modified
+
+- `docs/README.md` — index entry
+
+### Patterns followed
+
+- Same as names route: `auth.ok` narrowing, `notes ?? ""` for blocklist, `new mongoose.Types.ObjectId` for DELETE lookup
+- `IDescriptionDocument` for duplicate-check return typing
+- Optional `createdBy` on model — non-null assertions where legacy route assumed doc exists
+
+### Verification
+
+- `pnpm test` — 13 suites, 60 tests passed
+- `pnpm build` — succeeded
+
+### Next logical step
+
+Convert `ContactForm.jsx` to TypeScript, or smaller API routes (`names/swr`, `description/swr`, check-if-content-exists).
+
+---
+
+## 2026-06-08 — Unit tests for recent migrations (extract + test pure logic)
+
+### What was built and why
+
+Recent route/action migrations were manual-only. Followed existing pattern (`resolveSignInCallback`, `detectBotPatterns`): extract pure validation into `utils/api/*`, add Jest suites. Full handler tests still need DB/auth mocks — not added.
+
+### Files created
+
+- `utils/api/validateContactSubmission.ts` + `.test.ts` — honeypot, timing, required fields, email, lengths, reCAPTCHA
+- `utils/api/descriptionDuplicateCheck.ts` + `.test.ts` — duplicate guard decision + 409 payload
+- `utils/stringManipulation/check-for-valid-content.test.ts` — name character rules (used by names route)
+
+### Files modified
+
+- `app/actions/sendContactEmail.ts` — uses `validateContactSubmission`
+- `app/api/description/route.ts` — uses `descriptionDuplicateCheck`
+- `docs/notes/app/actions/sendContactEmail.md`, `docs/notes/app/api/description-route.md`
+
+### Verification
+
+- `pnpm test` — 16 suites, 85 tests passed (+25)
+
+### Still manual / not unit-tested
+
+- Names/description route handlers (Mongoose + `getSessionForApis` mocks)
+- Resend email send path
+- Model schemas (Mongoose integration)
+- `e2e/login.spec.ts` remains the only Playwright flow test
+
+---
+
+## 2026-06-08 — Names validation extract + Playwright `/addnames` and `/contact`
+
+### What was built and why
+
+Extracted names-route validation into unit-tested helpers. Added Playwright specs for contact (timing, language) and addnames (logged-out gate + optional authenticated submit). E2E contact tests use env-gated reCAPTCHA bypass (`E2E_TEST_MODE` / `NEXT_PUBLIC_E2E_TEST_MODE`) only when Playwright starts the server.
+
+### Files created
+
+- `utils/api/validateNameSubmission.ts` + `.test.ts`
+- `e2e/addnames.spec.ts`, `e2e/contact.spec.ts`, `e2e/helpers/auth.ts`
+
+### Files modified
+
+- `app/api/names/route.ts` — uses `validateNameSubmission`
+- `app/actions/sendContactEmail.ts`, `components/Contact/ContactForm.jsx` — E2E bypass
+- `playwright.config.ts` — E2E env on `webServer`
+- `docs/notes/app/api/names-route.md`, `TESTING.md`
+
+### Verification
+
+- `pnpm test` — 17 suites, 92 tests passed
+- `pnpm test:e2e:local` — 6 passed, 2 skipped (no `PLAYWRIGHT_TEST_*` creds)
+
+### E2E follow-up fixes (freeze + selectors)
+
+- Contact Submit was disabled up to 10s while reCAPTCHA loaded — tests timed out waiting; E2E build now skips that gate
+- `pnpm test:e2e` can hang if port 3000 is busy during `build && start` — added `pnpm test:e2e:local` + `scripts/playwright-local.mjs`
+- Fixed contact selectors (`input[name=…]`), login strict-mode Register link, addnames logged-out test
+
+---
+
+## 2026-06-08 — E2E: MONGODB_URI_TEST + NextAuth notes
+
+### What was changed and why
+
+Playwright `webServer` now sets `MONGODB_URI` from `MONGODB_URI_TEST` so E2E hits an isolated DB while dev keeps `MONGODB_URI`. Added `pnpm build:e2e` / `pnpm start:e2e` for local E2E server; documented that NextAuth uses the same swapped URI (seed test user once via `/register`).
+
+### Files modified
+
+- `playwright.config.ts`, `package.json`, `scripts/build-e2e.mjs`, `scripts/start-e2e.mjs`, `TESTING.md`
+
+---
+
+## 2026-06-08 — E2E: register reCAPTCHA bypass for test DB seeding
+
+### What was changed and why
+
+`/register` required reCAPTCHA, which fails on localhost. Added same E2E bypass as contact (`e2e-bypass` token when `E2E_TEST_MODE` / `NEXT_PUBLIC_E2E_TEST_MODE` set at build/start).
+
+### Files created
+
+- `utils/api/e2eTestMode.ts`
+
+### Files modified
+
+- `app/api/auth/signup/route.js`, `components/Register/RegisterForm.jsx`
+- `components/Contact/ContactForm.jsx`, `app/actions/sendContactEmail.ts` — use shared helper
+- `TESTING.md`
+
+---
+
+## 2026-06-08 — `pnpm seed:e2e-user` CLI for test DB
+
+### What was built and why
+
+Browser register + captcha blocked seeding the Playwright user. Script inserts/updates credentials user directly in `MONGODB_URI_TEST` from env vars.
+
+### Files created
+
+- `scripts/seed-e2e-user.mjs`
+
+### Files modified
+
+- `package.json` — `seed:e2e-user` script
+- `TESTING.md`
+
+---
+
+## 2026-06-08 — Expand E2E + TESTING.md E2E vs manual matrix
+
+### What was built and why
+
+Added Playwright coverage for manual checks that automate cleanly (contact spam/language/rate limit, login auth, addnames duplicate/blocklist, browse load). Documented which § items E2E replaces vs still manual.
+
+### Files created
+
+- `e2e/browse.spec.ts`, `e2e/helpers/contact.ts`
+
+### Files modified
+
+- `e2e/contact.spec.ts`, `e2e/login.spec.ts`, `e2e/addnames.spec.ts`
+- `app/actions/sendContactEmail.ts` — rate limit before E2E email skip
+- `TESTING.md`, `docs/notes/app/actions/sendContactEmail.md`
+
+---
+
+## 2026-06-08 — TESTING.md: E2E owns automated flows; manual = captcha/email/gaps
+
+### What was changed and why
+
+Removed manual checklist items now covered by Playwright. Manual section reorganized by what E2E cannot test (captcha, Resend, magic link, multi-user, admin, content depth, Network inspection).
+
+### Files modified
+
+- `TESTING.md`
+
+---
+
+## 2026-06-08 — Follow API: use `Follow` model (not `User.followers`)
+
+### What was changed and why
+
+Followers live in the `follows` collection (`models/Follow.ts`), not on `User`. Reverted mistaken `followers` field on `User`. `updatefollows` now upserts/deletes `Follow` docs; profile and `getASpecificUserByProfileName` load followers via `getUserFollowers`.
+
+### Files created
+
+- `utils/api/getUserFollowers.ts`
+
+### Files modified
+
+- `app/api/user/updatefollows/route.js`
+- `app/api/user/getASpecificUserByProfileName/[name]/route.js`
+- `app/profile/[profilename]/page.jsx`
+- `models/User.ts` (reverted `followers`)
+- `scripts/seed-e2e.mjs`, `docs/notes/models/likes-and-follows.md`
+
+---
+
+## 2026-06-08 — E2E: admin, edits, social specs
+
+### What was built and why
+
+Added Playwright coverage for admin access, ownership edits, and social flows using seeded user + admin. Extended fixtures with admin-owned name/description.
+
+### Files created
+
+- `e2e/admin.spec.ts`, `e2e/edits.spec.ts`, `e2e/social.spec.ts`
+- `e2e/helpers/seed-lookup.ts`, `e2e/helpers/likes.ts`
+
+### Files modified
+
+- `e2e/fixtures/seed-data.json`, `seed-data.ts`, `scripts/seed-e2e.mjs`
+- `TESTING.md`
+
+---
+
+## 2026-06-08 — E2E shared seed fixtures (name, descriptions, admin)
+
+### What was built and why
+
+Single source of truth for seeded test DB content: `e2e/fixtures/seed-data.json` is read by `pnpm seed:e2e` and Playwright tests via `seed-data.ts`. Duplicate name/description specs no longer create-then-duplicate at runtime.
+
+### Files created
+
+- `e2e/fixtures/seed-data.json`, `e2e/fixtures/seed-data.ts`
+- `scripts/seed-e2e.mjs`
+
+### Files modified
+
+- `e2e/addnames.spec.ts`, `e2e/adddescriptions.spec.ts`
+- `e2e/helpers/auth.ts` — `loginWithAdminCredentials`
+- `e2e/helpers/register.ts` — profile name from fixture module
+- `package.json`, `TESTING.md`
+
+### Files removed
+
+- `scripts/seed-e2e-user.mjs` (replaced by `seed-e2e.mjs`; `seed:e2e-user` script kept as alias)
+
+### Next logical step
+
+Add admin/ownership E2E using `loginWithAdminCredentials` and seeded admin user.
+
+---
+
+## 2026-06-08 — E2E: move more manual checks (auth, descriptions, blocklist, API shape)
+
+### What was built and why
+
+Reviewed remaining manual verification items and automated flows that do not need captcha, Resend, or a second user: session/dashboard/notifications/profile, sign-out round-trip, description create/detail, duplicate “check if exists” (start vs middle), name/detail page, `fluffy butt` negative blocklist case, editsettings validation, duplicate register email, and names SWR `_id` string shape.
+
+### Files created
+
+- `e2e/auth-session.spec.ts`
+- `e2e/adddescriptions.spec.ts`
+- `e2e/editsettings.spec.ts`
+- `e2e/helpers/descriptions.ts`
+
+### Files modified
+
+- `e2e/helpers/auth.ts` — `openProfileMenu`, `signOutViaNav`
+- `e2e/addnames.spec.ts`, `e2e/register.spec.ts`, `e2e/browse.spec.ts`
+- `TESTING.md` — E2E bullets + trimmed manual checklist
+
+### Problems encountered
+
+- Description form does not require tags server-side; removed flaky react-select helper.
+- Nav menu items use Headless UI `menuitem` role, not `link` / `button` for Profile/Logout.
+- Contact rate-limit test must run last in serial `contact.spec.ts` (Spanish + legitimate consume 2 of 3 IP slots).
+
+### TODOs
+
+- Social/notification flows still need a second seeded E2E user.
+- Pagination/sort cooldown tests skipped (15s+ waits).
+- Full register happy path + default avatar still manual (real captcha).
+
+### Next logical step
+
+Run `pnpm seed:e2e-user && pnpm test:e2e` and fix any flaky tag-select or aggregate `_id` assertions.
+
+---
+
+## 2026-06-08 — E2E: contact spam message + register duplicate profilename
+
+### What was built and why
+
+Gibberish contact message and duplicate `PLAYWRIGHT_TEST_PROFILENAME` on register are automatable with E2E captcha bypass; removed from manual checklist.
+
+### Files created
+
+- `e2e/register.spec.ts`, `e2e/helpers/register.ts`
+
+### Files modified
+
+- `e2e/contact.spec.ts`, `TESTING.md`

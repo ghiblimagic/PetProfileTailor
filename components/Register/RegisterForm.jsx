@@ -14,12 +14,17 @@ import { usePrefersReducedMotion } from "@/hooks/usePrefersReducedMotions";
 import ReCAPTCHA from "react-google-recaptcha";
 
 import { useGoogleReCaptcha } from "react-google-recaptcha-v3";
+import {
+  E2E_CAPTCHA_BYPASS_TOKEN,
+  isE2eClientMode,
+} from "@/utils/api/e2eTestMode";
 
 import RegisterInput from "@components/FormComponents/RegisterInput";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
 
 export default function RegisterForm() {
   const prefersReducedMotion = usePrefersReducedMotion();
+  const isE2eTestMode = isE2eClientMode();
   const { executeRecaptcha } = useGoogleReCaptcha();
   const [showV2, setShowV2] = useState(false);
   const [v2Token, setV2Token] = useState(null);
@@ -89,14 +94,14 @@ export default function RegisterForm() {
         setIsLoading(false);
         return;
       }
-      if (!executeRecaptcha && !v2Token) {
+      if (isE2eTestMode) {
+        captchaToken = E2E_CAPTCHA_BYPASS_TOKEN;
+      } else if (!executeRecaptcha && !v2Token) {
         setIsLoading(false);
         toast.error("reCAPTCHA is not ready. Please try again.");
         return;
-      }
-
-      // Use v3 first
-      if (!showV2) {
+      } else if (!showV2) {
+        // Use v3 first
         captchaToken = await executeRecaptcha("register");
 
         if (!captchaToken) {

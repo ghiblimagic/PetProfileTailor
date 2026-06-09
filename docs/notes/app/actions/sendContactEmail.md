@@ -17,7 +17,7 @@ Server action for `/contact`. Validates submission, verifies reCAPTCHA, rate-lim
 7. Rate limit (`rateLimitPresets.contact` — 3 per 5 min)
 8. Resend send
 
-Rate limit runs **after** captcha so failed validations do not consume the contact quota.
+Rate limit runs **after** captcha so failed validations do not consume the contact quota. In E2E mode, rate limit still runs before the email-skip return so `contact.spec.ts` can test throttling.
 
 ## Client
 
@@ -25,5 +25,6 @@ Rate limit runs **after** captcha so failed validations do not consume the conta
 
 ## Related
 
+- [`utils/api/validateContactSubmission.ts`](../../../utils/api/validateContactSubmission.ts) — honeypot, timing, email/length, reCAPTCHA threshold (unit tested)
 - [`utils/api/detectBotPatterns.ts`](../../../utils/api/detectBotPatterns.ts)
 - [`utils/api/rateLimiter.ts`](../../../utils/api/rateLimiter.ts)

@@ -14,7 +14,7 @@ Three small Mongoose models for **social edges** — who liked what, and (via mi
 |-------|---------|-------------------|
 | `NameLike` | One row per user ↔ name like | Like toggle API, notifications, user likes |
 | `DescriptionLike` | One row per user ↔ description like | Same for descriptions |
-| `Follow` | One row per follower → followed user | **Migrations only** today; live follow UI still uses `User.followers` array + `updatefollows` API |
+| `Follow` | One row per follower → followed user | `updatefollows` API + profile/user read paths (`getUserFollowers`) |
 
 All three use `{ timestamps: true }` and explicit MongoDB collection names (third arg to `mongoose.model`) so migration scripts work outside the Next.js app context.
 
@@ -50,7 +50,7 @@ All three use `{ timestamps: true }` and explicit MongoDB collection names (thir
 | `NameLike` / `DescriptionLike` | `app/api/user/likes/route.js` | List what the logged-in user has liked |
 | `Follow` | `migrations/followersIntoFollowDb.js` | Copy `User.followers[]` into `follows` collection |
 
-**Note:** `FollowButton.jsx` calls `app/api/user/updatefollows` — that updates `User.followers`, not the `Follow` model.
+**Note:** `FollowButton.jsx` calls `app/api/user/updatefollows` — that creates/deletes `Follow` documents in the `follows` collection.
 
 ---
 

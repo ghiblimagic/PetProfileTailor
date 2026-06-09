@@ -26,6 +26,7 @@ CRUD for pet names at `/api/names`. Used by `addingName.jsx` (POST), `ContentLis
 
 ## Related
 
+- [`utils/api/validateNameSubmission.ts`](../../../utils/api/validateNameSubmission.ts) — length, blocklist guard, duplicate-on-update (unit tested)
 - [`models/Name.ts`](../../../models/Name.ts)
 - [`utils/stringManipulation/findNormalizedMatch.ts`](../../../utils/stringManipulation/findNormalizedMatch.ts)
 - SWR listing: [`app/api/names/swr/route.js`](../../../app/api/names/swr/route.js)

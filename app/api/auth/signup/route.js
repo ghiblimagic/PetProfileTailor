@@ -17,37 +17,43 @@ export async function POST(req) {
   params.append("secret", secretKey);
   params.append("response", captchaToken);
 
+  const e2eBypass =
+    process.env.E2E_TEST_MODE === "true" &&
+    captchaToken === "e2e-bypass";
+
   // ############ Verify reCAPTCHA v3 ###############
-  if (!captchaToken) {
-    return NextResponse.json(
-      { message: "Captcha token missing" },
-      { status: 400 },
-    );
-  }
-
-  try {
-    const captchaRes = await axios.post(
-      "https://www.google.com/recaptcha/api/siteverify",
-      params.toString(), // send as form-encoded string
-      {
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded",
-        },
-      },
-    );
-
-    const { success, score } = captchaRes.data;
-    if (!success || score < 0.5) {
+  if (!e2eBypass) {
+    if (!captchaToken) {
       return NextResponse.json(
-        { message: "Captcha verification failed" },
+        { message: "Captcha token missing" },
         { status: 400 },
       );
     }
-  } catch (err) {
-    return NextResponse.json(
-      { message: "Captcha verification error" },
-      { status: 500 },
-    );
+
+    try {
+      const captchaRes = await axios.post(
+        "https://www.google.com/recaptcha/api/siteverify",
+        params.toString(), // send as form-encoded string
+        {
+          headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+          },
+        },
+      );
+
+      const { success, score } = captchaRes.data;
+      if (!success || score < 0.5) {
+        return NextResponse.json(
+          { message: "Captcha verification failed" },
+          { status: 400 },
+        );
+      }
+    } catch (err) {
+      return NextResponse.json(
+        { message: "Captcha verification error" },
+        { status: 500 },
+      );
+    }
   }
 
   const errors = {};

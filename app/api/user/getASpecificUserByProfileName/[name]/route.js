@@ -1,6 +1,8 @@
 import { getUserByProfileName } from "@utils/getUserByProfileName";
 import User from "@/models/User";
 import dbConnect from "@utils/db";
+import { leanWithStrings } from "@/utils/mongoDataCleanup";
+import { getUserFollowers } from "@/utils/api/getUserFollowers";
 
 export async function GET(req, { params }) {
   await dbConnect.connect();
@@ -16,12 +18,16 @@ export async function GET(req, { params }) {
       });
     }
 
-    // Apply select/populate only in this API route
-    const detailedUser = await User.findById(user.id).select(
-      "name followers profileImage profileName bio location",
+    const detailedUser = await leanWithStrings(
+      User.findById(user.id).select(
+        "name profileImage profileName bio location",
+      ),
     );
+    const followers = await getUserFollowers(user.id);
 
-    return new Response(JSON.stringify(detailedUser), { status: 200 });
+    return new Response(JSON.stringify({ ...detailedUser, followers }), {
+      status: 200,
+    });
   } catch (err) {
     return new Response(JSON.stringify({ error: err.message }), {
       status: 500,

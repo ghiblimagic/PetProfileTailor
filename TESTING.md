@@ -2,288 +2,236 @@
 
 ## Stack
 
-- **Jest** — unit and integration tests
+- **Jest** — unit tests (pure logic, no browser)
 - **React Testing Library** — component tests
-- **Playwright** — E2E tests
-
-Vitest would have been easier to set up with TypeScript, but Jest was chosen for maturity, ecosystem, CI/coverage support, snapshots, and RTL's default pairing — experience that transfers to most existing codebases.
+- **Playwright** — E2E on test DB (`MONGODB_URI_TEST`)
 
 ## Scripts
 
+| Command | Purpose |
+|---------|---------|
+| `pnpm test` | Jest once |
+| `pnpm test:watch` | Jest watch |
+| `pnpm test:ci` | Jest + coverage |
+| `pnpm test:e2e` | Playwright (build + start test server) |
+| `pnpm test:e2e:local` | Playwright only (server already on :3000) |
+| `pnpm seed:e2e` | Seed test DB (user, admin, name, descriptions) |
+| `pnpm seed:e2e-user` | Alias for `seed:e2e` |
+| `pnpm build:e2e` | Production build with E2E client flags |
+| `pnpm start:e2e` | Start server against `MONGODB_URI_TEST` |
 
-| Command           | Purpose                                                              |
-| ----------------- | -------------------------------------------------------------------- |
-| `pnpm test`       | Run Jest once                                                        |
-| `pnpm test:watch` | Jest watch mode                                                      |
-| `pnpm test:ci`    | Jest in CI with coverage                                             |
-| `pnpm test:e2e`   | Playwright E2E (builds and starts app unless server already running) |
-
-
-## Convert-then-test workflow
-
-When converting files during the TypeScript migration:
-
-1. Convert the file (`.js` → `.ts` or `.jsx` → `.tsx`)
-2. Add or update tests for that file if it contains testable logic
-3. Run `pnpm test` and `pnpm build` before merging
-
-Do **not** block low-risk conversions on full coverage. Do **block** high-risk areas (`lib/auth.ts`, rate limiter, ownership checks) without at least smoke tests.
-
-## Where tests live
-
-- Unit tests: co-located as `*.test.ts` next to the module (e.g. `utils/error.test.ts`)
-- Component tests: co-located as `*.test.tsx` (e.g. `components/ui/skeleton.test.tsx`)
-- E2E tests: `e2e/*.spec.ts`
-- Design / learning notes: `[docs/notes/](docs/notes/)` (see `[docs/README.md](docs/README.md)`)
-
-## E2E notes
-
-Playwright starts the app via `pnpm build && pnpm start`. For local runs, you can start `pnpm dev` or `pnpm start` first; Playwright reuses an existing server when not in CI.
-
-Login E2E is a **smoke test** (page renders) — it does not require a test database or successful authentication.
-
----
-
-## Manual verification (TypeScript migration)
-
-Use this after converting modules or before merging a migration PR. Automated tests catch compile errors and unit logic; these checks catch wiring and runtime issues in the real app.
-
-### Baseline
+## Before merge (automated)
 
 ```bash
 pnpm test
+pnpm test:e2e        # needs: playwright install, seed:e2e, MONGODB_URI_TEST in .env
 pnpm build
-pnpm dev
 ```
 
-Local green + Vercel green means TS modules compile and unit tests pass. Manual checks below cover integration paths Jest does not exercise.
-
-### Manual checks (oldest → newest)
-
-Work through in order for a **full migration smoke**. For a single PR, jump to the section that matches your change.
-
-**Note:** Checkboxes (`[x]` / `[ ]`) are your personal progress — preserve them when adding or reordering sections.
+Jest + E2E green covers validation logic and the flows listed below. Manual checks on **dev** (`MONGODB_URI`) are only for what automation skips.
 
 ---
 
-#### 1. Wave 1 — leaf utils (2026-06-02)
+## E2E (Playwright)
 
-Code touched: `fetch`, `error`, `normalizeString`, `debounce`, `checkIfValidContentType`, hooks, etc.
+Runs against **`MONGODB_URI_TEST`**. Captcha and Resend are bypassed (`E2E_TEST_MODE` / `NEXT_PUBLIC_E2E_TEST_MODE` at build). **Do not duplicate these in manual testing.**
 
-- [ ] `chooseRandomDefaultAvatar` — `/register` new user → default profile avatar assigned
-- [ ] `getError` — `/editsettings` → trigger validation error → message still displays
-- [ ] `useApiRateLimiter` + `debounce` — toggle/cooldown buttons → rapid clicks throttled
-- [ ] `checkIfValidContentType` — `/fetchnames` / `/fetchdescriptions` listing pages load via SWR/API
-
----
-
-#### 2. Cumulative quick pass (2026-06-03 — general smoke, ~15–20 min)
-
-Broad sanity check after early migration waves.
-
-- [x] `/fetchnames` — name list loads
-- [x] One `/name/[name]` page — content, tags, categories render
-- [x] One `/profile/[profilename]` page — user data and lists load
-- [x] Log in → `/notifications` — tabs and notification items load
-- [x] `/contact` — one legitimate submit (wait **>3 seconds** before clicking submit)
-- [x] `/contact` — one obvious spam submit (gibberish name or message) → rejected
-- [x] One owner action (edit your own content) — still works
-- [x] Rapid-click a rate-limited button (like/follow) — throttles, no double submit
-
----
-
-#### 3. Wave 2 — `mongoDataCleanup` + `db` (2026-06-06)
-
-Code touched: `utils/db.ts`, `leanWithStrings`. Regressions: **500**, blank sections, `[object Object]` IDs.
-
-- [x] `/fetchnames` — list loads; no server error
-- [x] `/name/[name]` — page renders with related data
-- [x] `/description/[id]` — content loads
-- [x] `/profile/[profilename]` — profile, lists, images load
-- [x] `/dashboard` (logged in) — dashboard data renders
-- [x] `/notifications` (logged in) — like/thank items show linked content
-- [x] DevTools → Network → data API responses: `_id` values are **strings**; no `__v` in JSON
-
-**Network tip:** string IDs mean `leanWithStrings` is working.
-
----
-
-#### 4. Contact spam + rate limiter (2026-06-02)
-
-Code touched: `detectBotPatterns`, `rateLimiter` on `/contact`.
-
-- [x] Happy path — real name + normal message; wait **>3s** before submit → success (or email if Resend configured)
-- [x] Gibberish name — 19+ letter token (e.g. `abcdefghijklmnopqrst`) → rejected
-- [x] Gibberish message — long random / spam-like text → rejected
-- [x] Legitimate long name — e.g. `Wojciechowski` + normal message → allowed
-- [x] Rate limit — two submits from same IP within preset window → second blocked
-- [ ] Spanish message — e.g. `Hola, quisiera información sobre adopción` → allowed
-- [ ] Non-English/Spanish message — e.g. Japanese or Chinese inquiry → rejected with language error
-
----
-
-#### 5. Wave 2 — auth guards (2026-06-02)
-
-Code touched: `checkIfAdmin`, `checkOwnership`, `getSessionForApis`. See **§7** for full login/session smoke after `lib/auth.ts`.
-
-- [ ] Admin — edit category/tag as admin → works
-- [ ] Admin — same action as non-admin → 401/403, not 500
-- [ ] Edit own content → saves
-- [ ] Edit others' content → blocked cleanly (403/401, not 500)
-
----
-
-#### 6. Name normalization (2026-06-02)
-
-Code touched: `normalizeString` (duplicate detection, check-if-exists).
-
-- [ ] Create or search with spaces/punctuation/case variants → same normalized match as before
-- [ ] Duplicate name on `/addnames` → still caught
-
----
-
-#### 7. Auth + `User` model (2026-06-07 — `b1f0994`, ~15 min)
-
-Code touched: `lib/auth.ts`, `models/User.ts`, `types/next-auth.d.ts`, `resolveSignInCallback`.
-
-- [ ] `/login` — credentials login with valid email + password → nav shows logged-in state
-- [ ] `/login` — wrong password → error message, no session
-- [ ] `/login` — magic link request (skip if Resend not configured) → redirect to `/magiclink`, email arrives
-- [ ] Magic link — click email link → logged in; refresh keeps session
-- [ ] Nav / profile — avatar and `profileName` visible after login (admin menu too if admin)
-- [ ] `/dashboard` — loads when logged in
-- [ ] `/notifications` — loads when logged in
-- [ ] `/dashboard` — logged out → redirect or login prompt (not 500)
-- [ ] Sign out → credentials login again → session restored
-- [ ] `/register` — new user with unique email + profile name → account created, default avatar assigned
-- [ ] `/register` — existing `profileName` → rejected before account created
-- [ ] Admin — edit category or tag while logged in as admin → succeeds
-- [ ] Admin — same action as non-admin (or watch Network on admin API) → 401/403, not 500
-- [ ] Content — edit your own name/description → saves
-- [ ] Content — edit someone else's entry → blocked (403/401, not 500)
-
-Optional: banned account → ban error on login; or mid-session ban + session refresh → logged out.
-
----
-
-#### 8. Utils wave 3 (2026-06-07 — `b29c9e7`, ~10 min)
-
-Code touched: `getUserByProfileName.ts`, `startCooldown.ts`, `findNormalizedMatch.ts`.
-
-- [ ] `/profile/[profilename]` — known user's profile loads (avatar, lists; not 404/500)
-- [ ] `/register` with taken profile name → rejected
-- [ ] `/addnames` — duplicate name (`Fluffy` when `fluffy` exists) → 409 / “already exists”
-- [ ] Edit description to text matching another entry → duplicate blocked
-- [ ] `/adddescriptions` → “Check if a description exists” → paste **start** of existing description → duplicate message + existing content shown
-- [ ] Same UI, text matching only **middle** of existing description → **not** flagged as duplicate
-- [ ] `/fetchnames` or `/fetchdescriptions` → spam pagination **next** → ~15s cooldown
-- [ ] Same pages → rapid sort or filter changes → ~3s cooldown
-
-**Note:** Name “check if exists” on `/fetchname` uses its own route, not `findNormalizedMatch`.
-
----
-
-#### 9. `lib/checkBlocklist` (2026-06-07, ~5 min)
-
-Code touched: `lib/checkBlocklist.ts`, `checkMultipleBlocklists.ts`, `data/blockList.js`.
-
-- [ ] `/addnames` — submit `**butt`** alone → 403 / blocklist message (`exact-name`)
-- [ ] `/addnames` — submit `**fluffy butt**` → allowed
-- [ ] `/adddescriptions` — substring blocklist hit → 403 with `blockedBy` in message
-- [ ] `/addnames` or `/adddescriptions` — legitimate content → saves successfully
-- [ ] `/register` or `/editsettings` — blocklisted bio (if field checked) → rejected
-
-**Note:** `/contact` uses `detectBotPatterns`, not `checkBlocklist`.
-
----
-
-#### 10. Likes models (2026-06-07 — `NameLike` / `DescriptionLike`, ~10 min)
-
-Code touched: `models/NameLike.ts`, `models/DescriptionLike.ts`. (`Follow.ts` — migrations only.)
-
-Use **two users** (or like another user's content).
-
-- [ ] Name like toggle on `/name/[name]` → like / unlike; count updates
-- [ ] Rapid double-click like → one like only, no 500
-- [ ] Description like toggle on `/description/[id]` → like / unlike works
-- [ ] `/notifications` — names tab shows like from another user
-- [ ] `/notifications` — descriptions tab shows like notification
-- [ ] Mark like notification read → stays read on refresh
-- [ ] User likes list loads (dashboard / likes view if exposed)
-- [ ] Self-like → no notification for yourself
-- [ ] Profile follow / unfollow still works (`User.followers`, not `Follow` model)
-
----
-
-#### 11. Thank, Suggestion, Report (2026-06-07 — `Thank.ts` / `Suggestion.ts` / `Report.ts`, ~15 min)
-
-Code touched: `models/Thank.ts`, `models/Suggestion.ts`, `models/Report.ts`.
-
-Use **two users** for thanks (thank someone else's content).
-
-- [ ] `/name/[name]` or `/description/[id]` — send thank with preset message → success
-- [ ] Thank same content again → rejected or no duplicate (per route rules)
-- [ ] `/notifications` — thanks tab shows thank from another user
-- [ ] Mark thank notification read → stays read on refresh
-- [ ] Self-thank → no notification for yourself
-- [ ] `/name/[name]` — submit tag suggestion (incorrect + suggested tags) → saved
-- [ ] `/dashboard` or user suggestions list — new suggestion appears
-- [ ] Flag/report flow on name or description → report submitted (not 500)
-- [ ] Admin or owner reports list loads if exposed in UI
-
-**Note:** Thank API uses `contentType === "description"` (singular) for `descriptionId` required check; schema enum is `"descriptions"`.
-
----
-
-#### 12. Core content models (2026-06-07 — `Name.ts` / `Description.ts`, ~15 min)
-
-Code touched: `models/Name.ts`, `models/Description.ts` — all Mongoose models are now TypeScript.
-
-- [ ] `/fetchnames` and `/fetchdescriptions` — lists load
-- [ ] `/addnames` — create name with tags → appears on `/name/[name]`
-- [ ] `/addnames` — duplicate normalized name → 409
-- [ ] `/adddescriptions` — create description → `/description/[id]` loads
-- [ ] Edit own name/description → saves; `likedByCount` unchanged unless liking
-- [ ] Name unique constraint — same `content` twice → rejected (not 500)
-
----
-
-### Regression signals (all waves)
-
-
-| Symptom                                                  | Likely cause                                               |
-| -------------------------------------------------------- | ---------------------------------------------------------- |
-| 500 on page load                                         | `db.connect` or `leanWithStrings` on that route            |
-| Hydration error / "Objects are not valid as React child" | ObjectId not stringified (`mongoDataCleanup`)              |
-| Contact always fails                                     | Rate limiter or bot detection too aggressive               |
-| Admin/owner action returns 500                           | `checkIfAdmin` / `checkOwnership` session handling         |
-| Login succeeds but nav shows logged out                  | `session` / `jwt` callback or `toTokenUser`                |
-| `profileName` or `role` missing in UI                    | NextAuth augmentation / JWT payload                        |
-| Profile page 500 for valid user                          | `getUserByProfileName` or `db.connect`                     |
-| Duplicate name slips through on submit                   | `findExactNormalized`                                      |
-| Description check never finds known duplicate            | `findStartNormalized` / normalization                      |
-| Pagination or sort spam works with no delay              | `startCooldown`                                            |
-| All names/descriptions rejected                          | Blocklist Sets / Trie; `data/blockList.js`                 |
-| `butt` alone allowed                                     | exact-name pass broken or content length ≥ 100             |
-| Obvious substring slips through                          | Trie or lowercasing on list entries                        |
-| 500 instead of 403 on block                              | `respondIfBlocked` / `bannedWordsMessage`                  |
-| Like toggle 500                                          | `NameLike` / `DescriptionLike` or toggle route transaction |
-| Count wrong but no error                                 | `likedByCount` out of sync with like collection            |
-| Notifications empty after like                           | `contentCreator` / populate / `getPaginatedNotifications`  |
-| Duplicate likes in DB                                    | unique index missing on `namelikes` / `descriptionlikes`   |
-| Thank submit 500                                         | `Thank` model / `ThanksOptions` enum mismatch              |
-| Thank notification missing                               | `contentCreator` index or thanks route populate            |
-| Suggestion save 500                                      | `Suggestion` refs (`NameTag`, `DescriptionTag`)            |
-| Report flag 500                                          | `Report` `contentCopy` or category validation              |
-
-
----
-
-### Optional automated smoke
+### Setup
 
 ```bash
 pnpm exec playwright install   # once
-pnpm test:e2e                  # login page render only
+# .env: MONGODB_URI_TEST, PLAYWRIGHT_TEST_EMAIL, PLAYWRIGHT_TEST_PASSWORD, NEXTAUTH_URL=http://localhost:3000
+# optional: PLAYWRIGHT_TEST_ADMIN_EMAIL/PASSWORD (defaults in e2e/fixtures/seed-data.json)
+pnpm seed:e2e                  # once — content from e2e/fixtures/seed-data.json
+pnpm test:e2e
 ```
 
-E2E does not replace the manual checks above.
+Playwright maps `MONGODB_URI_TEST` → `MONGODB_URI` when starting the server. `NEXTAUTH_SECRET` can match dev.
+
+**Slow runs:** `pnpm test:e2e` runs `build && start` (~3–6 min). If port 3000 is busy, use `pnpm build:e2e && pnpm start:e2e` then `pnpm test:e2e:local`.
+
+### What E2E covers
+
+**`e2e/browse.spec.ts`**
+
+- `/fetchnames` loads (no 500)
+- `/fetchdescriptions` loads (no 500)
+
+**`e2e/contact.spec.ts`**
+
+- Form fields and English/Spanish rule visible
+- Too-fast submit → rejected
+- Japanese message → rejected
+- Spanish message → allowed (validation passes)
+- Gibberish spam message → rejected
+- Gibberish spam name → rejected
+- Legitimate long name (Wojciechowski) → allowed
+- Rate limit → 4th submit blocked
+
+**`e2e/register.spec.ts`**
+
+- Duplicate `PLAYWRIGHT_TEST_PROFILENAME` → rejected (new email, seeded user owns profile name)
+- Duplicate seeded email → rejected (new profile name)
+
+**`e2e/login.spec.ts`**
+
+- Login page UI (magic link section, register link)
+- Wrong password → error, stay on `/login`
+- Credentials login → logged-in nav (profile menu)
+
+**`e2e/addnames.spec.ts`**
+
+- Logged-out → sign-in gate, disabled input/submit
+- Invalid `@` in name → client-side warning
+- Submit unique name → success toast
+- Duplicate of seeded name (`SEED_NAME_DUPLICATE_VARIANT`) → 409
+- Seeded name → `/name/[name]` loads
+- Blocklisted name `butt` alone → rejected
+- `fluffy butt` → allowed (blocklisted word not alone)
+- Created name → `/name/[name]` loads
+
+**`e2e/adddescriptions.spec.ts`**
+
+- Logged-out → sign-in gate, disabled textarea
+- Submit unique description → success toast; `/description/[id]` loads
+- Blocklisted substring in description → rejected
+- “Check if exists” at **start** of seeded description → duplicate shown
+- Same UI — seeded **middle-only** marker → not flagged
+
+**`e2e/auth-session.spec.ts`**
+
+- Logged-out `/dashboard` → redirect to `/login`
+- Logged-in `/dashboard` and `/notifications` load
+- `/profile/[profilename]` loads for seeded user
+- Profile menu → Profile link visible
+- Sign out → login again → session restored
+
+**`e2e/editsettings.spec.ts`**
+
+- Clear name → client validation error (`Please enter a name`)
+
+**`e2e/browse.spec.ts`** (also page load above)
+
+- `POST /api/names/swr` — `_id` values are strings; no `__v`
+
+**`e2e/admin.spec.ts`**
+
+- Regular user — no Admin nav; category API → 403
+- Admin — Admin menu links; can create name category via API
+
+**`e2e/edits.spec.ts`**
+
+- Owner updates seeded name notes (API + UI)
+- Non-owner cannot edit admin-owned name → 403
+- Edit description to duplicate another seeded entry → 409
+
+**`e2e/social.spec.ts`**
+
+- Admin like → appears in user notifications API
+- Self-like → excluded from notifications API
+- Admin follow regular user via API
+
+### Fixture data
+
+Shared seed content lives in **`e2e/fixtures/seed-data.json`** (imported by `scripts/seed-e2e.mjs` and Playwright via `e2e/fixtures/seed-data.ts`). Tests use constants like `SEED_NAME` — not hardcoded strings — so duplicate checks stay in sync with the DB.
+
+### Where tests live
+
+- Unit: `*.test.ts` next to modules
+- E2E: `e2e/*.spec.ts`
+- E2E fixtures: `e2e/fixtures/`
+- Notes: [docs/notes/](docs/notes/)
+
+---
+
+## Manual verification (dev only)
+
+Use **`pnpm dev`** against your normal **`MONGODB_URI`**. Run the sections that match your PR — skip anything already in the E2E table above.
+
+**Note:** Checkboxes are personal progress; preserve them when editing.
+
+### Captcha, email, and real third-party services
+
+E2E cannot exercise these (bypassed or skipped).
+
+- [ ] **Contact happy path** — `/contact`, wait **>3s**, complete **real reCAPTCHA**, submit → success toast or email (Resend configured)
+- [ ] **Register** — `/register` with real reCAPTCHA → new user, default avatar
+- [ ] **Magic link** — `/login` request link → email arrives (skip if Resend not configured)
+- [ ] **Magic link** — click link → logged in; refresh keeps session
+
+### Auth & session (beyond E2E)
+
+- [ ] Nav — avatar image detail (pixel/layout)
+- [ ] Optional: banned account → ban error; mid-session ban + refresh → logged out
+
+### Admin UI depth
+
+- [ ] Admin — create tag/category via **UI** (not just API smoke)
+- [ ] Admin — edit existing category/tag in UI
+
+### Content depth (tags, normalization)
+
+- [ ] `/addnames` — name with **tags** → appears on `/name/[name]` with tags/categories
+- [ ] Name normalization — spaces/punctuation/case variants → same duplicate behavior (UI search/add flows beyond case duplicate)
+- [ ] Edit own content → `likedByCount` unchanged unless liking
+
+### Blocklist (bio and API detail)
+
+- [ ] `/register` or profile bio — blocklisted bio → rejected (if field checked)
+- [ ] DevTools — blocklist 403 responses include `blockedBy` (E2E asserts message only)
+
+### Social & notifications (beyond E2E API smoke)
+
+- [ ] Like toggle on name detail UI — rapid double-click → one like, no 500
+- [ ] `/notifications` UI — mark read persists
+- [ ] Profile follow / unfollow via **UI** (followers list is commented out on profile)
+- [ ] Thank, suggestion, report flows — submit without 500; lists load if exposed
+
+### Data shape & listing UX
+
+- [ ] DevTools → Network — other APIs (`leanWithStrings`) still return string `_id`; no `__v`
+- [ ] `/name/[name]`, `/description/[id]` — render with related data (tags, creator)
+- [ ] `/fetchnames` or `/fetchdescriptions` — pagination spam **next** → ~15s cooldown
+- [ ] Same pages — rapid sort/filter → ~3s cooldown
+- [ ] `useApiRateLimiter` / like button — rapid clicks throttled
+
+### Misc utils (no E2E yet)
+
+- [ ] `/register` — full signup with real captcha → default avatar assigned (`chooseRandomDefaultAvatar`)
+
+---
+
+## Convert-then-test workflow (TS migration)
+
+1. Convert file (`.js` → `.ts` / `.jsx` → `.tsx`)
+2. Add unit tests if the module has pure logic
+3. Add E2E only for stable user flows not needing captcha/email
+4. `pnpm test` + `pnpm build`; `pnpm test:e2e` if you touched covered flows
+
+Block high-risk areas (`lib/auth.ts`, rate limiter, ownership) without unit smoke tests.
+
+---
+
+## Regression signals
+
+| Symptom | Likely cause |
+|---------|----------------|
+| 500 on page load | `db.connect` or `leanWithStrings` |
+| Hydration / `[object Object]` in UI | ObjectId not stringified |
+| Contact always fails on dev | Rate limiter, bot rules, or captcha keys |
+| Login OK but nav logged out | `session` / `jwt` callback |
+| `profileName` or `role` missing | NextAuth augmentation |
+| Duplicate name slips through | `findExactNormalized` |
+| Description duplicate check wrong | `findStartNormalized` / normalization |
+| Pagination spam with no delay | `startCooldown` |
+| Like toggle 500 | `NameLike` / transaction |
+| Thank submit 500 | `Thank` model / enum mismatch |
+
+---
+
+## Where tests live
+
+- Unit tests: co-located as `*.test.ts`
+- Component tests: co-located as `*.test.tsx`
+- E2E tests: `e2e/*.spec.ts`
+- Design notes: [docs/notes/](docs/notes/) — see [docs/README.md](docs/README.md)

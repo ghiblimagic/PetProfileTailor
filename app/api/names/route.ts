@@ -10,6 +10,13 @@ import {
 } from "@/utils/api/checkMultipleBlocklists";
 import normalizeString from "@/utils/stringManipulation/normalizeString";
 import { findExactNormalized } from "@/utils/stringManipulation/findNormalizedMatch";
+import {
+  formatNameDuplicateMessage,
+  formatNameInvalidCharsMessage,
+  shouldRecheckNameDuplicateOnUpdate,
+  shouldRunNameBlocklistOnUpdate,
+  validateNameLength,
+} from "@/utils/api/validateNameSubmission";
 
 type NameCreateBody = {
   content: string;
@@ -61,13 +68,9 @@ export async function POST(req: Request) {
 
   const { content, notes, tags } = (await req.json()) as NameCreateBody;
 
-  if (content.length > 50) {
-    return Response.json(
-      {
-        message: `Ruh Roh! The name ${content} has more than 50 characters. It is ${content.length} characters`,
-      },
-      { status: 400 },
-    );
+  const lengthCheck = validateNameLength(content);
+  if (!lengthCheck.ok) {
+    return Response.json({ message: lengthCheck.message }, { status: 400 });
   }
 
   try {
@@ -86,7 +89,7 @@ export async function POST(req: Request) {
     if (existingNameCheck) {
       return Response.json(
         {
-          message: `Ruh Roh! The name ${content} already exists!`,
+          message: formatNameDuplicateMessage(content),
           existingName: existingNameCheck,
         },
         { status: 409 },
@@ -96,7 +99,7 @@ export async function POST(req: Request) {
     if (invalidChars) {
       return Response.json(
         {
-          message: `Ruh Roh! The name ${content} has invalid character(s) ${invalidChars}`,
+          message: formatNameInvalidCharsMessage(content, invalidChars),
         },
         { status: 400 },
       );
@@ -127,16 +130,12 @@ export async function PUT(req: Request) {
   const { submission } = (await req.json()) as NameUpdateBody;
   const { contentId, content, notes, tags } = submission;
 
-  if (content.length > 50) {
-    return Response.json(
-      {
-        message: `Ruh Roh! The name ${content} has more than 50 characters. It is ${content.length} characters`,
-      },
-      { status: 400 },
-    );
+  const lengthCheck = validateNameLength(content);
+  if (!lengthCheck.ok) {
+    return Response.json({ message: lengthCheck.message }, { status: 400 });
   }
 
-  if (content || notes) {
+  if (shouldRunNameBlocklistOnUpdate(content, notes)) {
     const blockResult = checkMultipleFieldsBlocklist([
       { value: content, fieldName: "content" },
       { value: notes ?? "", fieldName: "notes" },
@@ -158,14 +157,11 @@ export async function PUT(req: Request) {
 
   try {
     // if the content is changing, make sure it doesn't already exist
-    if (
-      content &&
-      content.toLowerCase() !== toUpdateName.content.toLowerCase()
-    ) {
+    if (shouldRecheckNameDuplicateOnUpdate(content, toUpdateName.content)) {
       const existingNameCheck = await findExactNormalized(Names, content);
       if (existingNameCheck) {
         return Response.json(
-          { message: `Ruh Roh! The name ${content} already exists!` },
+          { message: formatNameDuplicateMessage(content) },
           { status: 409 },
         );
       }

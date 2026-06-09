@@ -18,6 +18,15 @@ import {
   hasRealisticContactFields,
   isEnglishOrSpanishScript,
 } from "@utils/api/detectBotPatterns";
+import { isE2eCaptchaBypass } from "@/utils/api/e2eTestMode";
+import {
+  isHoneypotTriggered,
+  isRecaptchaAcceptable,
+  validateContactEmail,
+  validateContactFieldLengths,
+  validateContactFormTiming,
+  validateRequiredContactFields,
+} from "@/utils/api/validateContactSubmission";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
@@ -50,7 +59,7 @@ export async function sendContactEmail(
   // HONEYPOT CHECK - if filled, it's a bot
   const honeypotWebsite = getFormString(formData.get("website"));
   const honeypotPhone = getFormString(formData.get("phone"));
-  if (honeypotWebsite || honeypotPhone) {
+  if (isHoneypotTriggered(honeypotWebsite, honeypotPhone)) {
     console.log("Bot detected: Honeypot filled", {
       honeypotWebsite,
       honeypotPhone,
@@ -64,40 +73,38 @@ export async function sendContactEmail(
 
   // Time-based checks — kick out requests from bots, who will usually submit quickly
   const formStartTime = parseInt(getFormString(formData.get("formStartTime")), 10);
-  if (!formStartTime || Number.isNaN(formStartTime)) {
-    return { success: false, error: "Invalid form submission.", email: null };
-  }
-
   const submissionTime = Date.now();
-  const timeSpent = submissionTime - formStartTime;
-
-  if (timeSpent < 3000) {
-    // Less than 3 seconds
-    console.log("Bot detected: Too fast", { timeSpent, ip: clientIP });
-    return { success: false, error: "Form submitted too quickly.", email: null };
-  }
-
-  if (timeSpent > 3600000) {
-    // 1 hour
-    return {
-      success: false,
-      error: "Form session expired. Please refresh and try again.",
-      email: null,
-    };
+  const timing = validateContactFormTiming(formStartTime, submissionTime);
+  if (!timing.ok) {
+    if (timing.error === "Form submitted too quickly.") {
+      // Less than 3 seconds
+      console.log("Bot detected: Too fast", {
+        timeSpent: submissionTime - formStartTime,
+        ip: clientIP,
+      });
+    }
+    return { success: false, error: timing.error, email: null };
   }
 
   // ******************** Validation ********************
-  if (!name || !email || !message || !captchaToken) {
-    return { success: false, error: "All fields are required.", email: null };
+  const required = validateRequiredContactFields(
+    name,
+    email,
+    message,
+    captchaToken,
+  );
+  if (!required.ok) {
+    return { success: false, error: required.error, email: null };
   }
 
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  if (!emailRegex.test(email)) {
-    return { success: false, error: "Invalid email address.", email: null };
+  const emailCheck = validateContactEmail(email);
+  if (!emailCheck.ok) {
+    return { success: false, error: emailCheck.error, email: null };
   }
 
-  if (message.length > 10000 || name.length > 100 || email.length > 254) {
-    return { success: false, error: "Input too long.", email: null };
+  const lengths = validateContactFieldLengths(name, email, message);
+  if (!lengths.ok) {
+    return { success: false, error: lengths.error, email: null };
   }
 
   if (!isEnglishOrSpanishScript(message)) {
@@ -128,7 +135,10 @@ export async function sendContactEmail(
     return { success: false, error: "Please enter a valid message.", email: null };
   }
 
+  const e2eBypass = isE2eCaptchaBypass(captchaToken);
+
   // ******************** Recaptcha ********************
+  if (!e2eBypass) {
   try {
     const captchaVerify = await fetch(
       "https://www.google.com/recaptcha/api/siteverify",
@@ -163,10 +173,7 @@ export async function sendContactEmail(
       timestamp: new Date().toISOString(),
     });
 
-    if (
-      !captchaData.success ||
-      (captchaData.score !== undefined && captchaData.score < 0.7)
-    ) {
+    if (!isRecaptchaAcceptable(captchaData)) {
       return {
         success: false,
         error: "reCAPTCHA failed. Please try again.",
@@ -176,6 +183,7 @@ export async function sendContactEmail(
   } catch (error) {
     console.error("Captcha verification error:", error);
     return { success: false, error: "Could not verify captcha.", email: null };
+  }
   }
 
   // Check rate limit to not punish them for errors (only after validating everything else)
@@ -191,6 +199,14 @@ export async function sendContactEmail(
         minutesUntilReset > 1 ? "s" : ""
       }.`,
       email,
+    };
+  }
+
+  if (e2eBypass) {
+    return {
+      success: false,
+      error: "E2E test mode — email send skipped.",
+      email: null,
     };
   }
 

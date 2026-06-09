@@ -12,6 +12,10 @@ import GeneralButton from "../ReusableSmallComponents/buttons/GeneralButton";
 
 import ReCAPTCHA from "react-google-recaptcha";
 import { useGoogleReCaptcha } from "react-google-recaptcha-v3";
+import {
+  E2E_CAPTCHA_BYPASS_TOKEN,
+  isE2eClientMode,
+} from "@/utils/api/e2eTestMode";
 
 export default function ContactPage() {
   const formStartTime = useRef(Date.now());
@@ -22,7 +26,8 @@ export default function ContactPage() {
   const { executeRecaptcha } = useGoogleReCaptcha();
   const [showV2, setShowV2] = useState(false);
   const [v2Token, setV2Token] = useState(null);
-  const [recaptchaLoading, setRecaptchaLoading] = useState(true);
+  const isE2eTestMode = isE2eClientMode();
+  const [recaptchaLoading, setRecaptchaLoading] = useState(!isE2eTestMode);
   const [recaptchaFailed, setRecaptchaFailed] = useState(false);
 
   const [state, formAction, isPending] = useActionState(sendContactEmail, {
@@ -33,6 +38,11 @@ export default function ContactPage() {
 
   // Set recaptcha as loaded when it's ready, with timeout fallback
   useEffect(() => {
+    if (isE2eTestMode) {
+      setRecaptchaLoading(false);
+      return;
+    }
+
     if (executeRecaptcha) {
       setRecaptchaLoading(false);
       setRecaptchaFailed(false);
@@ -54,6 +64,13 @@ export default function ContactPage() {
   async function handleSubmit(e) {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
+
+    // E2E only — skip reCAPTCHA when Playwright builds with NEXT_PUBLIC_E2E_TEST_MODE
+    if (isE2eTestMode) {
+      formData.append("captchaToken", E2E_CAPTCHA_BYPASS_TOKEN);
+      formAction(formData);
+      return;
+    }
 
     try {
       let token = null;

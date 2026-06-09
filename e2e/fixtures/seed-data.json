@@ -1,0 +1,28 @@
+{
+  "name": {
+    "content": "E2ESeedName",
+    "duplicateVariant": "E2ESEEDNAME"
+  },
+  "nameAdmin": {
+    "content": "E2EAdminSeedName"
+  },
+  "description": {
+    "startDuplicate": {
+      "content": "E2E seeded description prefix for duplicate checks with enough length here",
+      "checkPrefix": "E2E seeded description prefix"
+    },
+    "middleOnly": {
+      "content": "E2E prefix e2emidmarkeronly suffix with enough characters for validation",
+      "marker": "e2emidmarkeronly"
+    },
+    "adminOwned": {
+      "content": "E2E admin owned description with enough characters for validation here"
+    }
+  },
+  "admin": {
+    "defaultEmail": "e2e-admin@example.com",
+    "defaultPassword": "e2eadminpass",
+    "defaultName": "E2E Admin",
+    "defaultProfileName": "e2eadmin"
+  }
+}

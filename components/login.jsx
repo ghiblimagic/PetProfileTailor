@@ -63,14 +63,11 @@ export default function Login() {
   }, []);
 
   useEffect(() => {
-    if (!redirect) return;
-    if (session) {
-      // Use a microtask Promise.resolve() to avoid interfering with render
-      Promise.resolve().then(() => router.replace("/dashboard"));
-    }
+    if (!redirect || !session) return;
+    // Defer until after render; wait for session — redirect was firing before useSession updated
+    Promise.resolve().then(() => router.replace("/dashboard"));
     setRedirect(false);
-    //Wrapping in Promise.resolve() defers the push until after the current render, preventing multiple “history” calls.
-  }, [redirect]);
+  }, [redirect, session, router]);
 
   const {
     handleSubmit,
