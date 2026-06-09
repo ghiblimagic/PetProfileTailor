@@ -48,8 +48,10 @@ function buildFilter(parsed: ReturnType<typeof parseNamesSwrRequest>) {
   const filter: Record<string, unknown> = {};
 
   if (parsed.tags?.length) {
+    // console.log("tags in swr", tags);
     const tagIds = parsed.tags.map((id) => new mongoose.Types.ObjectId(id));
     filter.tags = { $all: tagIds };
+    // console.log("tag ids in swr", tagIds);
   }
 
   if (parsed.profileUserId) {
@@ -80,10 +82,21 @@ async function handleRequest(req: Request): Promise<Response> {
   try {
     const totalDocs = await Names.countDocuments(filter);
     const totalPagesInDatabase = Math.ceil(totalDocs / LIMIT);
+    // console.log("filter in swr", filter);
+
+    // console.log(
+    //   "sortLogic",
+    //   sortLogic,
+    //   "page",
+    //   parsed.page,
+    //   "skip",
+    //   (parsed.page - 1) * LIMIT,
+    // );
 
     const names = await Names.aggregate([
       { $match: filter },
-      { $sort: sortLogic },
+      // tiebreaker applied in buildNamesSwrSort unless sorting by _id
+      { $sort: sortLogic }, // _id in ascending order — see docs for tiebreaker notes
       { $skip: (parsed.page - 1) * LIMIT },
       { $limit: LIMIT },
       {

@@ -1,7 +1,9 @@
 import {
+  buildSwrFilterSourceFromSearchParams,
   mergePostBodyWithSearchParams,
   parseNamesSwrRequest,
   parseSourceFromGet,
+  parseSwrPaginationFromSearchParams,
 } from "./parseNamesSwrRequest";
 
 describe("parseSourceFromGet", () => {
@@ -41,6 +43,45 @@ describe("mergePostBodyWithSearchParams", () => {
     expect(source.tags).toEqual(["from-body"]);
     expect(source.sortingproperty).toBe("likedByCount");
     expect(source.profileUserId).toBe("user1");
+  });
+});
+
+describe("buildSwrFilterSourceFromSearchParams", () => {
+  it("collects tags and likedIds via getAll", () => {
+    const params = new URLSearchParams(
+      "tags=a&tags=b&likedIds=id1&likedIds=id2&profileUserId=user1",
+    );
+    const source = buildSwrFilterSourceFromSearchParams(params);
+
+    expect(source.tags).toEqual(["a", "b"]);
+    expect(source.likedIds).toEqual(["id1", "id2"]);
+    expect(source.profileUserId).toBe("user1");
+  });
+
+  it("keeps a single likedIds query value from getAll as-is (CSV split only when getAll empty)", () => {
+    const params = new URLSearchParams("likedIds=abc,def,ghi");
+    const source = buildSwrFilterSourceFromSearchParams(params);
+
+    expect(source.likedIds).toEqual(["abc,def,ghi"]);
+  });
+});
+
+describe("parseSwrPaginationFromSearchParams", () => {
+  it("reads page and sort from query string with defaults", () => {
+    expect(parseSwrPaginationFromSearchParams(new URLSearchParams())).toEqual({
+      page: 1,
+      sortingValue: -1,
+      sortingProperty: "likedByCount",
+    });
+
+    const params = new URLSearchParams(
+      "page=3&sortingvalue=1&sortingproperty=_id",
+    );
+    expect(parseSwrPaginationFromSearchParams(params)).toEqual({
+      page: 3,
+      sortingValue: 1,
+      sortingProperty: "_id",
+    });
   });
 });
 

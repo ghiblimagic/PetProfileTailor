@@ -1420,3 +1420,48 @@ Converted paginated names SWR listing to TypeScript. Extracted pure GET/POST sou
 ### Next logical step
 
 Convert `app/api/description/swr/route.js` (similar shape) or run `pnpm test:e2e e2e/browse.spec.ts`.
+
+---
+
+## 2026-06-09 — TypeScript: `description/swr` API route
+
+### What was changed and why
+
+Converted paginated descriptions SWR listing to TypeScript. Reused `parseNamesSwrRequest.ts` with description-specific helpers (`buildSwrFilterSourceFromSearchParams`, `parseSwrPaginationFromSearchParams`). Preserved original behavior: page/sort always from URL; filters from POST body or query `getAll`. Kept PUT/DELETE 405.
+
+### Files created
+
+- `app/api/description/swr/route.ts`
+- `docs/notes/app/api/description-swr-route.md`
+
+### Files removed
+
+- `app/api/description/swr/route.js`
+
+### Files modified
+
+- `utils/api/parseNamesSwrRequest.ts`, `parseNamesSwrRequest.test.ts` (3 new tests, 9 total)
+- `docs/notes/app/api/description-route.md`, `docs/README.md`
+
+### Verification
+
+- `pnpm test -- parseNamesSwrRequest` — 9 passed
+- `pnpm build` — OK
+
+### Next logical step
+
+Run `pnpm test:e2e e2e/browse.spec.ts` or convert smaller API routes (`check-if-content-exists`, `grabusersfollowing`).
+
+---
+
+## 2026-06-09 — Restore original inline comments on SWR routes
+
+### What was changed and why
+
+Re-added explanatory comments from the original `route.js` files into `names/swr/route.ts`, `description/swr/route.ts`, and `parseNamesSwrRequest.ts` (POST/GET merge, likedIds Case 1/2, filter build, aggregation sections, handler docs).
+
+### Files modified
+
+- `app/api/names/swr/route.ts`
+- `app/api/description/swr/route.ts`
+- `utils/api/parseNamesSwrRequest.ts`

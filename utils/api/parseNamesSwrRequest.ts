@@ -1,5 +1,6 @@
 /**
- * Pure request parsing for names SWR listing. Notes: docs/notes/app/api/names-swr-route.md
+ * Pure request parsing for SWR listing routes (names + descriptions).
+ * Notes: docs/notes/app/api/names-swr-route.md, description-swr-route.md
  */
 
 export type NamesSwrSource = Record<
@@ -35,17 +36,17 @@ export function parseSourceFromGet(
   });
 
   // Handle likedIds: support repeated params & CSV
-  // Case 1: Already an array of strings — e.g. ?likedIds=abc&likedIds=def → ["abc", "def"]
-  // (built by searchParams.forEach above when the same key appears more than once)
+  // Case 1: Already an array of string
+  // ["abc", "def"].
   let likedIds = source.likedIds ?? [];
   if (!Array.isArray(likedIds)) {
     likedIds = [String(likedIds)];
   }
 
   if (!likedIds.length) {
-    // Case 2: comma-separated fallback like ?likedIds=1,2,3
-    // When the param was missing from forEach, searchParams.get returns e.g. "abc,def"
-    // and we normalize into the same shape as Case 1: ["abc", "def"]
+    // Case 2: support comma-separated fallback like ?likedIds=1,2,3
+    // ["abc,def"] (a single string)
+    // Normalizes it into the same shape as Case 1
     const likedCsv = searchParams.get("likedIds");
     if (likedCsv) {
       likedIds = likedCsv
@@ -57,6 +58,64 @@ export function parseSourceFromGet(
 
   source.likedIds = likedIds;
   return source;
+}
+
+/** Description SWR: filters only — page/sort always read from URL separately. */
+export function buildSwrFilterSourceFromSearchParams(
+  searchParams: URLSearchParams,
+): NamesSwrSource {
+  // Build the same shape as the old req.query would have produced
+  const tags = searchParams.getAll("tags");
+
+  // for if we're only returning items the user liked, for the dashboard SWR
+  let likedIds = searchParams.getAll("likedIds");
+  // Case 1: Already an array of string
+  // ["abc", "def"].
+  if (!likedIds.length) {
+    // Case 2: support comma-separated fallback like ?likedIds=1,2,3
+    // ["abc,def"] (a single string)
+    // Normalizes it into the same shape as Case 1
+    const likedCsv = searchParams.get("likedIds");
+    if (likedCsv) {
+      likedIds = likedCsv
+        .split(",")
+        .map((s) => s.trim())
+        .filter(Boolean);
+    }
+  }
+
+  // Filter by user ID if provided
+  const profileUserId = searchParams.get("profileUserId") || undefined;
+
+  const source: NamesSwrSource = {};
+  if (tags.length) source.tags = tags;
+  if (profileUserId) source.profileUserId = profileUserId;
+  if (likedIds.length) source.likedIds = likedIds;
+
+  return source;
+}
+
+/** Description SWR: pagination/sort always from query string, not POST body. */
+export function parseSwrPaginationFromSearchParams(
+  searchParams: URLSearchParams,
+): Pick<ParsedNamesSwrRequest, "page" | "sortingValue" | "sortingProperty"> {
+  return {
+    page: parseInt(searchParams.get("page") || "1", 10) || 1,
+    sortingValue: parseInt(searchParams.get("sortingvalue") || "-1", 10) || -1,
+    sortingProperty: searchParams.get("sortingproperty") || "likedByCount",
+  };
+}
+
+export function parseSwrFilters(
+  source: NamesSwrSource,
+): Pick<ParsedNamesSwrRequest, "tags" | "profileUserId" | "likedIds"> {
+  return {
+    tags: normalizeStringArray(source.tags),
+    profileUserId: source.profileUserId
+      ? String(source.profileUserId)
+      : undefined,
+    likedIds: normalizeStringArray(source.likedIds),
+  };
 }
 
 export function mergePostBodyWithSearchParams(
@@ -96,11 +155,7 @@ export function parseNamesSwrRequest(
     page,
     sortingValue,
     sortingProperty,
-    tags: normalizeStringArray(source.tags),
-    profileUserId: source.profileUserId
-      ? String(source.profileUserId)
-      : undefined,
-    likedIds: normalizeStringArray(source.likedIds),
+    ...parseSwrFilters(source),
   };
 }
 
@@ -113,8 +168,9 @@ export function buildNamesSwrSort(
   };
 
   if (sortingProperty === "_id") {
-    return sortLogic;
+    return sortLogic; // If sorting by _id, don't add tiebreaker
   }
 
-  return { ...sortLogic, _id: 1 };
+  // Otherwise, add _id as tiebreaker
+  return { ...sortLogic, _id: 1 }; // _id in ascending order — see route docs for tiebreaker notes
 }
