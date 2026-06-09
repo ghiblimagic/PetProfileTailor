@@ -1191,6 +1191,22 @@ Removed manual checklist items now covered by Playwright. Manual section reorgan
 
 ---
 
+## 2026-06-08 — Restore `.gitattributes` (LF line endings)
+
+### What was changed and why
+
+Re-added repo-level line-ending rules so Git stops warning about LF/CRLF on Windows. Text files use LF; common binary extensions are excluded.
+
+### Files created
+
+- `.gitattributes`
+
+### Next logical step
+
+After pulling this file, run `git add --renormalize .` once if old CRLF files still warn, then recommit.
+
+---
+
 ## 2026-06-08 — Follow API: use `Follow` model (not `User.followers`)
 
 ### What was changed and why
