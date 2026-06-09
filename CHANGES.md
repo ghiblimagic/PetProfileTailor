@@ -1389,3 +1389,34 @@ Converted the register form to TypeScript as part of the signup-route migration.
 ### Next logical step
 
 Run `pnpm test:e2e e2e/register.spec.ts` or convert `app/api/names/swr/route.js` next.
+
+---
+
+## 2026-06-09 — TypeScript: `names/swr` API route
+
+### What was changed and why
+
+Converted paginated names SWR listing to TypeScript. Extracted pure GET/POST source parsing and sort defaults into `parseNamesSwrRequest.ts` (6 unit tests). Behavior unchanged: POST body + query merge, `_id` sort tiebreaker, 50-item pages.
+
+### Files created
+
+- `app/api/names/swr/route.ts`
+- `utils/api/parseNamesSwrRequest.ts`, `parseNamesSwrRequest.test.ts`
+- `docs/notes/app/api/names-swr-route.md`
+
+### Files removed
+
+- `app/api/names/swr/route.js`
+
+### Files modified
+
+- `docs/notes/app/api/names-route.md`, `docs/README.md`
+
+### Verification
+
+- `pnpm test -- parseNamesSwrRequest` — 6 passed
+- `pnpm build` — OK
+
+### Next logical step
+
+Convert `app/api/description/swr/route.js` (similar shape) or run `pnpm test:e2e e2e/browse.spec.ts`.
