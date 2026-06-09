@@ -1465,3 +1465,36 @@ Re-added explanatory comments from the original `route.js` files into `names/swr
 - `app/api/names/swr/route.ts`
 - `app/api/description/swr/route.ts`
 - `utils/api/parseNamesSwrRequest.ts`
+
+---
+
+## 2026-06-09 — VS Code: save files with LF line endings
+
+### What was changed and why
+
+Added `"files.eol": "\n"` to workspace settings so Cursor/VS Code saves new edits as LF on Windows, matching `.gitattributes` and reducing CRLF warnings on `git add`.
+
+### Files modified
+
+- `.vscode/settings.json`
+
+### Next logical step
+
+Re-save or convert any files still showing `w/crlf` (`git ls-files --eol | rg w/crlf`), then run `git add` again.
+
+---
+
+## 2026-06-09 — One-time CRLF → LF working-tree normalize
+
+### What was changed and why
+
+`files.eol` only affects new saves; 344 tracked files still had CRLF on disk (`w/crlf`). Converted working copies to LF and added `.editorconfig` so editors respect LF alongside `.gitattributes`.
+
+### Files created
+
+- `.editorconfig`
+
+### Verification
+
+- `git ls-files --eol | rg w/crlf` — 0 matches
+- `git add .` — no CRLF warnings
