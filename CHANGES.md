@@ -1925,3 +1925,33 @@ Converted notifications context from `.js` to `.tsx`, replacing the interim `.d.
 ### Next logical step
 
 Convert `NotifListingWrapper.jsx` or `app/api/user/notifications/route.js` to complete the notifications cluster.
+
+---
+
+## 2026-06-07 — TypeScript: `NotifListingWrapper`
+
+### What was changed and why
+
+Converted shared notifications list shell to `.tsx`. Typed SWR hook, listing component, and recheck/load-more handlers. Removed unused `LikeNotificationListing` import from the JSX original. `docs` accepts `unknown[]` from SWR with `_id` cast at render time.
+
+### Files created
+
+- `components/Notifications/NotifListingWrapper.tsx`
+
+### Files removed
+
+- `components/Notifications/NotifListingWrapper.jsx`
+
+### Files modified
+
+- `docs/notes/app/notifications-page.md`
+- `docs/README.md`
+
+### Verification
+
+- `pnpm exec tsc --noEmit` — OK
+- `pnpm build` — OK
+
+### Next logical step
+
+Convert `app/api/user/notifications/route.js` to complete the notifications cluster, or `LikeNotificationListing.jsx` / `ThankNotificationListing.jsx`.

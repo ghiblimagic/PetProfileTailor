@@ -1,8 +1,36 @@
-import LikeNotificationListing from "@/components/Notifications/LikeNotificationListing";
+/**
+ * Shared notifications list shell — load more, recheck cooldown, empty/end states.
+ * Notes: docs/notes/app/notifications-page.md
+ */
+"use client";
+
+import type { ComponentType, ReactNode } from "react";
 import LoadingSpinner from "@components/ui/LoadingSpinner";
 import GeneralButton from "@components/ReusableSmallComponents/buttons/GeneralButton";
 import Image from "next/image";
 import { useLocalStorageCooldown } from "@/hooks/useLocalStorageCooldown";
+import type {
+  NotificationModelType,
+  SwrSimpleReturn,
+} from "@/hooks/useSwrSimple";
+
+export type NotificationDoc = {
+  _id: string;
+};
+
+export type NotificationListingProps = {
+  singleContent: NotificationDoc;
+};
+
+export type NotifListingWrapperProps = {
+  swrHook: SwrSimpleReturn;
+  /** Flattened SWR pages; each row must have `_id` for list keys. */
+  docs: unknown[];
+  noNotificationsMessage: ReactNode;
+  handleLoadMore: (swrHook: SwrSimpleReturn) => void;
+  ListingComponent: ComponentType<NotificationListingProps>;
+  swrType: NotificationModelType;
+};
 
 export default function NotifListingWrapper({
   swrHook,
@@ -11,7 +39,7 @@ export default function NotifListingWrapper({
   handleLoadMore,
   ListingComponent,
   swrType,
-}) {
+}: NotifListingWrapperProps) {
   const { canClick, formattedTimer, trigger } = useLocalStorageCooldown(
     `lastRecheck-notifications${swrType}`,
     120,
@@ -49,12 +77,12 @@ export default function NotifListingWrapper({
 
       {Array.isArray(docs) &&
         docs.length > 0 &&
-        docs.map((singleContent) => (
-          <ListingComponent
-            singleContent={singleContent}
-            key={singleContent._id}
-          />
-        ))}
+        docs.map((singleContent) => {
+          const doc = singleContent as NotificationDoc;
+          return (
+            <ListingComponent singleContent={doc} key={doc._id} />
+          );
+        })}
 
       {!swrHook.isLoading && docs?.length === 0 && noNotificationsMessage}
 

@@ -39,7 +39,7 @@ Effect cleanup sets `canceled = true` if the user switches tabs before the timer
 | Names / Descriptions | `LikeNotificationListing` (`LikesContentListing`) |
 | Thanks | `ThankNotificationListing` (`ThanksContentListing`) |
 
-Shared list UI: `NotifListingWrapper` (load more, recheck cooldown, empty state).
+Shared list UI: [`NotifListingWrapper.tsx`](../../../components/Notifications/NotifListingWrapper.tsx) — renders `ListingComponent` rows, **load more** (while `!SWRisReachingEnd`), empty message when idle with no docs, and end-of-list digging-dog UI. When `SWRisReachingEnd`, shows **Recheck** with a 2-minute `useLocalStorageCooldown` per `swrType` (`lastRecheck-notifications{thanks|names|descriptions}`); recheck calls `swrHook.mutate()`.
 
 ### `useSWRSimple` hook
 
