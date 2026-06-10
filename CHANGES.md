@@ -2076,3 +2076,33 @@ Converted thank-notification row component to `.tsx`. Exported `ThankNotificatio
 ### Next logical step
 
 Convert `NotificationsButton.jsx` or delete stale duplicate `app/api/notifications/**/route.js` files.
+
+---
+
+## 2026-06-07 — TypeScript: `NotificationsButton`
+
+### What was changed and why
+
+Converted nav notification bell to `.tsx` — completes the notifications UI folder. Removed unused `faBell` import and unused context destructuring. Fixed broken `className` template literal (was rendering literal `className="..."` text).
+
+### Files created
+
+- `components/Notifications/NotificationsButton.tsx`
+
+### Files removed
+
+- `components/Notifications/NotificationsButton.jsx`
+
+### Files modified
+
+- `docs/notes/app/notifications-page.md`
+- `docs/README.md`
+
+### Verification
+
+- `pnpm exec tsc --noEmit` — OK
+- `pnpm build` — OK
+
+### Next logical step
+
+`app/api/user/likes/route.js`, `hooks/useLocalStorageCooldown.js`, or protected pages (`dashboard`, `editsettings`).
