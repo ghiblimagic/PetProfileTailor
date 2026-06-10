@@ -2197,3 +2197,35 @@ Converted thin client wrapper for `LikesProvider` to `.tsx` so the server layout
 ### Next logical step
 
 Convert `hooks/useLikeState.js` or `hooks/useLocalStorageCooldown.js`.
+
+---
+
+## 2026-06-07 — TypeScript: `hooks/useLikeState`
+
+### What was changed and why
+
+Converted like-button hook to `.ts`. Exported `LikeableContent`, `UseLikeStateParams`; wired `RecentLikeDelta` rollback typing via `useToggleState<RecentLikeDelta>`. Added `hooks/useToggleState.d.ts` for callback generics. `userId` param kept optional (callers pass it; hook does not use it).
+
+### Files created
+
+- `hooks/useLikeState.ts`
+- `hooks/useToggleState.d.ts`
+
+### Files removed
+
+- `hooks/useLikeState.js`
+
+### Files modified
+
+- `docs/notes/app/api/togglelike-route.md`
+- `docs/notes/app/api/user-likes-route.md`
+- `docs/README.md`
+
+### Verification
+
+- `pnpm exec tsc --noEmit` — OK
+- `pnpm build` — OK
+
+### Next logical step
+
+Convert `hooks/useToggleState.js` or `hooks/useLocalStorageCooldown.js`.

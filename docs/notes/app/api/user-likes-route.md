@@ -8,7 +8,7 @@ Returns every name and description the signed-in user has liked. [`LikesContext.
 
 ## `LikesProvider` / `useLikes`
 
-On session load: `GET /api/user/likes` → `likesRef.current.names` / `.descriptions` as `Map<contentId, null>`. `recentLikesRef` tracks per-`contentId` session deltas (`-1` | `0` | `1`) so optimistic like counts in [`useLikeState`](../../../hooks/useLikeState.js) survive navigation. `addLike` / `deleteLike` / `hasLiked` mutate the maps; mounted via [`LikesWrapper.tsx`](../../../wrappers/LikesWrapper.tsx) in `app/layout.js`.
+On session load: `GET /api/user/likes` → `likesRef.current.names` / `.descriptions` as `Map<contentId, null>`. `recentLikesRef` tracks per-`contentId` session deltas (`-1` | `0` | `1`) so optimistic like counts in [`useLikeState.ts`](../../../hooks/useLikeState.ts) survive navigation. `addLike` / `deleteLike` / `hasLiked` mutate the maps; mounted via [`LikesWrapper.tsx`](../../../wrappers/LikesWrapper.tsx) in `app/layout.js`.
 
 ## Auth
 
