@@ -1,18 +1,17 @@
 import dbConnect from "@utils/db";
 import Thank from "@/models/Thank";
-import { NextResponse } from "next/server";
 import { getSessionForApis } from "@/utils/api/getSessionForApis";
 
-export async function PATCH(req) {
+export async function PATCH(req: Request) {
   // partial update
   // just updating an existing field, not creating anything
   // so this is a PATCH instead of a PUT
-  const { ok, session } = await getSessionForApis({ req });
-  if (!ok || !session) {
-    return NextResponse.json({ message: "Not authenticated" }, { status: 401 });
+  const auth = await getSessionForApis({ req });
+  if (!auth.ok) {
+    return Response.json({ message: "Not authenticated" }, { status: 401 });
   }
 
-  const userId = session.user.id;
+  const userId = auth.session.user.id;
   await dbConnect.connect();
 
   await Thank.updateMany(
@@ -20,5 +19,5 @@ export async function PATCH(req) {
     { $set: { read: true } },
   );
 
-  return NextResponse.json({ success: true });
+  return Response.json({ success: true });
 }

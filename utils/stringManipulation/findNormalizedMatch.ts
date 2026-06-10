@@ -2,7 +2,10 @@
  * Design notes (regex strategies, index tradeoffs): docs/notes/utils/stringManipulation/findNormalizedMatch.md
  */
 import { type Model } from "mongoose";
+// necessary for populate (createdBy → User)
+import User from "@/models/User";
 import normalizeString from "./normalizeString";
+void User;
 
 export interface NormalizedContentFields {
   normalizedContent: string;

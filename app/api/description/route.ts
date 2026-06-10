@@ -1,6 +1,11 @@
 import dbConnect from "@utils/db";
 import mongoose from "mongoose";
+// necessary for populate
+import DescriptionTag from "@/models/DescriptionTag";
+import User from "@/models/User";
 import Description from "@/models/Description";
+void DescriptionTag;
+void User;
 import { checkOwnership } from "@/utils/api/checkOwnership";
 import { getSessionForApis } from "@/utils/api/getSessionForApis";
 import {

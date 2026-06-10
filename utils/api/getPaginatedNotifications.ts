@@ -6,6 +6,16 @@ type PaginationOptions = {
   limit?: number;
 };
 
+/** Shared `page` / `limit` parsing for notification API routes. */
+export function parseNotificationPagination(
+  searchParams: URLSearchParams,
+): { page: number; limit: number } {
+  return {
+    page: parseInt(searchParams.get("page") || "1", 10) || 1,
+    limit: parseInt(searchParams.get("limit") || "25", 10) || 25,
+  };
+}
+
 export async function getPaginatedNotifications(
   model: Model<unknown>,
   filter: Record<string, unknown> = {},

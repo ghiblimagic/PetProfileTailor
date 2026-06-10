@@ -6,6 +6,10 @@ Source: [`app/api/names/route.ts`](../../../app/api/names/route.ts)
 
 CRUD for pet names at `/api/names`. Used by `addingName.jsx` (POST), `ContentListing.jsx` (GET list + PUT edits), and `DeleteDialog.jsx` (DELETE).
 
+## Populate model imports
+
+`GET` / `PUT` call `.populate("tags")` and `.populate("createdBy")`. Import `NameTag` and `User` in the route (see `// necessary for populate` in `route.ts`) so Mongoose can resolve those `ref`s — same pattern as the original `route.js`.
+
 ## Handlers
 
 | Method | Auth | Main checks |

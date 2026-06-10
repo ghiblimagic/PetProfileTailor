@@ -130,6 +130,14 @@ Playwright maps `MONGODB_URI_TEST` → `MONGODB_URI` when starting the server. `
 - Admin like → appears in user notifications API
 - Self-like → excluded from notifications API
 - Admin follow regular user via API
+- `grabusersfollowing` lists followed users from Follow collection
+
+**`e2e/notifications.spec.ts`**
+
+- Unauthenticated `GET` on names / descriptions / thanks → 401
+- Name notifications — `likedBy` and `contentId` populated (not bare ids; regression for populate model imports)
+- Description notifications — same populate shape after admin like
+- `PATCH /api/notifications/names/mark-read` → all name like notifications `read: true`
 
 ### Fixture data
 
@@ -183,8 +191,10 @@ E2E cannot exercise these (bypassed or skipped).
 ### Social & notifications (beyond E2E API smoke)
 
 - [ ] Like toggle on name detail UI — rapid double-click → one like, no 500
-- [ ] `/notifications` UI — mark read persists
+- [ ] `/notifications` **UI** — mark read persists (E2E covers names mark-read **API** only)
+- [ ] `/notifications` UI — description and thanks tabs render populated rows
 - [ ] Profile follow / unfollow via **UI** (followers list is commented out on profile)
+- [ ] **Thanks** notifications — submit thank via UI/API → appears in `/api/notifications/thanks` (no E2E yet)
 - [ ] Thank, suggestion, report flows — submit without 500; lists load if exposed
 
 ### Data shape & listing UX

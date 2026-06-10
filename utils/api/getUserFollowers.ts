@@ -1,5 +1,8 @@
 import type { Types } from "mongoose";
+// necessary for populate
+import User from "@/models/User";
 import Follow from "@/models/Follow";
+void User;
 import { leanWithStrings } from "@/utils/mongoDataCleanup";
 
 type FollowerUser = {

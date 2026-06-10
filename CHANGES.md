@@ -1655,3 +1655,90 @@ Converted contact form to TypeScript. Typed `useActionState` with `ContactEmailS
 ### Next logical step
 
 Convert notification routes or `app/contact/page.jsx`.
+
+---
+
+## 2026-06-09 — TypeScript: notification API routes
+
+### What was changed and why
+
+Converted all six notification routes (names, descriptions, thanks — each with `mark-read`). Added `parseNotificationPagination` to shared helper. Preserved `$ne` ObjectId comments on names route, thanks PATCH comments, and descriptions error strings (pre-existing copy). Removed debug `console.log` from thanks GET.
+
+### Files created
+
+- `app/api/notifications/names/route.ts`, `names/mark-read/route.ts`
+- `app/api/notifications/descriptions/route.ts`, `descriptions/mark-read/route.ts`
+- `app/api/notifications/thanks/route.ts`, `thanks/mark-read/route.ts`
+- `docs/notes/app/api/notifications-routes.md`
+
+### Files removed
+
+- Six corresponding `route.js` files under `app/api/notifications/`
+
+### Files modified
+
+- `utils/api/getPaginatedNotifications.ts`
+- `docs/notes/models/likes-and-follows.md`, `docs/README.md`
+
+### Verification
+
+- `pnpm build` — OK
+- E2E: `e2e/social.spec.ts`, `e2e/auth-session.spec.ts`
+
+### Next logical step
+
+Convert `app/contact/page.jsx` or `app/(protected)/notifications/page.jsx`.
+
+---
+
+## 2026-06-09 — Restore populate side-effect imports on notification routes
+
+### What was changed and why
+
+Re-added `User` / `Name` / `Description` imports on notification GET routes. They register Mongoose models so `populate()` can resolve `ref` fields — not dead code. Documented in `notifications-routes.md`.
+
+### Files modified
+
+- `app/api/notifications/names/route.ts`
+- `app/api/notifications/descriptions/route.ts`
+- `app/api/notifications/thanks/route.ts`
+- `docs/notes/app/api/notifications-routes.md`
+
+---
+
+## 2026-06-09 — Notifications: unit + E2E tests
+
+### What was built and why
+
+Added notification test coverage: unit tests for `parseNotificationPagination`; E2E for 401, populate shape (guards ref model imports), description notifications, and names mark-read. Thanks notifications remain manual (no seeded thank helper).
+
+### Files created
+
+- `utils/api/getPaginatedNotifications.test.ts`
+- `e2e/notifications.spec.ts`
+
+### Files modified
+
+- `e2e/helpers/likes.ts` — `ensureDescriptionLiked`
+- `TESTING.md`, `docs/notes/app/api/notifications-routes.md`
+
+### Verification
+
+- `pnpm test -- getPaginatedNotifications` — 3 passed
+- `pnpm test:e2e e2e/notifications.spec.ts` — run with seeded test DB
+
+---
+
+## 2026-06-09 — Audit: restore populate side-effect imports across TS conversions
+
+### What was changed and why
+
+Audited all `.populate()` call sites vs git history. Several TS conversions dropped ref-model imports that existed in JS (or were never added on new Follow/findNormalized helpers). Restored `// necessary for populate` imports on names/description routes, check-if-content-exists, getUserFollowers/Following, findNormalizedMatch. Documented full audit table in `notifications-routes.md`.
+
+### Files modified
+
+- `app/api/names/route.ts`, `app/api/description/route.ts`
+- `app/api/names/check-if-content-exists/[content]/route.ts`
+- `utils/api/getUserFollowers.ts`, `getUserFollowing.ts`
+- `utils/stringManipulation/findNormalizedMatch.ts`
+- `docs/notes/app/api/notifications-routes.md`

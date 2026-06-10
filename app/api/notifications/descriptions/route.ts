@@ -1,26 +1,34 @@
-import db from "@utils/db";
+/**
+ * Paginated description-like notifications for the signed-in user.
+ * Notes: docs/notes/app/api/notifications-routes.md
+ */
+import mongoose from "mongoose";
+import dbConnect from "@utils/db";
 // necessary for populate
 import Description from "@/models/Description";
 import User from "@/models/User";
 import DescriptionLike from "@/models/DescriptionLike";
+void Description;
+void User;
 import { getSessionForApis } from "@/utils/api/getSessionForApis";
-import { getPaginatedNotifications } from "@/utils/api/getPaginatedNotifications";
-import mongoose from "mongoose";
+import {
+  getPaginatedNotifications,
+  parseNotificationPagination,
+} from "@/utils/api/getPaginatedNotifications";
 
-export const GET = async (req) => {
+export async function GET(req: Request) {
   try {
-    const { ok, session, response } = await getSessionForApis({ req });
-    if (!ok) return response;
+    const auth = await getSessionForApis({ req });
+    if (!auth.ok) return auth.response;
 
-    const userId = new mongoose.Types.ObjectId(session.user.id);
+    const userId = new mongoose.Types.ObjectId(auth.session.user.id);
 
-    await db.connect();
+    await dbConnect.connect();
 
     const { searchParams } = new URL(req.url);
-    const page = parseInt(searchParams.get("page") || 1);
-    const limit = parseInt(searchParams.get("limit") || 25);
+    const { page, limit } = parseNotificationPagination(searchParams);
 
-    const thankNotifs = await getPaginatedNotifications(
+    const descriptionNotifs = await getPaginatedNotifications(
       DescriptionLike,
       { contentCreator: userId, likedBy: { $ne: userId } },
       [
@@ -30,11 +38,11 @@ export const GET = async (req) => {
       { page, limit },
     );
 
-    return new Response(JSON.stringify(thankNotifs), { status: 200 });
+    return Response.json(descriptionNotifs);
   } catch (err) {
     console.error("Error fetching name likes notifications:", err);
     return new Response("Failed to fetch name likes notifications", {
       status: 500,
     });
   }
-};
+}

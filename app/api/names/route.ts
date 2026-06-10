@@ -1,6 +1,5 @@
 import dbConnect from "@utils/db";
 import mongoose from "mongoose";
-import Names from "@models/Name";
 import regexInvalidInput from "@/utils/stringManipulation/check-for-valid-content";
 import { checkOwnership } from "@/utils/api/checkOwnership";
 import { getSessionForApis } from "@/utils/api/getSessionForApis";
@@ -17,6 +16,13 @@ import {
   shouldRunNameBlocklistOnUpdate,
   validateNameLength,
 } from "@/utils/api/validateNameSubmission";
+// necessary for populate (tags → NameTag, createdBy → User)
+import NameTag from "@/models/NameTag";
+import User from "@/models/User";
+import Names from "@models/Name";
+
+void NameTag;
+void User;
 
 type NameCreateBody = {
   content: string;

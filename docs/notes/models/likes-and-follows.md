@@ -43,10 +43,10 @@ All three use `{ timestamps: true }` and explicit MongoDB collection names (thir
 | Model | Route / file | What happens |
 |-------|--------------|--------------|
 | `NameLike` | `app/api/names/likes/[contentId]/togglelike/route.ts` | Transaction: create/delete like doc + bump `Name.likedByCount` |
-| `NameLike` | `app/api/notifications/names/route.js` | Paginated like notifications for content creator |
-| `NameLike` | `app/api/notifications/names/mark-read/route.js` | Mark like notifications read |
+| `NameLike` | `app/api/notifications/names/route.ts` | Paginated like notifications for content creator |
+| `NameLike` | `app/api/notifications/names/mark-read/route.ts` | Mark like notifications read |
 | `DescriptionLike` | `app/api/description/likes/[contentId]/togglelike/route.ts` | Same as names |
-| `DescriptionLike` | `app/api/notifications/descriptions/route.js` | Description like notifications |
+| `DescriptionLike` | `app/api/notifications/descriptions/route.ts` | Description like notifications |
 | `NameLike` / `DescriptionLike` | `app/api/user/likes/route.js` | List what the logged-in user has liked |
 | `Follow` | `migrations/followersIntoFollowDb.js` | Copy `User.followers[]` into `follows` collection |
 | `Follow` | `app/api/user/grabusersfollowing/[userid]/route.ts` | List who a user follows (`getUserFollowing`) |
@@ -99,7 +99,7 @@ NameLikeSchema.index({ contentCreator: 1, read: 1, createdAt: -1 });
 > - `read: 1` → ensures unread (`read: false`) come first if you sort `{ read: 1 }`.
 > - `createdAt: -1` → ensures newest first within each read/unread group.
 
-Notification query pattern (`app/api/notifications/names/route.js`):
+Notification query pattern (`app/api/notifications/names/route.ts`):
 
 ```typescript
 await getPaginatedNotifications(
