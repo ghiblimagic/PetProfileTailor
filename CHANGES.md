@@ -1742,3 +1742,59 @@ Audited all `.populate()` call sites vs git history. Several TS conversions drop
 - `utils/api/getUserFollowers.ts`, `getUserFollowing.ts`
 - `utils/stringManipulation/findNormalizedMatch.ts`
 - `docs/notes/app/api/notifications-routes.md`
+
+---
+
+## 2026-06-09 — TypeScript: `app/contact/page`
+
+### What was changed and why
+
+Converted contact page wrapper to TypeScript. Renamed default export `CustomError` → `ContactPage` (route is `/contact`). Added `PageTitleWithImages.d.ts` for TS consumer.
+
+### Files created
+
+- `app/contact/page.tsx`
+- `components/ReusableSmallComponents/TitlesOrHeadings/PageTitleWithImages.d.ts`
+
+### Files removed
+
+- `app/contact/page.jsx`
+
+### Files modified
+
+- `docs/notes/app/actions/sendContactEmail.md`
+
+### Verification
+
+- `pnpm build` — OK
+- E2E: `e2e/contact.spec.ts`
+
+### Next logical step
+
+Convert `app/(protected)/notifications/page.jsx` or `app/api/user/likes/route.js`.
+
+---
+
+## 2026-06-07 — Fix `PageTitleWithImages` props on contact page
+
+### What was changed and why
+
+`app/contact/page.tsx` failed type-check because TypeScript inferred all destructured props (`imgSrc`, `title`, `title2`) as required from the untyped `.jsx` component, ignoring the optional `.d.ts`. Converted the component to `.tsx` with an explicit optional props type.
+
+### Files created
+
+- `components/ReusableSmallComponents/TitlesOrHeadings/PageTitleWithImages.tsx`
+
+### Files removed
+
+- `components/ReusableSmallComponents/TitlesOrHeadings/PageTitleWithImages.jsx`
+- `components/ReusableSmallComponents/TitlesOrHeadings/PageTitleWithImages.d.ts`
+
+### Verification
+
+- `pnpm build` — OK
+- `pnpm exec tsc --noEmit` — no errors on contact page / `PageTitleWithImages`
+
+### Next logical step
+
+Continue TS migration (`app/(protected)/notifications/page.jsx` or remaining API routes).

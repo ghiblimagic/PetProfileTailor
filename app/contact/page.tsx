@@ -4,10 +4,10 @@ import PageTitleWithImages from "@components/ReusableSmallComponents/TitlesOrHea
 import ContactForm from "@components/Contact/ContactForm";
 import { GoogleReCaptchaProvider } from "react-google-recaptcha-v3";
 
-export default function CustomError() {
+export default function ContactPage() {
   return (
     <GoogleReCaptchaProvider
-      reCaptchaKey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY}
+      reCaptchaKey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY!}
       scriptProps={{
         async: true,
         defer: true,

@@ -23,6 +23,8 @@ Rate limit runs **after** captcha so failed validations do not consume the conta
 
 [`components/Contact/ContactForm.tsx`](../../../components/Contact/ContactForm.tsx) — `useActionState(sendContactEmail, …)`.
 
+Page wrapper: [`app/contact/page.tsx`](../../../app/contact/page.tsx) — `GoogleReCaptchaProvider` + form.
+
 ## Related
 
 - [`utils/api/validateContactSubmission.ts`](../../../utils/api/validateContactSubmission.ts) — honeypot, timing, email/length, reCAPTCHA threshold (unit tested)

@@ -1,6 +1,16 @@
 import React from "react";
 
-export default function PageTitleWithImages({ imgSrc, title, title2 }) {
+type PageTitleWithImagesProps = {
+  imgSrc?: string;
+  title?: string;
+  title2?: string;
+};
+
+export default function PageTitleWithImages({
+  imgSrc,
+  title,
+  title2,
+}: PageTitleWithImagesProps) {
   return (
     <div
       className={`h-32 mb-4 bg-no-repeat relative bg-cover ${imgSrc} relative  mx-auto `}
