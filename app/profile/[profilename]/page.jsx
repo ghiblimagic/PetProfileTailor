@@ -6,6 +6,7 @@ import Descriptions from "@/models/Description";
 import DescriptionTag from "@/models/DescriptionTag";
 import User from "@models/User";
 import { getUserFollowers } from "@/utils/api/getUserFollowers";
+import { getUserFollowing } from "@/utils/api/getUserFollowing";
 import Profile from "@/components/profile";
 import { getServerSession } from "next-auth";
 import { serverAuthOptions } from "@/lib/auth";
@@ -67,11 +68,7 @@ export default async function ProfilePage({ params }) {
 
   //### FOLLOWING LIST, followers is grabbed from userData
 
-  // let usersFollowing = await leanWithStrings(
-  //   User.find({
-  //     followers: userId,
-  //   }).select("name followers name profileImage profileName bio location"),
-  // );
+  // let usersFollowing = await getUserFollowing(userId);
 
   let usersLikedContent = [];
 

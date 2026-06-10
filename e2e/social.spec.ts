@@ -112,4 +112,40 @@ test.describe("Social interactions", () => {
     expect(updated.followers).toContain(adminUser._id);
   });
 
+  test("grabusersfollowing lists followed users from Follow collection", async ({
+    page,
+  }) => {
+    const regularProfile = getPlaywrightProfileName();
+    const regularUser = await lookupUserByProfileName(
+      page.request,
+      regularProfile,
+    );
+    const adminUser = await lookupUserByProfileName(
+      page.request,
+      getPlaywrightAdminProfileName(),
+    );
+
+    await loginWithAdminCredentials(page);
+    const followResponse = await page.request.put("/api/user/updatefollows/", {
+      data: {
+        userToFollowId: regularUser._id,
+        userFollowed: false,
+      },
+    });
+    expect(followResponse.ok()).toBeTruthy();
+
+    const followingResponse = await page.request.get(
+      `/api/user/grabusersfollowing/${adminUser._id}`,
+    );
+    expect(followingResponse.ok()).toBeTruthy();
+
+    const following = (await followingResponse.json()) as Array<{
+      _id: string;
+      profileName?: string;
+    }>;
+
+    expect(
+      following.some((user) => user._id === regularUser._id),
+    ).toBeTruthy();
+  });
 });

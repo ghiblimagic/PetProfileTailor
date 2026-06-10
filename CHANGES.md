@@ -1530,3 +1530,66 @@ Converted live duplicate-check API routes for names and descriptions to TypeScri
 ### Next logical step
 
 Run `pnpm test:e2e e2e/adddescriptions.spec.ts` or convert `app/api/user/grabusersfollowing` (Follow model fix).
+
+---
+
+## 2026-06-09 — TypeScript + Follow fix: `grabusersfollowing`
+
+### What was changed and why
+
+`GET /api/user/grabusersfollowing/[userid]` no longer queries removed `User.followers`. Added `getUserFollowing` (reads `Follow` where `followedBy = userid`, populates `userId`). Converted route to TypeScript. Profile page commented hook updated for when following UI is re-enabled. E2E social spec asserts the API after admin follow.
+
+### Files created
+
+- `app/api/user/grabusersfollowing/[userid]/route.ts`
+- `utils/api/getUserFollowing.ts`
+- `docs/notes/app/api/grabusersfollowing-route.md`
+
+### Files removed
+
+- `app/api/user/grabusersfollowing/[userid]/route.js`
+
+### Files modified
+
+- `app/profile/[profilename]/page.jsx`
+- `e2e/social.spec.ts`
+- `docs/notes/models/likes-and-follows.md`, `docs/README.md`
+
+### Verification
+
+- `pnpm build` — OK
+- `pnpm test:e2e e2e/social.spec.ts` — run with seeded test DB
+
+### Next logical step
+
+Convert `app/api/user/updatefollows/route.js` or `ContactForm.jsx` to TypeScript.
+
+---
+
+## 2026-06-09 — TypeScript: `updatefollows` API route
+
+### What was changed and why
+
+Converted follow toggle route to TypeScript. Behavior unchanged: session auth, upsert/delete `Follow` docs based on `userFollowed` UI flag. Uses `Response.json` (same payloads as before).
+
+### Files created
+
+- `app/api/user/updatefollows/route.ts`
+- `docs/notes/app/api/updatefollows-route.md`
+
+### Files removed
+
+- `app/api/user/updatefollows/route.js`
+
+### Files modified
+
+- `docs/notes/app/api/grabusersfollowing-route.md`, `docs/notes/models/likes-and-follows.md`, `docs/README.md`
+
+### Verification
+
+- `pnpm build` — OK
+- E2E: `e2e/social.spec.ts` (existing follow tests)
+
+### Next logical step
+
+Convert `ContactForm.jsx` or like-toggle routes (`names/likes/.../togglelike`).
