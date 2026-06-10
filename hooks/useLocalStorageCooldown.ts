@@ -1,6 +1,20 @@
+/**
+ * Client-side cooldown via localStorage — rate-limit repeat clicks (e.g. recheck, magic link).
+ */
 import { useState, useEffect } from "react";
 
-export function useLocalStorageCooldown(key, duration = 120) {
+export type UseLocalStorageCooldownReturn = {
+  canClick: boolean;
+  timer: number;
+  formattedTimer: string;
+  /** Returns true when click is allowed and cooldown was started. */
+  trigger: () => boolean;
+};
+
+export function useLocalStorageCooldown(
+  key: string,
+  duration = 120,
+): UseLocalStorageCooldownReturn {
   const [canClick, setCanClick] = useState(false); //default as false to avoid a flash of it being enabled before it reads from localStorage
   const [timer, setTimer] = useState(0);
 
@@ -38,7 +52,7 @@ export function useLocalStorageCooldown(key, duration = 120) {
     return () => clearInterval(interval);
   }, [timer, key]);
 
-  const trigger = () => {
+  const trigger = (): boolean => {
     if (!canClick) return false;
     localStorage.setItem(key, Date.now().toString());
     setCanClick(false);

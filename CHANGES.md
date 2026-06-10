@@ -2260,3 +2260,32 @@ Converted debounced optimistic-toggle hook to `.ts`, replacing the interim `.d.t
 ### Next logical step
 
 Convert `hooks/useLocalStorageCooldown.js` or `components/ReusableSmallComponents/buttons/LikesButtonAndLikesLogic.js`.
+
+---
+
+## 2026-06-07 — TypeScript: `hooks/useLocalStorageCooldown`
+
+### What was changed and why
+
+Converted localStorage cooldown hook to `.ts`. Exported `UseLocalStorageCooldownReturn`; typed `key`, `duration`, and `trigger()` boolean return. Used by notification recheck and login magic-link cooldown.
+
+### Files created
+
+- `hooks/useLocalStorageCooldown.ts`
+
+### Files removed
+
+- `hooks/useLocalStorageCooldown.js`
+
+### Files modified
+
+- `docs/notes/app/notifications-page.md`
+
+### Verification
+
+- `pnpm exec tsc --noEmit` — OK
+- `pnpm build` — OK
+
+### Next logical step
+
+Convert `components/ReusableSmallComponents/buttons/LikesButtonAndLikesLogic.js` or `components/ReusableSmallComponents/IconWithCount.jsx`.

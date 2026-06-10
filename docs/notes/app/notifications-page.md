@@ -41,7 +41,7 @@ Effect cleanup sets `canceled = true` if the user switches tabs before the timer
 | Names / Descriptions | [`LikeNotificationListing.tsx`](../../../components/Notifications/LikeNotificationListing.tsx) (`LikesContentListing`) — populated `likedBy` + `contentId`; intersection observer fades row after ~1.2s in view |
 | Thanks | [`ThankNotificationListing.tsx`](../../../components/Notifications/ThankNotificationListing.tsx) (`ThanksContentListing`) — populated `thanksBy`, `nameId` / `descriptionId`, message list |
 
-Shared list UI: [`NotifListingWrapper.tsx`](../../../components/Notifications/NotifListingWrapper.tsx) — renders `ListingComponent` rows, **load more** (while `!SWRisReachingEnd`), empty message when idle with no docs, and end-of-list digging-dog UI. When `SWRisReachingEnd`, shows **Recheck** with a 2-minute `useLocalStorageCooldown` per `swrType` (`lastRecheck-notifications{thanks|names|descriptions}`); recheck calls `swrHook.mutate()`.
+Shared list UI: [`NotifListingWrapper.tsx`](../../../components/Notifications/NotifListingWrapper.tsx) — renders `ListingComponent` rows, **load more** (while `!SWRisReachingEnd`), empty message when idle with no docs, and end-of-list digging-dog UI. When `SWRisReachingEnd`, shows **Recheck** with a 2-minute [`useLocalStorageCooldown`](../../../hooks/useLocalStorageCooldown.ts) per `swrType` (`lastRecheck-notifications{thanks|names|descriptions}`); recheck calls `swrHook.mutate()`.
 
 ### `useSWRSimple` hook
 
