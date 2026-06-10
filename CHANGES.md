@@ -2106,3 +2106,34 @@ Converted nav notification bell to `.tsx` — completes the notifications UI fol
 ### Next logical step
 
 `app/api/user/likes/route.js`, `hooks/useLocalStorageCooldown.js`, or protected pages (`dashboard`, `editsettings`).
+
+---
+
+## 2026-06-07 — TypeScript: `app/api/user/likes/route`
+
+### What was changed and why
+
+Converted user likes bulk-fetch API to TypeScript. Exported `UserLikesResponse` / `UserLikeEntry` for `LikesContext` consumers. Aligned model imports (`NameLike`, `DescriptionLike`) and `dbConnect` with other user API routes.
+
+### Files created
+
+- `app/api/user/likes/route.ts`
+- `docs/notes/app/api/user-likes-route.md`
+
+### Files removed
+
+- `app/api/user/likes/route.js`
+
+### Files modified
+
+- `docs/README.md`
+- `docs/notes/app/api/togglelike-route.md`
+
+### Verification
+
+- `pnpm exec tsc --noEmit` — OK
+- `pnpm build` — OK
+
+### Next logical step
+
+Convert `context/LikesContext.js` or `hooks/useLocalStorageCooldown.js`.
