@@ -2137,3 +2137,33 @@ Converted user likes bulk-fetch API to TypeScript. Exported `UserLikesResponse` 
 ### Next logical step
 
 Convert `context/LikesContext.js` or `hooks/useLocalStorageCooldown.js`.
+
+---
+
+## 2026-06-07 — TypeScript: `context/LikesContext`
+
+### What was changed and why
+
+Converted likes context to `.tsx`. Typed `likesRef` maps, `recentLikesRef` session deltas, and API response via `UserLikesResponse` from `app/api/user/likes/route.ts`. Removed unused `useState` import from the JS original.
+
+### Files created
+
+- `context/LikesContext.tsx`
+
+### Files removed
+
+- `context/LikesContext.js`
+
+### Files modified
+
+- `docs/notes/app/api/user-likes-route.md`
+- `docs/README.md`
+
+### Verification
+
+- `pnpm exec tsc --noEmit` — OK
+- `pnpm build` — OK
+
+### Next logical step
+
+Convert `wrappers/LikesWrapper.jsx`, `hooks/useLikeState.js`, or `hooks/useLocalStorageCooldown.js`.

@@ -31,7 +31,7 @@ Each source file with notes should have a one-line pointer at the top linking to
 | [`app/api/user/grabusersfollowing/[userid]/route.ts`](../app/api/user/grabusersfollowing/[userid]/route.ts) | [grabusersfollowing-route.md](notes/app/api/grabusersfollowing-route.md) |
 | [`app/api/user/updatefollows/route.ts`](../app/api/user/updatefollows/route.ts) | [updatefollows-route.md](notes/app/api/updatefollows-route.md) |
 | Names + description togglelike routes | [togglelike-route.md](notes/app/api/togglelike-route.md) |
-| [`app/api/user/likes/route.ts`](../app/api/user/likes/route.ts) | [user-likes-route.md](notes/app/api/user-likes-route.md) |
+| [`app/api/user/likes/route.ts`](../app/api/user/likes/route.ts), [`context/LikesContext.tsx`](../context/LikesContext.tsx) | [user-likes-route.md](notes/app/api/user-likes-route.md) |
 | Notification API routes (`names`, `descriptions`, `thanks`, `user/notifications`) | [notifications-routes.md](notes/app/api/notifications-routes.md) |
 | Notifications stack (`page`, tabs, listings, [`NotificationsButton.tsx`](../components/Notifications/NotificationsButton.tsx), context, wrapper, `useSwrSimple`, `user/notifications` API) | [notifications-page.md](notes/app/notifications-page.md) |
 | [`models/NameLike.ts`](../models/NameLike.ts), [`DescriptionLike.ts`](../models/DescriptionLike.ts), [`Follow.ts`](../models/Follow.ts) | [likes-and-follows.md](notes/models/likes-and-follows.md) |
