@@ -29,7 +29,7 @@ Normalization lives in [`normalizeString.ts`](../../../../utils/stringManipulati
 |-------|----------|---------|
 | `app/api/names/route.js` (POST, PATCH) | `findExactNormalized` | Reject duplicate pet names before save |
 | `app/api/description/route.js` (edit flow) | `findExactNormalized` | Reject duplicate descriptions when content changes |
-| `app/api/description/check-if-content-exists/[content]/route.js` | `findStartNormalized` | Return `{ type: "duplicate" }` while user types or pastes |
+| `app/api/description/check-if-content-exists/[content]/route.ts` | `findStartNormalized` | Return `{ type: "duplicate" }` while user types or pastes |
 
 `findPartialMatch` is **not wired to any route** today. It is kept for cases that need a substring hit without a start-of-string prefix.
 
@@ -134,7 +134,7 @@ export async function findStartNormalized<T extends NormalizedContentFields>(
 }
 ```
 
-**Example:** live duplicate check (`app/api/description/check-if-content-exists/[content]/route.js`):
+**Example:** live duplicate check (`app/api/description/check-if-content-exists/[content]/route.ts`):
 
 ```typescript
 const existingContentCheck = await findStartNormalized(Description, content);

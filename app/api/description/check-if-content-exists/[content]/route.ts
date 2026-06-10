@@ -1,17 +1,23 @@
+/**
+ * Live duplicate check while adding a description (start-normalized match).
+ * Notes: docs/notes/app/api/check-if-content-exists.md
+ */
 import dbConnect from "@utils/db";
 import Description from "@/models/Description";
-import { checkMultipleFieldsBlocklist } from "@/utils/api/checkMultipleBlocklists";
-
-import { respondIfBlocked } from "@/utils/api/checkMultipleBlocklists";
-
+import {
+  checkMultipleFieldsBlocklist,
+  respondIfBlocked,
+} from "@/utils/api/checkMultipleBlocklists";
 import { findStartNormalized } from "@/utils/stringManipulation/findNormalizedMatch";
 
-export async function GET(req, { params }) {
+type RouteContext = {
+  params: Promise<{ content: string }>;
+};
+
+export async function GET(_req: Request, { params }: RouteContext) {
   await dbConnect.connect();
 
   const { content } = await params;
-
-  console.log("content in api/description/check", content);
 
   // 1. Blocklist check
   const blockResult = checkMultipleFieldsBlocklist([
@@ -46,13 +52,14 @@ export async function GET(req, { params }) {
         type: "duplicate",
         data: existingContentCheck,
       });
-    } else {
-      return Response.json({
-        type: "success",
-        message: "Success! That content is not in the database",
-      });
     }
+
+    return Response.json({
+      type: "success",
+      message: "Success! That content is not in the database",
+    });
   } catch (err) {
-    return Response.json({ error: err.message }, { status: 500 });
+    const message = err instanceof Error ? err.message : "Server error";
+    return Response.json({ error: message }, { status: 500 });
   }
 }

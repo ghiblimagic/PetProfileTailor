@@ -1,13 +1,21 @@
+/**
+ * Live duplicate / validation check while adding a name.
+ * Notes: docs/notes/app/api/check-if-content-exists.md
+ */
 import dbConnect from "@utils/db";
 import Names from "@models/Name";
-import NameTag from "@/models/NameTag";
-import User from "@/models/User";
-import { checkMultipleFieldsBlocklist } from "@/utils/api/checkMultipleBlocklists";
+import {
+  checkMultipleFieldsBlocklist,
+  respondIfBlocked,
+} from "@/utils/api/checkMultipleBlocklists";
 import normalizeString from "@/utils/stringManipulation/normalizeString";
-import { respondIfBlocked } from "@/utils/api/checkMultipleBlocklists";
 import regexInvalidInput from "@/utils/stringManipulation/check-for-valid-content";
 
-export async function GET(req, { params }) {
+type RouteContext = {
+  params: Promise<{ content: string }>;
+};
+
+export async function GET(_req: Request, { params }: RouteContext) {
   try {
     await dbConnect.connect();
 
@@ -53,14 +61,15 @@ export async function GET(req, { params }) {
         type: "duplicate",
         data: existingNameCheck,
       });
-    } else {
-      return Response.json({
-        type: "success",
-        message: "Success! That content is not in the database",
-      });
     }
+
+    return Response.json({
+      type: "success",
+      message: "Success! That content is not in the database",
+    });
   } catch (err) {
     console.error("🔥 Error in GET route:", err);
-    return Response.json({ error: err.message }, { status: 500 });
+    const message = err instanceof Error ? err.message : "Server error";
+    return Response.json({ error: message }, { status: 500 });
   }
 }

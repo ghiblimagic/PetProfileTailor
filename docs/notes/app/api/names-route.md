@@ -30,4 +30,4 @@ CRUD for pet names at `/api/names`. Used by `addingName.jsx` (POST), `ContentLis
 - [`models/Name.ts`](../../../models/Name.ts)
 - [`utils/stringManipulation/findNormalizedMatch.ts`](../../../utils/stringManipulation/findNormalizedMatch.ts)
 - SWR listing: [`app/api/names/swr/route.ts`](../../../app/api/names/swr/route.ts) — [names-swr-route.md](names-swr-route.md)
-- Check exists: [`app/api/names/check-if-content-exists/[content]/route.js`](../../../app/api/names/check-if-content-exists/[content]/route.js)
+- Check exists: [`app/api/names/check-if-content-exists/[content]/route.ts`](../../../app/api/names/check-if-content-exists/[content]/route.ts) — [check-if-content-exists.md](check-if-content-exists.md)

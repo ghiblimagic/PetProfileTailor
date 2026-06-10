@@ -24,4 +24,4 @@ CRUD for descriptions at `/api/description`. Mirror of [`names/route.ts`](../../
 
 - [`models/Description.ts`](../../../models/Description.ts)
 - SWR listing: [`app/api/description/swr/route.ts`](../../../app/api/description/swr/route.ts) — [description-swr-route.md](description-swr-route.md)
-- Check exists: [`app/api/description/check-if-content-exists/[content]/route.js`](../../../app/api/description/check-if-content-exists/[content]/route.js)
+- Check exists: [`app/api/description/check-if-content-exists/[content]/route.ts`](../../../app/api/description/check-if-content-exists/[content]/route.ts) — [check-if-content-exists.md](check-if-content-exists.md)

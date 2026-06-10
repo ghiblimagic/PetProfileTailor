@@ -1498,3 +1498,35 @@ Re-save or convert any files still showing `w/crlf` (`git ls-files --eol | rg w/
 
 - `git ls-files --eol | rg w/crlf` — 0 matches
 - `git add .` — no CRLF warnings
+
+---
+
+## 2026-06-09 — TypeScript: `check-if-content-exists` routes
+
+### What was changed and why
+
+Converted live duplicate-check API routes for names and descriptions to TypeScript. Behavior unchanged: names use blocklist + invalid chars + exact normalized match; descriptions use blocklist + `findStartNormalized`. Removed unused imports (names) and debug `console.log` (descriptions).
+
+### Files created
+
+- `app/api/names/check-if-content-exists/[content]/route.ts`
+- `app/api/description/check-if-content-exists/[content]/route.ts`
+- `docs/notes/app/api/check-if-content-exists.md`
+
+### Files removed
+
+- `app/api/names/check-if-content-exists/[content]/route.js`
+- `app/api/description/check-if-content-exists/[content]/route.js`
+
+### Files modified
+
+- `docs/notes/app/api/names-route.md`, `description-route.md`, `docs/README.md`
+- `docs/notes/utils/stringManipulation/findNormalizedMatch.md`
+
+### Verification
+
+- `pnpm build` — OK
+
+### Next logical step
+
+Run `pnpm test:e2e e2e/adddescriptions.spec.ts` or convert `app/api/user/grabusersfollowing` (Follow model fix).
