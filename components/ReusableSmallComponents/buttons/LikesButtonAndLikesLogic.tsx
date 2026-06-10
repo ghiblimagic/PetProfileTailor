@@ -1,12 +1,30 @@
+/**
+ * Heart button + like count; wires useLikeState and sign-in gate.
+ * Notes: docs/notes/app/api/togglelike-route.md
+ */
 "use client";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faHeart } from "@fortawesome/free-solid-svg-icons";
 import "@fortawesome/fontawesome-svg-core/styles.css";
 import "react-toastify/dist/ReactToastify.css";
-import { useLikeState } from "@hooks/useLikeState";
+import {
+  useLikeState,
+  type LikeableContent,
+} from "@hooks/useLikeState";
+import type { LikeContentType } from "@/context/LikesContext";
 import ContainerForLikeShareFlag from "./ContainerForLikeShareFlag";
 import { useSession } from "next-auth/react";
+
+export type LikesButtonAndLikesLogicProps = {
+  data: LikeableContent;
+  signedInUsersId: string;
+  apiBaseLink: string;
+  HeartIconStyling: string;
+  HeartIconTextStyling: string;
+  setShowLikesSignInMessage: (message: string) => void;
+  dataType: LikeContentType;
+};
 
 export default function LikesButtonAndLikesLogic({
   data,
@@ -16,7 +34,7 @@ export default function LikesButtonAndLikesLogic({
   HeartIconTextStyling,
   setShowLikesSignInMessage,
   dataType,
-}) {
+}: LikesButtonAndLikesLogicProps) {
   const { data: session } = useSession();
   // console.log("session in likes button", session);
 
@@ -29,7 +47,7 @@ export default function LikesButtonAndLikesLogic({
     apiBaseLink,
   });
 
-  const toggleLikeIfSignedIn = function () {
+  const toggleLikeIfSignedIn = () => {
     if (!session) {
       setShowLikesSignInMessage("you must be signed in to like content");
       return;

@@ -38,4 +38,6 @@ Only `contentCreator._id` is used (for `contentCreator` on the like doc and self
 
 - [`docs/notes/models/likes-and-follows.md`](../models/likes-and-follows.md)
 - [`GET /api/user/likes`](user-likes-route.md) — bulk fetch for `LikesContext`
-- [`hooks/useLikeState.ts`](../../../hooks/useLikeState.ts) (uses [`useToggleState.ts`](../../../hooks/useToggleState.ts)), `e2e/helpers/likes.ts`
+- [`hooks/useLikeState.ts`](../../../hooks/useLikeState.ts) (uses [`useToggleState.ts`](../../../hooks/useToggleState.ts))
+- [`LikesButtonAndLikesLogic.tsx`](../../../components/ReusableSmallComponents/buttons/LikesButtonAndLikesLogic.tsx) — listing heart UI
+- `e2e/helpers/likes.ts`

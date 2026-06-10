@@ -2289,3 +2289,32 @@ Converted localStorage cooldown hook to `.ts`. Exported `UseLocalStorageCooldown
 ### Next logical step
 
 Convert `components/ReusableSmallComponents/buttons/LikesButtonAndLikesLogic.js` or `components/ReusableSmallComponents/IconWithCount.jsx`.
+
+---
+
+## 2026-06-07 — TypeScript: `LikesButtonAndLikesLogic`
+
+### What was changed and why
+
+Converted listing like button to `.tsx`. Exported `LikesButtonAndLikesLogicProps`; reuses `LikeableContent` and `LikeContentType` from the likes stack. Sign-in gate before `toggleLike`.
+
+### Files created
+
+- `components/ReusableSmallComponents/buttons/LikesButtonAndLikesLogic.tsx`
+
+### Files removed
+
+- `components/ReusableSmallComponents/buttons/LikesButtonAndLikesLogic.js`
+
+### Files modified
+
+- `docs/notes/app/api/togglelike-route.md`
+
+### Verification
+
+- `pnpm exec tsc --noEmit` — OK
+- `pnpm build` — OK
+
+### Next logical step
+
+Convert `components/ShowingListOfContent/ContentListing.jsx` or `components/ReusableSmallComponents/IconWithCount.jsx`.
