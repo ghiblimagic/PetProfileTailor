@@ -18,6 +18,10 @@ Server page: `app/(protected)/notifications/page.tsx`. Client tabs: `components/
 
 Hooks stay mounted when switching tabs so SWR cache and pagination (`size`) persist.
 
+### `NotificationsProvider` / `useNotifications`
+
+[`context/notificationsContext.tsx`](../../../context/notificationsContext.tsx) wraps the app (via `NotificationWrapper`). On session load it `GET`s `/api/user/notifications` for unread counts (`names`, `descriptions`, `thanks`). `resetNotificationType(type)` fires `PATCH /api/notifications/{type}/mark-read` and zeros that badge in local state.
+
 ### Unread badge → mark-read
 
 `useNotifications()` supplies unread counts from `/api/user/notifications`. When a tab with a non-zero count is open:

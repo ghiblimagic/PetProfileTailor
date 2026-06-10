@@ -1894,3 +1894,34 @@ Converted notification infinite-SWR hook from `.js` to `.ts`, replacing the inte
 ### Next logical step
 
 Convert `context/notificationsContext.js` or `NotifListingWrapper.jsx` to `.tsx`.
+
+---
+
+## 2026-06-07 — TypeScript: `context/notificationsContext`
+
+### What was changed and why
+
+Converted notifications context from `.js` to `.tsx`, replacing the interim `.d.ts`. Exported `NotificationCounts` and `NotificationsContextValue`; typed API response, `resetNotificationType`, and `createContext` null guard.
+
+### Files created
+
+- `context/notificationsContext.tsx`
+
+### Files removed
+
+- `context/notificationsContext.js`
+- `context/notificationsContext.d.ts`
+
+### Files modified
+
+- `docs/notes/app/notifications-page.md`
+- `docs/README.md`
+
+### Verification
+
+- `pnpm exec tsc --noEmit` — OK
+- `pnpm build` — OK
+
+### Next logical step
+
+Convert `NotifListingWrapper.jsx` or `app/api/user/notifications/route.js` to complete the notifications cluster.
