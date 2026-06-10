@@ -1955,3 +1955,124 @@ Converted shared notifications list shell to `.tsx`. Typed SWR hook, listing com
 ### Next logical step
 
 Convert `app/api/user/notifications/route.js` to complete the notifications cluster, or `LikeNotificationListing.jsx` / `ThankNotificationListing.jsx`.
+
+---
+
+## 2026-06-07 — TypeScript: `app/api/user/notifications/route`
+
+### What was changed and why
+
+Converted unread-count API to TypeScript — completes the notifications cluster (badge API + context + UI + paginated feeds). Exported `UserNotificationsCountsResponse`. Removed unused `leanWithStrings` import; aligned `dbConnect` import with other notification routes; fixed error log message (was "suggestions").
+
+### Files created
+
+- `app/api/user/notifications/route.ts`
+
+### Files removed
+
+- `app/api/user/notifications/route.js`
+
+### Files modified
+
+- `docs/notes/app/api/notifications-routes.md`
+- `docs/notes/app/notifications-page.md`
+- `docs/README.md`
+
+### Verification
+
+- `pnpm exec tsc --noEmit` — OK
+- `pnpm build` — OK
+
+### Next logical step
+
+Convert `LikeNotificationListing.jsx` / `ThankNotificationListing.jsx`, or delete stale duplicate `app/api/notifications/**/route.js` files alongside `.ts` versions.
+
+---
+
+## 2026-06-07 — TypeScript: `wrappers/NotificationWrapper`
+
+### What was changed and why
+
+Converted thin client wrapper for `NotificationsProvider` to `.tsx` so the server `app/layout.js` can mount notification context with typed `children`. Removed unused `useEffect` / `useState` imports from the JSX original.
+
+### Files created
+
+- `wrappers/NotificationWrapper.tsx`
+
+### Files removed
+
+- `wrappers/NotificationWrapper.jsx`
+
+### Files modified
+
+- `docs/notes/app/notifications-page.md`
+- `docs/README.md`
+
+### Verification
+
+- `pnpm exec tsc --noEmit` — OK
+- `pnpm build` — OK
+
+### Next logical step
+
+Convert `LikeNotificationListing.jsx` / `ThankNotificationListing.jsx` or `NotificationsButton.jsx`.
+
+---
+
+## 2026-06-07 — TypeScript: `LikeNotificationListing`
+
+### What was changed and why
+
+Converted like-notification row component to `.tsx`. Exported `LikeNotification` type aligned with E2E populate shape. Safe optional access on `contentId` / `likedBy`; `ProfileImage` width/height as strings per JS component defaults.
+
+### Files created
+
+- `components/Notifications/LikeNotificationListing.tsx`
+
+### Files removed
+
+- `components/Notifications/LikeNotificationListing.jsx`
+
+### Files modified
+
+- `docs/notes/app/notifications-page.md`
+- `docs/README.md`
+
+### Verification
+
+- `pnpm exec tsc --noEmit` — OK
+- `pnpm build` — OK
+
+### Next logical step
+
+Convert `ThankNotificationListing.jsx` or `NotificationsButton.jsx`.
+
+---
+
+## 2026-06-07 — TypeScript: `ThankNotificationListing`
+
+### What was changed and why
+
+Converted thank-notification row component to `.tsx`. Exported `ThankNotification` type aligned with `/api/notifications/thanks` populate shape. Same patterns as like rows: optional refs, `ProfileImage` href/onClick, intersection observer fade.
+
+### Files created
+
+- `components/Notifications/ThankNotificationListing.tsx`
+
+### Files removed
+
+- `components/Notifications/ThankNotificationListing.jsx`
+
+### Files modified
+
+- `docs/notes/app/notifications-page.md`
+- `docs/README.md`
+
+### Verification
+
+- `pnpm exec tsc --noEmit` — OK
+- `pnpm build` — OK
+
+### Next logical step
+
+Convert `NotificationsButton.jsx` or delete stale duplicate `app/api/notifications/**/route.js` files.

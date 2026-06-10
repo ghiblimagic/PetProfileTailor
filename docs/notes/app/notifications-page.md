@@ -20,7 +20,7 @@ Hooks stay mounted when switching tabs so SWR cache and pagination (`size`) pers
 
 ### `NotificationsProvider` / `useNotifications`
 
-[`context/notificationsContext.tsx`](../../../context/notificationsContext.tsx) wraps the app (via `NotificationWrapper`). On session load it `GET`s `/api/user/notifications` for unread counts (`names`, `descriptions`, `thanks`). `resetNotificationType(type)` fires `PATCH /api/notifications/{type}/mark-read` and zeros that badge in local state.
+[`context/notificationsContext.tsx`](../../../context/notificationsContext.tsx) wraps the app (via [`NotificationWrapper.tsx`](../../../wrappers/NotificationWrapper.tsx) in `app/layout.js`). On session load it `GET`s [`/api/user/notifications`](../../../app/api/user/notifications/route.ts) for unread counts (`names`, `descriptions`, `thanks`). `resetNotificationType(type)` fires `PATCH /api/notifications/{type}/mark-read` and zeros that badge in local state.
 
 ### Unread badge → mark-read
 
@@ -36,8 +36,8 @@ Effect cleanup sets `canceled = true` if the user switches tabs before the timer
 
 | Tab | Component |
 |-----|-----------|
-| Names / Descriptions | `LikeNotificationListing` (`LikesContentListing`) |
-| Thanks | `ThankNotificationListing` (`ThanksContentListing`) |
+| Names / Descriptions | [`LikeNotificationListing.tsx`](../../../components/Notifications/LikeNotificationListing.tsx) (`LikesContentListing`) — populated `likedBy` + `contentId`; intersection observer fades row after ~1.2s in view |
+| Thanks | [`ThankNotificationListing.tsx`](../../../components/Notifications/ThankNotificationListing.tsx) (`ThanksContentListing`) — populated `thanksBy`, `nameId` / `descriptionId`, message list |
 
 Shared list UI: [`NotifListingWrapper.tsx`](../../../components/Notifications/NotifListingWrapper.tsx) — renders `ListingComponent` rows, **load more** (while `!SWRisReachingEnd`), empty message when idle with no docs, and end-of-list digging-dog UI. When `SWRisReachingEnd`, shows **Recheck** with a 2-minute `useLocalStorageCooldown` per `swrType` (`lastRecheck-notifications{thanks|names|descriptions}`); recheck calls `swrHook.mutate()`.
 

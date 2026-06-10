@@ -1,25 +1,61 @@
+/**
+ * Single row for name/description like notifications.
+ * Notes: docs/notes/app/notifications-page.md
+ */
 "use client";
 
 import React, { useEffect, useRef, useState } from "react";
 import { formatDistanceStrict } from "date-fns";
 import Link from "next/link";
 import ProfileImage from "../ReusableSmallComponents/ProfileImage";
-import Thanks from "@components/ReusableSmallComponents/iconsOrSvgImages/svgImages/thanks";
 import { useRouter } from "next/navigation";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faHeart } from "@fortawesome/free-solid-svg-icons";
+import "@fortawesome/fontawesome-svg-core/styles.css";
+import type { NotificationListingProps } from "./NotifListingWrapper";
 
-export default function ThanksContentListing({ singleContent }) {
-  const {
-    thanksBy,
-    contentType,
-    nameId,
-    descriptionId,
-    messages,
-    createdAt,
-    read,
-  } = singleContent;
+export type LikeNotificationUser = {
+  _id?: string;
+  profileName?: string;
+  profileImage?: string;
+  name?: string;
+};
 
-  const [isSeen, setIsSeen] = useState(read); // start from DB value
-  const ref = useRef(null);
+export type LikeNotificationContent = {
+  _id?: string;
+  content?: string;
+  createdBy?: string;
+  tags?: string[];
+};
+
+/** Populated shape from `/api/notifications/names` and `.../descriptions`. */
+export type LikeNotification = {
+  _id: string;
+  contentType?: "names" | "descriptions" | string;
+  contentId?: LikeNotificationContent;
+  likedBy?: LikeNotificationUser;
+  contentCreator?: string;
+  read?: boolean;
+  createdAt?: string | Date;
+};
+
+export type LikesContentListingProps = NotificationListingProps & {
+  singleContent: LikeNotification;
+};
+
+export default function LikesContentListing({
+  singleContent,
+}: LikesContentListingProps) {
+  const { contentType, contentId, likedBy, read, createdAt } = singleContent;
+
+  const content = contentId?.content ?? "";
+  console.log("this is singleContent", singleContent);
+  console.log("this is content", content);
+  const contentSliced =
+    content.slice(0, 60) + (content.length > 60 ? "..." : "");
+
+  const [isSeen, setIsSeen] = useState(Boolean(read)); // start from DB value
+  const ref = useRef<HTMLDivElement>(null);
 
   const router = useRouter();
   // useRouter since a Link cannot be inside a Link, because a's cannot be nested
@@ -42,7 +78,8 @@ export default function ThanksContentListing({ singleContent }) {
       { threshold: [0.5] },
     );
 
-    if (ref.current) observer.observe(ref.current);
+    const node = ref.current;
+    if (node) observer.observe(node);
     return () => observer.disconnect();
   }, [isSeen]);
 
@@ -59,18 +96,13 @@ export default function ThanksContentListing({ singleContent }) {
 
   const profileLink = `${
     process.env.NEXT_PUBLIC_BASE_FETCH_URL
-  }profile/${thanksBy.profileName.toLowerCase()}`;
+  }profile/${likedBy?.profileName?.toLowerCase() ?? ""}`;
   const contentLink =
     contentType === "names"
-      ? `/name/${nameId?.content}`
-      : `/description/${descriptionId?._id}`;
+      ? `/name/${contentId?._id}`
+      : `/description/${contentId?._id}`;
 
   const currentDate = new Date();
-
-  const descriptionContent = descriptionId?.content
-    ? descriptionId.content.slice(0, 60) +
-      (descriptionId.content.length > 60 ? "..." : "")
-    : "";
 
   return (
     <div
@@ -80,19 +112,20 @@ export default function ThanksContentListing({ singleContent }) {
       } hover:bg-secondary/60`}
     >
       <span className="mr-4 mt-3">
-        <Thanks fill="#FF0000" />
+        <FontAwesomeIcon icon={faHeart} color={"red"} />
       </span>
 
       <section>
         <Link href={contentLink}>
           <ProfileImage
             divStyling="h-8 w-8 mr-4 mt-3 mb-2"
-            profileImage={thanksBy.profileImage}
+            profileImage={likedBy?.profileImage}
             layout="responsive"
             className="rounded-2xl"
-            width={40}
-            height={40}
-            onClick={(e) => {
+            width="40"
+            height="40"
+            href={undefined}
+            onClick={(e: React.MouseEvent) => {
               e.preventDefault(); // prevent outer link trigger
               e.stopPropagation();
               router.push(profileLink);
@@ -108,22 +141,17 @@ export default function ThanksContentListing({ singleContent }) {
                 router.push(profileLink);
               }}
             >
-              {thanksBy.name}
+              {likedBy?.name}
             </span>
 
-            {`thanked you • ${formatDistanceStrict(
-              new Date(createdAt),
-              currentDate,
-            )} ago`}
+            {createdAt &&
+              `Liked • ${formatDistanceStrict(
+                new Date(createdAt),
+                currentDate,
+              )} ago`}
           </p>
 
-          <ul className="my-2">
-            {messages.map((message) => (
-              <li key={message}>{`• ${message}`}</li>
-            ))}
-          </ul>
-
-          <p>{contentType === "names" ? nameId.content : descriptionContent}</p>
+          <p>{contentSliced}</p>
         </Link>
       </section>
     </div>

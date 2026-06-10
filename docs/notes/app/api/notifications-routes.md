@@ -22,6 +22,14 @@ Mongoose `populate()` resolves `ref: "User"` etc. only if those models are regis
 
 **Already correct (unchanged):** `app/(protected)/dashboard/page.js` documents tag imports; legacy `.js` routes like `thanks/route.js`, `suggestion/route.js` still import ref models.
 
+## Unread counts (`GET`)
+
+| Path | Purpose |
+|------|---------|
+| `/api/user/notifications` | Parallel `countDocuments` for unread likes/thanks — feeds [`notificationsContext.tsx`](../../../context/notificationsContext.tsx) nav badge |
+
+[`route.ts`](../../../app/api/user/notifications/route.ts): same self-action exclusion as list routes (`likedBy` / `thanksBy` `$ne userId` as ObjectId, `read: false`). Response: `{ names, descriptions, thanks }`.
+
 ## List routes (`GET`)
 
 | Path | Model | Filter notes |

@@ -1,14 +1,21 @@
+/**
+ * Unread notification counts for nav badge + NotificationsProvider.
+ * Notes: docs/notes/app/api/notifications-routes.md
+ */
 import { NextResponse } from "next/server";
 import mongoose from "mongoose";
-import db from "@/utils/db";
+import dbConnect from "@utils/db";
 import Thank from "@/models/Thank";
 import NameLike from "@/models/NameLike";
 import DescriptionLike from "@/models/DescriptionLike";
-
-import { leanWithStrings } from "@/utils/mongoDataCleanup";
-
 import { getServerSession } from "next-auth";
 import { serverAuthOptions } from "@/lib/auth";
+
+export type UserNotificationsCountsResponse = {
+  names: number;
+  descriptions: number;
+  thanks: number;
+};
 
 export async function GET() {
   try {
@@ -23,8 +30,9 @@ export async function GET() {
     // console.log("userid mongoose", userId instanceof mongoose.Types.ObjectId);
 
     // console.log("userid in api/user/notifications", userId);
-    await db.connect();
+    await dbConnect.connect();
 
+    // $ne on likedBy / thanksBy needs explicit ObjectId — same as list routes.
     //  Fetch in parallel
     const [descriptionLikes, nameLikes, thanks] = await Promise.all([
       DescriptionLike.countDocuments({
@@ -54,13 +62,15 @@ export async function GET() {
       descriptionLikes,
     );
 
-    return NextResponse.json({
+    const body: UserNotificationsCountsResponse = {
       names: nameLikes,
       descriptions: descriptionLikes,
       thanks: thanks,
-    });
+    };
+
+    return NextResponse.json(body);
   } catch (err) {
-    console.error("Error fetching suggestions:", err);
+    console.error("Error fetching notification counts:", err);
     return NextResponse.json(
       { error: "Internal Server Error" },
       { status: 500 },
