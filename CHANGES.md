@@ -2229,3 +2229,34 @@ Converted like-button hook to `.ts`. Exported `LikeableContent`, `UseLikeStatePa
 ### Next logical step
 
 Convert `hooks/useToggleState.js` or `hooks/useLocalStorageCooldown.js`.
+
+---
+
+## 2026-06-07 — TypeScript: `hooks/useToggleState`
+
+### What was changed and why
+
+Converted debounced optimistic-toggle hook to `.ts`, replacing the interim `.d.ts`. Exported `UseToggleStateOptions<TRollback>` generic; typed `rollbackRef`. Rollback only runs when a snapshot exists (`!== undefined`, so `RecentLikeDelta` `0` still rolls back).
+
+### Files created
+
+- `hooks/useToggleState.ts`
+
+### Files removed
+
+- `hooks/useToggleState.js`
+- `hooks/useToggleState.d.ts`
+
+### Files modified
+
+- `docs/notes/app/api/togglelike-route.md`
+- `docs/README.md`
+
+### Verification
+
+- `pnpm exec tsc --noEmit` — OK
+- `pnpm build` — OK
+
+### Next logical step
+
+Convert `hooks/useLocalStorageCooldown.js` or `components/ReusableSmallComponents/buttons/LikesButtonAndLikesLogic.js`.
