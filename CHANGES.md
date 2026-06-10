@@ -1593,3 +1593,35 @@ Converted follow toggle route to TypeScript. Behavior unchanged: session auth, u
 ### Next logical step
 
 Convert `ContactForm.jsx` or like-toggle routes (`names/likes/.../togglelike`).
+
+---
+
+## 2026-06-09 — TypeScript: togglelike routes (names + descriptions)
+
+### What was changed and why
+
+Converted both like-toggle API routes to TypeScript. Preserved transaction flow, original inline comments, and route-specific quirks (names passes `{ req }` to `getSessionForApis`; description calls it with no args; description keeps GET 405).
+
+### Files created
+
+- `app/api/names/likes/[contentId]/togglelike/route.ts`
+- `app/api/description/likes/[contentId]/togglelike/route.ts`
+- `docs/notes/app/api/togglelike-route.md`
+
+### Files removed
+
+- `app/api/names/likes/[contentId]/togglelike/route.js`
+- `app/api/description/likes/[contentId]/togglelike/route.js`
+
+### Files modified
+
+- `docs/notes/models/likes-and-follows.md`, `docs/README.md`
+
+### Verification
+
+- `pnpm build` — OK
+- E2E: `e2e/social.spec.ts`, `e2e/helpers/likes.ts`
+
+### Next logical step
+
+Convert `ContactForm.jsx` or notification routes (`app/api/notifications/names/route.js`).

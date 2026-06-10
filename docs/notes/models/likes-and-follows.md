@@ -42,10 +42,10 @@ All three use `{ timestamps: true }` and explicit MongoDB collection names (thir
 
 | Model | Route / file | What happens |
 |-------|--------------|--------------|
-| `NameLike` | `app/api/names/likes/[contentId]/togglelike/route.js` | Transaction: create/delete like doc + bump `Name.likedByCount` |
+| `NameLike` | `app/api/names/likes/[contentId]/togglelike/route.ts` | Transaction: create/delete like doc + bump `Name.likedByCount` |
 | `NameLike` | `app/api/notifications/names/route.js` | Paginated like notifications for content creator |
 | `NameLike` | `app/api/notifications/names/mark-read/route.js` | Mark like notifications read |
-| `DescriptionLike` | `app/api/description/likes/[contentId]/togglelike/route.js` | Same as names |
+| `DescriptionLike` | `app/api/description/likes/[contentId]/togglelike/route.ts` | Same as names |
 | `DescriptionLike` | `app/api/notifications/descriptions/route.js` | Description like notifications |
 | `NameLike` / `DescriptionLike` | `app/api/user/likes/route.js` | List what the logged-in user has liked |
 | `Follow` | `migrations/followersIntoFollowDb.js` | Copy `User.followers[]` into `follows` collection |

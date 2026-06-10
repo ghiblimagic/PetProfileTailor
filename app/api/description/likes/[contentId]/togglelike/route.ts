@@ -1,25 +1,40 @@
-// app/api/descriptions/[id]/like/route.js
+/**
+ * Toggle like on a description (transaction). Notes: docs/notes/app/api/togglelike-route.md
+ */
 import dbConnect from "@/utils/db";
 import mongoose from "mongoose";
 import DescriptionLikes from "@/models/DescriptionLike";
 import Description from "@/models/Description";
 import { getSessionForApis } from "@/utils/api/getSessionForApis";
 
-export async function POST(req, { params }) {
+type RouteContext = {
+  params: Promise<{ contentId: string }>;
+};
+
+type ToggleLikeBody = {
+  contentCreator: {
+    _id: string;
+    name?: string;
+    profileName?: string;
+    profileImage?: string;
+  };
+};
+
+export async function POST(req: Request, { params }: RouteContext) {
   await dbConnect.connect();
 
   const { contentId } = await params;
-  const body = await req.json();
-  const { _id, name, profileName, profileImage } = body.contentCreator;
+  const body = (await req.json()) as ToggleLikeBody;
+  const { _id } = body.contentCreator;
 
   const creatorId = _id;
 
-  const { ok, session: serverSession } = await getSessionForApis();
-  if (!ok) {
+  const auth = await getSessionForApis();
+  if (!auth.ok) {
     return new Response("Unauthorized", { status: 401 });
   }
 
-  const likedBy = serverSession.user.id;
+  const likedBy = auth.session.user.id;
   if (!likedBy) {
     return Response.json({ error: "userId required" }, { status: 400 });
   }
@@ -74,7 +89,8 @@ export async function POST(req, { params }) {
     return Response.json({ liked });
   } catch (err) {
     await session.abortTransaction();
-    return Response.json({ error: err.message }, { status: 500 });
+    const message = err instanceof Error ? err.message : "Server error";
+    return Response.json({ error: message }, { status: 500 });
   } finally {
     session.endSession();
   }
