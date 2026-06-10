@@ -2167,3 +2167,33 @@ Converted likes context to `.tsx`. Typed `likesRef` maps, `recentLikesRef` sessi
 ### Next logical step
 
 Convert `wrappers/LikesWrapper.jsx`, `hooks/useLikeState.js`, or `hooks/useLocalStorageCooldown.js`.
+
+---
+
+## 2026-06-07 — TypeScript: `wrappers/LikesWrapper`
+
+### What was changed and why
+
+Converted thin client wrapper for `LikesProvider` to `.tsx` so the server layout can mount likes context with typed `children` (same pattern as `NotificationWrapper`).
+
+### Files created
+
+- `wrappers/LikesWrapper.tsx`
+
+### Files removed
+
+- `wrappers/LikesWrapper.jsx`
+
+### Files modified
+
+- `docs/notes/app/api/user-likes-route.md`
+- `docs/README.md`
+
+### Verification
+
+- `pnpm exec tsc --noEmit` — OK
+- `pnpm build` — OK
+
+### Next logical step
+
+Convert `hooks/useLikeState.js` or `hooks/useLocalStorageCooldown.js`.

@@ -8,7 +8,7 @@ Returns every name and description the signed-in user has liked. [`LikesContext.
 
 ## `LikesProvider` / `useLikes`
 
-On session load: `GET /api/user/likes` → `likesRef.current.names` / `.descriptions` as `Map<contentId, null>`. `recentLikesRef` tracks per-`contentId` session deltas (`-1` | `0` | `1`) so optimistic like counts in [`useLikeState`](../../../hooks/useLikeState.js) survive navigation. `addLike` / `deleteLike` / `hasLiked` mutate the maps; mounted via [`LikesWrapper.jsx`](../../../wrappers/LikesWrapper.jsx) in `app/layout.js`.
+On session load: `GET /api/user/likes` → `likesRef.current.names` / `.descriptions` as `Map<contentId, null>`. `recentLikesRef` tracks per-`contentId` session deltas (`-1` | `0` | `1`) so optimistic like counts in [`useLikeState`](../../../hooks/useLikeState.js) survive navigation. `addLike` / `deleteLike` / `hasLiked` mutate the maps; mounted via [`LikesWrapper.tsx`](../../../wrappers/LikesWrapper.tsx) in `app/layout.js`.
 
 ## Auth
 
@@ -29,4 +29,4 @@ Parallel `find({ likedBy })` on `NameLike` and `DescriptionLike`, projection `{ 
 
 - [togglelike-route.md](togglelike-route.md) — create/delete like docs
 - [likes-and-follows.md](../models/likes-and-follows.md) — model fields
-- `context/LikesContext.tsx`, `wrappers/LikesWrapper.jsx`
+- `context/LikesContext.tsx`, `wrappers/LikesWrapper.tsx`
