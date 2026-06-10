@@ -18,6 +18,7 @@ Mongoose `populate()` resolves `ref: "User"` etc. only if those models are regis
 | `app/api/names/check-if-content-exists/.../route.ts` | `NameTag`, `User` |
 | `utils/api/getUserFollowers.ts`, `getUserFollowing.ts` | `User` |
 | `utils/stringManipulation/findNormalizedMatch.ts` | `User` |
+| `app/(protected)/notifications/page.tsx` | `Name`, `User` |
 
 **Already correct (unchanged):** `app/(protected)/dashboard/page.js` documents tag imports; legacy `.js` routes like `thanks/route.js`, `suggestion/route.js` still import ref models.
 
@@ -57,5 +58,5 @@ Populate regressions: E2E asserts `likedBy.profileName` and `contentId.content` 
 ## Related
 
 - [`docs/notes/models/likes-and-follows.md`](../models/likes-and-follows.md)
-- `app/(protected)/notifications/page.jsx` — server-side prefetch
+- [`app/(protected)/notifications/page.tsx`](../../../app/(protected)/notifications/page.tsx) — server-side prefetch ([notes](../notifications-page.md))
 - E2E: `e2e/notifications.spec.ts`, `e2e/social.spec.ts`, `e2e/auth-session.spec.ts`

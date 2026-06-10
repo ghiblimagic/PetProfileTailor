@@ -1,37 +1,55 @@
+/**
+ * Client notifications tabs — SWR per type, unread badge reset.
+ * Notes: docs/notes/app/notifications-page.md
+ */
 "use client";
 
 import React, { useState, useEffect } from "react";
-import GeneralOpenCloseButton from "../ReusableSmallComponents/buttons/generalOpenCloseButton";
-import CoreListingPageLogic from "../CoreListingPagesLogic";
 import ThanksContentListing from "./ThankNotificationListing";
 import { useNotifications } from "@/context/notificationsContext";
-import GeneralButton from "../ReusableSmallComponents/buttons/GeneralButton";
-import { useSWRSimple } from "@/hooks/useSwrSimple";
+import {
+  useSWRSimple,
+  type NotificationModelType as SwrModelType,
+  type SwrSimpleReturn,
+} from "@/hooks/useSwrSimple";
 import LikesContentListing from "./LikeNotificationListing";
-import LoadingSpinner from "../ui/LoadingSpinner";
 import NotifListingWrapper from "./NotifListingWrapper";
-import LikeNotificationListing from "@/components/Notifications/LikeNotificationListing";
 import IconOpenCloseButton from "../ReusableSmallComponents/buttons/iconOpenCloseButton";
+
+export type NotificationModelType = SwrModelType;
+
+export type NotificationTabConfig = {
+  text: string;
+  className: string;
+  value: NotificationModelType;
+  type: NotificationModelType;
+  icon: string;
+};
+
+export type { SwrSimpleReturn };
+
+export type ToggleOneNotificationPageProps = {
+  contentList: NotificationTabConfig[];
+  /** Reserved for profile/dashboard parity; not used in this component yet. */
+  swrForThisUserID?: string;
+  defaultOpen?: NotificationModelType;
+  initialNamesDocs?: unknown[] | null;
+};
 
 export default function ToggleOneNotificationPage({
   contentList,
-  swrForThisUserID,
   defaultOpen = "names",
   initialNamesDocs,
-}) {
-  const [openContent, setOpenContent] = useState(defaultOpen);
+}: ToggleOneNotificationPageProps) {
+  const [openContent, setOpenContent] = useState<NotificationModelType | null>(
+    defaultOpen,
+  );
 
   // wait to load name and desc docs until after the user clicks those notifications sections
 
-  const {
-    notifications,
-    setNotifications,
-    notificationsTotal,
-    timeGrabbed,
-    resetNotificationType,
-  } = useNotifications();
+  const { notifications, resetNotificationType } = useNotifications();
 
-  console.log("notifications in toggle", notifications);
+  // console.log("notifications in toggle", notifications);
 
   //############## SWR #################
 
@@ -56,7 +74,7 @@ export default function ToggleOneNotificationPage({
     enabled: openContent === "descriptions",
   });
 
-  console.log("descriptionsSWR  ", descriptionsSWR);
+  // console.log("descriptionsSWR  ", descriptionsSWR);
   // The hook is mounted all the time, so size, mutate, cache, etc. are preserved.
   // SWR will remember previously loaded pages.
   // The first fetch is truly lazy: it only fires when enabled === true.
@@ -69,11 +87,11 @@ export default function ToggleOneNotificationPage({
 
   // Extract notifications if SWR exists
   const thankDocs = thanksSWR?.SWRNotifications || [];
-  console.log("this is thank docs", thankDocs);
+  // console.log("this is thank docs", thankDocs);
   const nameDocs = namesSWR?.SWRNotifications || [];
   const descDocs = descriptionsSWR?.SWRNotifications || [];
 
-  console.log("descDocs", descDocs);
+  // console.log("descDocs", descDocs);
   // const descDocs = descriptionsSWR ?.SWRNotifications || [];
 
   // swr properties:
@@ -85,12 +103,12 @@ export default function ToggleOneNotificationPage({
   // setSize,
   // mutate,
 
-  const handleLoadMore = (SWRType) => {
-    console.log("handle load more ran");
+  const handleLoadMore = (SWRType: SwrSimpleReturn) => {
+    // console.log("handle load more ran");
     if (!SWRType.SWRisReachingEnd) SWRType.setSize((s) => s + 1);
   };
 
-  function handleContentClick(contentKey) {
+  function handleContentClick(contentKey: NotificationModelType) {
     setOpenContent(openContent === contentKey ? null : contentKey);
 
     // if its descriptions,
@@ -101,8 +119,9 @@ export default function ToggleOneNotificationPage({
     // load the api to grab descriptions
   }
 
-  function notificationCount(content) {
-    const lookup = {
+  function notificationCount(content: NotificationModelType | null): number {
+    if (!content) return 0;
+    const lookup: Record<NotificationModelType, number> = {
       thanks: notifications.thanks,
       names: notifications.names,
       descriptions: notifications.descriptions,
@@ -129,7 +148,7 @@ export default function ToggleOneNotificationPage({
   }
 
   useEffect(() => {
-    const swrMap = {
+    const swrMap: Record<NotificationModelType, SwrSimpleReturn> = {
       thanks: thanksSWR,
       names: namesSWR,
       descriptions: descriptionsSWR,
@@ -140,11 +159,13 @@ export default function ToggleOneNotificationPage({
     if (currentCount === 0) return;
     let canceled = false;
 
-    const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+    const sleep = (ms: number) =>
+      new Promise<void>((resolve) => setTimeout(resolve, ms));
     // When the timer finishes, it calls resolve(), the Promise completes, and the reference is released
     // React GC (garbage collection) cleans it up once it resolves
 
-    const currentSWR = swrMap[openContent];
+    const currentSWR =
+      openContent !== null ? swrMap[openContent] : undefined;
 
     const waitForSWRAndReset = async () => {
       if (!currentSWR) return;

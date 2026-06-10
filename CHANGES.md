@@ -1798,3 +1798,99 @@ Convert `app/(protected)/notifications/page.jsx` or `app/api/user/likes/route.js
 ### Next logical step
 
 Continue TS migration (`app/(protected)/notifications/page.jsx` or remaining API routes).
+
+---
+
+## 2026-06-07 — TypeScript: `app/(protected)/notifications/page`
+
+### What was changed and why
+
+Converted the protected notifications server page to TypeScript. Kept `User` / `Name` populate side-effect imports; removed unused imports (`Description`, `Thank`, `leanWithStrings`, `MarkThanksRead`). Added `ToggleOneNotificationPage.d.ts` so optional props (`swrForThisUserID`) type-check from TS consumers.
+
+### Files created
+
+- `app/(protected)/notifications/page.tsx`
+- `components/Notifications/ToggleOneNotificationPage.d.ts`
+- `docs/notes/app/notifications-page.md`
+
+### Files removed
+
+- `app/(protected)/notifications/page.jsx`
+
+### Files modified
+
+- `docs/README.md`
+- `docs/notes/app/api/notifications-routes.md`
+
+### Verification
+
+- `pnpm exec tsc --noEmit` — OK
+- `pnpm build` — OK
+
+### Next logical step
+
+Convert `app/api/user/likes/route.js` or `ToggleOneNotificationPage.jsx` to `.tsx`.
+
+---
+
+## 2026-06-07 — TypeScript: `ToggleOneNotificationPage`
+
+### What was changed and why
+
+Converted the notifications tab client component to `.tsx` with exported prop types (`NotificationTabConfig`, `NotificationModelType`). Removed unused imports. Added `.d.ts` stubs for `useSWRSimple` and `notificationsContext` so `initialPage` and unread-count context type-check. Expanded `docs/notes/app/notifications-page.md` with SWR lazy-load and mark-read behavior. Removed the interim `ToggleOneNotificationPage.d.ts`.
+
+### Files created
+
+- `components/Notifications/ToggleOneNotificationPage.tsx`
+- `hooks/useSwrSimple.d.ts`
+- `context/notificationsContext.d.ts`
+
+### Files removed
+
+- `components/Notifications/ToggleOneNotificationPage.jsx`
+- `components/Notifications/ToggleOneNotificationPage.d.ts`
+
+### Files modified
+
+- `docs/notes/app/notifications-page.md`
+- `docs/README.md`
+
+### Verification
+
+- `pnpm exec tsc --noEmit` — OK
+- `pnpm build` — OK
+
+### Next logical step
+
+Convert `app/api/user/likes/route.js` or `NotifListingWrapper.jsx` to `.tsx`.
+
+---
+
+## 2026-06-07 — TypeScript: `hooks/useSwrSimple`
+
+### What was changed and why
+
+Converted notification infinite-SWR hook from `.js` to `.ts`, replacing the interim `.d.ts`. Exported `NotificationModelType`, `UseSWRSimpleOptions`, and `SwrSimpleReturn` from the implementation so `ToggleOneNotificationPage` and `notificationsContext.d.ts` resolve types from the real module.
+
+### Files created
+
+- `hooks/useSwrSimple.ts`
+
+### Files removed
+
+- `hooks/useSwrSimple.js`
+- `hooks/useSwrSimple.d.ts`
+
+### Files modified
+
+- `docs/notes/app/notifications-page.md`
+- `docs/README.md`
+
+### Verification
+
+- `pnpm exec tsc --noEmit` — OK
+- `pnpm build` — OK
+
+### Next logical step
+
+Convert `context/notificationsContext.js` or `NotifListingWrapper.jsx` to `.tsx`.
