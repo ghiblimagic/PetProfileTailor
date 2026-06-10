@@ -1625,3 +1625,33 @@ Converted both like-toggle API routes to TypeScript. Preserved transaction flow,
 ### Next logical step
 
 Convert `ContactForm.jsx` or notification routes (`app/api/notifications/names/route.js`).
+
+---
+
+## 2026-06-09 — TypeScript: `ContactForm`
+
+### What was changed and why
+
+Converted contact form to TypeScript. Typed `useActionState` with `ContactEmailState`, captcha flow (v3/v2/E2E bypass), and form submit handler. Renamed default export to `ContactForm` (was `ContactPage` in JSX file). Added `.d.ts` stubs for `StyledInput` / `StyledTextarea`.
+
+### Files created
+
+- `components/Contact/ContactForm.tsx`
+- `components/FormComponents/StyledInput.d.ts`, `StyledTextarea.d.ts`
+
+### Files removed
+
+- `components/Contact/ContactForm.jsx`
+
+### Files modified
+
+- `docs/notes/app/actions/sendContactEmail.md`, `docs/README.md`
+
+### Verification
+
+- `pnpm build` — OK
+- E2E: `e2e/contact.spec.ts`
+
+### Next logical step
+
+Convert notification routes or `app/contact/page.jsx`.

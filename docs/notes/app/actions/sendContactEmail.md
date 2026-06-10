@@ -21,7 +21,7 @@ Rate limit runs **after** captcha so failed validations do not consume the conta
 
 ## Client
 
-[`components/Contact/ContactForm.jsx`](../../../components/Contact/ContactForm.jsx) — `useActionState(sendContactEmail, …)`.
+[`components/Contact/ContactForm.tsx`](../../../components/Contact/ContactForm.tsx) — `useActionState(sendContactEmail, …)`.
 
 ## Related
 

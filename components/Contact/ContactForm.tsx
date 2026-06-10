@@ -1,8 +1,11 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, type FormEvent } from "react";
 import { useActionState } from "react";
-import { sendContactEmail } from "@/app/actions/sendContactEmail";
+import {
+  sendContactEmail,
+  type ContactEmailState,
+} from "@/app/actions/sendContactEmail";
 import LoadingSpinner from "../ui/LoadingSpinner";
 import StyledInput from "../FormComponents/StyledInput";
 import StyledTextarea from "../FormComponents/StyledTextarea";
@@ -17,7 +20,13 @@ import {
   isE2eClientMode,
 } from "@/utils/api/e2eTestMode";
 
-export default function ContactPage() {
+const initialContactState: ContactEmailState = {
+  success: false,
+  error: null,
+  email: null,
+};
+
+export default function ContactForm() {
   const formStartTime = useRef(Date.now());
   // useRef so:
   //  1. a bot can't spoof the date, like they could with useState
@@ -25,16 +34,15 @@ export default function ContactPage() {
   //  3. ideal since we want a timestamp that won't change
   const { executeRecaptcha } = useGoogleReCaptcha();
   const [showV2, setShowV2] = useState(false);
-  const [v2Token, setV2Token] = useState(null);
+  const [v2Token, setV2Token] = useState<string | null>(null);
   const isE2eTestMode = isE2eClientMode();
   const [recaptchaLoading, setRecaptchaLoading] = useState(!isE2eTestMode);
   const [recaptchaFailed, setRecaptchaFailed] = useState(false);
 
-  const [state, formAction, isPending] = useActionState(sendContactEmail, {
-    success: false,
-    error: null,
-    email: null,
-  });
+  const [state, formAction, isPending] = useActionState(
+    sendContactEmail,
+    initialContactState,
+  );
 
   // Set recaptcha as loaded when it's ready, with timeout fallback
   useEffect(() => {
@@ -59,9 +67,9 @@ export default function ContactPage() {
     }, 10000); // 10 second timeout
 
     return () => clearTimeout(timeout);
-  }, [executeRecaptcha]);
+  }, [executeRecaptcha, isE2eTestMode]);
 
-  async function handleSubmit(e) {
+  async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
 
@@ -73,7 +81,7 @@ export default function ContactPage() {
     }
 
     try {
-      let token = null;
+      let token: string | null = null;
 
       // v3 recaptcha
       if (executeRecaptcha && !showV2 && !recaptchaFailed) {
@@ -94,7 +102,7 @@ export default function ContactPage() {
         token = v2Token;
       }
 
-      formData.append("captchaToken", token);
+      formData.append("captchaToken", token ?? "");
       // no await since it does not return a promise, instead react schedules the server action
       formAction(formData);
       // server errors will appear in state.error since server actions are not promises
@@ -119,7 +127,7 @@ export default function ContactPage() {
           <input
             type="text"
             name="website"
-            tabIndex="-1"
+            tabIndex={-1}
             autoComplete="off"
             style={{
               position: "absolute",
@@ -132,7 +140,7 @@ export default function ContactPage() {
           <input
             type="text"
             name="phone"
-            tabIndex="-1"
+            tabIndex={-1}
             autoComplete="off"
             style={{
               position: "absolute",
@@ -161,9 +169,7 @@ export default function ContactPage() {
           />
 
           <h4>Message</h4>
-          <p className="text-sm text-gray-400 mt-1">
-            English or Spanish only
-          </p>
+          <p className="text-sm text-gray-400 mt-1">English or Spanish only</p>
           <StyledTextarea
             name="message"
             required
@@ -175,7 +181,7 @@ export default function ContactPage() {
           <input
             type="text"
             name="website"
-            tabIndex="-1"
+            tabIndex={-1}
             autoComplete="off"
             style={{ position: "absolute", left: "-9999px" }}
             aria-hidden="true"
@@ -210,7 +216,7 @@ export default function ContactPage() {
                 </p>
               )}
               <ReCAPTCHA
-                sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_V2_SITE_KEY}
+                sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_V2_SITE_KEY!}
                 onChange={(token) => setV2Token(token)}
               />
             </div>
