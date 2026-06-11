@@ -124,7 +124,6 @@ export default function LikesContentListing({
             className="rounded-2xl"
             width="40"
             height="40"
-            href={undefined}
             onClick={(e: React.MouseEvent) => {
               e.preventDefault(); // prevent outer link trigger
               e.stopPropagation();

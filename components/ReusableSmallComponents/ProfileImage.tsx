@@ -1,24 +1,35 @@
 "use client";
 
-import { useState } from "react";
+import { useState, type MouseEvent } from "react";
 import Image from "next/image";
 import Link from "next/link";
+
+export type ProfileImageProps = {
+  profileImage?: string;
+  className?: string;
+  /** Legacy prop — kept for callers; not used in this component. */
+  layout?: string;
+  width?: number | `${number}`;
+  height?: number | `${number}`;
+  divStyling?: string;
+  href?: string;
+  onClick?: (e: MouseEvent) => void;
+};
 
 export default function ProfileImage({
   profileImage,
   className,
-  layout,
   width = "200",
   height = "200",
   divStyling,
   href,
   onClick,
-}) {
+}: ProfileImageProps) {
   const [hover, setHover] = useState(false);
   const handleMouseEnter = () => setHover(true);
   const handleMouseLeave = () => setHover(false);
 
-  const profileImageString = profileImage;
+  const profileImageString = profileImage ?? "";
   const hoverProfileImage = hover
     ? profileImageString
     : profileImageString.replace(".gif", ".jpg");
@@ -48,10 +59,7 @@ export default function ProfileImage({
       {href ? (
         //  If href provided, use Next.js Link
         // for contentListing
-        <Link
-          href={href}
-          className="inline-block"
-        >
+        <Link href={href} className="inline-block">
           {imageElement}
         </Link>
       ) : (

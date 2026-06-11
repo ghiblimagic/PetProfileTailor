@@ -2378,3 +2378,34 @@ Converted `thanks.jsx` → `thanks.tsx`; removed unused `props` destructuring th
 ### Next logical step
 
 Convert `iconOpenCloseButton.jsx` or `components/Thanks/ThanksButton.jsx`.
+
+---
+
+## 2026-06-07 — TypeScript: `ProfileImage`
+
+### What was changed and why
+
+Converted profile avatar component to `.tsx` with optional `href` and `onClick`. Removed `href={undefined}` hacks from notification listing rows. `width` / `height` typed for Next.js `Image` (`number | \`${number}\``).
+
+### Files created
+
+- `components/ReusableSmallComponents/ProfileImage.tsx`
+
+### Files removed
+
+- `components/ReusableSmallComponents/ProfileImage.js`
+
+### Files modified
+
+- `components/Notifications/LikeNotificationListing.tsx`
+- `components/Notifications/ThankNotificationListing.tsx`
+- `docs/notes/app/notifications-page.md`
+
+### Verification
+
+- `pnpm exec tsc --noEmit` — OK
+- `pnpm build` — OK
+
+### Next logical step
+
+Convert `iconOpenCloseButton.jsx` or `ContainerForLikeShareFlag.jsx`.

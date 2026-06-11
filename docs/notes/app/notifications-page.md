@@ -38,7 +38,7 @@ Effect cleanup sets `canceled = true` if the user switches tabs before the timer
 
 | Tab | Component |
 |-----|-----------|
-| Names / Descriptions | [`LikeNotificationListing.tsx`](../../../components/Notifications/LikeNotificationListing.tsx) (`LikesContentListing`) — populated `likedBy` + `contentId`; intersection observer fades row after ~1.2s in view |
+| Names / Descriptions | [`LikeNotificationListing.tsx`](../../../components/Notifications/LikeNotificationListing.tsx) (`LikesContentListing`) — populated `likedBy` + `contentId`; [`ProfileImage.tsx`](../../../components/ReusableSmallComponents/ProfileImage.tsx) uses `onClick` (no `href`) inside outer `Link`; intersection observer fades row after ~1.2s in view |
 | Thanks | [`ThankNotificationListing.tsx`](../../../components/Notifications/ThankNotificationListing.tsx) (`ThanksContentListing`) — populated `thanksBy`, `nameId` / `descriptionId`, message list; cat icon [`thanks.tsx`](../../../components/ReusableSmallComponents/iconsOrSvgImages/svgImages/thanks.tsx) |
 
 Shared list UI: [`NotifListingWrapper.tsx`](../../../components/Notifications/NotifListingWrapper.tsx) — renders `ListingComponent` rows, **load more** (while `!SWRisReachingEnd`), empty message when idle with no docs, and end-of-list digging-dog UI. When `SWRisReachingEnd`, shows **Recheck** with a 2-minute [`useLocalStorageCooldown`](../../../hooks/useLocalStorageCooldown.ts) per `swrType` (`lastRecheck-notifications{thanks|names|descriptions}`); recheck calls `swrHook.mutate()`.
