@@ -1,13 +1,23 @@
 import { Dialog, DialogPanel } from "@headlessui/react";
 import DeleteContentNotification from "@components/DeletingData/DeleteContentNotification";
 
+type DeleteTarget = { _id: string };
+
+export type DeleteDialogProps = {
+  open: boolean;
+  target: DeleteTarget | null;
+  onClose: () => void;
+  onConfirm: () => void;
+  /** Accepted for caller parity; confirm runs via `onConfirm`. */
+  signedInUsersId?: string;
+};
+
 export default function DeleteDialog({
   open,
   target,
   onClose,
-  onConfirm, // new prop
-  signedInUsersId,
-}) {
+  onConfirm,
+}: DeleteDialogProps) {
   if (!open || !target) return null;
 
   return (
@@ -19,7 +29,7 @@ export default function DeleteDialog({
       <div
         className="fixed inset-0 bg-black/50 overflow-y-auto"
         aria-hidden="true"
-        tabIndex={0} // <-- make it focusable, so we can scroll up and down with arrow keys
+        tabIndex={0}
       >
         <DialogPanel
           className=" bg-secondary sm:p-12 bg-opacity-40 h-fit"
@@ -27,11 +37,7 @@ export default function DeleteDialog({
         >
           <DeleteContentNotification
             setShowDeleteConfirmation={onClose}
-            contentId={target._id}
-            signedInUsersId={signedInUsersId}
-            contentCreatedBy={target.createdBy.id}
-            apiLink="/api/names/"
-            onConfirm={onConfirm} // passes down confirmDelete
+            onConfirm={onConfirm}
           />
         </DialogPanel>
       </div>

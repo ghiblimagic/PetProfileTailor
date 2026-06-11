@@ -2786,3 +2786,37 @@ Converted listing row delete/edit menu buttons and edit dialog to `.tsx`. Export
 ### Next logical step
 
 Convert `components/ShowingListOfContent/ContentListing.jsx`.
+
+---
+
+## 2026-06-07 — TypeScript: `ContentListing` dependencies (jsx/js imports)
+
+### What was changed and why
+
+Converted remaining non-TS components imported by `ContentListing.jsx` before listing conversion: share bar, delete dialog, flag/suggestion menu buttons and dialogs. Removed dead props on `DeleteDialog` → `DeleteContentNotification`. Context hooks cast until `ReportsContext` / `SuggestionsContext` are TS.
+
+### Files created
+
+- `components/ReusableMediumComponents/SharingOptionsBar.tsx`
+- `components/DeletingData/DeleteDialog.tsx`
+- `components/Flagging/FlagButton.tsx`
+- `components/Flagging/FlagDialog.tsx`
+- `components/Suggestions/SuggestionButton.tsx`
+- `components/Suggestions/SuggestionDialog.tsx`
+
+### Files removed
+
+- `components/ReusableMediumComponents/SharingOptionsBar.jsx`
+- `components/DeletingData/DeleteDialog.jsx`
+- `components/Flagging/FlagButton.js`
+- `components/Flagging/FlagDialog.js`
+- `components/Suggestions/SuggestionButton.jsx`
+- `components/Suggestions/SuggestionDialog.js`
+
+### Verification
+
+- `pnpm exec tsc --noEmit` — OK
+
+### Next logical step
+
+Convert `components/ShowingListOfContent/ContentListing.jsx`.

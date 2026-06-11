@@ -1,7 +1,25 @@
+"use client";
+
 import { Dialog, DialogPanel } from "@headlessui/react";
 import AddReport from "@/components/Flagging/AddReport";
 import { useReports } from "@context/ReportsContext";
 import EditReport from "@components/Flagging/EditReport";
+import type { ContentType } from "@/utils/api/checkIfValidContentType";
+
+type ListingContent = { _id: string };
+
+type ReportsContextValue = {
+  getStatus: (type: string, contentId: string) => string | null;
+};
+
+export type FlagDialogProps = {
+  dataType: ContentType | string;
+  open: boolean;
+  target: ListingContent | null;
+  onClose: () => void;
+  signedInUsersId?: string;
+  contentId: string;
+};
 
 export default function FlagDialog({
   dataType,
@@ -10,8 +28,8 @@ export default function FlagDialog({
   onClose,
   signedInUsersId,
   contentId,
-}) {
-  const { getStatus } = useReports();
+}: FlagDialogProps) {
+  const { getStatus } = useReports() as ReportsContextValue;
   if (!open || !target) return null;
 
   const reportStatus = getStatus(dataType, contentId.toString());
@@ -20,13 +38,12 @@ export default function FlagDialog({
     <Dialog
       open={open}
       onClose={() => {}}
-      // this way the form won't close when the user clicks on the backdrop
       className="relative z-50 "
     >
       <div
         className="fixed inset-0 bg-black/50 overflow-y-auto"
         aria-hidden="true"
-        tabIndex={0} // <-- make it focusable, so we can scroll up and down with arrow keys
+        tabIndex={0}
       >
         <DialogPanel
           className=" bg-secondary sm:p-12 bg-opacity-40 h-fit"
@@ -48,7 +65,6 @@ export default function FlagDialog({
               contentInfo={target}
               contentId={contentId}
               flaggedByUser={signedInUsersId}
-              apiflagReportSubmission="/api/flag/flagreportsubmission/"
               onClose={onClose}
             />
           )}
