@@ -43,10 +43,8 @@ export default async function DashboardPage() {
 
   return (
     <Dashboard
-      likedNames={[]}
       namesCreated={namesCreated}
       createdDescriptions={createdDescriptions}
-      likedDescriptions={[]}
     />
   );
 }

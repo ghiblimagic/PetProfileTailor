@@ -1,34 +1,51 @@
+/**
+ * Public profile page: bio card, points, and added names/descriptions tabs.
+ * Notes: docs/notes/components/profile.md
+ */
 "use client";
 
 import { useState } from "react";
-
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faLocationDot } from "@fortawesome/free-solid-svg-icons";
 import "@fortawesome/fontawesome-svg-core/styles.css";
-
 import PointSystemList from "@components/Ranking/PointSystemList";
 import EditBioAndProfile from "@components/EditingData/EditBioAndProfile";
-
-import ToggleOneContentPage from "./ShowingListOfContent/ToggleOneContentPage";
-
+import ToggleOneContentPage, {
+  type ToggleContentListItem,
+} from "./ShowingListOfContent/ToggleOneContentPage";
 import GeneralButton from "./ReusableSmallComponents/buttons/GeneralButton";
 import { useSession } from "next-auth/react";
 import ProfileImage from "./ReusableSmallComponents/ProfileImage";
 
+export type ProfileUserData = {
+  _id: string;
+  name?: string;
+  profileName?: string;
+  profileImage?: string;
+  bio?: string;
+  location?: string;
+  followers?: unknown[];
+};
+
+export type ProfileProps = {
+  userData: ProfileUserData;
+  nameList: unknown[];
+  createdDescriptions: unknown[];
+};
+
 export default function Profile({
   userData,
   nameList,
-
   createdDescriptions,
-}) {
+}: ProfileProps) {
   const { data: session } = useSession();
 
   let userName = "";
   let profileImage = "";
   let signedInUsersId = "";
   if (session?.user) {
-    userName = session.user.name;
-    profileImage = session.user.profileImage;
+    userName = session.user.name ?? "";
+    profileImage = session.user.profileImage ?? "";
     signedInUsersId = session.user.id;
   }
 
@@ -58,7 +75,7 @@ export default function Profile({
   //   setShowFollowingList(!showFollowingList);
   // }
 
-  const contentList = [
+  const contentList: ToggleContentListItem[] = [
     {
       text: "Names",
       className: "mb-2",
@@ -138,7 +155,7 @@ export default function Profile({
                 </div>
 
                 <div className="text-center">
-                  {userName != "" && session.user.id == userData._id && (
+                  {userName != "" && session?.user?.id == userData._id && (
                     <GeneralButton
                       subtle
                       type="button"

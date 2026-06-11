@@ -1,21 +1,29 @@
+/**
+ * Signed-in user dashboard: points summary and content tab switcher.
+ * Notes: docs/notes/components/dashboard.md
+ */
 "use client";
 
-import React from "react";
 import PointSystemList from "@components/Ranking/PointSystemList";
 import { useSession } from "next-auth/react";
-import ToggleOneContentPage from "./ShowingListOfContent/ToggleOneContentPage";
+import ToggleOneContentPage, {
+  type ToggleContentListItem,
+} from "./ShowingListOfContent/ToggleOneContentPage";
+
+export type DashboardProps = {
+  namesCreated: unknown[];
+  createdDescriptions: unknown[];
+};
 
 export default function Dashboard({
-  likedNames,
   namesCreated,
   createdDescriptions,
-  likedDescriptions,
-}) {
+}: DashboardProps) {
   const { data: session } = useSession();
 
   const userName = session?.user?.name || "Guest";
 
-  const contentList = [
+  const contentList: ToggleContentListItem[] = [
     { text: "Fav Names", className: "mb-2", value: "Fav Names" },
     {
       text: "Fav Descriptions",
@@ -66,9 +74,7 @@ export default function Dashboard({
                     </h3>
 
                     <PointSystemList
-                      namesLikes={likedNames.length}
                       namesAdds={namesCreated.length}
-                      descriptionsLikes={likedDescriptions.length}
                       descriptionsAdds={createdDescriptions.length}
                     />
                   </div>
@@ -87,8 +93,7 @@ export default function Dashboard({
        pb-2
        w-full"
         >
-          {/* ############# FAVORITE NAMES LIST ############ */}
-
+       
           <section className="flex flex-wrap gap-1 items-center justify-center">
             <h4 className="w-full text-xl mb-4">
               {" "}

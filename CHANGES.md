@@ -3330,3 +3330,55 @@ Deleted dead profile listing component — nothing imported it; profile/dashboar
 ### Verification
 
 - `pnpm exec tsc --noEmit` — OK
+
+---
+
+## 2026-06-07 — TypeScript: `dashboard`, `profile`
+
+### What was changed and why
+
+Converted dashboard and profile client pages to TypeScript. Exported `DashboardProps`, `ProfileProps`, and `ProfileUserData`. Typed `contentList` with `ToggleContentListItem`. Removed dead `namesLikes` / `descriptionsLikes` props to `PointSystemList` on dashboard (component never read them). Safe optional chaining for edit button (`session?.user?.id`). Preserved inline comments from originals.
+
+### Files created
+
+- `components/dashboard.tsx`
+- `components/profile.tsx`
+- `docs/notes/components/dashboard.md`
+- `docs/notes/components/profile.md`
+
+### Files removed
+
+- `components/dashboard.jsx`
+- `components/profile.jsx`
+
+### Files modified
+
+- `docs/notes/components/toggle-one-content-page.md`
+- `docs/README.md`
+
+### Verification
+
+- `pnpm exec tsc --noEmit` — OK
+- `pnpm build` — OK
+
+### Next logical step
+
+Convert `app/fetchname/page.js` or `app/(protected)/dashboard/page.js`.
+
+---
+
+## 2026-06-07 — Remove dead `likedNames` / `likedDescriptions` from `Dashboard`
+
+### What was changed and why
+
+Dropped unused props from `Dashboard` and dashboard page. Fav tabs already read liked IDs from `LikesContext` through `ToggleOneContentPage` → `CoreListingPageLogic` → `useSwrPagination`.
+
+### Files modified
+
+- `components/dashboard.tsx`
+- `app/(protected)/dashboard/page.js`
+- `docs/notes/components/dashboard.md`
+
+### Verification
+
+- `pnpm exec tsc --noEmit` — OK

@@ -20,5 +20,5 @@ Tab strip that mounts one [`CoreListingPageLogic`](../../../components/CoreListi
 
 ## Consumers
 
-- [`components/dashboard.jsx`](../../../components/dashboard.jsx) — all four tabs
-- [`components/profile.jsx`](../../../components/profile.jsx) — Added Names / Added Descriptions only; `defaultOpen="Added Names"`
+- [`components/dashboard.tsx`](../../../components/dashboard.tsx) — all four tabs
+- [`components/profile.tsx`](../../../components/profile.tsx) — Added Names / Added Descriptions only; `defaultOpen="Added Names"`
