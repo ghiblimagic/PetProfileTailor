@@ -19,7 +19,7 @@ Shared client shell for paginated name/description listings: filter drawer, pagi
 ## Consumers
 
 - [`app/fetchnames/page.jsx`](../../../app/fetchnames/page.jsx), [`app/fetchdescriptions/page.jsx`](../../../app/fetchdescriptions/page.jsx)
-- [`ToggleOneContentPage.jsx`](../../../components/ShowingListOfContent/ToggleOneContentPage.jsx) (dashboard liked/added tabs)
+- [`ToggleOneContentPage.tsx`](../../../components/ShowingListOfContent/ToggleOneContentPage.tsx) (dashboard liked/added tabs) — see [toggle-one-content-page.md](./toggle-one-content-page.md)
 
 ## Related
 

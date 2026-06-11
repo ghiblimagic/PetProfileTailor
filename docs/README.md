@@ -53,6 +53,7 @@ Each source file with notes should have a one-line pointer at the top linking to
 | [`addingName.tsx`](../components/AddingNewData/addingName.tsx), [`addingdescription.tsx`](../components/AddingNewData/addingdescription.tsx) | [add-content-forms.md](notes/components/add-content-forms.md) |
 | [`CheckIfContentExists.tsx`](../components/AddingNewData/CheckIfContentExists.tsx) | [check-if-content-exists.md](notes/components/check-if-content-exists.md) |
 | [`CoreListingPagesLogic.tsx`](../components/CoreListingPagesLogic.tsx) | [core-listing-pages-logic.md](notes/components/core-listing-pages-logic.md) |
+| [`ToggleOneContentPage.tsx`](../components/ShowingListOfContent/ToggleOneContentPage.tsx) | [toggle-one-content-page.md](notes/components/toggle-one-content-page.md) |
 | [`ContentListing.tsx`](../components/ShowingListOfContent/ContentListing.tsx) | [content-listing.md](notes/components/content-listing.md) |
 | [`models/Name.ts`](../models/Name.ts), [`Description.ts`](../models/Description.ts) | [name-and-description.md](notes/models/name-and-description.md) |
 | [`utils/stringManipulation/findNormalizedMatch.ts`](../utils/stringManipulation/findNormalizedMatch.ts) | [findNormalizedMatch.md](notes/utils/stringManipulation/findNormalizedMatch.md) |

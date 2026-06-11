@@ -1,15 +1,49 @@
-import React, { useState } from "react";
+/**
+ * Tab buttons that mount one `CoreListingPageLogic` panel at a time (dashboard / profile).
+ * Notes: docs/notes/components/toggle-one-content-page.md
+ */
+"use client";
+
+import { useState, type ComponentType } from "react";
 import GeneralOpenCloseButton from "../ReusableSmallComponents/buttons/generalOpenCloseButton";
 import CoreListingPageLogic from "../CoreListingPagesLogic";
+
+export type ToggleContentTab =
+  | "Fav Names"
+  | "Fav Descriptions"
+  | "Added Names"
+  | "Added Descriptions";
+
+export type ToggleContentListItem = {
+  text: string;
+  className?: string;
+  value: ToggleContentTab;
+};
+
+export type ToggleOneContentPageProps = {
+  contentList: ToggleContentListItem[];
+  swrForThisUserID?: string;
+  defaultOpen?: ToggleContentTab | null;
+};
+
+const TabButton = GeneralOpenCloseButton as ComponentType<{
+  text: string;
+  setState: (value: ToggleContentTab) => void;
+  className?: string;
+  value: ToggleContentTab;
+  state: ToggleContentTab | null;
+}>;
 
 export default function ToggleOneContentPage({
   contentList,
   swrForThisUserID,
   defaultOpen = null,
-}) {
-  const [openContent, setOpenContent] = useState(defaultOpen);
+}: ToggleOneContentPageProps) {
+  const [openContent, setOpenContent] = useState<ToggleContentTab | null>(
+    defaultOpen,
+  );
 
-  function handleContentClick(contentKey) {
+  function handleContentClick(contentKey: ToggleContentTab) {
     setOpenContent(openContent === contentKey ? null : contentKey);
   }
 
@@ -17,7 +51,7 @@ export default function ToggleOneContentPage({
     <section>
       <div className="flex justify-center flex-wrap">
         {contentList.map((category) => (
-          <GeneralOpenCloseButton
+          <TabButton
             key={category.value}
             text={category.text}
             setState={handleContentClick}

@@ -3275,3 +3275,58 @@ Re-added section markers and explanatory comments from the original `.jsx` that 
 ### Files modified
 
 - `components/CoreListingPagesLogic.tsx`
+
+---
+
+## 2026-06-07 — TypeScript: `ProfilePagesLogic`, `ToggleOneContentPage`
+
+### What was changed and why
+
+Converted profile listing shell and dashboard/profile tab switcher to TypeScript. Exported `ProfilePagesLogicProps`, `ToggleOneContentPageProps`, `ToggleContentTab`, and `ToggleContentListItem`. Preserved inline comments from originals. Removed dead `setPageFunction` from profile listing. Added `isValidating` to profile `Pagination` (required by TS). `generalOpenCloseButton` cast for tab props.
+
+### Files created
+
+- `components/ProfilePagesLogic.tsx`
+- `components/ShowingListOfContent/ToggleOneContentPage.tsx`
+- `docs/notes/components/profile-pages-logic.md`
+- `docs/notes/components/toggle-one-content-page.md`
+
+### Files removed
+
+- `components/ProfilePagesLogic.jsx`
+- `components/ShowingListOfContent/ToggleOneContentPage.jsx`
+
+### Files modified
+
+- `docs/notes/components/core-listing-pages-logic.md`
+- `docs/README.md`
+
+### Verification
+
+- `pnpm exec tsc --noEmit` — OK
+- `pnpm build` — OK
+
+### Next logical step
+
+Convert `dashboard.jsx` / `profile.jsx` or `app/fetchname/page.js`.
+
+---
+
+## 2026-06-07 — Remove unused `ProfilePagesLogic`
+
+### What was changed and why
+
+Deleted dead profile listing component — nothing imported it; profile/dashboard use `ToggleOneContentPage` + `CoreListingPageLogic` instead.
+
+### Files removed
+
+- `components/ProfilePagesLogic.tsx`
+- `docs/notes/components/profile-pages-logic.md`
+
+### Files modified
+
+- `docs/README.md`
+
+### Verification
+
+- `pnpm exec tsc --noEmit` — OK
