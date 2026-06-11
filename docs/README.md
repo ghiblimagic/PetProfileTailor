@@ -46,6 +46,7 @@ Each source file with notes should have a one-line pointer at the top linking to
 | [`hooks/useDeleteConfirmation.ts`](../hooks/useDeleteConfirmation.ts) | [useDeleteConfirmation.md](notes/hooks/useDeleteConfirmation.md) |
 | [`context/ReportsContext.tsx`](../context/ReportsContext.tsx), [`context/SuggestionsContext.tsx`](../context/SuggestionsContext.tsx) | [moderation-and-thanks.md](notes/models/moderation-and-thanks.md) |
 | [`hooks/useEditHandler.ts`](../hooks/useEditHandler.ts), [`EditContent.tsx`](../components/EditingData/EditContent.tsx), [`EditButton.tsx`](../components/ReusableSmallComponents/buttons/EditButton.tsx) | [useEditHandler.md](notes/hooks/useEditHandler.md) |
+| [`hooks/useTags.ts`](../hooks/useTags.ts), [`TagsSelectAndCheatSheet.tsx`](../components/FormComponents/TagsSelectAndCheatSheet.tsx) | [useTags.md](notes/hooks/useTags.md), [tags-select-and-cheat-sheet.md](notes/components/tags-select-and-cheat-sheet.md) |
 | [`ContentListing.tsx`](../components/ShowingListOfContent/ContentListing.tsx) | [content-listing.md](notes/components/content-listing.md) |
 | [`models/Name.ts`](../models/Name.ts), [`Description.ts`](../models/Description.ts) | [name-and-description.md](notes/models/name-and-description.md) |
 | [`utils/stringManipulation/findNormalizedMatch.ts`](../utils/stringManipulation/findNormalizedMatch.ts) | [findNormalizedMatch.md](notes/utils/stringManipulation/findNormalizedMatch.md) |

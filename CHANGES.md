@@ -2953,7 +2953,40 @@ Converted suggestion add/edit forms to TypeScript. Exported `SuggestionContentIn
 
 ### Next logical step
 
-Convert `TagsSelectAndCheatSheet.jsx` or flag/suggestion API routes to TypeScript.
+Convert `TagsSelectAndCheatSheet.jsx` / `useTags.js`.
+
+---
+
+## 2026-06-07 — TypeScript: `useTags`, `TagsSelectAndCheatSheet`
+
+### What was changed and why
+
+Converted shared tag-selection hook and form component to TypeScript. Exported `TagOption` and `TagCheckboxChange`. Wrapped handlers in `useCallback`; react-select styles typed with `StylesConfig`.
+
+### Files created
+
+- `hooks/useTags.ts`
+- `components/FormComponents/TagsSelectAndCheatSheet.tsx`
+- `docs/notes/hooks/useTags.md`
+- `docs/notes/components/tags-select-and-cheat-sheet.md`
+
+### Files removed
+
+- `hooks/useTags.js`
+- `components/FormComponents/TagsSelectAndCheatSheet.jsx`
+
+### Files modified
+
+- `docs/README.md`
+
+### Verification
+
+- `pnpm exec tsc --noEmit` — OK
+- `pnpm build` — OK
+
+### Next logical step
+
+Convert `useCategoriesForDataType.js` / `CategoriesAndTagsContext.js` or flag/suggestion API routes.
 
 ---
 

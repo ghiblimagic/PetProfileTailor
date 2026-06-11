@@ -1,38 +1,58 @@
+/**
+ * Multi-select tags picker with category cheat-sheet panel.
+ * Notes: docs/notes/components/tags-select-and-cheat-sheet.md
+ */
 "use client";
 
 import { Disclosure } from "@headlessui/react";
 import { ChevronUpIcon } from "@heroicons/react/20/solid";
 import { useState } from "react";
-import Select from "react-select";
+import Select, { type StylesConfig } from "react-select";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPaw } from "@fortawesome/free-solid-svg-icons";
 import { useCategoriesForDataType } from "@/hooks/useCategoriesForDataType";
 import GeneralButton from "../ReusableSmallComponents/buttons/GeneralButton";
+import type { TagOption, TagCheckboxChange } from "@/hooks/useTags";
+import type { ContentType } from "@/utils/api/checkIfValidContentType";
+
+type CategoryTag = {
+  _id: string;
+  tag: string;
+};
+
+type CategoryWithTags = {
+  _id: string;
+  category: string;
+  tags: CategoryTag[];
+};
+
+export type TagsSelectAndCheatSheetProps = {
+  dataType: ContentType | string;
+  tagsToSubmit: TagOption[];
+  handleSelectChange: (selected: TagOption[]) => void;
+  handleCheckboxChange: (args: TagCheckboxChange) => void;
+  isDisabled?: boolean;
+};
 
 export default function TagsSelectAndCheatSheet({
   dataType,
   tagsToSubmit,
   handleSelectChange,
   handleCheckboxChange,
-  isDisabled,
-}) {
-  // console.log({ tagsToSubmit, handleSelectChange, handleCheckboxChange });
-  const disabledColor = "rgb(30 41 59)";
-
-  const { categoriesWithTags, tagList } = useCategoriesForDataType(dataType);
+  isDisabled = false,
+}: TagsSelectAndCheatSheetProps) {
+  const { categoriesWithTags, tagList } = useCategoriesForDataType(dataType) as {
+    categoriesWithTags: CategoryWithTags[];
+    tagList: TagOption[];
+  };
   const [isOpen, setIsOpen] = useState(false);
 
-  // Map tagsToSubmit to the actual objects in tagList so React Select displays them
-
-  // do NOT use filter, it will reorganized the array, so the selected tags won't appear in the order the user added them
-  // we have to use map isntead to preserve the order
   const selectedOptions = tagsToSubmit.map(
     (tag) => tagList.find((option) => option.value === tag.value) || tag,
   );
 
-  const customSelectStyles = {
+  const customSelectStyles: StylesConfig<TagOption, true> = {
     control: (provided) => ({
-      // is the outer box
       ...provided,
       backgroundColor: isDisabled
         ? "var(--select-bg-disabled)"
@@ -43,7 +63,6 @@ export default function TagsSelectAndCheatSheet({
       width: "96%",
       borderRadius: "10px",
       marginTop: "1rem",
-
       paddingTop: "1rem",
       paddingBottom: "1rem",
       paddingLeft: "0.5rem",
@@ -54,9 +73,9 @@ export default function TagsSelectAndCheatSheet({
         borderColor: "rgb(221 214 254)",
       },
     }),
-    dropdownIndicator: (provided, state) => ({
+    dropdownIndicator: (provided) => ({
       ...provided,
-      color: "var(--select-text)", // arrow color
+      color: "var(--select-text)",
       cursor: isDisabled ? "not-allowed" : "pointer",
       backgroundColor: "transparent",
       "&:hover": {
@@ -64,10 +83,10 @@ export default function TagsSelectAndCheatSheet({
         color: "var(--select-text)",
       },
     }),
-    clearIndicator: (provided, state) => ({
+    clearIndicator: (provided) => ({
       cursor: isDisabled ? "not-allowed" : "pointer",
       ...provided,
-      color: "var(--select-text)", // x color
+      color: "var(--select-text)",
       backgroundColor: "transparent",
       "&:hover": {
         backgroundColor: "var(--select-hover)",
@@ -80,21 +99,20 @@ export default function TagsSelectAndCheatSheet({
       padding: 0,
       boxShadow: "none",
       outline: "none",
-
       cursor: isDisabled ? "not-allowed" : "pointer",
       background: "transparent",
       caretColor: "var(--select-text)",
       color: "var(--select-text)",
       lineHeight: "1.2",
-      minWidth: "1px", // ensures the input isn’t zero-width
-      width: "auto", // prevents it from stretching across flex/grid
-      flex: "0 0 auto", // keeps input from expanding
+      minWidth: "1px",
+      width: "auto",
+      flex: "0 0 auto",
     }),
     valueContainer: (provided) => ({
       ...provided,
       display: "flex",
       cursor: isDisabled ? "not-allowed" : "pointer",
-      flexWrap: "wrap", // ensures multiple values don't collapse the input
+      flexWrap: "wrap",
       gap: "0.25rem",
       overflow: "hidden",
       wordBreak: "break-word",
@@ -106,7 +124,6 @@ export default function TagsSelectAndCheatSheet({
       ...provided,
       backgroundColor: "var(--select-bg-primary)",
       color: "var(--select-text)",
-
       borderRadius: "0.5rem",
     }),
     menuList: (provided) => ({
@@ -125,7 +142,6 @@ export default function TagsSelectAndCheatSheet({
       paddingBottom: "0.25rem",
       borderRadius: "9999px",
     }),
-
     multiValue: (provided) => ({
       ...provided,
       backgroundColor: "var(--select-bg-secondary)",
@@ -135,8 +151,8 @@ export default function TagsSelectAndCheatSheet({
     multiValueLabel: (provided) => ({
       ...provided,
       color: "var(--select-text)",
-      whiteSpace: "normal", // allow wrapping
-      wordBreak: "break-word", // break long words
+      whiteSpace: "normal",
+      wordBreak: "break-word",
       overflowWrap: "break-word",
     }),
     multiValueRemove: (provided) => ({
@@ -156,8 +172,8 @@ export default function TagsSelectAndCheatSheet({
 
   return (
     <div className="h-fit w-full bg-secondary border-b-2 border-subtleWhite rounded-box py-2 mx-auto">
-      <Select
-        instanceId={`tags-select-${dataType}`} // stable ID per data type to avoid the error: A tree hydrated but some attributes of the server rendered HTML didn't match the client properties.
+      <Select<TagOption, true>
+        instanceId={`tags-select-${dataType}`}
         styles={customSelectStyles}
         options={tagList}
         value={selectedOptions}
@@ -167,9 +183,7 @@ export default function TagsSelectAndCheatSheet({
         filterOption={(option, inputValue) =>
           option.label.toLowerCase().includes(inputValue.toLowerCase())
         }
-        // ensures React-Select only looks at the label (or whatever you define in getOptionLabel) and ignores extra fields
-        // before if you typed ddd it would still show "summer", because it was looking at extra fields, not just the label
-        onChange={handleSelectChange}
+        onChange={(selected) => handleSelectChange([...selected])}
       />
 
       <p className="my-4 text-subtleWhite text-center">
@@ -205,7 +219,7 @@ export default function TagsSelectAndCheatSheet({
                   <Disclosure.Panel
                     className={`px-4 pt-4 pb-2 text-sm text-subtleWhite  bg-primary  w-[306px] ${
                       isDisabled &&
-                      "bg-errorBackgroundColor [&_*]:cursor-not-allowed" // Tailwind arbitrary variant, it sets not-allowed on every descendant of this panel
+                      "bg-errorBackgroundColor [&_*]:cursor-not-allowed"
                     }`}
                   >
                     <div className={`space-y-6 mb-4y `}>
