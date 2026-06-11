@@ -1,10 +1,14 @@
+/**
+ * Add-name page shell — sign-in gate and `addingName` form.
+ * Notes: docs/notes/app/addnames-page.md
+ */
 "use client";
 
 import NewNameWithTagsData from "@components/AddingNewData/addingName";
 import PageTitleWithImages from "@components/ReusableSmallComponents/TitlesOrHeadings/PageTitleWithImages";
 import { useSession } from "next-auth/react";
 
-function AddNewNameWithTags() {
+export default function AddNamesPage() {
   const { data: session } = useSession();
 
   return (
@@ -27,5 +31,3 @@ function AddNewNameWithTags() {
     </div>
   );
 }
-
-export default AddNewNameWithTags;

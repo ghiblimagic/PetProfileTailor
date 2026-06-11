@@ -39,6 +39,7 @@ Each source file with notes should have a one-line pointer at the top linking to
 | Notifications stack (`page`, tabs, listings, [`NotificationsButton.tsx`](../components/Notifications/NotificationsButton.tsx), context, wrapper, `useSwrSimple`, `user/notifications` API) | [notifications-page.md](notes/app/notifications-page.md) |
 | [`app/(protected)/dashboard/page.tsx`](../app/(protected)/dashboard/page.tsx), [`dashboard.tsx`](../components/dashboard.tsx) | [dashboard-page.md](notes/app/dashboard-page.md), [dashboard.md](notes/components/dashboard.md) |
 | [`app/fetchname/page.tsx`](../app/fetchname/page.tsx) | [fetchname-page.md](notes/app/fetchname-page.md) |
+| [`app/addnames/page.tsx`](../app/addnames/page.tsx) | [addnames-page.md](notes/app/addnames-page.md) |
 | [`app/profile/[profilename]/page.tsx`](../app/profile/[profilename]/page.tsx), [`profile.tsx`](../components/profile.tsx) | [profile-page.md](notes/app/profile-page.md), [profile.md](notes/components/profile.md) |
 | [`models/NameLike.ts`](../models/NameLike.ts), [`DescriptionLike.ts`](../models/DescriptionLike.ts), [`Follow.ts`](../models/Follow.ts) | [likes-and-follows.md](notes/models/likes-and-follows.md) |
 | [`models/Thank.ts`](../models/Thank.ts), [`Suggestion.ts`](../models/Suggestion.ts), [`Report.ts`](../models/Report.ts) | [moderation-and-thanks.md](notes/models/moderation-and-thanks.md) |

@@ -3530,3 +3530,34 @@ Converted profile server route to TypeScript. Typed `params` as `Promise<{ profi
 ### Next logical step
 
 Convert `app/addnames/page.js` or `app/fetchnames/page.jsx`.
+
+---
+
+## 2026-06-07 — TypeScript: `app/addnames/page`
+
+### What was changed and why
+
+Converted add-names page shell to TypeScript. Renamed default export to `AddNamesPage`. Form logic remains in `addingName.tsx`.
+
+### Files created
+
+- `app/addnames/page.tsx`
+- `docs/notes/app/addnames-page.md`
+
+### Files removed
+
+- `app/addnames/page.js`
+
+### Files modified
+
+- `docs/notes/components/add-content-forms.md`
+- `docs/README.md`
+
+### Verification
+
+- `pnpm exec tsc --noEmit` — OK
+- `pnpm build` — OK
+
+### Next logical step
+
+Convert `app/adddescriptions/page.js` or `app/fetchnames/page.jsx`.
