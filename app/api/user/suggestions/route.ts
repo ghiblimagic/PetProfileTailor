@@ -1,11 +1,25 @@
+/**
+ * Current user's active suggestions for SuggestionsContext.
+ * Notes: docs/notes/app/api/suggestion-route.md
+ */
 import { NextResponse } from "next/server";
 import mongoose from "mongoose";
-import db from "@/utils/db";
-import Report from "@/models/Report";
+import dbConnect from "@utils/db";
+import Suggestion from "@/models/Suggestion";
 import { leanWithStrings } from "@/utils/mongoDataCleanup";
-
 import { getServerSession } from "next-auth";
 import { serverAuthOptions } from "@/lib/auth";
+
+export type UserSuggestionEntry = {
+  contentId?: string;
+  _id?: string;
+  status?: string;
+};
+
+export type UserSuggestionsResponse = {
+  names: UserSuggestionEntry[];
+  descriptions: UserSuggestionEntry[];
+};
 
 export async function GET() {
   try {
@@ -16,13 +30,13 @@ export async function GET() {
 
     const userId = new mongoose.Types.ObjectId(session.user.id);
 
-    await db.connect();
+    await dbConnect.connect();
 
-    const [nameReports, descriptionReports] = await Promise.all([
+    const [nameSuggestions, descriptionSuggestions] = await Promise.all([
       leanWithStrings(
-        Report.find(
+        Suggestion.find(
           {
-            reportedBy: userId,
+            suggestionBy: userId,
             status: { $nin: ["dismissed", "deleted", "resolved"] },
             contentType: "names",
           },
@@ -30,9 +44,9 @@ export async function GET() {
         ),
       ),
       leanWithStrings(
-        Report.find(
+        Suggestion.find(
           {
-            reportedBy: userId,
+            suggestionBy: userId,
             status: "pending",
             contentType: "descriptions",
           },
@@ -42,11 +56,11 @@ export async function GET() {
     ]);
 
     return NextResponse.json({
-      names: nameReports,
-      descriptions: descriptionReports,
-    });
+      names: (nameSuggestions ?? []) as UserSuggestionEntry[],
+      descriptions: (descriptionSuggestions ?? []) as UserSuggestionEntry[],
+    } satisfies UserSuggestionsResponse);
   } catch (err) {
-    console.error("Error fetching reports:", err);
+    console.error("Error fetching suggestions:", err);
     return NextResponse.json(
       { error: "Internal Server Error" },
       { status: 500 },

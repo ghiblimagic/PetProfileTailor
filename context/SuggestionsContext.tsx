@@ -14,6 +14,7 @@ import {
 } from "react";
 import { useSession } from "next-auth/react";
 import type { ContentType } from "@/utils/api/checkIfValidContentType";
+import type { UserSuggestionsResponse } from "@/app/api/user/suggestions/route";
 
 type SuggestionMapEntry = {
   suggestionId?: string;
@@ -40,17 +41,6 @@ export type SuggestionsContextValue = {
     contentId: string,
     suggestionId: string,
   ) => void;
-};
-
-type UserSuggestionApiEntry = {
-  contentId?: string;
-  _id?: string;
-  status?: string;
-};
-
-type UserSuggestionsResponse = {
-  names?: UserSuggestionApiEntry[];
-  descriptions?: UserSuggestionApiEntry[];
 };
 
 const emptySuggestionsRef = (): SuggestionsRefData => ({

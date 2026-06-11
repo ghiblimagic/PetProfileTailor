@@ -2986,7 +2986,49 @@ Converted shared tag-selection hook and form component to TypeScript. Exported `
 
 ### Next logical step
 
-Convert flag/suggestion API routes or `CategTagsWrapper.js`.
+Convert `CategTagsWrapper.js` or `addingName.jsx` / `addingdescription.jsx`.
+
+---
+
+## 2026-06-07 — TypeScript: flag/suggestion API routes
+
+### What was changed and why
+
+Converted moderation API routes to TypeScript with exported response types for contexts. Removed dead commented legacy handler code. Fixed suggestion `DELETE` ownership check (`!ownership.ok` instead of truthy object). PUT now converts tag id strings to ObjectIds explicitly.
+
+### Files created
+
+- `app/api/suggestion/route.ts`
+- `app/api/flag/flagreportsubmission/route.ts`
+- `app/api/flag/getSpecificReport/route.ts`
+- `app/api/user/reports/route.ts`
+- `app/api/user/suggestions/route.ts`
+- `docs/notes/app/api/suggestion-route.md`
+- `docs/notes/app/api/flag-routes.md`
+
+### Files removed
+
+- `app/api/suggestion/route.js`
+- `app/api/flag/flagreportsubmission/route.js`
+- `app/api/flag/getSpecificReport/route.js`
+- `app/api/user/reports/route.js`
+- `app/api/user/suggestions/route.js`
+
+### Files modified
+
+- `context/ReportsContext.tsx` (import `UserReportsResponse`)
+- `context/SuggestionsContext.tsx` (import `UserSuggestionsResponse`)
+- `docs/README.md`
+- `docs/notes/models/moderation-and-thanks.md`
+
+### Verification
+
+- `pnpm exec tsc --noEmit` — OK
+- `pnpm build` — OK
+
+### Next logical step
+
+Convert `CategTagsWrapper.js` or add-content forms.
 
 ---
 

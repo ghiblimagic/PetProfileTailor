@@ -30,7 +30,7 @@ Sources:
 
 Tag suggestion workflow: incorrect tags, suggested replacements, categories, optional `description` / `comments`.
 
-**Routes:** `app/api/suggestion`, `app/api/user/suggestions`.
+**Routes:** [`app/api/suggestion`](../../app/api/suggestion/route.ts), [`app/api/user/suggestions`](../../app/api/user/suggestions/route.ts). API notes: [suggestion-route.md](../app/api/suggestion-route.md).
 
 **UI:** listing row menu → [`useSuggest.ts`](../../hooks/useSuggest.ts) → `SuggestionDialog` → [`AddSuggestion.tsx`](../../components/Suggestions/AddSuggestion.tsx) / [`EditSuggestion.tsx`](../../components/Suggestions/EditSuggestion.tsx). Notes: [useSuggest.md](../hooks/useSuggest.md), [suggestion-forms.md](../components/suggestion-forms.md).
 
@@ -40,7 +40,7 @@ Tag suggestion workflow: incorrect tags, suggested replacements, categories, opt
 
 Stores a snapshot `contentCopy` of flagged content plus `reportCategories` and moderation fields.
 
-**Routes:** `app/api/flag/flagreportsubmission`, `app/api/flag/getSpecificReport`, `app/api/user/reports`.
+**Routes:** [`app/api/flag/flagreportsubmission`](../../app/api/flag/flagreportsubmission/route.ts), [`app/api/flag/getSpecificReport`](../../app/api/flag/getSpecificReport/route.ts), [`app/api/user/reports`](../../app/api/user/reports/route.ts). API notes: [flag-routes.md](../app/api/flag-routes.md).
 
 **UI:** listing row menu → [`useFlagging.ts`](../../hooks/useFlagging.ts) → `FlagDialog` → [`AddReport.tsx`](../../components/Flagging/AddReport.tsx) / [`EditReport.tsx`](../../components/Flagging/EditReport.tsx). Notes: [useFlagging.md](../hooks/useFlagging.md), [flag-report-forms.md](../components/flag-report-forms.md).
 

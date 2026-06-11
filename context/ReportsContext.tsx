@@ -13,6 +13,7 @@ import {
   type MutableRefObject,
 } from "react";
 import { useSession } from "next-auth/react";
+import type { UserReportsResponse } from "@/app/api/user/reports/route";
 
 export type ReportBucketType = "names" | "descriptions" | "users";
 
@@ -38,18 +39,6 @@ export type ReportsContextValue = {
     contentId: string,
     reportId: string,
   ) => void;
-};
-
-type UserReportApiEntry = {
-  contentId: string;
-  _id?: string;
-  status?: string;
-};
-
-type UserReportsResponse = {
-  names?: UserReportApiEntry[];
-  descriptions?: UserReportApiEntry[];
-  users?: UserReportApiEntry[];
 };
 
 const emptyReportsRef = (): ReportsRefData => ({
