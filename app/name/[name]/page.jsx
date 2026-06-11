@@ -42,7 +42,7 @@ export default async function Postid({ params }) {
         <ContentListing
           singleContent={nameData}
           dataType="names"
-          mode="local"
+          mode="standalone"
           className="mt-4"
         />
       )}

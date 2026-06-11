@@ -22,14 +22,14 @@ export function useDeleteConfirmation() {
    * @param {string} apiLink - API endpoint to call
    * @param {string} signedInUsersId - user ID for backend validation
    * @param {function} [customMutate] - optional SWR mutate function (for SWR mode)
-   * @param {function} [setLocalData] - optional local setter (for local mode)
+   * @param {function} [setLocalData] - optional state setter (standalone mode)
    */
 
   async function confirmDelete(
     apiLink,
     signedInUsersId,
     customMutate, //swr mode
-    setLocalData, // local mode
+    setLocalData, // standalone mode
   ) {
     if (!deleteTarget) return;
     try {

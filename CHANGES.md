@@ -2668,6 +2668,8 @@ Converted three small listing/UI helpers to TypeScript. `ToggeableAlert` typed `
 
 Convert `components/ShowingListOfContent/ContentListing.jsx`.
 
+
+
 ---
 
 ## 2026-06-07 — Cleanup: remove dead `target` from `ThanksDialog`
@@ -2726,6 +2728,8 @@ Completed thanks-flow migration: data options, submission form, API routes, and 
 
 Convert `components/ShowingListOfContent/ContentListing.jsx`.
 
+
+
 ---
 
 ## 2026-06-07 — Fix: canonical `descriptions` contentType
@@ -2752,6 +2756,8 @@ Aligned server branches with UI convention (`"descriptions"` not `"description"`
 ### Next logical step
 
 Convert `components/ShowingListOfContent/ContentListing.jsx`.
+
+
 
 ---
 
@@ -2787,6 +2793,8 @@ Converted listing row delete/edit menu buttons and edit dialog to `.tsx`. Export
 
 Convert `components/ShowingListOfContent/ContentListing.jsx`.
 
+
+
 ---
 
 ## 2026-06-07 — TypeScript: `ContentListing` dependencies (jsx/js imports)
@@ -2820,3 +2828,54 @@ Converted remaining non-TS components imported by `ContentListing.jsx` before li
 ### Next logical step
 
 Convert `components/ShowingListOfContent/ContentListing.jsx`.
+
+---
+
+## 2026-06-07 — TypeScript: `ContentListing`
+
+### What was changed and why
+
+Converted main listing row component to `.tsx`. Exported `ContentListingItem` / `ContentListingProps`. Context hooks cast until reports/suggestions contexts are TS. Fixed undefined `userAlreadySentIdea` (TODO stub). Removed dead props on `EditContent` / `SuggestButton`.
+
+### Files created
+
+- `components/ShowingListOfContent/ContentListing.tsx`
+- `docs/notes/components/content-listing.md`
+
+### Files removed
+
+- `components/ShowingListOfContent/ContentListing.jsx`
+
+### Files modified
+
+- `docs/README.md`
+
+### Verification
+
+- `pnpm exec tsc --noEmit` — OK
+- `pnpm build` — OK
+
+### Next logical step
+
+Convert `hooks/useDeleteConfirmation.js` or `context/ReportsContext.js` / `SuggestionsContext.js`.
+
+---
+
+## 2026-06-07 — Rename `ContentListing` mode: `local` → `standalone`
+
+### What was changed and why
+
+Clearer name for single-content pages that update row state instead of SWR cache.
+
+### Files modified
+
+- `components/ShowingListOfContent/ContentListing.tsx`
+- `app/name/[name]/page.jsx`
+- `app/description/[id]/page.jsx`
+- `components/AddingNewData/CheckIfContentExists.js`
+- `docs/notes/components/content-listing.md`
+- `hooks/useDeleteConfirmation.js` (comments)
+
+### Verification
+
+- `pnpm exec tsc --noEmit` — OK

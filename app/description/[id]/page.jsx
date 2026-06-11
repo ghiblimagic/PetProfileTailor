@@ -41,7 +41,7 @@ export default async function Postid({ params }) {
       <ContentListing
         dataType="descriptions"
         singleContent={description}
-        mode="local"
+        mode="standalone"
         className="mt-4"
       />
     </div>

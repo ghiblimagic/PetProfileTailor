@@ -159,7 +159,7 @@ export default function CheckIfContentExists({
                 <ContentListing
                   singleContent={existingContent}
                   dataType="names"
-                  mode="local"
+                  mode="standalone"
                   className="mt-4"
                 />
               )}

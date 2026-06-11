@@ -1,20 +1,20 @@
+/**
+ * Single name/description row on listing pages (SWR list or standalone page).
+ * Notes: docs/notes/components/content-listing.md
+ */
 "use client";
 
-import React, { useState } from "react";
+import { useState } from "react";
 import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/react";
 import LikesButtonAndLikesLogic from "@components/ReusableSmallComponents/buttons/LikesButtonAndLikesLogic";
 import DeleteButton from "@components/DeletingData/DeleteButton";
 import EditButton from "@components/ReusableSmallComponents/buttons/EditButton";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-
 import EditContent from "../EditingData/EditContent";
 import ShareButton from "@components/ReusableSmallComponents/buttons/ShareButton";
 import SharingOptionsBar from "../ReusableMediumComponents/SharingOptionsBar";
-
 import ProfileImage from "@components/ReusableSmallComponents/ProfileImage";
 import ToggeableAlert from "../ReusableMediumComponents/ToggeableAlert";
-import AddHashToArrayString from "@utils/stringManipulation/addHashToArrayString";
-
+import addHashToArrayString from "@utils/stringManipulation/addHashToArrayString";
 import { Ellipsis } from "lucide-react";
 import { useDeleteConfirmation } from "@hooks/useDeleteConfirmation";
 import DeleteDialog from "@components/DeletingData/DeleteDialog";
@@ -25,25 +25,48 @@ import { useSuggest } from "@/hooks/useSuggest";
 import { useEditHandler } from "@hooks/useEditHandler";
 import { useReports } from "@context/ReportsContext";
 import { useSuggestions } from "@/context/SuggestionsContext";
-
 import { useSession } from "next-auth/react";
 import SuggestButton from "../Suggestions/SuggestionButton";
 import SuggestionDialog from "../Suggestions/SuggestionDialog";
-
 import ThanksButton from "@/components/Thanks/ThanksButton";
 import { useThanksHandler } from "@/hooks/useThanksHandler";
 import ThanksDialog from "../Thanks/ThanksDialog";
+import type { LikeableContent } from "@hooks/useLikeState";
+import type { EditableContent } from "../EditingData/EditContent";
+import type { ContentType } from "@/utils/api/checkIfValidContentType";
+import type { LikeContentType } from "@/context/LikesContext";
+
+export type ContentListingItem = LikeableContent & EditableContent;
+
+type SwrPage = { data: ContentListingItem[] };
+
+type ModerationContextValue = {
+  getStatus: (type: string, contentId: string) => string | null;
+  getSuggestionStatus: (type: string, contentId: string) => string | null;
+};
+
+export type ContentListingProps = {
+  dataType: ContentType | string;
+  singleContent: ContentListingItem;
+  mutate?: (
+    updater: (pages?: SwrPage[]) => SwrPage[],
+    shouldRevalidate?: boolean,
+  ) => void;
+  mode?: "swr" | "standalone";
+  className?: string;
+  /** Accepted from callers; session user id is read from `useSession`. */
+  signedInUsersId?: string;
+};
 
 export default function ContentListing({
   dataType,
   singleContent,
   mutate,
-  mode = "swr", //swr or local, local is or pages with a single piece of content
+  mode = "swr",
   className,
-  // needed for editing, since the non-swr page needs state to reflect the edits, since it doesn't use the swr logic
-}) {
+}: ContentListingProps) {
   const { data: session } = useSession();
-  const { role, status, id: signedInUsersId } = session?.user || {};
+  const { role, status, id: signedInUsersId } = session?.user ?? {};
 
   const {
     showDeleteConfirmation,
@@ -53,21 +76,14 @@ export default function ContentListing({
     confirmDelete,
   } = useDeleteConfirmation();
 
-  const { getStatus } = useReports();
-  const { getSuggestionStatus } = useSuggestions();
-  const [localContent, setLocalContent] = useState(singleContent);
+  const { getStatus } = useReports() as ModerationContextValue;
+  const { getSuggestionStatus } = useSuggestions() as ModerationContextValue;
+  const [localContent, setLocalContent] =
+    useState<ContentListingItem>(singleContent);
 
-  // Decide which content to use based on mode
-  const content = mode === "local" ? localContent : singleContent;
-
-  // const [content, setLocalData] =
-  //   mode === "local" ? useState(singleContent) : [singleContent, null];
-  // for names, we use content instead of singleContent for properties that can be edited (name, notes)
-  // since pages for individual names don't have SWR
-  // in "swr" mode, you always render directly from singleContent, and updates from SWR flow straight into the UI.
+  const content = mode === "standalone" ? localContent : singleContent;
 
   const reportStatus = getStatus(dataType, singleContent._id.toString());
-
   const reportPendingOrNone =
     reportStatus === "pending" || reportStatus === null;
 
@@ -80,8 +96,6 @@ export default function ContentListing({
 
   const apiEndPoint =
     dataType === "names" ? "/api/names/" : "/api/description/";
-
-  //SHARING
 
   const apiBaseLink =
     dataType === "names" ? `/api/names/likes` : `/api/description/likes`;
@@ -96,8 +110,6 @@ export default function ContentListing({
       ? `/name/${content.content}`
       : `/description/${singleContent._id}`;
 
-  // TODO
-
   const { showFlagDialog, flagTarget, openFlag, closeFlag } = useFlagging();
   const {
     showSuggestionDialog,
@@ -108,47 +120,46 @@ export default function ContentListing({
 
   const {
     showEditDialog,
-    editTarget,
     openEdit,
     closeEdit,
     confirmEdit,
-    isSaving,
   } = useEditHandler({
     apiEndpoint: apiEndPoint,
     mutate,
-    setLocalData: setLocalContent,
+    setLocalData: (item) =>
+      setLocalContent(item as ContentListingItem),
   });
-  const {
-    showThanksDialog,
-    openThanks,
-    closeThanks,
-  } = useThanksHandler({ apiEndpoint: "api/thanks" });
+
+  const { showThanksDialog, openThanks, closeThanks } = useThanksHandler({
+    apiEndpoint: "api/thanks",
+  });
 
   const userIsTheCreator = singleContent.createdBy._id === signedInUsersId;
 
   const contentProfileImage = userIsTheCreator
-    ? session.user.profileImage
+    ? session?.user?.profileImage
     : singleContent.createdBy.profileImage;
 
-  const [showLikesSignInMessage, setShowLikesSignInMessage] = useState(false);
-
-  //STATE FOR SHOWING SHARE OPTIONS
+  const [showLikesSignInMessage, setShowLikesSignInMessage] = useState<
+    string | boolean
+  >(false);
   const [shareSectionShowing, setShareSectionShowing] = useState(false);
-
   const [ideaFormToggled, setIdeaFormToggled] = useState(false);
 
-  //for shares
+  // TODO: wire idea submission state (was referenced in jsx but never defined)
+  const userAlreadySentIdea = false;
+
   function onClickShowShares() {
     setShareSectionShowing(!shareSectionShowing);
   }
 
-  const href = `${
-    process.env.NEXT_PUBLIC_BASE_FETCH_URL
-  }profile/${singleContent.createdBy.profileName.toLowerCase()}`;
+  const href = `${process.env.NEXT_PUBLIC_BASE_FETCH_URL}profile/${singleContent.createdBy.profileName?.toLowerCase() ?? ""}`;
+
+  const likeDataType = dataType as LikeContentType;
 
   return (
     <div
-      className={`text-base flex border-t border-subtleWhite mb-4 ${className}   bg-primary`}
+      className={`text-base flex border-t border-subtleWhite mb-4 ${className ?? ""}   bg-primary`}
     >
       <ProfileImage
         divStyling="min-h-10 max-w-12 mr-4 mt-3 min-w-10 max-h-12"
@@ -160,29 +171,14 @@ export default function ContentListing({
         href={href}
       />
       <div className="flex-grow ">
-        <div
-          className="grid  grid-cols-1
-         space-between flex-none     
-                
-           
-         
-                    text-subtleWhite sm:p-2 
-                  justify-items-center "
-          //  items-center
-        >
-          {/* ###### CREATEDBY SECTION #### */}
+        <div className="grid  grid-cols-1 space-between flex-none text-subtleWhite sm:p-2 justify-items-center ">
           <section className="w-full pt-2 text-left">
-            {/* height needed otherwise the nonpositioned elements will move up */}
-
             <div className="">
               <div className="w-full p-2 flex items-start">
                 <a
-                  href={`${
-                    process.env.NEXT_PUBLIC_BASE_FETCH_URL
-                  }profile/${singleContent.createdBy.profileName.toLowerCase()}`}
+                  href={`${process.env.NEXT_PUBLIC_BASE_FETCH_URL}profile/${singleContent.createdBy.profileName?.toLowerCase() ?? ""}`}
                   className="flex-1 min-w-0 flex flex-col"
                 >
-                  {/* flex-1 min-w-0 use remaining space but still wrap. Without min-w-0, text might overflow instead of wrapping.*/}
                   <span className="font-bold text-lg break-words">
                     {singleContent.createdBy.name}
                   </span>
@@ -218,15 +214,13 @@ export default function ContentListing({
                       (role === "admin" && status === "active") ? (
                         <MenuItems className="absolute right-0 mt-2 w-48 py-3 origin-top-right bg-secondary border text-subtleWhite border-subtleWhite rounded-md shadow-lg focus:outline-none z-50 space-y-2">
                           <MenuItem as="div">
-                            {/* MenuItem as="div" prevents Headless UI from treating your button as a MenuItem that auto-closes. this way the state has time to update*/}
                             {({ focus }) => (
                               <DeleteButton
                                 content={singleContent}
-                                onDeleteClick={(content, e) => {
-                                  e.stopPropagation(); // prevent Menu from closing immediately before the click bubbles up and closes the menu before the delete dialog state updates
-                                  openDelete(content);
+                                onDeleteClick={(item, e) => {
+                                  e.stopPropagation();
+                                  openDelete(item);
                                 }}
-                                // focus == important for keyboard styling
                                 className={`ml-2 mr-6 rounded-sm w-[90%] group flex items-center ${
                                   focus ? "bg-blue-500 text-white" : ""
                                 }`}
@@ -237,9 +231,9 @@ export default function ContentListing({
                             {({ focus }) => (
                               <EditButton
                                 content={singleContent}
-                                onupdateEditState={(content, e) => {
-                                  e.stopPropagation(); // prevent menu from closing
-                                  if (content) openEdit(content);
+                                onupdateEditState={(item, e) => {
+                                  e.stopPropagation();
+                                  if (item) openEdit(item);
                                 }}
                                 className={`ml-2 mr-6 w-[90%] rounded-sm group flex items-center ${
                                   focus ? "bg-blue-500 text-white" : ""
@@ -251,7 +245,7 @@ export default function ContentListing({
                       ) : (
                         <MenuItems className="absolute right-0 mt-2 w-48 py-3 origin-top-right bg-secondary border text-subtleWhite border-subtleWhite rounded-md shadow-lg focus:outline-none z-50">
                           <MenuItem>
-                            {({ active }) => (
+                            {() => (
                               <FlagButton
                                 content={singleContent}
                                 dataType={dataType}
@@ -265,15 +259,11 @@ export default function ContentListing({
                           </MenuItem>
 
                           <MenuItem as="div">
-                            {({ focus }) => (
+                            {() => (
                               <SuggestButton
                                 content={singleContent}
                                 dataType={dataType}
                                 onClick={openSuggestion}
-                                userIsTheCreator={
-                                  singleContent.createdBy._id ===
-                                  signedInUsersId
-                                }
                               />
                             )}
                           </MenuItem>
@@ -285,23 +275,19 @@ export default function ContentListing({
               </div>
             </div>
 
-            {/* Dialog rendered outside, it can't be placed in  <DeleteButton> in the MenuItem because headlessUi's menu will closed anything inside it when one of its button is clicked
-            so the deletion confirmation dialog has to be outside of it, so it isn't immeditely sent to the abyss */}
-
             {showDeleteConfirmation && deleteTarget && (
               <DeleteDialog
                 open={showDeleteConfirmation}
                 target={deleteTarget}
                 onClose={closeDelete}
                 signedInUsersId={signedInUsersId}
-                onConfirm={
-                  () =>
-                    confirmDelete(
-                      apiEndPoint,
-                      signedInUsersId,
-                      mode === "swr" ? mutate : undefined,
-                      mode === "local" ? setLocalContent : undefined,
-                    ) // passing mutate from useSwrPagination
+                onConfirm={() =>
+                  confirmDelete(
+                    apiEndPoint,
+                    signedInUsersId ?? "",
+                    mode === "swr" ? mutate : undefined,
+                    mode === "standalone" ? setLocalContent : undefined,
+                  )
                 }
               />
             )}
@@ -340,14 +326,13 @@ export default function ContentListing({
               />
             )}
 
-            {showEditDialog && editTarget && (
+            {showEditDialog && (
               <EditContent
                 dataType={dataType}
                 open={showEditDialog}
                 onClose={closeEdit}
-                content={localContent} // needed because the hook won't rerender after the changes we made with the edits, so we use localContent to show the changes
+                content={localContent}
                 onSave={confirmEdit}
-                signedInUsersId={signedInUsersId}
               />
             )}
           </section>
@@ -360,37 +345,30 @@ export default function ContentListing({
             {content.content}{" "}
           </span>
 
-          {/* ###### DESCRIPTION SECTION #### */}
-
           <p className="whitespace-pre-line">{content.notes}</p>
 
-          {/* ###### TAGS SECTION #### */}
-          <span className="my-4"> {AddHashToArrayString(singleContent)} </span>
-
-          {/* ###### LIKES, SHARE, FLAG #### */}
+          <span className="my-4"> {addHashToArrayString(singleContent)} </span>
 
           <div className="w-full flex justify-evenly m-2 ">
             <LikesButtonAndLikesLogic
-              dataType={dataType}
+              dataType={likeDataType}
               data={singleContent}
-              setShowLikesSignInMessage={setShowLikesSignInMessage}
+              setShowLikesSignInMessage={(message) =>
+                setShowLikesSignInMessage(message)
+              }
               HeartIconStyling="text-xl ml-2 my-auto mx-auto"
               HeartIconTextStyling="mx-2"
-              signedInUsersId={signedInUsersId}
+              signedInUsersId={signedInUsersId ?? ""}
               apiBaseLink={apiBaseLink}
             />
 
             <ShareButton onClickShowShares={onClickShowShares} />
 
-            {singleContent &&
-              singleContent.createdBy._id !== signedInUsersId && (
-                <ThanksButton onClick={() => openThanks(singleContent._id)} />
-              )}
+            {singleContent.createdBy._id !== signedInUsersId && (
+              <ThanksButton onClick={() => openThanks(singleContent._id)} />
+            )}
           </div>
         </div>
-        {/* ###### END OF LISTING #### */}
-
-        {/* ###### TOGGLES SECTION, pops up underneath listing #### */}
 
         {shareSectionShowing && (
           <section className="bg-primary py-2">
