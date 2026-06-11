@@ -39,9 +39,6 @@ export type CoreListingPageLogicProps = {
   swrForThisUserID?: string;
   showHeader?: boolean;
   restrictSwrToLikedNames?: boolean;
-  /** Legacy props from `app/fetchnames/page.jsx` — not read by this component. */
-  sessionFromServer?: unknown;
-  usersLikedContent?: unknown;
 };
 
 export default function CoreListingPageLogic({

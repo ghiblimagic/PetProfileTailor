@@ -9,6 +9,7 @@ Heavy design and learning notes for converted TypeScript modules live here so so
 | Module design notes | `docs/notes/<path>/<module>.md` | `docs/notes/utils/mongoDataCleanup.md` for `utils/mongoDataCleanup.ts` |
 | TypeScript conventions | [type-vs-interface.md](notes/typescript/type-vs-interface.md) | When to use `type` vs `interface` in this repo |
 | Operational changelog | [`CHANGES.md`](../CHANGES.md) | What changed, when, verification |
+| Post-migration backlog | [`FUTURE.md`](FUTURE.md) | Deferred improvements (e.g. likes SSR hydration) |
 | Testing | [`TESTING.md`](../TESTING.md) | Automated + manual verification checklists |
 
 Each source file with notes should have a one-line pointer at the top linking to its markdown file.
@@ -40,6 +41,7 @@ Each source file with notes should have a one-line pointer at the top linking to
 | [`app/(protected)/dashboard/page.tsx`](../app/(protected)/dashboard/page.tsx), [`dashboard.tsx`](../components/dashboard.tsx) | [dashboard-page.md](notes/app/dashboard-page.md), [dashboard.md](notes/components/dashboard.md) |
 | [`app/fetchname/page.tsx`](../app/fetchname/page.tsx) | [fetchname-page.md](notes/app/fetchname-page.md) |
 | [`app/addnames/page.tsx`](../app/addnames/page.tsx) | [addnames-page.md](notes/app/addnames-page.md) |
+| [`app/fetchnames/page.tsx`](../app/fetchnames/page.tsx) | [fetchnames-page.md](notes/app/fetchnames-page.md) |
 | [`app/profile/[profilename]/page.tsx`](../app/profile/[profilename]/page.tsx), [`profile.tsx`](../components/profile.tsx) | [profile-page.md](notes/app/profile-page.md), [profile.md](notes/components/profile.md) |
 | [`models/NameLike.ts`](../models/NameLike.ts), [`DescriptionLike.ts`](../models/DescriptionLike.ts), [`Follow.ts`](../models/Follow.ts) | [likes-and-follows.md](notes/models/likes-and-follows.md) |
 | [`models/Thank.ts`](../models/Thank.ts), [`Suggestion.ts`](../models/Suggestion.ts), [`Report.ts`](../models/Report.ts) | [moderation-and-thanks.md](notes/models/moderation-and-thanks.md) |

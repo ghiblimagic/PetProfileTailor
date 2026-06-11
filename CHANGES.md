@@ -3561,3 +3561,51 @@ Converted add-names page shell to TypeScript. Renamed default export to `AddName
 ### Next logical step
 
 Convert `app/adddescriptions/page.js` or `app/fetchnames/page.jsx`.
+
+---
+
+## 2026-06-07 — TypeScript: `app/fetchnames/page`
+
+### What was changed and why
+
+Converted fetch-names listing route to TypeScript. Removed dead server prefetch (`NameLikes`, session, legacy props never read by `CoreListingPageLogic`). Page now matches slim `fetchdescriptions` pattern. Dropped unused `sessionFromServer` / `usersLikedContent` from `CoreListingPageLogicProps`.
+
+### Files created
+
+- `app/fetchnames/page.tsx`
+- `docs/notes/app/fetchnames-page.md`
+
+### Files removed
+
+- `app/fetchnames/page.jsx`
+
+### Files modified
+
+- `components/CoreListingPagesLogic.tsx`
+- `docs/notes/components/core-listing-pages-logic.md`
+- `docs/README.md`
+
+### Verification
+
+- `pnpm exec tsc --noEmit` — OK
+- `pnpm build` — OK
+
+### Next logical step
+
+Convert `app/fetchdescriptions/page.jsx`.
+
+---
+
+## 2026-06-07 — Add `docs/FUTURE.md` (likes prefetch plan)
+
+### What was changed and why
+
+Documented post–TypeScript migration backlog. First item: Option B — server-fetch likes and seed `LikesProvider` (not reviving dead `fetchnames` page props).
+
+### Files created
+
+- `docs/FUTURE.md`
+
+### Files modified
+
+- `docs/README.md`
