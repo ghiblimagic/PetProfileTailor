@@ -15,6 +15,7 @@ import {
 import LikesContentListing from "./LikeNotificationListing";
 import NotifListingWrapper from "./NotifListingWrapper";
 import IconOpenCloseButton from "../ReusableSmallComponents/buttons/iconOpenCloseButton";
+import type { IconBadgeName } from "../ReusableSmallComponents/IconWithCount";
 
 export type NotificationModelType = SwrModelType;
 
@@ -23,7 +24,7 @@ export type NotificationTabConfig = {
   className: string;
   value: NotificationModelType;
   type: NotificationModelType;
-  icon: string;
+  icon: IconBadgeName;
 };
 
 export type { SwrSimpleReturn };

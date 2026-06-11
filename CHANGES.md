@@ -2409,3 +2409,33 @@ Converted profile avatar component to `.tsx` with optional `href` and `onClick`.
 ### Next logical step
 
 Convert `iconOpenCloseButton.jsx` or `ContainerForLikeShareFlag.jsx`.
+
+---
+
+## 2026-06-07 — TypeScript: `iconOpenCloseButton`
+
+### What was changed and why
+
+Converted notifications tab button to `.tsx`. Generic `IconOpenCloseButtonProps<T>` for tab `value` / `state`; `icon` typed as `IconBadgeName`. Tightened `NotificationTabConfig.icon` in `ToggleOneNotificationPage`.
+
+### Files created
+
+- `components/ReusableSmallComponents/buttons/iconOpenCloseButton.tsx`
+
+### Files removed
+
+- `components/ReusableSmallComponents/buttons/iconOpenCloseButton.jsx`
+
+### Files modified
+
+- `components/Notifications/ToggleOneNotificationPage.tsx`
+- `docs/notes/app/notifications-page.md`
+
+### Verification
+
+- `pnpm exec tsc --noEmit` — OK
+- `pnpm build` — OK
+
+### Next logical step
+
+Convert `ContainerForLikeShareFlag.jsx` or `components/Thanks/ThanksButton.jsx`.

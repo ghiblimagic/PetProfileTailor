@@ -10,6 +10,8 @@ Server page: `app/(protected)/notifications/page.tsx`. Client tabs: `components/
 
 ## `ToggleOneNotificationPage` (client)
 
+Tab buttons: [`iconOpenCloseButton.tsx`](../../../components/ReusableSmallComponents/buttons/iconOpenCloseButton.tsx) + [`IconWithCount.tsx`](../../../components/ReusableSmallComponents/IconWithCount.tsx) unread badge.
+
 | Tab | SWR key | Fetch timing |
 |-----|---------|--------------|
 | Names | `names` | Always mounted; `initialPage` from SSR; `revalidateOnMount: false` |

@@ -1,16 +1,30 @@
-import React from "react";
-import IconBadge from "../IconWithCount";
+/**
+ * Tab-style open/close button with icon badge (notifications tabs).
+ * Notes: docs/notes/app/notifications-page.md
+ */
+"use client";
 
-function IconOpenCloseButton({
+import IconBadge, { type IconBadgeName } from "../IconWithCount";
+
+export type IconOpenCloseButtonProps<T extends string> = {
+  state: T | null;
+  text: string;
+  value: T;
+  className?: string;
+  setState: (value: T) => void;
+  icon: IconBadgeName;
+  unreadCount?: number;
+};
+
+export default function IconOpenCloseButton<T extends string>({
   state,
   text,
   value,
   className,
   setState,
-
   icon,
   unreadCount,
-}) {
+}: IconOpenCloseButtonProps<T>) {
   return (
     <button
       className={`hover:rounded-2xl
@@ -25,13 +39,8 @@ function IconOpenCloseButton({
       <div className="flex items-center">
         <p className="whitespace-normal break-words mr-2">{text}</p>
 
-        <IconBadge
-          icon={icon}
-          count={unreadCount}
-        />
+        <IconBadge icon={icon} count={unreadCount} />
       </div>
     </button>
   );
 }
-
-export default IconOpenCloseButton;
