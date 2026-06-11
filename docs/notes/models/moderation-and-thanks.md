@@ -24,7 +24,7 @@ Sources:
 
 **Routes:** `app/api/thanks`, `app/api/notifications/thanks`, `app/api/thanks/get-thanks-count`.
 
-**UI:** [`ThanksButton.tsx`](../../components/Thanks/ThanksButton.tsx) on listing rows (`ContentListing`) → [`useThanksHandler.ts`](../../hooks/useThanksHandler.ts) dialog. Notes: [useThanksHandler.md](../hooks/useThanksHandler.md).
+**UI:** [`ThanksButton.tsx`](../../components/Thanks/ThanksButton.tsx) on listing rows (`ContentListing`) → [`useThanksHandler.ts`](../../hooks/useThanksHandler.ts) → [`ThanksDialog.tsx`](../../components/Thanks/ThanksDialog.tsx). Notes: [useThanksHandler.md](../hooks/useThanksHandler.md).
 
 ## Suggestion
 

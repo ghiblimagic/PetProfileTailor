@@ -11,7 +11,7 @@ Manages thanks-dialog visibility and target content id for listing rows (`Conten
 | Return | Type | Notes |
 |--------|------|-------|
 | `showThanksDialog` | `boolean` | Dialog open state |
-| `thanksTarget` | `string \| null` | Content `_id` passed to `ThanksDialog` as `target` |
+| `thanksTarget` | `string \| null` | Internal id for legacy `confirmThanks` only |
 | `isSavingThanks` | `boolean` | Legacy save flag for `confirmThanks` |
 | `openThanks` | `(contentId: string) => void` | Content `_id` from the listing row |
 | `closeThanks` | `() => void` | Resets dialog + target |

@@ -120,11 +120,8 @@ export default function ContentListing({
   });
   const {
     showThanksDialog,
-    thanksTarget,
-    isSavingThanks,
     openThanks,
     closeThanks,
-    confirmThanks,
   } = useThanksHandler({ apiEndpoint: "api/thanks" });
 
   const userIsTheCreator = singleContent.createdBy._id === signedInUsersId;
@@ -339,8 +336,6 @@ export default function ContentListing({
                 open={showThanksDialog}
                 contentInfo={content}
                 onClose={closeThanks}
-                target={thanksTarget}
-                onSave={confirmThanks}
                 signedInUsersId={signedInUsersId}
               />
             )}

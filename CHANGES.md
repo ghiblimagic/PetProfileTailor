@@ -2634,3 +2634,54 @@ Converted edit-dialog + PUT hook to `.ts`. Typed `EditSubmission` from `EditCont
 ### Next logical step
 
 Convert `components/ShowingListOfContent/ContentListing.jsx`.
+
+---
+
+## 2026-06-07 — TypeScript: `ToggeableAlert`, `addHashToArrayString`, `ThanksDialog`
+
+### What was changed and why
+
+Converted three small listing/UI helpers to TypeScript. `ToggeableAlert` typed `toggleState` as `boolean | string` (legacy `addingName` passes message string). `addHashToArrayString` renamed internal function to match file name. `ThanksDialog` typed props; dropped unused `contentId` / `suggestionBy` pass-through to `AddThanks` (never consumed).
+
+### Files created
+
+- `components/ReusableMediumComponents/ToggeableAlert.tsx`
+- `utils/stringManipulation/addHashToArrayString.ts`
+- `components/Thanks/ThanksDialog.tsx`
+
+### Files removed
+
+- `components/ReusableMediumComponents/ToggeableAlert.jsx`
+- `utils/stringManipulation/addHashToArrayString.jsx`
+- `components/Thanks/ThanksDialog.jsx`
+
+### Files modified
+
+- `docs/notes/models/moderation-and-thanks.md`
+
+### Verification
+
+- `pnpm exec tsc --noEmit` — OK
+- `pnpm build` — OK
+
+### Next logical step
+
+Convert `components/ShowingListOfContent/ContentListing.jsx`.
+
+---
+
+## 2026-06-07 — Cleanup: remove dead `target` from `ThanksDialog`
+
+### What was changed and why
+
+`ThanksDialog` never used `target` beyond an early return; `AddThanks` reads `contentInfo`. Removed prop from dialog and caller; dropped unused `thanksTarget` / `confirmThanks` destructuring in `ContentListing`.
+
+### Files modified
+
+- `components/Thanks/ThanksDialog.tsx`
+- `components/ShowingListOfContent/ContentListing.jsx`
+- `docs/notes/hooks/useThanksHandler.md`
+
+### Verification
+
+- `pnpm exec tsc --noEmit` — OK
