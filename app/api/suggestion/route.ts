@@ -3,10 +3,9 @@
  * Notes: docs/notes/app/api/suggestion-route.md
  */
 import dbConnect from "@utils/db";
-import NameTag from "@/models/NameTag";
-import DescriptionTag from "@/models/DescriptionTag";
-void NameTag;
-void DescriptionTag;
+// Register tag models for Mongoose populate
+import "@/models/NameTag";
+import "@/models/DescriptionTag";
 import Suggestion from "@/models/Suggestion";
 import { leanWithStrings } from "@/utils/mongoDataCleanup";
 import { getSessionForApis } from "@/utils/api/getSessionForApis";

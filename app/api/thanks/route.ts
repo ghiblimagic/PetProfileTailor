@@ -3,13 +3,10 @@
  * Notes: docs/notes/app/api/thanks-route.md
  */
 import dbConnect from "@utils/db";
-// necessary for populate
-import Name from "@/models/Name";
-import Description from "@/models/Description";
-import User from "@/models/User";
-void Name;
-void Description;
-void User;
+// Register models for Mongoose populate
+import "@/models/Name";
+import "@/models/Description";
+import "@/models/User";
 import Thanks from "@/models/Thank";
 import { leanWithStrings } from "@/utils/mongoDataCleanup";
 import { getSessionForApis } from "@/utils/api/getSessionForApis";

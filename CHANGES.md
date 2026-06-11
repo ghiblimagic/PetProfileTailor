@@ -3376,8 +3376,62 @@ Dropped unused props from `Dashboard` and dashboard page. Fav tabs already read 
 ### Files modified
 
 - `components/dashboard.tsx`
-- `app/(protected)/dashboard/page.js`
+- `app/(protected)/dashboard/page.tsx` (was `page.js` when props removed)
 - `docs/notes/components/dashboard.md`
+
+### Verification
+
+- `pnpm exec tsc --noEmit` — OK
+
+---
+
+## 2026-06-07 — TypeScript: `app/(protected)/dashboard/page`
+
+### What was changed and why
+
+Converted dashboard server route to TypeScript. `void` side-effect imports for tag models (populate). Removed unnecessary `await` on `session.user.id`. `?? []` fallback for lean query results. `redirect()` without `return` (Next.js 15 pattern).
+
+### Files created
+
+- `app/(protected)/dashboard/page.tsx`
+- `docs/notes/app/dashboard-page.md`
+
+### Files removed
+
+- `app/(protected)/dashboard/page.js`
+
+### Files modified
+
+- `docs/notes/components/dashboard.md`
+- `docs/README.md`
+
+### Verification
+
+- `pnpm exec tsc --noEmit` — OK
+- `pnpm build` — OK
+
+### Next logical step
+
+Convert `app/fetchname/page.js` or `app/profile/[profilename]/page.jsx`.
+
+---
+
+## 2026-06-07 — Side-effect imports for Mongoose populate models
+
+### What was changed and why
+
+Replaced `import Model from "..."; void Model` with `import "@/models/..."` wherever models are only loaded to register refs for `.populate()`. Documented convention in `mongoDataCleanup.md`.
+
+### Files modified
+
+- `app/(protected)/dashboard/page.tsx`
+- `app/(protected)/notifications/page.tsx`
+- `app/api/names/route.ts`, `check-if-content-exists/[content]/route.ts`
+- `app/api/description/route.ts`, `suggestion/route.ts`, `thanks/route.ts`
+- `app/api/notifications/names/route.ts`, `descriptions/route.ts`, `thanks/route.ts`
+- `utils/api/getUserFollowers.ts`, `getUserFollowing.ts`
+- `utils/stringManipulation/findNormalizedMatch.ts`
+- `docs/notes/utils/mongoDataCleanup.md`
 
 ### Verification
 

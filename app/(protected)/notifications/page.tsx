@@ -3,11 +3,9 @@
  * Notes: docs/notes/app/notifications-page.md
  */
 import dbConnect from "@utils/db";
-// necessary for populate
-import Name from "@/models/Name";
-import User from "@/models/User";
-void Name;
-void User;
+// Register models for Mongoose populate
+import "@/models/Name";
+import "@/models/User";
 import NameLike from "@/models/NameLike";
 import { serverAuthOptions } from "@/lib/auth";
 import { getServerSession } from "next-auth";

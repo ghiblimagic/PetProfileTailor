@@ -4,12 +4,10 @@
  */
 import mongoose from "mongoose";
 import dbConnect from "@utils/db";
-// necessary for populate
-import Name from "@/models/Name";
-import User from "@/models/User";
+// Register models for Mongoose populate
+import "@/models/Name";
+import "@/models/User";
 import NameLike from "@/models/NameLike";
-void Name;
-void User;
 import { getSessionForApis } from "@/utils/api/getSessionForApis";
 import {
   getPaginatedNotifications,

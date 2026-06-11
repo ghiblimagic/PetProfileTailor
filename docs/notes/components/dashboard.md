@@ -10,14 +10,14 @@ Signed-in home: welcome header, [`PointSystemList`](../../../components/Ranking/
 
 | Prop | Source | Used for |
 |------|--------|----------|
-| `namesCreated` | `app/(protected)/dashboard/page.js` | Points table names count |
+| `namesCreated` | [`dashboard/page.tsx`](../../../app/(protected)/dashboard/page.tsx) | Points table names count |
 | `createdDescriptions` | same | Points table descriptions count |
 
 Fav Names / Fav Descriptions tabs load likes from [`LikesContext`](../../../context/LikesContext.tsx) via `useSwrPagination` (`restrictSwrToLikedNames`) — not from server props.
 
 ## Page
 
-[`app/(protected)/dashboard/page.js`](../../../app/(protected)/dashboard/page.js) — requires session; loads user-created names/descriptions from Mongo.
+See [dashboard-page.md](../app/dashboard-page.md).
 
 ## Related
 

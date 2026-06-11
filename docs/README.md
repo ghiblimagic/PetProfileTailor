@@ -37,6 +37,7 @@ Each source file with notes should have a one-line pointer at the top linking to
 | Thanks API (`/api/thanks`, get-thanks-count) + thanks UI stack | [thanks-route.md](notes/app/api/thanks-route.md), [moderation-and-thanks.md](notes/models/moderation-and-thanks.md) |
 | Suggestion + flag/report API routes | [suggestion-route.md](notes/app/api/suggestion-route.md), [flag-routes.md](notes/app/api/flag-routes.md) |
 | Notifications stack (`page`, tabs, listings, [`NotificationsButton.tsx`](../components/Notifications/NotificationsButton.tsx), context, wrapper, `useSwrSimple`, `user/notifications` API) | [notifications-page.md](notes/app/notifications-page.md) |
+| [`app/(protected)/dashboard/page.tsx`](../app/(protected)/dashboard/page.tsx), [`dashboard.tsx`](../components/dashboard.tsx) | [dashboard-page.md](notes/app/dashboard-page.md), [dashboard.md](notes/components/dashboard.md) |
 | [`models/NameLike.ts`](../models/NameLike.ts), [`DescriptionLike.ts`](../models/DescriptionLike.ts), [`Follow.ts`](../models/Follow.ts) | [likes-and-follows.md](notes/models/likes-and-follows.md) |
 | [`models/Thank.ts`](../models/Thank.ts), [`Suggestion.ts`](../models/Suggestion.ts), [`Report.ts`](../models/Report.ts) | [moderation-and-thanks.md](notes/models/moderation-and-thanks.md) |
 | [`hooks/useThanksHandler.ts`](../hooks/useThanksHandler.ts) | [useThanksHandler.md](notes/hooks/useThanksHandler.md) |

@@ -1,8 +1,7 @@
 import type { Types } from "mongoose";
-// necessary for populate
-import User from "@/models/User";
+// Register User model for Mongoose populate
+import "@/models/User";
 import Follow from "@/models/Follow";
-void User;
 import { leanWithStrings } from "@/utils/mongoDataCleanup";
 
 type FollowerUser = {

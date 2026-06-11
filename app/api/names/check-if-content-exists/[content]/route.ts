@@ -3,12 +3,10 @@
  * Notes: docs/notes/app/api/check-if-content-exists.md
  */
 import dbConnect from "@utils/db";
-// necessary for populate
-import NameTag from "@/models/NameTag";
-import User from "@/models/User";
+// Register models for Mongoose populate
+import "@/models/NameTag";
+import "@/models/User";
 import Names from "@models/Name";
-void NameTag;
-void User;
 import {
   checkMultipleFieldsBlocklist,
   respondIfBlocked,

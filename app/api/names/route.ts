@@ -16,13 +16,10 @@ import {
   shouldRunNameBlocklistOnUpdate,
   validateNameLength,
 } from "@/utils/api/validateNameSubmission";
-// necessary for populate (tags → NameTag, createdBy → User)
-import NameTag from "@/models/NameTag";
-import User from "@/models/User";
+// Register models for Mongoose populate (tags, createdBy)
+import "@/models/NameTag";
+import "@/models/User";
 import Names from "@models/Name";
-
-void NameTag;
-void User;
 
 type NameCreateBody = {
   content: string;

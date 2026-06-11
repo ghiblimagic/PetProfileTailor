@@ -10,6 +10,17 @@ Shared helper used across pages and API routes. Runs `.lean().exec()` on a Mongo
 - Remove `__v`, because Mongoose adds a version key on every document.
 - Keep `Date` instances as `Date` (Next.js serializes them when passing to client components)
 
+## Mongoose `populate` side-effect imports
+
+When a query uses `.populate()` on a `ref`, the referenced model must be registered before the query runs. Import the model module for its side effect (do not bind a variable):
+
+```ts
+import "@/models/NameTag";
+import "@/models/User";
+```
+
+Avoid `import X from "..."; void X;` — side-effect-only imports state the intent and are not tree-shaken.
+
 ## Flow
 
 leanWithStrings(query)
