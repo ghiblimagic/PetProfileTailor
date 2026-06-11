@@ -2318,3 +2318,63 @@ Converted listing like button to `.tsx`. Exported `LikesButtonAndLikesLogicProps
 ### Next logical step
 
 Convert `components/ShowingListOfContent/ContentListing.jsx` or `components/ReusableSmallComponents/IconWithCount.jsx`.
+
+---
+
+## 2026-06-07 — TypeScript: `IconWithCount`
+
+### What was changed and why
+
+Converted icon + unread badge component to `.tsx` (default export still `IconBadge`). Exported `IconBadgeName` (`faBell` | `faHeart` | `thanks`) and `IconBadgeProps`. Used FontAwesome `SizeProp` for `iconSize`.
+
+### Files created
+
+- `components/ReusableSmallComponents/IconWithCount.tsx`
+
+### Files removed
+
+- `components/ReusableSmallComponents/IconWithCount.jsx`
+
+### Files modified
+
+- `docs/notes/app/notifications-page.md`
+
+### Verification
+
+- `pnpm exec tsc --noEmit` — OK
+- `pnpm build` — OK
+
+### Next logical step
+
+Convert `iconOpenCloseButton.jsx` or `ContainerForLikeShareFlag.jsx`.
+
+---
+
+## 2026-06-07 — TypeScript: thanks cat SVG icon
+
+### What was changed and why
+
+Converted `thanks.jsx` → `thanks.tsx`; removed unused `props` destructuring that forced `props={undefined}` hacks in TS consumers. Exported `ThanksIconProps` with optional `fill`.
+
+### Files created
+
+- `components/ReusableSmallComponents/iconsOrSvgImages/svgImages/thanks.tsx`
+
+### Files removed
+
+- `components/ReusableSmallComponents/iconsOrSvgImages/svgImages/thanks.jsx`
+
+### Files modified
+
+- `components/ReusableSmallComponents/IconWithCount.tsx`
+- `components/Notifications/ThankNotificationListing.tsx`
+- `docs/notes/app/notifications-page.md`
+
+### Verification
+
+- `pnpm exec tsc --noEmit` — OK
+- `pnpm build` — OK
+
+### Next logical step
+
+Convert `iconOpenCloseButton.jsx` or `components/Thanks/ThanksButton.jsx`.

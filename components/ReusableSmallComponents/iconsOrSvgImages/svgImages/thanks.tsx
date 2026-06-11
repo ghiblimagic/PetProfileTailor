@@ -1,4 +1,9 @@
-export default function NounBlackCatIcon({ props, fill }) {
+export type ThanksIconProps = {
+  fill?: string;
+};
+
+/** Thanks / grateful cat SVG (notification tab + thanks button). */
+export default function Thanks({ fill }: ThanksIconProps) {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"

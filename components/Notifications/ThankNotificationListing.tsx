@@ -124,7 +124,7 @@ export default function ThanksContentListing({
       } hover:bg-secondary/60`}
     >
       <span className="mr-4 mt-3">
-        <Thanks props={undefined} fill="#FF0000" />
+        <Thanks fill="#FF0000" />
       </span>
 
       <section>
