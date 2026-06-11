@@ -4,7 +4,7 @@ Source: [`components/FormComponents/TagsSelectAndCheatSheet.tsx`](../../../compo
 
 ## Role
 
-Multi-select tag picker (react-select) plus optional category cheat-sheet checkboxes. Categories come from [`useCategoriesForDataType.js`](../../../hooks/useCategoriesForDataType.js) / `CategoriesAndTagsContext`.
+Multi-select tag picker (react-select) plus optional category cheat-sheet checkboxes. Categories come from [`useCategoriesForDataType.ts`](../../../hooks/useCategoriesForDataType.ts) / [`CategoriesAndTagsContext.tsx`](../../../context/CategoriesAndTagsContext.tsx). Notes: [categories-and-tags.md](../context/categories-and-tags.md).
 
 ## Props
 

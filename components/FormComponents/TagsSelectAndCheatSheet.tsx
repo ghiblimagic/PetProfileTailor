@@ -15,17 +15,6 @@ import GeneralButton from "../ReusableSmallComponents/buttons/GeneralButton";
 import type { TagOption, TagCheckboxChange } from "@/hooks/useTags";
 import type { ContentType } from "@/utils/api/checkIfValidContentType";
 
-type CategoryTag = {
-  _id: string;
-  tag: string;
-};
-
-type CategoryWithTags = {
-  _id: string;
-  category: string;
-  tags: CategoryTag[];
-};
-
 export type TagsSelectAndCheatSheetProps = {
   dataType: ContentType | string;
   tagsToSubmit: TagOption[];
@@ -41,10 +30,7 @@ export default function TagsSelectAndCheatSheet({
   handleCheckboxChange,
   isDisabled = false,
 }: TagsSelectAndCheatSheetProps) {
-  const { categoriesWithTags, tagList } = useCategoriesForDataType(dataType) as {
-    categoriesWithTags: CategoryWithTags[];
-    tagList: TagOption[];
-  };
+  const { categoriesWithTags, tagList } = useCategoriesForDataType(dataType);
   const [isOpen, setIsOpen] = useState(false);
 
   const selectedOptions = tagsToSubmit.map(

@@ -2986,7 +2986,42 @@ Converted shared tag-selection hook and form component to TypeScript. Exported `
 
 ### Next logical step
 
-Convert `useCategoriesForDataType.js` / `CategoriesAndTagsContext.js` or flag/suggestion API routes.
+Convert flag/suggestion API routes or `CategTagsWrapper.js`.
+
+---
+
+## 2026-06-07 — TypeScript: `CategoriesAndTagsContext`, `useCategoriesForDataType`
+
+### What was changed and why
+
+Converted categories/tags client cache and data-type selector hook to TypeScript. Exported `CategoryWithTags`, `CategoriesAndTagsContextValue`, `CategoriesForDataType`. Removed cast in `TagsSelectAndCheatSheet`. Fixed provider error message (was incorrectly referencing `ReportsProvider`).
+
+### Files created
+
+- `context/CategoriesAndTagsContext.tsx`
+- `hooks/useCategoriesForDataType.ts`
+- `docs/notes/context/categories-and-tags.md`
+
+### Files removed
+
+- `context/CategoriesAndTagsContext.js`
+- `hooks/useCategoriesForDataType.js`
+
+### Files modified
+
+- `components/FormComponents/TagsSelectAndCheatSheet.tsx`
+- `docs/README.md`
+- `docs/notes/components/tags-select-and-cheat-sheet.md`
+- `docs/notes/hooks/useTags.md`
+
+### Verification
+
+- `pnpm exec tsc --noEmit` — OK
+- `pnpm build` — OK
+
+### Next logical step
+
+Convert `app/api/suggestion/route.js` and flag API routes, or `CategTagsWrapper.js`.
 
 ---
 

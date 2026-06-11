@@ -25,4 +25,4 @@ Shared tag-selection state for [`TagsSelectAndCheatSheet.tsx`](../../components/
 
 ## Consumers
 
-`EditContent`, `AddSuggestion`, `EditSuggestion`, `addingName.jsx`, `addingdescription.jsx`.
+`EditContent`, `AddSuggestion`, `EditSuggestion`, `TagsSelectAndCheatSheet`, `addingName.jsx`, `addingdescription.jsx`. Category options: [categories-and-tags.md](../context/categories-and-tags.md).
