@@ -3231,3 +3231,47 @@ Removed redundant `| string` from `type` union (it collapsed the literals to pla
 ### Verification
 
 - `pnpm exec tsc --noEmit` — OK
+
+---
+
+## 2026-06-07 — TypeScript: `CoreListingPagesLogic`
+
+### What was changed and why
+
+Converted shared listing shell to TypeScript. Exported `CoreListingPageLogicProps`. Added `hooks/useSwrPagination.d.ts` for hook param/return types. Removed dead `setPageFunction` and unused `filterCooldownRef` prop (FilteringSidebar never read it). Removed unused imports/vars (`CheckForMoreData`, `userName`, `profileImage`). `LinkButton` cast for optional style props (same pattern as `SharingOptionsBar`).
+
+### Files created
+
+- `components/CoreListingPagesLogic.tsx`
+- `hooks/useSwrPagination.d.ts`
+- `docs/notes/components/core-listing-pages-logic.md`
+
+### Files removed
+
+- `components/CoreListingPagesLogic.jsx`
+
+### Files modified
+
+- `docs/notes/components/content-listing.md`
+- `docs/README.md`
+
+### Verification
+
+- `pnpm exec tsc --noEmit` — OK
+- `pnpm build` — OK
+
+### Next logical step
+
+Convert `ProfilePagesLogic.jsx`, `ToggleOneContentPage.jsx`, or `app/fetchname/page.js`.
+
+---
+
+## 2026-06-07 — Restore inline comments in `CoreListingPagesLogic.tsx`
+
+### What was changed and why
+
+Re-added section markers and explanatory comments from the original `.jsx` that were dropped during TS conversion.
+
+### Files modified
+
+- `components/CoreListingPagesLogic.tsx`

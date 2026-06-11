@@ -1,45 +1,70 @@
+/**
+ * Shared listing shell: filters drawer, pagination, SWR data, ContentListing rows.
+ * Notes: docs/notes/components/core-listing-pages-logic.md
+ */
 "use client";
 
-import React, { useEffect, useState, useRef } from "react";
+import {
+  useEffect,
+  useState,
+  useRef,
+  type ChangeEvent,
+  type ComponentType,
+} from "react";
 import { Drawer } from "@mui/material";
 import GeneralButton from "@components/ReusableSmallComponents/buttons/GeneralButton";
 import FilteringSidebar from "@components/Filtering/FilteringSidebar";
 import PageTitleWithImages from "@components/ReusableSmallComponents/TitlesOrHeadings/PageTitleWithImages";
-import ContentListing from "@/components/ShowingListOfContent/ContentListing";
+import ContentListing, {
+  type ContentListingItem,
+} from "@/components/ShowingListOfContent/ContentListing";
 import Pagination from "@components/ShowingListOfContent/pagination";
-import CheckForMoreData from "@components/ReusableSmallComponents/buttons/CheckForMoreDataButton";
 import { useSwrPagination } from "@hooks/useSwrPagination";
 import startCooldown from "@utils/startCooldown";
 import Image from "next/image";
 import LinkButton from "./ReusableSmallComponents/buttons/LinkButton";
 
+const ContactLinkButton = LinkButton as ComponentType<{
+  href: string;
+  text: string;
+  className?: string;
+  subtle?: boolean;
+}>;
 import { useSession } from "next-auth/react";
 import LoadingSpinner from "./ui/LoadingSpinner";
+import type { ContentType } from "@/utils/api/checkIfValidContentType";
+
+export type CoreListingPageLogicProps = {
+  dataType: ContentType;
+  swrForThisUserID?: string;
+  showHeader?: boolean;
+  restrictSwrToLikedNames?: boolean;
+  /** Legacy props from `app/fetchnames/page.jsx` — not read by this component. */
+  sessionFromServer?: unknown;
+  usersLikedContent?: unknown;
+};
 
 export default function CoreListingPageLogic({
   dataType,
   swrForThisUserID = "",
   showHeader = true,
   restrictSwrToLikedNames = false,
-}) {
+}: CoreListingPageLogicProps) {
   // console.log("restrictSwrToLikedNames", restrictSwrToLikedNames);
   const { data: session } = useSession();
   const [remainingFilterCooldown, setRemainingFilterCooldown] = useState(0);
   const [remainingSortCooldown, setRemainingSortCooldown] = useState(0);
-  const filterCooldownRef = useRef(null);
-  const sortIntervalRef = useRef(null);
-  let profileUserId = swrForThisUserID;
+  const filterCooldownRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const sortIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   // prevents overlapping cooldown intervals by attaching the interval to useRef, it will clear after 5 seconds
   // so we check if filterCooldownRef.current has no intervals currently going before running another interval
 
-  let userName = "";
-  let profileImage = "";
+  const profileUserId = swrForThisUserID;
+
   let signedInUsersId = "";
 
   if (session?.user) {
-    userName = session.user.name;
-    profileImage = session.user.profileImage;
     signedInUsersId = session.user.id;
   }
 
@@ -47,16 +72,16 @@ export default function CoreListingPageLogic({
 
   const [itemsPerPage, setItemsPerPage] = useState(10);
   const [isOpen, setIsOpen] = useState(false);
-  const [filterTagsIds, setFilterTagsIds] = useState([]);
+  const [filterTagsIds, setFilterTagsIds] = useState<string[]>([]);
 
   const [currentUiPage, setCurrentUiPage] = useState(1);
-  const [itemsPerUiPage, setItemsPerUiPage] = useState(10);
+  const [itemsPerUiPage] = useState(10);
 
   const [sortingValue, setSortingValue] = useState(-1);
   const [sortingProperty, setSortingProperty] = useState("likedByCount");
-  const [triggerApplyFilters, setTriggerApplyFilters] = useState([]);
+  const [triggerApplyFilters, setTriggerApplyFilters] = useState<string[]>([]);
 
-  const toggleDrawer = (newOpen) => {
+  const toggleDrawer = (newOpen: boolean) => {
     setIsOpen(newOpen);
   };
 
@@ -76,8 +101,8 @@ export default function CoreListingPageLogic({
     currentUiPage,
     itemsPerUiPage,
     tags: triggerApplyFilters,
-    sortingProperty: sortingProperty,
-    sortingValue: sortingValue,
+    sortingProperty,
+    sortingValue,
     profileUserId,
     restrictSwrToLikedNames,
   });
@@ -87,40 +112,40 @@ export default function CoreListingPageLogic({
   // console.log("SWR", typeof data[0]); // "object"
   // console.log("SWR first item", data[0] ? data[0]._id : "null"); // check first object's id
 
-  let content = data ?? [];
+  const content: ContentListingItem[] = data ?? [];
 
   // console.log("content check", content);
 
   // ############ Section for passing state into components as functions #######
 
-  function setItemsPerPageFunction(event) {
+  function setItemsPerPageFunction(event: number) {
     setItemsPerPage(event);
   }
 
-  function setPageFunction(event) {
-    setSize(event);
-  }
-
-  function setSortingLogicFunction(event) {
+  function setSortingLogicFunction(event: string) {
     // setSortingLogicString(event);
-    setSortingValue(event.split(",")[1]);
-    setSortingProperty(event.split(",")[0]);
+    const [property, value] = event.split(",");
+    setSortingProperty(property);
+    setSortingValue(Number(value));
     startCooldown(sortIntervalRef, setRemainingSortCooldown, 3);
   }
 
   // ########## End of section for passing state into components as functions ####
 
-  const handleFilterChange = (e) => {
+  const handleFilterChange = (e: ChangeEvent<HTMLInputElement>) => {
     // console.log("handleFilterChange", e.target);
     // console.log("handleFilterChange filterTagsIds", filterTagsIds);
     const { value, checked } = e.target;
 
     checked
       ? setFilterTagsIds([...filterTagsIds, value])
-      : setFilterTagsIds(filterTagsIds.filter((tag) => tag != value));
+      : setFilterTagsIds(filterTagsIds.filter((tag) => tag !== value));
   };
 
-  const handleApplyFilters = (reset, quickSearchTags) => {
+  const handleApplyFilters = (
+    reset: boolean,
+    quickSearchTags?: string[],
+  ) => {
     if (reset) {
       setFilterTagsIds([]);
       setTriggerApplyFilters([]);
@@ -138,6 +163,7 @@ export default function CoreListingPageLogic({
   // if users have changed how the items get sorted, then start over swr from page 1
   useEffect(() => {
     setSize(1);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sortingValue, sortingProperty]);
 
   //########### Section that allows the deleted content to be removed without having to refresh the page, react notices that a key has been removed from the content list and unmounts that content ###########
@@ -150,7 +176,8 @@ export default function CoreListingPageLogic({
             title="Fetch"
             title2={
               (dataType === "names" && "Names") ||
-              (dataType == "descriptions" && "Descriptions")
+              (dataType === "descriptions" && "Descriptions") ||
+              ""
             }
           />
         </section>
@@ -158,7 +185,7 @@ export default function CoreListingPageLogic({
       {/* *****************  Drawer for filtering options *****************  */}
       <Drawer
         open={isOpen}
-        onClose={(event, reason) => {
+        onClose={(_event, reason) => {
           if (reason === "backdropClick") {
             // prevent closing when clicking on backdrop
             return;
@@ -183,14 +210,13 @@ export default function CoreListingPageLogic({
             toggleDrawer={toggleDrawer}
             isLoading={isLoading}
             remainingFilterCooldown={remainingFilterCooldown}
-            filterCooldownRef={filterCooldownRef}
             startCooldown={startCooldown}
             setFilterTagsIds={setFilterTagsIds}
           />
         </div>
       </Drawer>
 
-      {content?.length === 0 && !isLoading ? (
+      {content.length === 0 && !isLoading ? (
         <div className="text-center my-6 text-subtleWhite">
           <GeneralButton
             text={`${isOpen ? "Close Filters" : "Open Filters"}`}
@@ -249,7 +275,7 @@ export default function CoreListingPageLogic({
               </li>
             </ol>
 
-            <LinkButton
+            <ContactLinkButton
               href="/contact"
               text="Contact"
               className="py-2"
@@ -271,7 +297,6 @@ export default function CoreListingPageLogic({
             <Pagination
               itemsPerPage={itemsPerPage}
               setItemsPerPageFunction={setItemsPerPageFunction}
-              setPageFunction={setPageFunction}
               setSize={setSize}
               size={size}
               currentUiPage={currentUiPage}
@@ -290,26 +315,24 @@ export default function CoreListingPageLogic({
               {isLoading && <LoadingSpinner />}
 
               <section className="whitespace-pre-line ">
-                {content?.length > 0 &&
+                {content.length > 0 &&
                   content
                     .slice(
-                      currentUiPage - 1 == 0
+                      currentUiPage - 1 === 0
                         ? 0
                         : (currentUiPage - 1) * itemsPerPage,
                       currentUiPage * itemsPerPage,
                     )
-                    .map((singleContent) => {
-                      return (
-                        <ContentListing
-                          dataType={dataType}
-                          singleContent={singleContent}
-                          key={singleContent._id}
-                          // VITAL for the ui to see the mutation changes, if the key hasn't changed, then react will ignore the updates
-                          signedInUsersId={signedInUsersId}
-                          mutate={mutate}
-                        />
-                      );
-                    })}
+                    .map((singleContent) => (
+                      <ContentListing
+                        dataType={dataType}
+                        singleContent={singleContent}
+                        key={singleContent._id}
+                        // VITAL for the ui to see the mutation changes, if the key hasn't changed, then react will ignore the updates
+                        signedInUsersId={signedInUsersId}
+                        mutate={mutate}
+                      />
+                    ))}
 
                 {/* <CheckForMoreData
                 filteredListLastPage={filteredListLastPage} //deleted
