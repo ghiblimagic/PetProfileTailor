@@ -1,4 +1,10 @@
-import { useState } from "react";
+/**
+ * New report submission form inside FlagDialog.
+ * Notes: docs/notes/components/flag-report-forms.md
+ */
+"use client";
+
+import { useState, type ChangeEvent, type FormEvent } from "react";
 import GeneralButton from "@components/ReusableSmallComponents/buttons/GeneralButton";
 import { toast } from "react-toastify";
 import axios from "axios";
@@ -10,6 +16,26 @@ import { useReports } from "@context/ReportsContext";
 import { useSession } from "next-auth/react";
 import MustLoginMessage from "@components/ui/MustLoginMessage";
 import LoadingSpinner from "../ui/LoadingSpinner";
+import type { ContentType } from "@/utils/api/checkIfValidContentType";
+
+export type ReportContentInfo = {
+  _id: string;
+  createdBy?: { _id: string };
+};
+
+type FlagReportPostResponse = {
+  report: { _id: string };
+  message: string;
+};
+
+export type AddReportProps = {
+  dataType: ContentType | string;
+  flaggedByUser?: string;
+  contentInfo: ReportContentInfo;
+  copyOfContentForReport: Record<string, unknown>;
+  apiflagReportSubmission: string;
+  onClose?: () => void;
+};
 
 export default function AddReport({
   dataType,
@@ -18,45 +44,46 @@ export default function AddReport({
   copyOfContentForReport,
   apiflagReportSubmission,
   onClose,
-}) {
+}: AddReportProps) {
   const { addReport } = useReports();
   const { data: session } = useSession();
   const signedInUser = session?.user?.id;
   const [loading, setLoading] = useState(false);
 
-  const [flagCategoriesState, setFlagCategoriesState] = useState([]);
-  const [additionalCommentsState, setAdditionalCommentsState] = useState([]);
+  const [flagCategoriesState, setFlagCategoriesState] = useState<string[]>([]);
+  const [additionalCommentsState, setAdditionalCommentsState] = useState("");
 
-  const handleFlagCategoriesState = (e) => {
+  const handleFlagCategoriesState = (e: ChangeEvent<HTMLInputElement>) => {
     const { value, checked } = e.target;
 
     checked
       ? setFlagCategoriesState([...flagCategoriesState, value])
       : setFlagCategoriesState(
-          flagCategoriesState.filter((flagTitle) => flagTitle != value),
+          flagCategoriesState.filter((flagTitle) => flagTitle !== value),
         );
   };
 
-  const handleSubmitReport = async (e) => {
+  const handleSubmitReport = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
 
     if (flagCategoriesState.length === 0) {
+      setLoading(false);
       toast.error(
         `Ruh Roh! You must click 1 or more of the checkboxes for report type`,
       );
       return;
     }
     if (!flaggedByUser) {
+      setLoading(false);
       toast.error(`Ruh Roh! You must be signed in to report content`);
       return;
     }
 
-    //dealing with the edge case because of profile pages, profile pages won't have a createdBy property
-    let profileIsLoggedInUserCheck = contentInfo._id;
+    const profileIsLoggedInUserCheck = contentInfo._id;
 
-    let contentCreatedByUserId =
-      contentInfo.createdBy != undefined
+    const contentCreatedByUserId =
+      contentInfo.createdBy !== undefined
         ? contentInfo.createdBy._id
         : profileIsLoggedInUserCheck;
 
@@ -78,12 +105,11 @@ export default function AddReport({
       contentCreatedBy: contentCreatedByUserId,
       reportedBy: flaggedByUser,
       reportCategories: flagCategoriesState,
-      comments: additionalCommentsState.toString(),
+      comments: additionalCommentsState,
     };
-    // console.log(reportSubmission);
 
     try {
-      const response = await axios.post(
+      const response = await axios.post<FlagReportPostResponse>(
         apiflagReportSubmission,
         reportSubmission,
       );
@@ -96,20 +122,25 @@ export default function AddReport({
       setLoading(false);
 
       onClose?.();
-    } catch (error) {
+    } catch (error: unknown) {
       console.log("this is an error", error);
       setLoading(false);
 
+      const err = error as {
+        message?: string;
+        response?: { data?: { message?: string } };
+      };
+
       toast.error(
-        `Ruh Roh! ${error.message} ${JSON.stringify(
-          error?.response?.data?.message,
+        `Ruh Roh! ${err.message ?? "Request failed"} ${JSON.stringify(
+          err.response?.data?.message,
         )}`,
       );
     }
   };
 
   function cancelFlagFormAndRevertFlagState() {
-    onClose?.(); // <-- close the dialog
+    onClose?.();
   }
 
   return (
@@ -125,8 +156,6 @@ export default function AddReport({
       </div>
 
       <div className={`-mx-3 mb-6`}>
-        {/* Area to Type a comment  */}
-
         <div className=" mb-2 text-subtleWhite px-4 pt-2">
           {!signedInUser && <MustLoginMessage text="submit a report" />}
           <section className="p-1">
@@ -236,7 +265,7 @@ export default function AddReport({
               ariaLabel="type-comments"
               onChange={(e) => setAdditionalCommentsState(e.target.value)}
               name="body"
-              maxLength="500"
+              maxLength={500}
               placeholder="Optional"
               disabled={!signedInUser}
             />
@@ -255,7 +284,6 @@ export default function AddReport({
             <GeneralButton
               type="submit"
               text="Submit"
-              default
               disabled={!signedInUser || loading}
             />
           </Field>

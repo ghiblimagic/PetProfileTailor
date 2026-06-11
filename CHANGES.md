@@ -2917,4 +2917,42 @@ Converted delete-confirmation hook and moderation client caches to TypeScript. E
 
 ### Next logical step
 
-Convert `components/DeletingData/DeleteContentNotification.jsx`, `AddReport.jsx` / `EditReport.js`, `AddSuggestion.jsx` / `EditSuggestion.jsx`.
+Convert `AddSuggestion.jsx` / `EditSuggestion.jsx`.
+
+---
+
+## 2026-06-07 — TypeScript: `DeleteContentNotification`, `AddReport`, `EditReport`
+
+### What was changed and why
+
+Converted shared delete-confirmation UI and flag report add/edit forms to TypeScript. Exported props types and `ReportContentInfo`. Fixed `additionalCommentsState` / `comments` to use strings (were incorrectly initialized as arrays). Added `setLoading(false)` on early validation exits in `AddReport`.
+
+### Files created
+
+- `components/DeletingData/DeleteContentNotification.tsx`
+- `components/Flagging/AddReport.tsx`
+- `components/Flagging/EditReport.tsx`
+- `docs/notes/components/delete-content-notification.md`
+- `docs/notes/components/flag-report-forms.md`
+
+### Files removed
+
+- `components/DeletingData/DeleteContentNotification.jsx`
+- `components/Flagging/AddReport.jsx`
+- `components/Flagging/EditReport.js`
+
+### Files modified
+
+- `components/FormComponents/StyledTextarea.d.ts` (added `placeholder` to match runtime usage)
+- `docs/README.md`
+- `docs/notes/hooks/useFlagging.md`
+- `docs/notes/models/moderation-and-thanks.md`
+
+### Verification
+
+- `pnpm exec tsc --noEmit` — OK
+- `pnpm build` — OK
+
+### Next logical step
+
+Convert `AddSuggestion.jsx` / `EditSuggestion.jsx`.

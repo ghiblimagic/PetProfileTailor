@@ -39,6 +39,8 @@ Each source file with notes should have a one-line pointer at the top linking to
 | [`models/Thank.ts`](../models/Thank.ts), [`Suggestion.ts`](../models/Suggestion.ts), [`Report.ts`](../models/Report.ts) | [moderation-and-thanks.md](notes/models/moderation-and-thanks.md) |
 | [`hooks/useThanksHandler.ts`](../hooks/useThanksHandler.ts) | [useThanksHandler.md](notes/hooks/useThanksHandler.md) |
 | [`hooks/useFlagging.ts`](../hooks/useFlagging.ts) | [useFlagging.md](notes/hooks/useFlagging.md) |
+| [`AddReport.tsx`](../components/Flagging/AddReport.tsx), [`EditReport.tsx`](../components/Flagging/EditReport.tsx) | [flag-report-forms.md](notes/components/flag-report-forms.md) |
+| [`DeleteContentNotification.tsx`](../components/DeletingData/DeleteContentNotification.tsx) | [delete-content-notification.md](notes/components/delete-content-notification.md) |
 | [`hooks/useSuggest.ts`](../hooks/useSuggest.ts) | [useSuggest.md](notes/hooks/useSuggest.md) |
 | [`hooks/useDeleteConfirmation.ts`](../hooks/useDeleteConfirmation.ts) | [useDeleteConfirmation.md](notes/hooks/useDeleteConfirmation.md) |
 | [`context/ReportsContext.tsx`](../context/ReportsContext.tsx), [`context/SuggestionsContext.tsx`](../context/SuggestionsContext.tsx) | [moderation-and-thanks.md](notes/models/moderation-and-thanks.md) |

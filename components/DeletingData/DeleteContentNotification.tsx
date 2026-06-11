@@ -1,11 +1,21 @@
-import React from "react";
+/**
+ * Shared delete-confirmation modal body (trash icon + yes/no).
+ * Notes: docs/notes/components/delete-content-notification.md
+ */
+"use client";
+
 import XSvgIcon from "@components/ReusableSmallComponents/iconsOrSvgImages/XSvgIcon";
 import GeneralButton from "@components/ReusableSmallComponents/buttons/GeneralButton";
+
+export type DeleteContentNotificationProps = {
+  setShowDeleteConfirmation: (show: boolean) => void;
+  onConfirm: () => void;
+};
 
 export default function DeleteContentNotification({
   setShowDeleteConfirmation,
   onConfirm,
-}) {
+}: DeleteContentNotificationProps) {
   return (
     <div
       className="relative z-10"
@@ -23,13 +33,11 @@ export default function DeleteContentNotification({
               p-4 shadow-lg max-w-3xl"
           >
             <div className="relative p-4 text-center rounded-lg shadow dark:bg-secondary sm:p-5">
-              {/* Close X */}
               <XSvgIcon
                 screenReaderText="Close Delete Confirmaton Screen"
                 onClickAction={() => setShowDeleteConfirmation(false)}
               />
 
-              {/* Trash can icon */}
               <svg
                 className="subtleWhite w-11 h-11 mb-3.5 mx-auto"
                 aria-hidden="true"
@@ -54,7 +62,7 @@ export default function DeleteContentNotification({
               <div className="flex justify-center items-center space-x-6">
                 <GeneralButton
                   warning
-                  onClick={onConfirm} // ✅ hook handles deletion now
+                  onClick={onConfirm}
                   text="Yes, I'm sure"
                 />
                 <GeneralButton

@@ -42,7 +42,7 @@ Stores a snapshot `contentCopy` of flagged content plus `reportCategories` and m
 
 **Routes:** `app/api/flag/flagreportsubmission`, `app/api/flag/getSpecificReport`, `app/api/user/reports`.
 
-**UI:** listing row menu → [`useFlagging.ts`](../../hooks/useFlagging.ts) → `FlagDialog`. Notes: [useFlagging.md](../hooks/useFlagging.md).
+**UI:** listing row menu → [`useFlagging.ts`](../../hooks/useFlagging.ts) → `FlagDialog` → [`AddReport.tsx`](../../components/Flagging/AddReport.tsx) / [`EditReport.tsx`](../../components/Flagging/EditReport.tsx). Notes: [useFlagging.md](../hooks/useFlagging.md), [flag-report-forms.md](../components/flag-report-forms.md).
 
 **Client cache:** [`ReportsContext.tsx`](../../context/ReportsContext.tsx) (`ReportsProvider` in [`ReportsWrapper.tsx`](../../wrappers/ReportsWrapper.jsx)) loads `/api/user/reports` and exposes `hasReported`, `getStatus`, `addReport`, `deleteReport`.
 

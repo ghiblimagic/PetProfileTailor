@@ -17,4 +17,4 @@ Manages flag/report dialog visibility and the listing content passed to `FlagDia
 
 ## Consumer
 
-[`ContentListing.jsx`](../../../components/ShowingListOfContent/ContentListing.jsx) — `FlagButton` → `openFlag(content)` → `FlagDialog`.
+[`ContentListing.tsx`](../../../components/ShowingListOfContent/ContentListing.tsx) — `FlagButton` → `openFlag(content)` → `FlagDialog` → `AddReport` / `EditReport`. Form notes: [flag-report-forms.md](../components/flag-report-forms.md).

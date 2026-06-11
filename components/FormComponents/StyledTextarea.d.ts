@@ -8,6 +8,7 @@ export type StyledTextareaProps = {
   value?: string;
   ariaLabel?: string;
   name?: string;
+  placeholder?: string;
   disabled?: boolean;
   "aria-label"?: string;
 };

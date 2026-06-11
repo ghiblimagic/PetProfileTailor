@@ -1,6 +1,10 @@
+/**
+ * Edit or delete a pending report inside FlagDialog.
+ * Notes: docs/notes/components/flag-report-forms.md
+ */
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, type ChangeEvent, type FormEvent } from "react";
 import GeneralButton from "@components/ReusableSmallComponents/buttons/GeneralButton";
 import { toast } from "react-toastify";
 import axios from "axios";
@@ -13,42 +17,56 @@ import { useReports } from "@/context/ReportsContext";
 import { useSession } from "next-auth/react";
 import MustLoginMessage from "@components/ui/MustLoginMessage";
 import LoadingSpinner from "../ui/LoadingSpinner";
+import type { ContentType } from "@/utils/api/checkIfValidContentType";
+import type { ReportContentInfo } from "@/components/Flagging/AddReport";
 
-function EditReport({
+type SpecificReportResponse = {
+  report?: {
+    _id: string;
+    reportCategories?: string[];
+    comments?: string;
+  };
+};
+
+export type EditReportProps = {
+  flaggedByUser?: string;
+  contentInfo: ReportContentInfo;
+  contentId: string;
+  onClose?: () => void;
+  dataType: ContentType | string;
+};
+
+export default function EditReport({
   flaggedByUser,
   contentInfo,
   contentId,
   onClose,
   dataType,
-}) {
-  // api to grab content by contentId
-
-  // pages\api\flag\getSpecificReport\route.js
-
+}: EditReportProps) {
   const { deleteReport } = useReports();
   const { data: session } = useSession();
   const signedInUser = session?.user?.id;
 
-  const [reportCategories, setReportCategories] = useState([]);
-  const [comments, setComments] = useState([]);
-  const [message, setMessage] = useState("");
+  const [reportCategories, setReportCategories] = useState<string[]>([]);
+  const [comments, setComments] = useState("");
   const [reportId, setReportId] = useState("");
   const [loading, setLoading] = useState(true);
   const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
 
   useEffect(() => {
-    // console.log("edit report ran", contentId);
     const fetchReport = async () => {
       try {
-        const res = await axios.get("/api/flag/getSpecificReport", {
-          params: { contentId, userId: flaggedByUser, status: "pending" },
-        });
-        // console.log("response", res.data);
+        const res = await axios.get<SpecificReportResponse>(
+          "/api/flag/getSpecificReport",
+          {
+            params: { contentId, userId: flaggedByUser, status: "pending" },
+          },
+        );
 
         if (res.data.report) {
-          setReportCategories(res.data.report.reportCategories || []);
-          setComments(res.data.report.comments || "");
-          setReportId(res.data.report._id); // keep the id so we can update it later
+          setReportCategories(res.data.report.reportCategories ?? []);
+          setComments(res.data.report.comments ?? "");
+          setReportId(res.data.report._id);
         }
       } catch (err) {
         console.error("Error fetching specific report", err);
@@ -62,47 +80,34 @@ function EditReport({
     }
   }, [flaggedByUser, contentId]);
 
-  const handleReportCategories = (e) => {
+  const handleReportCategories = (e: ChangeEvent<HTMLInputElement>) => {
     const { value, checked } = e.target;
 
     checked
       ? setReportCategories([...reportCategories, value])
       : setReportCategories(
-          reportCategories.filter((flagTitle) => flagTitle != value),
+          reportCategories.filter((flagTitle) => flagTitle !== value),
         );
   };
 
-  // ################ DELETION #################
-
-  const handleDeletion = async (e) => {
-    e.preventDefault();
-
+  const handleDeletion = async () => {
     try {
-      const res = await axios.delete("/api/flag/getSpecificReport", {
+      await axios.delete("/api/flag/getSpecificReport", {
         data: { reportId },
       });
-      // console.log("response", res.data);
 
       deleteReport(dataType, contentId, reportId);
-
-      if (res.data.report) {
-        setReportCategories(res.data.report.reportCategories || []);
-        setComments(res.data.report.comments || "");
-        setReportId(res.data.report._id); // keep the id so we can update it later
-      }
     } catch (err) {
-      console.error("Error fetching specific report", err);
+      console.error("Error deleting report", err);
     } finally {
       setLoading(false);
     }
 
     setShowDeleteConfirmation(false);
-    onClose();
-    // console.log("deleted");
+    onClose?.();
   };
 
-  // ################ EDIT #################
-  const handleSubmitEdit = async (e) => {
+  const handleSubmitEdit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     if (reportCategories.length === 0) {
@@ -116,11 +121,10 @@ function EditReport({
       return;
     }
 
-    //dealing with the edge case because of profile pages, profile pages won't have a createdBy property
-    let profileIsLoggedInUserCheck = contentInfo._id;
+    const profileIsLoggedInUserCheck = contentInfo._id;
 
-    let contentCreatedByUserId =
-      contentInfo.createdBy != undefined
+    const contentCreatedByUserId =
+      contentInfo.createdBy !== undefined
         ? contentInfo.createdBy._id
         : profileIsLoggedInUserCheck;
 
@@ -139,27 +143,20 @@ function EditReport({
       reportCategories,
       comments,
     };
-    // console.log(reportSubmission);
 
-    await axios
-      .put("/api/flag/getSpecificReport", reportSubmission)
-      .then((response) => {
-        toast.success(`Thank you for your report! Report successfully updated`);
-      })
-      // .then(() => callApiToaddUserToNamesArray(userAndNameId))
-      .then(() => {
-        onClose();
-      })
-
-      .catch((error) => {
-        console.log("this is an error", error);
-
-        toast.error(`Ruh Roh! ${error.message}`);
-      });
+    try {
+      await axios.put("/api/flag/getSpecificReport", reportSubmission);
+      toast.success(`Thank you for your report! Report successfully updated`);
+      onClose?.();
+    } catch (error: unknown) {
+      const err = error as { message?: string };
+      console.log("this is an error", error);
+      toast.error(`Ruh Roh! ${err.message ?? "Request failed"}`);
+    }
   };
 
   function cancelFlagFormAndRevertFlagState() {
-    onClose?.(); // <-- close the dialog
+    onClose?.();
   }
 
   return (
@@ -177,8 +174,6 @@ function EditReport({
             </div>
 
             <div className={`-mx-3 mb-6`}>
-              {/* Area to Type a comment  */}
-
               <div className=" mb-2 text-subtleWhite sm:px-4 pt-2">
                 {!signedInUser && (
                   <MustLoginMessage text="edit or delete a report" />
@@ -287,7 +282,7 @@ function EditReport({
                     value={comments}
                     onChange={(e) => setComments(e.target.value)}
                     name="body"
-                    maxLength="500"
+                    maxLength={500}
                     placeholder="Optional"
                     disabled={!signedInUser}
                   />
@@ -306,7 +301,6 @@ function EditReport({
                   <GeneralButton
                     type="submit"
                     text="Submit"
-                    default
                     disabled={!signedInUser}
                   />
                 </Field>
@@ -335,5 +329,3 @@ function EditReport({
     </div>
   );
 }
-
-export default EditReport;
