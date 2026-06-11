@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect, type FormEvent } from "react";
+import { useState, useRef, useEffect, type SubmitEvent } from "react";
 import { useActionState } from "react";
 import {
   sendContactEmail,
@@ -69,9 +69,9 @@ export default function ContactForm() {
     return () => clearTimeout(timeout);
   }, [executeRecaptcha, isE2eTestMode]);
 
-  async function handleSubmit(e: FormEvent<HTMLFormElement>) {
+  async function handleSubmit(e: SubmitEvent) {
     e.preventDefault();
-    const formData = new FormData(e.currentTarget);
+    const formData = new FormData(e.currentTarget as HTMLFormElement);
 
     // E2E only — skip reCAPTCHA when Playwright builds with NEXT_PUBLIC_E2E_TEST_MODE
     if (isE2eTestMode) {

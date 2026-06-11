@@ -7,7 +7,7 @@ Sources:
 
 ## Role
 
-Root layout loads populated categories from Mongo (`app/layout.js` → [`CategTagsWrapper.js`](../../../wrappers/CategTagsWrapper.js)). Client components read them via `useCategAndTags()` or `useCategoriesForDataType(dataType)`.
+Root layout loads populated categories from Mongo (`app/layout.js` → [`CategTagsWrapper.tsx`](../../../wrappers/CategTagsWrapper.tsx)). Client components read them via `useCategAndTags()` or `useCategoriesForDataType(dataType)`.
 
 ## Types
 

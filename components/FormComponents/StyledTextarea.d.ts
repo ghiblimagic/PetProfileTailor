@@ -1,6 +1,7 @@
 import type { ReactElement, TextareaHTMLAttributes } from "react";
 
 export type StyledTextareaProps = {
+  id?: string;
   className?: string;
   onChange?: TextareaHTMLAttributes<HTMLTextAreaElement>["onChange"];
   required?: boolean;

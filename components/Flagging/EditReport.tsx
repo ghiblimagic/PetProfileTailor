@@ -4,7 +4,7 @@
  */
 "use client";
 
-import { useState, useEffect, type ChangeEvent, type FormEvent } from "react";
+import { useState, useEffect, type ChangeEvent, type SubmitEvent } from "react";
 import GeneralButton from "@components/ReusableSmallComponents/buttons/GeneralButton";
 import { toast } from "react-toastify";
 import axios from "axios";
@@ -107,7 +107,7 @@ export default function EditReport({
     onClose?.();
   };
 
-  const handleSubmitEdit = async (e: FormEvent<HTMLFormElement>) => {
+  const handleSubmitEdit = async (e: SubmitEvent) => {
     e.preventDefault();
 
     if (reportCategories.length === 0) {

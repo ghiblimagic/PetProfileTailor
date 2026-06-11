@@ -1,90 +1,46 @@
+/**
+ * Add-name form with tags, notes, and duplicate check.
+ * Notes: docs/notes/components/add-content-forms.md
+ */
 "use client";
 
-import React, { useEffect, useState } from "react";
+import { useEffect, useState, type SubmitEvent, type ChangeEvent } from "react";
 import axios from "axios";
 import Image from "next/image";
-
 import { toast } from "react-toastify";
-
 import WarningMessage from "@components/ReusableSmallComponents/buttons/WarningMessage";
 import regexInvalidInput from "@/utils/stringManipulation/check-for-valid-content";
 import TagsSelectAndCheatSheet from "@components/FormComponents/TagsSelectAndCheatSheet";
 import { useTags } from "@hooks/useTags";
 import StyledTextarea from "@components/FormComponents/StyledTextarea";
 import { useSession } from "next-auth/react";
-
 import CheckIfContentExists from "./CheckIfContentExists";
 import PreserveTextAfterSubmission from "./preserveTextAfterSubmission";
 import ToggeableAlert from "../ReusableMediumComponents/ToggeableAlert";
 
-function NewNameWithTagsData() {
+export default function NewNameWithTagsData() {
   const [newName, setNewName] = useState("");
   const [isPending, setIsPending] = useState(false);
-
   const [note, setNote] = useState("");
   const [doNotClear, setDoNotClear] = useState(false);
   const [nameSubmissionMessage, setNameSubmissionMessage] = useState("");
   const [resetCheckContent, setResetCheckContent] = useState(false);
-
-  const [newNameInvalidInput, setNewNameInvalidInput] = useState(null);
+  const [newNameInvalidInput, setNewNameInvalidInput] = useState<
+    string[] | null
+  >(null);
   const [checkIsProcessing, setCheckIsProcessing] = useState(false);
 
-  const { data: session, status } = useSession();
-
-  const disabled = session === null ? true : false;
-
-  //   "session in adding names",
-  //   session,
-  //   session === null,
-  //   session === null ? false : true,
-  // );
-
-  //regex will return null if none of the characters are invalid, so start with null to begin with
+  const { data: session } = useSession();
+  const disabled = session === null;
 
   const { tagsToSubmit, handleSelectChange, handleCheckboxChange, clearTags } =
     useTags();
 
-  //     let nameResponse = await fetch("/api/names/check-if-content-exists/" + nameCheck);
-  //     let nameData = await nameResponse.json();
-  //     setNameCheckFunctionRun(true);
-
-  //     if (!nameResponse.ok) {
-  //       // Handles 400, 409, and other error statuses
-  //       // so this shows the invalid error message
-  //       setCheckContentMessage(
-  //         nameData.message || "Unexpected response from server",
-  //       );
-  //       setNamesThatExist(nameData.data || []);
-  //       return;
-  //     }
-
-  //     switch (nameData.type) {
-  //       case "duplicate":
-  //         setCheckContentMessage(`Ruh Roh! The name ${nameCheck} already exists`);
-  //         setNamesThatExist(nameData.data);
-  //         break;
-
-  //       case "success":
-  //         setCheckContentMessage(nameData.message); // "Success! That name is not in the database"
-  //         setNamesThatExist([]);
-  //         break;
-
-  //       default:
-  //         setCheckContentMessage("Unexpected response");
-  //         setNamesThatExist([]);
-  //     }
-  //   } catch (err) {
-  //     setCheckContentMessage("Error checking name: " + err.message);
-  //     setNamesThatExist([]);
-  //   }
-  // }
-
-  //client side validation for name submission section
   useEffect(() => {
     setNewNameInvalidInput(regexInvalidInput(newName));
   }, [newName]);
 
-  function handleNameSubmission(e) {
+  function handleNameSubmission(e: SubmitEvent) {
     e.preventDefault();
     setIsPending(true);
 
@@ -96,10 +52,10 @@ function NewNameWithTagsData() {
 
     axios
       .post("/api/names", nameSubmission)
-      .then((response) => {
+      .then(() => {
         setIsPending(false);
         toast.success(
-          `Successfully added name: ${newName}. Heres a treat point as thanks for your contribution ${session.user.name}!`,
+          `Successfully added name: ${newName}. Heres a treat point as thanks for your contribution ${session?.user?.name ?? ""}!`,
         );
         if (!doNotClear) {
           setNewName("");
@@ -107,18 +63,18 @@ function NewNameWithTagsData() {
           clearTags();
         }
       })
-      .catch((error) => {
+      .catch((error: unknown) => {
         console.log("this is error", error);
         setIsPending(false);
 
+        const err = error as {
+          response?: { data?: { message?: string } };
+        };
         const msg =
-          error.response?.data?.message ||
+          err.response?.data?.message ||
           "Ruh Roh! Something went wrong. Please try again.";
         setNameSubmissionMessage(msg);
       });
-    {
-      status === "loading" && <p>Loading...</p>;
-    }
   }
 
   return (
@@ -182,7 +138,6 @@ function NewNameWithTagsData() {
           {!session && (
             <WarningMessage message="please sign in to submit a name" />
           )}
-          {/* needs label and value for Select to work  */}
 
           <label
             className="font-bold block mt-8 mb-4 text-xl "
@@ -195,16 +150,16 @@ function NewNameWithTagsData() {
             id="nameInput"
             className="bg-secondary border-subtleWhite rounded-2xl disabled:bg-errorBackgroundColor disabled:text-errorTextColor disabled:cursor-not-allowed"
             value={newName}
-            onChange={(e) => {
+            onChange={(e: ChangeEvent<HTMLInputElement>) => {
               setNewName(e.target.value.trimStart());
               if (nameSubmissionMessage !== "") {
                 setNameSubmissionMessage("");
               }
               setResetCheckContent((prev) => !prev);
             }}
-            maxLength="50"
+            maxLength={50}
             disabled={disabled}
-          ></input>
+          />
 
           {newNameInvalidInput !== null && (
             <WarningMessage
@@ -227,7 +182,6 @@ function NewNameWithTagsData() {
             invalidInput={newNameInvalidInput}
           />
 
-          {/* setNote */}
           <label
             className="font-bold block mb-4 text-xl "
             htmlFor="nameNote"
@@ -236,9 +190,8 @@ function NewNameWithTagsData() {
           </label>
 
           <StyledTextarea
-            type="text"
             id="nameNote"
-            maxLength="1000"
+            maxLength={1000}
             value={note}
             className="bg-secondary border-subtleWhite  block "
             onChange={(e) => {
@@ -272,7 +225,7 @@ function NewNameWithTagsData() {
             tagsToSubmit={tagsToSubmit}
             handleSelectChange={handleSelectChange}
             handleCheckboxChange={handleCheckboxChange}
-            isDisabled={session === null ? true : false}
+            isDisabled={disabled}
           />
 
           <PreserveTextAfterSubmission
@@ -280,16 +233,12 @@ function NewNameWithTagsData() {
             setDoNotClear={setDoNotClear}
           />
 
-          {/* SUBMISSION */}
-
           {!isPending && (
             <button
               className={`font-bold py-2 px-4 border-b-4 rounded my-4 bg-yellow-300 text-violet-800 border-yellow-100                         hover:bg-blue-500                       hover:text-subtleWhite                   hover:border-blue-700
                     disabled:bg-errorBackgroundColor disabled:text-errorTextColor disabled:border-errorBorderColor disabled:cursor-not-allowed"             `}
               disabled={
                 !session || newNameInvalidInput !== null || newName.length < 2
-                  ? "disabled"
-                  : ""
               }
               type="submit"
             >
@@ -308,10 +257,6 @@ function NewNameWithTagsData() {
           )}
         </form>
         {nameSubmissionMessage && (
-          // <WarningMessage
-          //   state={setNameSubmissionMessage}
-          //   message={nameSubmissionMessage}
-          // />
           <ToggeableAlert
             text={nameSubmissionMessage}
             setToggleState={setNameSubmissionMessage}
@@ -322,5 +267,3 @@ function NewNameWithTagsData() {
     </div>
   );
 }
-
-export default NewNameWithTagsData;

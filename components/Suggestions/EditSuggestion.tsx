@@ -8,7 +8,7 @@ import {
   useState,
   useEffect,
   type ChangeEvent,
-  type FormEvent,
+  type SubmitEvent,
 } from "react";
 import GeneralButton from "@components/ReusableSmallComponents/buttons/GeneralButton";
 import { toast } from "react-toastify";
@@ -134,7 +134,7 @@ export default function EditSuggestion({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [contentInfo._id]);
 
-  const handleSubmitSuggestion = async (e: FormEvent<HTMLFormElement>) => {
+  const handleSubmitSuggestion = async (e: SubmitEvent) => {
     e.preventDefault();
 
     if (!suggestionBy) {

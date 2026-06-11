@@ -4,7 +4,7 @@
  */
 "use client";
 
-import { useState, type FormEvent } from "react";
+import { useState, type SubmitEvent } from "react";
 import GeneralButton from "@components/ReusableSmallComponents/buttons/GeneralButton";
 import { toast } from "react-toastify";
 import axios from "axios";
@@ -44,7 +44,7 @@ export default function AddThanks({
   const signedInUser = session?.user?.id;
   const [loading, setLoading] = useState(false);
 
-  const handleSubmitThanks = async (e: FormEvent<HTMLFormElement>) => {
+  const handleSubmitThanks = async (e: SubmitEvent) => {
     e.preventDefault();
     setLoading(true);
 

@@ -4,7 +4,7 @@
  */
 "use client";
 
-import { useState, type ChangeEvent, type FormEvent } from "react";
+import { useState, type ChangeEvent, type SubmitEvent } from "react";
 import GeneralButton from "@components/ReusableSmallComponents/buttons/GeneralButton";
 import { toast } from "react-toastify";
 import axios from "axios";
@@ -73,7 +73,7 @@ export default function AddSuggestion({
     }
   };
 
-  const handleSubmitSuggestion = async (e: FormEvent<HTMLFormElement>) => {
+  const handleSubmitSuggestion = async (e: SubmitEvent) => {
     e.preventDefault();
     setLoading(true);
 

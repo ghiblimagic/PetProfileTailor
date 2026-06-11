@@ -1,19 +1,21 @@
+/**
+ * Add-description form with tags, notes, and duplicate check.
+ * Notes: docs/notes/components/add-content-forms.md
+ */
 "use client";
 
-import React, { useState, useEffect } from "react";
+import { useState, type SubmitEvent, type ChangeEvent } from "react";
 import axios from "axios";
 import Image from "next/image";
 import WarningMessage from "../ReusableSmallComponents/buttons/WarningMessage";
-
 import { toast } from "react-toastify";
-
 import TagsSelectAndCheatSheet from "../FormComponents/TagsSelectAndCheatSheet";
 import { useTags } from "@/hooks/useTags";
 import { useSession } from "next-auth/react";
 import CheckIfContentExists from "./CheckIfContentExists";
 import PreserveTextAfterSubmission from "./preserveTextAfterSubmission";
 
-function NewDescriptionWithTagsData() {
+export default function NewDescriptionWithTagsData() {
   const [newDescription, setNewDescription] = useState("");
   const [doNotClear, setDoNotClear] = useState(false);
   const [notes, setNotes] = useState("");
@@ -24,42 +26,43 @@ function NewDescriptionWithTagsData() {
   const [checkIsProcessing, setCheckIsProcessing] = useState(false);
 
   const { data: session } = useSession();
-
-  const disabled = session === null ? true : false;
+  const disabled = session === null;
 
   const { tagsToSubmit, tagIds, handleSelectChange, handleCheckboxChange } =
     useTags();
 
-  function handleDescriptionSubmission(e) {
+  function handleDescriptionSubmission(e: SubmitEvent) {
     e.preventDefault();
     setIsPending(true);
 
     const descriptionSubmission = {
       content: newDescription,
       tags: tagIds,
-      notes: notes,
+      notes,
     };
 
-    // #######if the collection does not have the name, do this (allow post):  ..... otherwise update setNameExists to true and do not allow the new description
     axios
       .post("/api/description", descriptionSubmission)
-      .then((response) => {
+      .then(() => {
         setIsPending(false);
         toast.success(
           `Successfully added description: ${newDescription.slice(
             0,
             10,
           )}. Heres a treat point as thanks for your contribution ${
-            session.user.name
+            session?.user?.name ?? ""
           }!`,
         );
       })
-      .catch((error) => {
+      .catch((error: unknown) => {
         console.log("this is error", error);
         setIsPending(false);
 
+        const err = error as {
+          response?: { data?: { message?: string } };
+        };
         const msg =
-          error.response?.data?.message ||
+          err.response?.data?.message ||
           "Ruh Roh! Something went wrong. Please try again.";
         setSubmissionMessage(msg);
       });
@@ -112,7 +115,6 @@ function NewDescriptionWithTagsData() {
               Please sign in to submit a description{" "}
             </span>
           )}
-          {/* needs label and value for Select to work  */}
 
           <label
             className="font-bold block my-4 text-lg "
@@ -122,29 +124,28 @@ function NewDescriptionWithTagsData() {
           </label>
 
           <textarea
-            type="text"
-            id="nameDescription"
+            id="descriptionInput"
             className="text-subtleWhite block w-full rounded-2xl disabled:bg-errorBackgroundColor bg-secondary border-subtleWhite 
 disabled:text-errorTextColor "
             value={newDescription}
-            onChange={(e) => {
+            onChange={(e: ChangeEvent<HTMLTextAreaElement>) => {
               setNewDescription(e.target.value.trimStart());
               if (submissionMessage !== "") {
                 setSubmissionMessage("");
               }
               setResetCheckContent((prev) => !prev);
             }}
-            maxLength="4000"
+            maxLength={4000}
             disabled={disabled}
-            onClick={(e) => setDescriptionExists(false)}
-          ></textarea>
+            onClick={() => setDescriptionExists(false)}
+          />
 
           <span className="mt-2 inline-block">
             {" "}
             {`${4000 - newDescription.length}/4000 characters left`}
           </span>
 
-          {descriptionAlreadyExists == true && (
+          {descriptionAlreadyExists && (
             <p className="text-red-500 font-bold">
               Ruh Roh! This description already exists!
             </p>
@@ -160,8 +161,6 @@ disabled:text-errorTextColor "
             checkIsProcessing={checkIsProcessing}
             setCheckIsProcessing={setCheckIsProcessing}
           />
-
-          {/* NOTES SECTION           */}
 
           <label
             className="font-bold block mt-4 mb-2 text-lg "
@@ -181,13 +180,12 @@ disabled:text-errorTextColor "
             their way 😉
           </p>
           <textarea
-            type="text"
-            id="noteinput"
+            id="notesinput"
             className="text-subtleWhite block w-full disabled:bg-errorBackgroundColor  bg-secondary border-subtleWhite
 disabled:text-errorTextColor rounded-2xl"
             value={notes}
-            maxLength="800"
-            onChange={(e) => {
+            maxLength={800}
+            onChange={(e: ChangeEvent<HTMLTextAreaElement>) => {
               setNotes(e.target.value.trimStart());
               if (submissionMessage !== "") {
                 setSubmissionMessage("");
@@ -195,14 +193,13 @@ disabled:text-errorTextColor rounded-2xl"
               setResetCheckContent((prev) => !prev);
             }}
             disabled={disabled}
-          ></textarea>
+          />
 
           <span className="mt-2 inline-block">
             {" "}
             {`${800 - notes.length}/800 characters left`}
           </span>
 
-          {/* TAGS SECTION */}
           <label
             className="font-bold block mt-4 mb-2 text-lg"
             htmlFor="descriptionTags"
@@ -226,18 +223,14 @@ disabled:text-errorTextColor rounded-2xl"
             setDoNotClear={setDoNotClear}
           />
 
-          {/* BUTTON */}
-
           {!isPending && (
             <button
               className={`font-bold py-2 px-4 border-b-4 rounded     
                 disabled:bg-errorBackgroundColor disabled:text-errorTextColor           
                    mt-4 bg-yellow-300 text-violet-800 border-yellow-100   hover:bg-blue-500                       hover:text-subtleWhite                     hover:border-blue-700
                `}
-              disabled={
-                !session || newDescription.length < 10 ? "disabled" : ""
-              }
-              onClick={handleDescriptionSubmission}
+              disabled={!session || newDescription.length < 10}
+              type="submit"
             >
               Add description {!session && "(disabled)"}
             </button>
@@ -264,5 +257,3 @@ disabled:text-errorTextColor rounded-2xl"
     </div>
   );
 }
-
-export default NewDescriptionWithTagsData;

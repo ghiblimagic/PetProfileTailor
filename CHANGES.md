@@ -2990,6 +2990,66 @@ Convert `CategTagsWrapper.js` or `addingName.jsx` / `addingdescription.jsx`.
 
 ---
 
+## 2026-06-07 — TypeScript: `CategTagsWrapper`, add-content forms
+
+### What was changed and why
+
+Converted categories wrapper and add name/description forms to TypeScript. Fixed submit `disabled` props (were string `"disabled"`). Removed dead code in name submit handler. Added `.d.ts` for `CheckIfContentExists` and `WarningMessage` optional props.
+
+### Files created
+
+- `wrappers/CategTagsWrapper.tsx`
+- `components/AddingNewData/addingName.tsx`
+- `components/AddingNewData/addingdescription.tsx`
+- `components/AddingNewData/CheckIfContentExists.d.ts`
+- `components/ReusableSmallComponents/buttons/WarningMessage.d.ts`
+- `docs/notes/components/add-content-forms.md`
+
+### Files removed
+
+- `wrappers/CategTagsWrapper.js`
+- `components/AddingNewData/addingName.jsx`
+- `components/AddingNewData/addingdescription.jsx`
+
+### Files modified
+
+- `components/FormComponents/StyledTextarea.d.ts` (`id` prop)
+- `docs/README.md`
+- `docs/notes/context/categories-and-tags.md`
+- `docs/notes/hooks/useTags.md`
+
+### Verification
+
+- `pnpm exec tsc --noEmit` — OK
+- `pnpm build` — OK
+
+### Next logical step
+
+Convert `CheckIfContentExists.js` or `CoreListingPagesLogic.jsx`.
+
+---
+
+## 2026-06-07 — React 19: `SubmitEvent` for form handlers
+
+### What was changed and why
+
+Replaced deprecated `FormEvent<HTMLFormElement>` with `SubmitEvent` on all `onSubmit` handlers (React 19 typings). `ContactForm` casts `e.currentTarget` for `FormData`.
+
+### Files modified
+
+- `components/Contact/ContactForm.tsx`
+- `components/AddingNewData/addingName.tsx`, `addingdescription.tsx`
+- `components/Flagging/AddReport.tsx`, `EditReport.tsx`
+- `components/Suggestions/AddSuggestion.tsx`, `EditSuggestion.tsx`
+- `components/Thanks/AddThanks.tsx`
+- `docs/notes/typescript/type-vs-interface.md`
+
+### Verification
+
+- `pnpm exec tsc --noEmit` — OK
+
+---
+
 ## 2026-06-07 — TypeScript: flag/suggestion API routes
 
 ### What was changed and why

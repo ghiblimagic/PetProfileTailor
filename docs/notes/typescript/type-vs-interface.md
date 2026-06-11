@@ -89,3 +89,15 @@ Workspace rule of thumb (`.cursor/rules/Typescript.mdc`): **`interface` for obje
 - **`type`** — any named type expression, especially when it isn’t a simple extendable object
 
 Neither is “more correct” for React or Next.js.
+
+## React 19 form submit events
+
+For `onSubmit` handlers, prefer `SubmitEvent` from `"react"` instead of deprecated `FormEvent<HTMLFormElement>`:
+
+```ts
+function handleSubmit(e: SubmitEvent) {
+  e.preventDefault();
+}
+```
+
+Keep `ChangeEvent` for `onChange` on inputs and textareas.
