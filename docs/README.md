@@ -39,5 +39,6 @@ Each source file with notes should have a one-line pointer at the top linking to
 | [`hooks/useThanksHandler.ts`](../hooks/useThanksHandler.ts) | [useThanksHandler.md](notes/hooks/useThanksHandler.md) |
 | [`hooks/useFlagging.ts`](../hooks/useFlagging.ts) | [useFlagging.md](notes/hooks/useFlagging.md) |
 | [`hooks/useSuggest.ts`](../hooks/useSuggest.ts) | [useSuggest.md](notes/hooks/useSuggest.md) |
+| [`hooks/useEditHandler.ts`](../hooks/useEditHandler.ts) | [useEditHandler.md](notes/hooks/useEditHandler.md) |
 | [`models/Name.ts`](../models/Name.ts), [`Description.ts`](../models/Description.ts) | [name-and-description.md](notes/models/name-and-description.md) |
 | [`utils/stringManipulation/findNormalizedMatch.ts`](../utils/stringManipulation/findNormalizedMatch.ts) | [findNormalizedMatch.md](notes/utils/stringManipulation/findNormalizedMatch.md) |

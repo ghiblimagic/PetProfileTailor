@@ -2604,3 +2604,33 @@ Converted listing dialog state hooks to `.ts`. Both store the full listing row (
 ### Next logical step
 
 Convert `components/ShowingListOfContent/ContentListing.jsx` or `hooks/useEditHandler.js`.
+
+---
+
+## 2026-06-07 — TypeScript: `useEditHandler`
+
+### What was changed and why
+
+Converted edit-dialog + PUT hook to `.ts`. Typed `EditSubmission` from `EditContent` (`content`, `notes`, `tags`), optional SWR `mutate` over paginated pages, and `setLocalData` for local row state.
+
+### Files created
+
+- `hooks/useEditHandler.ts`
+- `docs/notes/hooks/useEditHandler.md`
+
+### Files removed
+
+- `hooks/useEditHandler.js`
+
+### Files modified
+
+- `docs/README.md`
+
+### Verification
+
+- `pnpm exec tsc --noEmit` — OK
+- `pnpm build` — OK
+
+### Next logical step
+
+Convert `components/ShowingListOfContent/ContentListing.jsx`.
