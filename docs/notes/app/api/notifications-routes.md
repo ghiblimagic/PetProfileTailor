@@ -20,7 +20,7 @@ Mongoose `populate()` resolves `ref: "User"` etc. only if those models are regis
 | `utils/stringManipulation/findNormalizedMatch.ts` | `User` |
 | `app/(protected)/notifications/page.tsx` | `Name`, `User` |
 
-**Already correct (unchanged):** `app/(protected)/dashboard/page.js` documents tag imports; legacy `.js` routes like `thanks/route.js`, `suggestion/route.js` still import ref models.
+**Already correct (unchanged):** `app/(protected)/dashboard/page.js` documents tag imports; legacy `.js` routes like `suggestion/route.js` still import ref models.
 
 ## Unread counts (`GET`)
 

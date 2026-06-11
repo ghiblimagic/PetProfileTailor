@@ -52,8 +52,7 @@ const ThankSchema = new mongoose.Schema<IThankDocument>(
       type: mongoose.Schema.Types.ObjectId,
       ref: "Description",
       required: function (this: IThankDocument) {
-        // Legacy: singular "description" matches thanks API, not enum value "descriptions"
-        return (this.contentType as string) === "description";
+        return this.contentType === "descriptions";
       },
       default: null,
     },

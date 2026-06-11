@@ -18,13 +18,13 @@ Sources:
 
 ## Thank
 
-- `messages` must be tags from [`data/ThanksOptions.js`](../../data/ThanksOptions.js).
-- `nameId` required when `contentType === "names"`; `descriptionId` when `contentType === "description"` (singular — matches legacy API/thanks route, not the `"descriptions"` enum value).
+- `messages` must be tags from [`data/ThanksOptions.ts`](../../data/ThanksOptions.ts).
+- `nameId` required when `contentType === "names"`; `descriptionId` when `contentType === "descriptions"`.
 - Index `{ contentCreator, nameId, descriptionId, thanksBy }` for notification lookups.
 
-**Routes:** `app/api/thanks`, `app/api/notifications/thanks`, `app/api/thanks/get-thanks-count`.
+**Routes:** [`app/api/thanks`](../../app/api/thanks/route.ts), `app/api/notifications/thanks`, [`app/api/thanks/get-thanks-count`](../../app/api/thanks/get-thanks-count/route.ts). API notes: [thanks-route.md](../app/api/thanks-route.md).
 
-**UI:** [`ThanksButton.tsx`](../../components/Thanks/ThanksButton.tsx) on listing rows (`ContentListing`) → [`useThanksHandler.ts`](../../hooks/useThanksHandler.ts) → [`ThanksDialog.tsx`](../../components/Thanks/ThanksDialog.tsx). Notes: [useThanksHandler.md](../hooks/useThanksHandler.md).
+**UI:** [`ThanksButton.tsx`](../../components/Thanks/ThanksButton.tsx) → [`useThanksHandler.ts`](../../hooks/useThanksHandler.ts) → [`ThanksDialog.tsx`](../../components/Thanks/ThanksDialog.tsx) → [`AddThanks.tsx`](../../components/Thanks/AddThanks.tsx). Hook notes: [useThanksHandler.md](../hooks/useThanksHandler.md).
 
 ## Suggestion
 

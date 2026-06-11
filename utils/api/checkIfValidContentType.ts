@@ -18,3 +18,8 @@ export function checkIfValidContentType(contentType: string): true {
   }
   return true;
 }
+
+/** Canonical type is `"descriptions"`; accepts legacy `"description"` when reading old records. */
+export function isDescriptionsContentType(contentType: string): boolean {
+  return contentType === "descriptions" || contentType === "description";
+}

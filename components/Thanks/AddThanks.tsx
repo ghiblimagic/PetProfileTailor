@@ -1,6 +1,10 @@
+/**
+ * Thanks submission form inside ThanksDialog.
+ * Notes: docs/notes/models/moderation-and-thanks.md
+ */
 "use client";
 
-import { useState } from "react";
+import { useState, type FormEvent } from "react";
 import GeneralButton from "@components/ReusableSmallComponents/buttons/GeneralButton";
 import { toast } from "react-toastify";
 import axios from "axios";
@@ -12,22 +16,35 @@ import {
   thanksOptionsPetOwners,
   thanksOptionsAnyone,
 } from "@/data/ThanksOptions";
+import type { ContentType } from "@/utils/api/checkIfValidContentType";
 import { useSession } from "next-auth/react";
 import MustLoginMessage from "@components/ui/MustLoginMessage";
 import LoadingSpinner from "../ui/LoadingSpinner";
 
-export default function AddThank({
+type ThanksContentInfo = {
+  _id: string;
+  createdBy: { _id: string };
+};
+
+export type AddThanksProps = {
+  dataType: ContentType | string;
+  contentInfo: ThanksContentInfo;
+  apiThanksSubmission: string;
+  onClose?: () => void;
+};
+
+export default function AddThanks({
   dataType,
   contentInfo,
   apiThanksSubmission,
   onClose,
-}) {
-  const [selectedThanks, setSelectedThanks] = useState([]);
+}: AddThanksProps) {
+  const [selectedThanks, setSelectedThanks] = useState<string[]>([]);
   const { data: session } = useSession();
   const signedInUser = session?.user?.id;
   const [loading, setLoading] = useState(false);
 
-  const handleSubmitThanks = async (e) => {
+  const handleSubmitThanks = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
 
@@ -37,7 +54,7 @@ export default function AddThank({
       return;
     }
 
-    let contentCreatedByUserId = contentInfo.createdBy._id;
+    const contentCreatedByUserId = contentInfo.createdBy._id;
 
     if (contentCreatedByUserId === signedInUser) {
       setLoading(false);
@@ -53,28 +70,48 @@ export default function AddThank({
       contentCreator: contentCreatedByUserId,
       messages: selectedThanks,
     };
-    // console.log(thanksSubmission);
 
     try {
-      const response = await axios.post(apiThanksSubmission, thanksSubmission);
+      await axios.post(apiThanksSubmission, thanksSubmission);
       setLoading(false);
       toast.success(`Thank you! Your thank your note was successfully sent`);
-
       onClose?.();
-    } catch (error) {
+    } catch (error: unknown) {
       console.log("this is an error", error);
       setLoading(false);
-      toast.error(
-        `Ruh Roh! ${error.message} ${JSON.stringify(
-          error?.response?.data?.message,
-        )}`,
-      );
+      const detail = axios.isAxiosError(error)
+        ? `${error.message} ${JSON.stringify(error.response?.data?.message)}`
+        : "Request failed";
+      toast.error(`Ruh Roh! ${detail}`);
     }
   };
 
   function cancelThanks() {
-    onClose?.(); // <-- close the dialog
+    onClose?.();
   }
+
+  const renderOptionGroup = (options: { tag: string }[], heading: string) => (
+    <>
+      <h4 className="text-center">{heading}</h4>
+      {options.map((option) => (
+        <StyledCheckbox
+          key={option.tag}
+          label={option.tag}
+          description=""
+          checked={selectedThanks.includes(option.tag)}
+          onChange={(e) =>
+            setSelectedThanks((prev) =>
+              prev.includes(e.target.value)
+                ? prev.filter((tag) => tag !== e.target.value)
+                : [...prev, e.target.value],
+            )
+          }
+          value={option.tag}
+          disabled={!signedInUser}
+        />
+      ))}
+    </>
+  );
 
   return (
     <form
@@ -109,73 +146,19 @@ export default function AddThank({
 
             <div className="flex flex-col gap-4 mt-4">
               <p className="text-center">
-                {" "}
-                Choose as many options as you like. You can mix and match
-                between the lists. Send an entire litter worth of thanks if
-                you&apos;re feeling it 🐶🐱!
+                Choose as many options as you like. You can mix and match between
+                the lists. Send an entire litter worth of thanks if you&apos;re
+                feeling it 🐶🐱!
               </p>
               <p className="text-center">
                 However to avoid spam, you can only thank a single piece of
                 content 10 times.
               </p>
-              <p className="text-center">
-                Thanks can not be edited or deleted.
-              </p>
+              <p className="text-center">Thanks can not be edited or deleted.</p>
               <div className="flex-col flex justify-center align-items-center md:flex-wrap gap-x-3 gap-y-8 mx-auto my-6">
-                <h4 className="text-center"> For Professionals </h4>
-                {thanksOptionsProfessional.map((option) => (
-                  <StyledCheckbox
-                    key={option.tag}
-                    label={option.tag}
-                    checked={selectedThanks.includes(option.tag)}
-                    onChange={(e) =>
-                      setSelectedThanks((prev) =>
-                        prev.includes(e.target.value)
-                          ? prev.filter((tag) => tag !== e.target.value)
-                          : [...prev, e.target.value],
-                      )
-                    }
-                    value={option.tag}
-                    disabled={!signedInUser}
-                  />
-                ))}
-
-                <h4 className="text-center"> For Pet Owners </h4>
-
-                {thanksOptionsPetOwners.map((option) => (
-                  <StyledCheckbox
-                    key={option.tag}
-                    label={option.tag}
-                    checked={selectedThanks.includes(option.tag)}
-                    onChange={(e) =>
-                      setSelectedThanks((prev) =>
-                        prev.includes(e.target.value)
-                          ? prev.filter((tag) => tag !== e.target.value)
-                          : [...prev, e.target.value],
-                      )
-                    }
-                    value={option.tag}
-                    disabled={!signedInUser}
-                  />
-                ))}
-
-                <h4 className="text-center"> For Anyone </h4>
-                {thanksOptionsAnyone.map((option) => (
-                  <StyledCheckbox
-                    key={option.tag}
-                    label={option.tag}
-                    checked={selectedThanks.includes(option.tag)}
-                    onChange={(e) =>
-                      setSelectedThanks((prev) =>
-                        prev.includes(e.target.value)
-                          ? prev.filter((tag) => tag !== e.target.value)
-                          : [...prev, e.target.value],
-                      )
-                    }
-                    value={option.tag}
-                    disabled={!signedInUser}
-                  />
-                ))}
+                {renderOptionGroup(thanksOptionsProfessional, " For Professionals ")}
+                {renderOptionGroup(thanksOptionsPetOwners, " For Pet Owners ")}
+                {renderOptionGroup(thanksOptionsAnyone, " For Anyone ")}
               </div>
             </div>
           </section>
@@ -191,7 +174,7 @@ export default function AddThank({
             <GeneralButton
               type="submit"
               text="Submit"
-              default
+              subtle
               disabled={!signedInUser || loading}
             />
           </Field>

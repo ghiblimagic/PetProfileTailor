@@ -2685,3 +2685,70 @@ Convert `components/ShowingListOfContent/ContentListing.jsx`.
 ### Verification
 
 - `pnpm exec tsc --noEmit` — OK
+
+---
+
+## 2026-06-07 — TypeScript: thanks flow (remaining files)
+
+### What was changed and why
+
+Completed thanks-flow migration: data options, submission form, API routes, and mark-read helper. Removed dead commented code from thanks route. Fixed `markThanksRead` fetch URL to `/api/notifications/thanks/mark-read` (old path did not exist). Documented legacy POST `descriptionId` mismatch in thanks-route notes.
+
+### Files created
+
+- `data/ThanksOptions.ts`
+- `components/Thanks/AddThanks.tsx`
+- `components/Thanks/markThanksRead.tsx`
+- `app/api/thanks/route.ts`
+- `app/api/thanks/get-thanks-count/route.ts`
+- `docs/notes/app/api/thanks-route.md`
+
+### Files removed
+
+- `data/ThanksOptions.js`
+- `components/Thanks/AddThanks.jsx`
+- `components/Thanks/markThanksRead.jsx`
+- `app/api/thanks/route.js`
+- `app/api/thanks/get-thanks-count/route.js`
+
+### Files modified
+
+- `docs/notes/models/moderation-and-thanks.md`
+- `docs/notes/app/api/notifications-routes.md`
+- `docs/README.md`
+
+### Verification
+
+- `pnpm exec tsc --noEmit` — OK
+- `pnpm build` — OK
+
+### Next logical step
+
+Convert `components/ShowingListOfContent/ContentListing.jsx`.
+
+---
+
+## 2026-06-07 — Fix: canonical `descriptions` contentType
+
+### What was changed and why
+
+Aligned server branches with UI convention (`"descriptions"` not `"description"`). Thanks POST now sets `descriptionId`; suggestion POST/PUT routes description tags correctly. Added `isDescriptionsContentType()` helper (accepts legacy `"description"` when reading old records).
+
+### Files modified
+
+- `utils/api/checkIfValidContentType.ts`
+- `utils/api/checkIfValidContentType.test.ts`
+- `app/api/thanks/route.ts`
+- `app/api/suggestion/route.js`
+- `models/Thank.ts`
+- `docs/notes/app/api/thanks-route.md`
+- `docs/notes/models/moderation-and-thanks.md`
+
+### Verification
+
+- `pnpm test -- checkIfValidContentType` — OK
+- `pnpm exec tsc --noEmit` — OK
+
+### Next logical step
+
+Convert `components/ShowingListOfContent/ContentListing.jsx`.

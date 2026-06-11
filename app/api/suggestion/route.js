@@ -7,6 +7,7 @@ import { getSessionForApis } from "@/utils/api/getSessionForApis";
 import { checkOwnership } from "@/utils/api/checkOwnership";
 import convertStringToMongooseId from "@/utils/stringManipulation/convertStringToMongooseId";
 import { NextResponse } from "next/server";
+import { isDescriptionsContentType } from "@/utils/api/checkIfValidContentType";
 
 // Shared auth helper
 async function requireAuth(req) {
@@ -62,10 +63,13 @@ export async function POST(req) {
 
   try {
     const nameTagsSuggested = contentType === "names" ? tags : [];
-    const descriptionTagsSuggested = contentType === "description" ? tags : [];
+    const descriptionTagsSuggested = isDescriptionsContentType(contentType)
+      ? tags
+      : [];
     const incorrectNameTags = contentType === "names" ? incorrectTags : [];
-    const incorrectDescriptionTags =
-      contentType === "description" ? incorrectTags : [];
+    const incorrectDescriptionTags = isDescriptionsContentType(contentType)
+      ? incorrectTags
+      : [];
 
     const suggestion = await Suggestion.create({
       contentType,
@@ -166,12 +170,16 @@ export async function PUT(req) {
 
     const nameTagsSuggested =
       existingSuggestion.contentType === "names" ? tags : [];
-    const descriptionTagsSuggested =
-      existingSuggestion.contentType === "description" ? tags : [];
+    const descriptionTagsSuggested = isDescriptionsContentType(
+      existingSuggestion.contentType,
+    )
+      ? tags
+      : [];
 
     const incorrectNameTags = contentType === "names" ? incorrectTags : [];
-    const incorrectDescriptionTags =
-      contentType === "description" ? incorrectTags : [];
+    const incorrectDescriptionTags = isDescriptionsContentType(contentType)
+      ? incorrectTags
+      : [];
 
     existingSuggestion.comments = comments;
     existingSuggestion.description = description;
