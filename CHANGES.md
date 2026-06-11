@@ -2526,3 +2526,47 @@ Converted listing share toggle button to `.tsx`. Typed `onClickShowShares` as `M
 ### Next logical step
 
 Convert `hooks/useThanksHandler.js` or `components/ShowingListOfContent/ContentListing.jsx`.
+
+---
+
+## 2026-06-07 — TypeScript: `useThanksHandler`
+
+### What was changed and why
+
+Converted thanks-dialog state hook to `.ts`. Typed `thanksTarget` as content id string (`openThanks` stores id only). Fixed `confirmThanks` to use `contentId: thanksTarget` (legacy path — `AddThanks` still POSTs directly). Removed debug `console.log` from `openThanks`.
+
+### Files created
+
+- `hooks/useThanksHandler.ts`
+- `docs/notes/hooks/useThanksHandler.md`
+
+### Files removed
+
+- `hooks/useThanksHandler.js`
+
+### Files modified
+
+- `docs/notes/models/moderation-and-thanks.md`
+- `docs/README.md`
+
+### Verification
+
+- `pnpm exec tsc --noEmit` — OK
+- `pnpm build` — OK
+
+### Next logical step
+
+Convert `components/ShowingListOfContent/ContentListing.jsx` or `hooks/useFlagging.js` / `useSuggest.js`.
+
+---
+
+## 2026-06-07 — Cleanup: `useThanksHandler` types
+
+### What was changed and why
+
+Trimmed over-defensive types: `openThanks` now takes `contentId: string` only (matches sole caller). Removed exported `ThanksOpenTarget` / `UseThanksHandlerOptions` aliases and unused axios response handling in legacy `confirmThanks`.
+
+### Files modified
+
+- `hooks/useThanksHandler.ts`
+- `docs/notes/hooks/useThanksHandler.md`

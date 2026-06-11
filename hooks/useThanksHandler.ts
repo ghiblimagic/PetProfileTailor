@@ -1,21 +1,19 @@
+/**
+ * Thanks dialog open/close state for listing rows.
+ * Notes: docs/notes/hooks/useThanksHandler.md
+ */
 import { useState } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
 
-export function useThanksHandler({ apiEndpoint }) {
+export function useThanksHandler({ apiEndpoint }: { apiEndpoint: string }) {
   const [showThanksDialog, setShowThanksDialog] = useState(false);
-  const [thanksTarget, setThanksTarget] = useState(null);
+  const [thanksTarget, setThanksTarget] = useState<string | null>(null);
   const [isSavingThanks, setIsSavingThanks] = useState(false);
 
-  const openThanks = (target) => {
-    console.log("openThanks called with target:", target);
-    const id = typeof target === "string" ? target : target?._id;
-    if (!id) {
-      console.warn("openThanks called with invalid target!", target);
-      return;
-    }
-    // console.log("this is id", id);
-    setThanksTarget(id);
+  const openThanks = (contentId: string) => {
+    if (!contentId) return;
+    setThanksTarget(contentId);
     setShowThanksDialog(true);
   };
 
@@ -25,28 +23,20 @@ export function useThanksHandler({ apiEndpoint }) {
     setIsSavingThanks(false);
   };
 
-  const confirmThanks = async (thanksData) => {
+  const confirmThanks = async (thanksData: Record<string, unknown>) => {
     if (!thanksTarget) return;
 
     setIsSavingThanks(true);
 
     try {
-      const res = await axios.put(apiEndpoint, {
+      await axios.put(apiEndpoint, {
         submission: {
           ...thanksData,
-          contentId: thanksTarget._id,
+          contentId: thanksTarget,
         },
       });
 
-      const submittedThanks = res.data?.data ??
-        res.data ?? { ...thanksTarget, ...thanksData };
-      // normalized so submittedThanks is always just the actual object to replace
-      // console.log("response data", res.data);
-
-      // console.log("submittedThanks", submittedThanks);
-
       toast.success("Successfully thanked!");
-
       closeThanks();
     } catch (error) {
       console.error("Error sending thanks:", error);
