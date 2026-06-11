@@ -16,7 +16,7 @@ Public profile view: avatar/bio card, add counts, [`ToggleOneContentPage`](../..
 
 ## Page
 
-[`app/profile/[profilename]/page.jsx`](../../../app/profile/[profilename]/page.jsx) — loads user by `profileName`, populates followers and content lists.
+See [profile-page.md](../app/profile-page.md).
 
 ## Related
 

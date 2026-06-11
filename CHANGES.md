@@ -3468,3 +3468,65 @@ Converted public name-lookup page to TypeScript. Renamed default export to `Fetc
 ### Next logical step
 
 Convert `app/addnames/page.js` or `app/profile/[profilename]/page.jsx`.
+
+---
+
+## 2026-06-07 — TypeScript: `app/profile/[profilename]/page`
+
+### What was changed and why
+
+Converted profile server route to TypeScript. Typed `params` as `Promise<{ profilename: string }>`. Reused `ProfileUserData` from `profile.tsx`. Side-effect imports for tag models. Removed dead code: `usersLikedContent` / `NameLikes` / session fetch (never passed to `Profile`), `getUserFollowing`, `console.log`. Dropped `JSON.parse(JSON.stringify(...))` — `leanWithStrings` already returns serializable plain objects.
+
+### Files created
+
+- `app/profile/[profilename]/page.tsx`
+- `docs/notes/app/profile-page.md`
+
+### Files removed
+
+- `app/profile/[profilename]/page.jsx`
+
+### Files modified
+
+- `docs/notes/components/profile.md`
+- `docs/README.md`
+
+### Verification
+
+- `pnpm exec tsc --noEmit` — OK
+- `pnpm build` — OK
+
+### Next logical step
+
+Convert `app/addnames/page.js` or `app/fetchnames/page.jsx`.
+
+---
+
+## 2026-06-07 — TypeScript: `app/profile/[profilename]/page`
+
+### What was changed and why
+
+Converted profile server route to TypeScript. Typed `params` as `Promise<{ profilename: string }>`. Reused `ProfileUserData` from `profile.tsx`. Side-effect imports for tag models. Removed dead code: `usersLikedContent` / `NameLikes` / session fetch (never passed to `Profile`), `getUserFollowing`, `console.log`. Dropped `JSON.parse(JSON.stringify(...))` — `leanWithStrings` already returns serializable plain objects.
+
+### Files created
+
+- `app/profile/[profilename]/page.tsx`
+- `docs/notes/app/profile-page.md`
+
+### Files removed
+
+- `app/profile/[profilename]/page.jsx`
+
+### Files modified
+
+- `docs/notes/components/profile.md`
+- `docs/README.md`
+
+### Verification
+
+- `pnpm exec tsc --noEmit` — OK
+- `pnpm build` — OK
+
+### Next logical step
+
+Convert `app/addnames/page.js` or `app/fetchnames/page.jsx`.
