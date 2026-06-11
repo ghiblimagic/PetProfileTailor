@@ -11,4 +11,4 @@ Likes for “Fav Names” on the dashboard use [`LikesContext`](../../../context
 ## Related
 
 - [core-listing-pages-logic.md](../components/core-listing-pages-logic.md)
-- [fetchdescriptions page](../../../app/fetchdescriptions/page.jsx) (descriptions twin)
+- [fetchdescriptions-page.md](./fetchdescriptions-page.md) (descriptions twin)

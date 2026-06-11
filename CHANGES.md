@@ -3609,3 +3609,31 @@ Documented post–TypeScript migration backlog. First item: Option B — server-
 ### Files modified
 
 - `docs/README.md`
+
+---
+
+## 2026-06-07 — TypeScript: `app/fetchdescriptions/page`
+
+### What was changed and why
+
+Converted fetch-descriptions listing route to TypeScript. Renamed default export to `FetchDescriptionsPage`. Same slim pattern as `fetchnames/page.tsx`.
+
+### Files created
+
+- `app/fetchdescriptions/page.tsx`
+- `docs/notes/app/fetchdescriptions-page.md`
+
+### Files removed
+
+- `app/fetchdescriptions/page.jsx`
+
+### Files modified
+
+- `docs/notes/app/fetchnames-page.md`
+- `docs/notes/components/core-listing-pages-logic.md`
+- `docs/README.md`
+
+### Verification
+
+- `pnpm exec tsc --noEmit` — OK
+- `pnpm build` — OK
