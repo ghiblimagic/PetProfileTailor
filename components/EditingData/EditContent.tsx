@@ -1,16 +1,35 @@
+/**
+ * Edit dialog for listing name/description rows.
+ * Notes: docs/notes/hooks/useEditHandler.md
+ */
 "use client";
 
 import { Dialog, DialogPanel, DialogTitle } from "@headlessui/react";
-
-import { useRef, useEffect, useState } from "react";
-
+import { useRef, useState } from "react";
 import GeneralButton from "@components/ReusableSmallComponents/buttons/GeneralButton";
 import XSvgIcon from "@components/ReusableSmallComponents/iconsOrSvgImages/XSvgIcon";
 import StyledInput from "@components/FormComponents/StyledInput";
 import StyledTextarea from "@components/FormComponents/StyledTextarea";
 import TagsSelectAndCheatSheet from "@components/FormComponents/TagsSelectAndCheatSheet";
 import { useTags } from "@hooks/useTags";
-import { useCategoriesForDataType } from "@/hooks/useCategoriesForDataType";
+import type { ContentType } from "@/utils/api/checkIfValidContentType";
+import type { EditSubmission } from "@/hooks/useEditHandler";
+
+type ContentTag = { tag: string; _id: string };
+
+export type EditableContent = {
+  content: string;
+  notes?: string;
+  tags: ContentTag[];
+};
+
+export type EditContentProps = {
+  dataType: ContentType | string;
+  open: boolean;
+  onClose: () => void;
+  content: EditableContent;
+  onSave: (editedData: EditSubmission) => void | Promise<void>;
+};
 
 export default function EditContent({
   dataType,
@@ -18,9 +37,7 @@ export default function EditContent({
   onClose,
   content,
   onSave,
-}) {
-  const { categoriesWithTags, tagList } = useCategoriesForDataType(dataType);
-
+}: EditContentProps) {
   const initialTags = content.tags.map((tag) => ({
     label: tag.tag,
     value: tag._id,
@@ -29,21 +46,21 @@ export default function EditContent({
   const { tagsToSubmit, handleSelectChange, handleCheckboxChange } =
     useTags(initialTags);
 
-  const panelRef = useRef(null);
+  const panelRef = useRef<HTMLDivElement>(null);
 
   const [updatedContent, setUpdatedContent] = useState(content.content);
-  const [notes, setNotes] = useState(content.notes);
+  const [notes, setNotes] = useState(content.notes ?? "");
   const [isSaving, setIsSaving] = useState(false);
 
   if (!open) return null;
 
   const handleSubmit = async () => {
-    if (isSaving) return; // prevent double click
+    if (isSaving) return;
     setIsSaving(true);
 
     await onSave({
       content: updatedContent,
-      notes: notes,
+      notes,
       tags: tagsToSubmit.map((t) => t.value),
     });
 
@@ -56,23 +73,20 @@ export default function EditContent({
     <Dialog
       open={open}
       onClose={() => {}}
-      // this way the form won't close when the user clicks on the backdrop
       className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto"
-      initialFocus={panelRef} // optional, for focusing panel for keyboard scroll
+      initialFocus={panelRef}
     >
-      {/* Backdrop */}
       <div
         className="fixed inset-0 bg-black/50"
         aria-hidden="true"
       />
 
-      {/* Modal panel */}
       <DialogPanel
+        ref={panelRef}
         className="relative bg-primary rounded-2xl shadow-xl w-full max-w-5xl max-h-[90vh] overflow-auto p-6 z-50 text-center"
-        onClick={(e) => e.stopPropagation()} // prevent clicks from closing
-        tabIndex={0} // focusable for arrow key scrolling
+        onClick={(e) => e.stopPropagation()}
+        tabIndex={0}
       >
-        {/* Close button */}
         <div className="flex justify-end">
           <XSvgIcon
             onClickAction={onClose}
@@ -84,7 +98,6 @@ export default function EditContent({
           Edit Content
         </DialogTitle>
 
-        {/* ############ CONTENT ################# */}
         <h4 className="text-subtleWhite mb-2 text-lg">
           {dataType === "names" ? "Name" : "Description"}
         </h4>
@@ -104,12 +117,9 @@ export default function EditContent({
           />
         )}
         <span className="block text-subtleWhite mb-2">
-          {`${
-            maxContentLength - updatedContent.length
-          }/ ${maxContentLength} characters left`}
+          {`${maxContentLength - updatedContent.length}/ ${maxContentLength} characters left`}
         </span>
 
-        {/* notes */}
         <h4 className="text-subtleWhite mb-2 text-lg">Notes</h4>
         <StyledTextarea
           value={notes}
@@ -120,15 +130,14 @@ export default function EditContent({
           {`${1000 - notes.length}/1000 characters left`}
         </span>
 
-        {/* Tags */}
         <TagsSelectAndCheatSheet
           dataType={dataType}
           tagsToSubmit={tagsToSubmit}
           handleSelectChange={handleSelectChange}
           handleCheckboxChange={handleCheckboxChange}
+          isDisabled={false}
         />
 
-        {/* Buttons */}
         <div className="mt-6 flex justify-evenly px-8">
           <GeneralButton
             text="Cancel"

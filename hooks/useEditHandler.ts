@@ -8,7 +8,7 @@ import { toast } from "react-toastify";
 
 type ListingContent = { _id: string };
 
-type EditSubmission = {
+export type EditSubmission = {
   content: string;
   notes: string;
   tags: string[];

@@ -2752,3 +2752,37 @@ Aligned server branches with UI convention (`"descriptions"` not `"description"`
 ### Next logical step
 
 Convert `components/ShowingListOfContent/ContentListing.jsx`.
+
+---
+
+## 2026-06-07 — TypeScript: `DeleteButton`, `EditButton`, `EditContent`
+
+### What was changed and why
+
+Converted listing row delete/edit menu buttons and edit dialog to `.tsx`. Exported `EditSubmission` from `useEditHandler` for shared save payload typing. Removed unused `useCategoriesForDataType` call from edit dialog.
+
+### Files created
+
+- `components/DeletingData/DeleteButton.tsx`
+- `components/ReusableSmallComponents/buttons/EditButton.tsx`
+- `components/EditingData/EditContent.tsx`
+
+### Files removed
+
+- `components/DeletingData/DeleteButton.jsx`
+- `components/ReusableSmallComponents/buttons/EditButton.jsx`
+- `components/EditingData/EditContent.jsx`
+
+### Files modified
+
+- `hooks/useEditHandler.ts`
+- `docs/notes/hooks/useEditHandler.md`
+- `docs/README.md`
+
+### Verification
+
+- `pnpm exec tsc --noEmit` — OK
+
+### Next logical step
+
+Convert `components/ShowingListOfContent/ContentListing.jsx`.
