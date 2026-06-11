@@ -2439,3 +2439,32 @@ Converted notifications tab button to `.tsx`. Generic `IconOpenCloseButtonProps<
 ### Next logical step
 
 Convert `ContainerForLikeShareFlag.jsx` or `components/Thanks/ThanksButton.jsx`.
+
+---
+
+## 2026-06-07 — TypeScript: `ContainerForLikeShareFlag`
+
+### What was changed and why
+
+Converted shared like/share/thanks action chrome wrapper to `.tsx` with typed `children`.
+
+### Files created
+
+- `components/ReusableSmallComponents/buttons/ContainerForLikeShareFlag.tsx`
+
+### Files removed
+
+- `components/ReusableSmallComponents/buttons/ContainerForLikeShareFlag.jsx`
+
+### Files modified
+
+- `docs/notes/app/api/togglelike-route.md`
+
+### Verification
+
+- `pnpm exec tsc --noEmit` — OK
+- `pnpm build` — OK
+
+### Next logical step
+
+Convert `components/Thanks/ThanksButton.jsx` or `ShareButton.jsx`.

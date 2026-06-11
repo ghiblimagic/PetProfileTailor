@@ -40,4 +40,5 @@ Only `contentCreator._id` is used (for `contentCreator` on the like doc and self
 - [`GET /api/user/likes`](user-likes-route.md) — bulk fetch for `LikesContext`
 - [`hooks/useLikeState.ts`](../../../hooks/useLikeState.ts) (uses [`useToggleState.ts`](../../../hooks/useToggleState.ts))
 - [`LikesButtonAndLikesLogic.tsx`](../../../components/ReusableSmallComponents/buttons/LikesButtonAndLikesLogic.tsx) — listing heart UI
+- [`ContainerForLikeShareFlag.tsx`](../../../components/ReusableSmallComponents/buttons/ContainerForLikeShareFlag.tsx) — shared action button chrome (like / share / thanks)
 - `e2e/helpers/likes.ts`
