@@ -2468,3 +2468,32 @@ Converted shared like/share/thanks action chrome wrapper to `.tsx` with typed `c
 ### Next logical step
 
 Convert `components/Thanks/ThanksButton.jsx` or `ShareButton.jsx`.
+
+---
+
+## 2026-06-07 — TypeScript: `ThanksButton`
+
+### What was changed and why
+
+Converted listing thanks action button to `.tsx`. Typed `onClick`; added `aria-label`. Uses `ContainerForLikeShareFlag` + `thanks` icon.
+
+### Files created
+
+- `components/Thanks/ThanksButton.tsx`
+
+### Files removed
+
+- `components/Thanks/ThanksButton.jsx`
+
+### Files modified
+
+- `docs/notes/models/moderation-and-thanks.md`
+
+### Verification
+
+- `pnpm exec tsc --noEmit` — OK
+- `pnpm build` — OK
+
+### Next logical step
+
+Convert `ShareButton.jsx` or `hooks/useThanksHandler.js`.

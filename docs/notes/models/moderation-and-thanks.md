@@ -24,6 +24,8 @@ Sources:
 
 **Routes:** `app/api/thanks`, `app/api/notifications/thanks`, `app/api/thanks/get-thanks-count`.
 
+**UI:** [`ThanksButton.tsx`](../../components/Thanks/ThanksButton.tsx) on listing rows (`ContentListing`) → `useThanksHandler` dialog.
+
 ## Suggestion
 
 Tag suggestion workflow: incorrect tags, suggested replacements, categories, optional `description` / `comments`.
