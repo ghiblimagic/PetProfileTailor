@@ -3779,3 +3779,70 @@ Re-added helpful inline comments stripped during TS conversion (pagination prelo
 - `components/Filtering/FilteringSidebar.tsx`
 - `hooks/useSwrPagination.ts`
 - `docs/notes/typescript/preserving-migration-notes.md`
+
+---
+
+## 2026-06-07 — TypeScript: form primitives and siblings
+
+### What was changed and why
+
+Converted shared form components to TypeScript with exported prop types. `StyledCheckbox.description` is optional (no empty string needed in FilteringSidebar). `RegisterInput` now honors `className` on the input (was passed from RegisterForm but ignored in JS). Preserved inline comments (checkbox id/mobile focus, StyledSelect SSR/hydration, RegisterInput helperText cases).
+
+### Files created
+
+- `components/FormComponents/StyledCheckbox.tsx`
+- `components/FormComponents/StyledInput.tsx`
+- `components/FormComponents/StyledTextarea.tsx`
+- `components/FormComponents/StyledSelect.tsx`
+- `components/FormComponents/RegisterInput.tsx`
+- `components/FormComponents/CheckboxWithLabelAndDescription.tsx`
+- `components/AddingNewData/preserveTextAfterSubmission.tsx`
+- `docs/notes/components/form-components.md`
+
+### Files removed
+
+- `components/FormComponents/*.jsx` (6 files) and `preserveTextAfterSubmission.jsx`
+
+### Files modified
+
+- `components/Filtering/FilteringSidebar.tsx`
+- `docs/notes/components/add-content-forms.md`, `filtering-sidebar.md`
+- `docs/README.md`
+
+### Verification
+
+- `pnpm exec tsc --noEmit` — OK
+- `pnpm build` — OK
+
+### Next logical step
+
+Convert `app/name/[name]/page.jsx` and `app/description/[id]/page.jsx`, then `app/api/categories-and-tags/route.js`.
+
+---
+
+## 2026-06-07 — Docs: form-components special-behavior notes
+
+### What was changed and why
+
+Expanded `form-components.md` with inline-comment behavior (StyledCheckbox id/mobile hiding, StyledSelect SSR/hydration, RegisterInput helperText cases). Updated preserving-migration-notes convention.
+
+### Files modified
+
+- `docs/notes/components/form-components.md`
+- `docs/notes/typescript/preserving-migration-notes.md`
+
+---
+
+## 2026-06-07 — Delete unused `CheckboxWithLabelAndDescription`
+
+### What was changed and why
+
+Removed orphaned component — no imports anywhere. Flag report categories use `StyledCheckbox` in `AddReport.tsx`. `addingName.jsx` once imported it but never rendered it.
+
+### Files removed
+
+- `components/FormComponents/CheckboxWithLabelAndDescription.tsx`
+
+### Files modified
+
+- `docs/notes/components/form-components.md` — removed section; note `AddReport` uses `StyledCheckbox` for categories

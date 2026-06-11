@@ -61,6 +61,7 @@ Each source file with notes should have a one-line pointer at the top linking to
 | [`CategoriesAndTagsContext.tsx`](../context/CategoriesAndTagsContext.tsx), [`useCategoriesForDataType.ts`](../hooks/useCategoriesForDataType.ts), [`CategTagsWrapper.tsx`](../wrappers/CategTagsWrapper.tsx) | [categories-and-tags.md](notes/context/categories-and-tags.md) |
 | [`addingName.tsx`](../components/AddingNewData/addingName.tsx), [`addingdescription.tsx`](../components/AddingNewData/addingdescription.tsx) | [add-content-forms.md](notes/components/add-content-forms.md) |
 | [`CheckIfContentExists.tsx`](../components/AddingNewData/CheckIfContentExists.tsx) | [check-if-content-exists.md](notes/components/check-if-content-exists.md) |
+| [`StyledCheckbox.tsx`](../components/FormComponents/StyledCheckbox.tsx), [`StyledInput.tsx`](../components/FormComponents/StyledInput.tsx), [`StyledTextarea.tsx`](../components/FormComponents/StyledTextarea.tsx), [`StyledSelect.tsx`](../components/FormComponents/StyledSelect.tsx), [`RegisterInput.tsx`](../components/FormComponents/RegisterInput.tsx) | [form-components.md](notes/components/form-components.md) |
 | [`CoreListingPagesLogic.tsx`](../components/CoreListingPagesLogic.tsx) | [core-listing-pages-logic.md](notes/components/core-listing-pages-logic.md) |
 | [`useSwrPagination.ts`](../hooks/useSwrPagination.ts) | [useSwrPagination.md](notes/hooks/useSwrPagination.md) |
 | [`pagination.tsx`](../components/ShowingListOfContent/pagination.tsx) | [pagination.md](notes/components/pagination.md) |

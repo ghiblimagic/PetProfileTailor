@@ -7,7 +7,7 @@ Sources:
 
 ## Role
 
-Signed-in users submit new names or descriptions with tags and optional notes. Both use [`useTags.ts`](../../../hooks/useTags.ts), [`TagsSelectAndCheatSheet.tsx`](../../FormComponents/TagsSelectAndCheatSheet.tsx), and [`CheckIfContentExists.tsx`](../../../components/AddingNewData/CheckIfContentExists.tsx) for duplicate checks. See [check-if-content-exists](./check-if-content-exists.md).
+Signed-in users submit new names or descriptions with tags and optional notes. Both use [`useTags.ts`](../../../hooks/useTags.ts), [`TagsSelectAndCheatSheet.tsx`](../../../components/FormComponents/TagsSelectAndCheatSheet.tsx), [`StyledTextarea.tsx`](../../../components/FormComponents/StyledTextarea.tsx), [`preserveTextAfterSubmission.tsx`](../../../components/AddingNewData/preserveTextAfterSubmission.tsx), and [`CheckIfContentExists.tsx`](../../../components/AddingNewData/CheckIfContentExists.tsx) for duplicate checks. See [check-if-content-exists](./check-if-content-exists.md) and [form-components.md](./form-components.md).
 
 ## APIs
 

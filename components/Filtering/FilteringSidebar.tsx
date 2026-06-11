@@ -155,7 +155,6 @@ export default function FilteringSidebar({
                         <StyledCheckbox
                           key={option._id}
                           label={option.tag} // visible text
-                          description=""
                           value={option._id} // unique id for accessibility — StyledCheckbox sets id/htmlFor={value}, not index
                           checked={filterTagsIds.includes(option._id)}
                           onChange={handleFilterChange}

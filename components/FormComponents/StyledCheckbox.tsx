@@ -1,7 +1,20 @@
-import React from "react";
-import { Field } from "@headlessui/react";
+/**
+ * Paw-styled checkbox for filters and forms.
+ * Notes: docs/notes/components/form-components.md
+ */
+import { type ChangeEventHandler, type ReactNode } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPaw } from "@fortawesome/free-solid-svg-icons";
+
+export type StyledCheckboxProps = {
+  label?: ReactNode;
+  description?: ReactNode;
+  checked?: boolean;
+  onChange?: ChangeEventHandler<HTMLInputElement>;
+  value: string;
+  className?: string;
+  disabled?: boolean;
+};
 
 export default function StyledCheckbox({
   label,
@@ -11,7 +24,7 @@ export default function StyledCheckbox({
   value,
   className = "",
   disabled = false,
-}) {
+}: StyledCheckboxProps) {
   // id={`filter-mobile-${index}`} wasn't working, htmlFor={id} and <input id={id} kept breaking
   // why?
   // Once a panel opens, closes, or React remounts, index-based ids break uniqueness across multiple panels
@@ -21,7 +34,7 @@ export default function StyledCheckbox({
   return (
     <label
       htmlFor={value}
-      className="flex items-start space-x-2 cursor-pointer max-w-96"
+      className={`flex items-start space-x-2 cursor-pointer max-w-96 ${className}`}
     >
       <input
         id={value}

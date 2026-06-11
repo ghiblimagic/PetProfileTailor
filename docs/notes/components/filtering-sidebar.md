@@ -132,7 +132,7 @@ const handleFilterChange = (e: ChangeEvent<HTMLInputElement>) => {
 Do **not** pass `id={`filter-mobile-${index}`}` — caused mobile focus / stuck-click when panels remount.
 
 ```jsx
-// components/FormComponents/StyledCheckbox.jsx
+// components/FormComponents/StyledCheckbox.tsx
 // id={`filter-mobile-${index}`} wasn't working ...
 // Once a panel opens, closes, or React remounts, index-based ids break uniqueness
 // value works because this will always be globally unique

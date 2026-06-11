@@ -1,7 +1,12 @@
+/**
+ * react-select wrapper for admin category pickers (SSR disabled).
+ * Notes: docs/notes/components/form-components.md
+ */
 "use client";
 
-import React, { useMemo } from "react";
+import { useMemo } from "react";
 import dynamic from "next/dynamic";
+import type { MultiValue, StylesConfig } from "react-select";
 
 const NoSSRSelect = dynamic(() => import("react-select"), { ssr: false });
 
@@ -15,7 +20,38 @@ const NoSSRSelect = dynamic(() => import("react-select"), { ssr: false });
 
 // const Select = dynamic(() => import("react-select"), { ssr: false });
 
-export default function StyledSelect({
+export type StyledSelectOption = Record<string, unknown> & { _id?: string };
+
+type FormattedOption = StyledSelectOption & { label: unknown; value: unknown };
+
+export type StyledSelectProps<T extends StyledSelectOption = StyledSelectOption> =
+  {
+    id?: string;
+    options?: T[];
+    value?: T[];
+    onChange: (normalized: T[]) => void;
+    labelProperty?: string;
+    valueProperty?: string;
+    isMulti?: boolean;
+    isSearchable?: boolean;
+  };
+
+const selectStyles: StylesConfig<FormattedOption, true> = {
+  menu: (provided) => ({
+    ...provided,
+    backgroundColor: "rgb(20 2 35)", // dark purple
+    color: "rgb(221 214 254)",
+    borderRadius: "0.5rem",
+  }),
+  option: (provided, state) => ({
+    ...provided,
+    backgroundColor: state.isFocused ? "#2563EB" : "rgb(20 2 35)", // Tailwind bg-blue-600 on hover :  dark purple
+    color: "rgb(221 214 254)", //subtle white
+    cursor: state.isDisabled ? "not-allowed" : "pointer",
+  }),
+};
+
+export default function StyledSelect<T extends StyledSelectOption>({
   id,
   options = [],
   value = [],
@@ -24,15 +60,15 @@ export default function StyledSelect({
   valueProperty = "value",
   isMulti = true,
   isSearchable = true,
-}) {
+}: StyledSelectProps<T>) {
   // create a stable array of react-select-friendly objects
   const formattedOptions = useMemo(
     () =>
       options.map((opt) => ({
-        ...opt, // keep original fields (_id, etc.)
+        ...opt,
         label: opt[labelProperty],
         value: opt[valueProperty],
-      })),
+      })) as FormattedOption[],
     [options, labelProperty, valueProperty],
   );
 
@@ -44,8 +80,7 @@ export default function StyledSelect({
     () =>
       value
         .map((v) => formattedOptions.find((o) => o._id === v._id))
-        // Find the actual objects inside formattedOptions
-        .filter(Boolean),
+        .filter(Boolean) as FormattedOption[],
     [value, formattedOptions],
   );
 
@@ -60,26 +95,13 @@ export default function StyledSelect({
       value={formattedValue}
       isMulti={isMulti}
       isSearchable={isSearchable}
-      styles={{
-        menu: (provided) => ({
-          ...provided,
-          backgroundColor: "rgb(20 2 35)", // dark purple
-          color: "rgb(221 214 254)",
-          borderRadius: "0.5rem",
-        }),
-        option: (provided, state) => ({
-          ...provided,
-          backgroundColor: state.isFocused ? "#2563EB" : "rgb(20 2 35)", // Tailwind bg-blue-600 on hover :  dark purple
-          color: "rgb(221 214 254)", //subtle white
-          cursor: state.isDisabled ? "not-allowed" : "pointer",
-        }),
-      }}
-      onChange={(selected) => {
+      styles={selectStyles}
+      onChange={(selected: MultiValue<FormattedOption>) => {
         // react-select gives you the same objects from formattedOptions
         // strip the label/value props back down to your raw data if you like aka  // map react-select’s values back into raw objects
         const normalized = (selected || []).map((s) => {
-          const { label, value, ...rest } = s;
-          return rest; // rest still contains _id, category, etc.
+          const { label: _label, value: _value, ...rest } = s;
+          return rest as T;
         });
         onChange(normalized);
       }}

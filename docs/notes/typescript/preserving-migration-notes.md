@@ -17,6 +17,7 @@ When converting a module, **long behavioral comments from the original file belo
    - **Architecture** — how it fits with neighbors (SWR chunks vs UI pages, context, API routes)
    - **Implementation notes** — preserved comments from the original `.js`/`.jsx`, rewritten as prose where needed (bug repro steps, “why not X”)
    - **Edge cases / bugs solved** — timing bugs, preload logic, rejected alternatives
+   - **Special behavior from inline comments** — SSR/hydration (`dynamic(..., { ssr: false })`), mobile a11y workarounds, `cloneElement` patterns — copy the comment text into a **Special behavior** subsection, not only a one-line summary
 3. **Inline comments** — re-add helpful originals in source (prop hints, JSX section labels, `// visible text`, accessibility notes). Move **long** paragraphs (multi-line bug essays) to the md file; keep a short pointer comment in source if useful.
 4. **Index** — add or update a row in [`docs/README.md`](../../README.md).
 
