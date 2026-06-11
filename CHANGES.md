@@ -3637,3 +3637,34 @@ Converted fetch-descriptions listing route to TypeScript. Renamed default export
 
 - `pnpm exec tsc --noEmit` — OK
 - `pnpm build` — OK
+
+---
+
+## 2026-06-07 — TypeScript: `app/adddescriptions/page`
+
+### What was changed and why
+
+Converted add-descriptions page shell to TypeScript. Server component (no page-level `useSession` — form handles auth). Renamed export to `AddDescriptionsPage`.
+
+### Files created
+
+- `app/adddescriptions/page.tsx`
+- `docs/notes/app/adddescriptions-page.md`
+
+### Files removed
+
+- `app/adddescriptions/page.js`
+
+### Files modified
+
+- `docs/notes/components/add-content-forms.md`
+- `docs/README.md`
+
+### Verification
+
+- `pnpm exec tsc --noEmit` — OK
+- `pnpm build` — OK
+
+### Next logical step
+
+Convert `hooks/useSwrPagination.js` or `components/ShowingListOfContent/pagination.js`.

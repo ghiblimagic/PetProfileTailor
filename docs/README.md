@@ -41,6 +41,7 @@ Each source file with notes should have a one-line pointer at the top linking to
 | [`app/(protected)/dashboard/page.tsx`](../app/(protected)/dashboard/page.tsx), [`dashboard.tsx`](../components/dashboard.tsx) | [dashboard-page.md](notes/app/dashboard-page.md), [dashboard.md](notes/components/dashboard.md) |
 | [`app/fetchname/page.tsx`](../app/fetchname/page.tsx) | [fetchname-page.md](notes/app/fetchname-page.md) |
 | [`app/addnames/page.tsx`](../app/addnames/page.tsx) | [addnames-page.md](notes/app/addnames-page.md) |
+| [`app/adddescriptions/page.tsx`](../app/adddescriptions/page.tsx) | [adddescriptions-page.md](notes/app/adddescriptions-page.md) |
 | [`app/fetchnames/page.tsx`](../app/fetchnames/page.tsx) | [fetchnames-page.md](notes/app/fetchnames-page.md) |
 | [`app/fetchdescriptions/page.tsx`](../app/fetchdescriptions/page.tsx) | [fetchdescriptions-page.md](notes/app/fetchdescriptions-page.md) |
 | [`app/profile/[profilename]/page.tsx`](../app/profile/[profilename]/page.tsx), [`profile.tsx`](../components/profile.tsx) | [profile-page.md](notes/app/profile-page.md), [profile.md](notes/components/profile.md) |
