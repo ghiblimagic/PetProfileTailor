@@ -8,11 +8,12 @@ Heavy design and learning notes for converted TypeScript modules live here so so
 |----------|----------|---------|
 | Module design notes | `docs/notes/<path>/<module>.md` | `docs/notes/utils/mongoDataCleanup.md` for `utils/mongoDataCleanup.ts` |
 | TypeScript conventions | [type-vs-interface.md](notes/typescript/type-vs-interface.md) | When to use `type` vs `interface` in this repo |
+| Migration note preservation | [preserving-migration-notes.md](notes/typescript/preserving-migration-notes.md) | Move long JS comments into `docs/notes/` on TS conversion |
 | Operational changelog | [`CHANGES.md`](../CHANGES.md) | What changed, when, verification |
 | Post-migration backlog | [`FUTURE.md`](FUTURE.md) | Deferred improvements (e.g. likes SSR hydration) |
 | Testing | [`TESTING.md`](../TESTING.md) | Automated + manual verification checklists |
 
-Each source file with notes should have a one-line pointer at the top linking to its markdown file.
+Each source file with notes should have a one-line pointer at the top linking to its markdown file. Notes files should include **code excerpts** (key functions, wiring, edge-case branches) so you can read behavior without opening the source.
 
 ## Index
 
@@ -61,6 +62,9 @@ Each source file with notes should have a one-line pointer at the top linking to
 | [`addingName.tsx`](../components/AddingNewData/addingName.tsx), [`addingdescription.tsx`](../components/AddingNewData/addingdescription.tsx) | [add-content-forms.md](notes/components/add-content-forms.md) |
 | [`CheckIfContentExists.tsx`](../components/AddingNewData/CheckIfContentExists.tsx) | [check-if-content-exists.md](notes/components/check-if-content-exists.md) |
 | [`CoreListingPagesLogic.tsx`](../components/CoreListingPagesLogic.tsx) | [core-listing-pages-logic.md](notes/components/core-listing-pages-logic.md) |
+| [`useSwrPagination.ts`](../hooks/useSwrPagination.ts) | [useSwrPagination.md](notes/hooks/useSwrPagination.md) |
+| [`pagination.tsx`](../components/ShowingListOfContent/pagination.tsx) | [pagination.md](notes/components/pagination.md) |
+| [`FilteringSidebar.tsx`](../components/Filtering/FilteringSidebar.tsx) | [filtering-sidebar.md](notes/components/filtering-sidebar.md) |
 | [`ToggleOneContentPage.tsx`](../components/ShowingListOfContent/ToggleOneContentPage.tsx) | [toggle-one-content-page.md](notes/components/toggle-one-content-page.md) |
 | [`dashboard.tsx`](../components/dashboard.tsx) | [dashboard.md](notes/components/dashboard.md) |
 | [`profile.tsx`](../components/profile.tsx) | [profile.md](notes/components/profile.md) |

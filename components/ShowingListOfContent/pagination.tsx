@@ -1,9 +1,37 @@
-import React, { useEffect, useState, useRef, useMemo } from "react";
-import GeneralButton from "@components/ReusableSmallComponents/buttons/GeneralButton";
+/**
+ * UI pagination + SWR chunk preload for listing pages.
+ * Edge cases and bug history: docs/notes/components/pagination.md
+ */
+"use client";
 
+import { useEffect, useState, useRef, useMemo } from "react";
+import GeneralButton from "@components/ReusableSmallComponents/buttons/GeneralButton";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faChevronCircleRight } from "@fortawesome/free-solid-svg-icons";
 import startCooldown from "@utils/startCooldown";
+
+type PreLoadOverrides = {
+  currentPage?: number;
+  totalLoadedPages?: number;
+  skipCooldown?: boolean;
+};
+
+export type PaginationProps = {
+  itemsPerPage: number;
+  setItemsPerPageFunction: (selection: number) => void;
+  setSize: (size: number | ((size: number) => number)) => void;
+  size: number;
+  currentUiPage: number;
+  setCurrentUiPage: (page: number) => void;
+  setSortingLogicFunction: (value: string) => void;
+  totalPagesInDatabase: number;
+  totalItems: number;
+  amountOfDataLoaded: number; // actual loaded items across all SWR chunks
+  remainingSortCooldown: number;
+  sortingValue: number;
+  sortingProperty: string;
+  isValidating: boolean;
+};
 
 export default function Pagination({
   itemsPerPage,
@@ -15,13 +43,15 @@ export default function Pagination({
   setSortingLogicFunction,
   totalPagesInDatabase,
   totalItems,
-  amountOfDataLoaded, // Add this prop to get the actual loaded items
+  amountOfDataLoaded,
   remainingSortCooldown,
   sortingValue,
   sortingProperty,
   isValidating,
-}) {
-  const paginationCooldownRef = useRef(null);
+}: PaginationProps) {
+  const paginationCooldownRef = useRef<ReturnType<typeof setInterval> | null>(
+    null,
+  );
   const [remainingPaginationCooldown, setRemainingPaginationCooldown] =
     useState(0);
 
@@ -38,89 +68,15 @@ export default function Pagination({
     totalItems,
   );
 
-  useEffect(() => {
-    const calculatedTotalLoadedPages = Math.ceil(
-      amountOfDataLoaded / itemsPerPage,
-    );
-
-    setTotalLoadedPages(calculatedTotalLoadedPages);
-
-    // handles edge case where we're at the exact boundary after filters change, we're reached the edge of the data from that chunk (50 items for chunk 1, when we select 50 items per page)
-
-    // unfortunately needed because of this bug:
-    // bug: even if we did tell CoreListingsPageLogic to load 2 chunks when
-    // 1. 50 items per page
-    // 2. just applied new filters, the 2nd chunk doesn't load in time
-    // result would be: render with only the page 1 button, no page 2. Even though chunk 2 DOES have that data
-
-    // so this useEffect is necessary so it knows to preload the next 2 page worth of chunks if we're reached the end of the chunks data (50 items)
-    if (
-      currentUiPage + 1 >= calculatedTotalLoadedPages &&
-      calculatedTotalLoadedPages < totalPagesInDatabase &&
-      remainingPaginationCooldown === 0
-    ) {
-      preLoadNextPage({
-        currentPage: currentUiPage,
-        totalLoadedPages: calculatedTotalLoadedPages,
-        skipCooldown: true,
-      });
-    }
-  }, [
-    amountOfDataLoaded,
-    itemsPerPage,
-    currentUiPage,
-    totalPagesInDatabase,
-    remainingPaginationCooldown,
-  ]);
-
-  const windowEnd = Math.min(windowStart + windowSize - 1, totalLoadedPages);
-
-  // Make pageNumbers reactive using useMemo
-  const pageNumbers = useMemo(() => {
-    const numbers = [];
-
-    for (let i = windowStart; i <= windowEnd; i++) {
-      numbers.push(i);
-    }
-
-    return numbers;
-  }, [windowStart, windowEnd, totalLoadedPages, isValidating]);
-  // useMemo only recalculates when the dependencies actually change, not on every render
-
-  const preLoadNextPage = (overrides = {}) => {
+  const preLoadNextPage = (overrides: PreLoadOverrides = {}) => {
     // called when:
     // 1. When clicking the next arrow (lastPageHandler)
-    // 2. When changing items per page (resetItemsPerPage), if we keep the current filters and select 60 items per pages which is equal to the chunk from the database, it will update correctly
-
-    // DOESN"T WORK WHEN
-    // 1. if we have 60 items per page AND select new filters, since thats the amount we get from the database.
-    // Solution: only let users select 1-50 items per page
-    // why: users don't need 60 items per page and fixing it would require either
-    // 1. adding another useEffect in this component to detect when we're at the exact edge (60 items) and to preload more
-    // 2. callback ref from coreListingPage to pagination, which triggers preload when filters are applied after a brief delay with setTimeOut
-    // 3. in coreListingPage have handleApplyFIlters check if they're looking for 60 items per page and click apply filters, it will load an entire extra chunk (so 120 items)
-
-    // Solves bug:
-    // overrides handle a timing bug where preLoadNextPage was using the old totalLoadedPages state value since react updates are asynchronous. Instead the function that calls preLoadNextPage calculates what this value will be and passes it as overrides
-    // Behavior of bug: when there was 72 items and 50 items per page were selected, but only 1 page icon had shown and the next page icon was greyed out.  It had given a false sense of having more pages we actually had with the new items-per-page.
-
-    // Using buggy OLD state values:
-    //currentPage + 2 >= totalLoadedPages  // State value = 5
-    //1 + 2 >= 5
-    //3 >= 5  // FALSE ❌
-    //Why it failed: The old totalLoadedPages of 5 made it think "we have 5 pages loaded, you're on page 1, that's plenty of buffer!" So it didn't preload.
-
-    // Using overrides solution:
-    // const newTotalLoadedPages = Math.ceil(50 / 50) = 1
-    // currentPage + 2 >= loadedPages  // Calculated value = 1
-    // 1 + 2 >= 1
-    // 3 >= 1  // TRUE ✅
-
-    // Why it works: With 50 per page, those same 50 items only make 1 page, so we're at the edge and need to preload!
+    // 2. When changing items per page (resetItemsPerPage)
+    // Longer bug history + override timing: docs/notes/components/pagination.md
 
     const currentPage = overrides.currentPage ?? currentUiPage;
     const loadedPages = overrides.totalLoadedPages ?? totalLoadedPages;
-    const skipCooldown = overrides.skipCooldown ?? false; // Add flag
+    const skipCooldown = overrides.skipCooldown ?? false; // skip cooldown for automatic preload
 
     // If we're at the last loaded page and there's more data to fetch
     if (
@@ -139,11 +95,52 @@ export default function Pagination({
           15,
         );
       }
-      return;
     }
   };
 
-  const resetItemsPerPage = (selection) => {
+  useEffect(() => {
+    const calculatedTotalLoadedPages = Math.ceil(
+      amountOfDataLoaded / itemsPerPage,
+    );
+
+    setTotalLoadedPages(calculatedTotalLoadedPages);
+
+    // handles edge case where we're at the exact boundary after filters change
+    if (
+      currentUiPage + 1 >= calculatedTotalLoadedPages &&
+      calculatedTotalLoadedPages < totalPagesInDatabase &&
+      remainingPaginationCooldown === 0
+    ) {
+      preLoadNextPage({
+        currentPage: currentUiPage,
+        totalLoadedPages: calculatedTotalLoadedPages,
+        skipCooldown: true,
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- preLoadNextPage uses latest closure; deps match original JS
+  }, [
+    amountOfDataLoaded,
+    itemsPerPage,
+    currentUiPage,
+    totalPagesInDatabase,
+    remainingPaginationCooldown,
+  ]);
+
+  const windowEnd = Math.min(windowStart + windowSize - 1, totalLoadedPages);
+
+  // Make pageNumbers reactive using useMemo
+  const pageNumbers = useMemo(() => {
+    const numbers: number[] = [];
+
+    for (let i = windowStart; i <= windowEnd; i++) {
+      numbers.push(i);
+    }
+
+    return numbers;
+  }, [windowStart, windowEnd, totalLoadedPages, isValidating]);
+  // useMemo only recalculates when the dependencies actually change, not on every render
+
+  const resetItemsPerPage = (selection: string) => {
     const newPerPage = Number(selection);
     setItemsPerPageFunction(newPerPage);
     // move user back to page 1 visually and through swr, since we're changing how we're switching to new database logic
@@ -171,7 +168,6 @@ export default function Pagination({
     }
 
     // If we have more pages loaded, just move to the next UI page
-
     if (currentUiPage < totalLoadedPages) {
       updateWindow(currentUiPage + 1);
       setCurrentUiPage(currentUiPage + 1);
@@ -181,7 +177,7 @@ export default function Pagination({
     preLoadNextPage();
   };
 
-  const updateWindow = (page) => {
+  const updateWindow = (page: number) => {
     // Slide the window if page goes beyond visible range
     if (page >= windowStart + windowSize) {
       setWindowStart(page - windowSize + 1);
@@ -190,13 +186,14 @@ export default function Pagination({
     }
   };
 
-  const handleClickPage = (page) => {
+  const handleClickPage = (page: number) => {
     if (page >= totalLoadedPages && totalLoadedPages < totalPagesInDatabase) {
       setSize(size + 1); // trigger SWR fetch for more pages
     }
     setCurrentUiPage(page);
     updateWindow(page);
   };
+
   return (
     <section className="pagination-navigation grid grid-rows-1 min-w-0 my-2  border-t border-violet-300 text-violet-900 font-bold pt-2 ">
       {/* sorting logic*/}
@@ -217,14 +214,7 @@ export default function Pagination({
             <option value="30">30</option>
             <option value="40">40</option>
             <option value="50">50</option>
-            {/* don't give an option 60 since it leads to an edge case since 60 is the amount of items we grab from the database each time (the chunk size)
-              edge case:
-                    if you search by 60 items per page and apply a new filter, pagination will show:
-                        only the page 1 button, the next page button is greyed out as if theres no more items
-                        but underneath it says 1-60 of 352 Items   
-                
-              otherwise I'd have to add extra logic to the useEffect to detect when data has loaded but w're at the edge and need more data. 
-            */}
+            {/* don't give an option 60 since it leads to an edge case since 60 is the amount of items we grab from the database each time (the chunk size)        */}
           </select>
           <label
             className="text-white ml-2"
@@ -259,13 +249,6 @@ export default function Pagination({
               <option value="_id,1">Oldest</option>
             </select>
           )}
-
-          {/* <label
-            className="text-white ml-2"
-            htmlFor="per-page"
-          >
-            Sort by
-          </label> */}
         </section>
       </div>
 
@@ -300,18 +283,12 @@ export default function Pagination({
         {pageNumbers.map((number) => {
           return (
             <GeneralButton
-              text={number}
+              text={String(number)}
               key={number}
               subtle={true}
               active={number === currentUiPage}
               className={` px-4`}
-              onClick={
-                () => handleClickPage(number)
-
-                // number == lastPageNumber
-                //   ? clickOnLastNumber(number)
-                //   : setPageFunction(number)
-              }
+              onClick={() => handleClickPage(number)}
             />
           );
         })}

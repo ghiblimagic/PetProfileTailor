@@ -81,5 +81,5 @@ That's why adding _id as a tiebreaker fixes it universally - even items with ide
 ## Related
 
 - [`utils/api/parseNamesSwrRequest.ts`](../../../utils/api/parseNamesSwrRequest.ts) — pure parsing (unit tested)
-- [`hooks/useSwrPagination.js`](../../../hooks/useSwrPagination.js) — client consumer
+- [`hooks/useSwrPagination.ts`](../../../hooks/useSwrPagination.ts) — client consumer
 - [`e2e/browse.spec.ts`](../../../e2e/browse.spec.ts) — `_id` string shape smoke test

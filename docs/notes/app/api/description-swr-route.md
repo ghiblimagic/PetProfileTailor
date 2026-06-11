@@ -34,5 +34,5 @@ When sorting by anything other than `_id`, aggregation adds `_id: 1` as a tiebre
 ## Related
 
 - [`utils/api/parseNamesSwrRequest.ts`](../../../utils/api/parseNamesSwrRequest.ts) — shared SWR parsing helpers
-- [`hooks/useSwrPagination.js`](../../../hooks/useSwrPagination.js) — client consumer
+- [`hooks/useSwrPagination.ts`](../../../hooks/useSwrPagination.ts) — client consumer
 - [`app/api/names/swr/route.ts`](../../../app/api/names/swr/route.ts) — names counterpart (merges page into POST source)

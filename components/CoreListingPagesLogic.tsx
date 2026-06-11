@@ -207,7 +207,6 @@ export default function CoreListingPageLogic({
             toggleDrawer={toggleDrawer}
             isLoading={isLoading}
             remainingFilterCooldown={remainingFilterCooldown}
-            startCooldown={startCooldown}
             setFilterTagsIds={setFilterTagsIds}
           />
         </div>

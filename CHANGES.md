@@ -3680,3 +3680,102 @@ Deleted unused component — nothing imported it; render body was fully commente
 ### Files removed
 
 - `components/ShowingListOfContent/DashboardChartForFavDescriptions.jsx`
+
+---
+
+## 2026-06-07 — TypeScript: listing stack (`useSwrPagination`, `pagination`, `FilteringSidebar`)
+
+### What was changed and why
+
+Converted the three modules that power browse/profile listing pages to TypeScript. Fixed `useLikes()` rules-of-hooks violation (now called unconditionally at hook top). Replaced filter reset `handleApplyFilters("reset")` with `handleApplyFilters(true)`. Removed unused `startCooldown` prop from `FilteringSidebar` (never used in component). Deleted `useSwrPagination.d.ts` — types live in the `.ts` hook file.
+
+### Files created
+
+- `hooks/useSwrPagination.ts`
+- `components/ShowingListOfContent/pagination.tsx`
+- `components/Filtering/FilteringSidebar.tsx`
+- `docs/notes/hooks/useSwrPagination.md`
+- `docs/notes/components/pagination.md`
+- `docs/notes/components/filtering-sidebar.md`
+
+### Files removed
+
+- `hooks/useSwrPagination.js`
+- `hooks/useSwrPagination.d.ts`
+- `components/ShowingListOfContent/pagination.js`
+- `components/Filtering/FilteringSidebar.jsx`
+
+### Files modified
+
+- `components/CoreListingPagesLogic.tsx` — drop dead `startCooldown` prop on filter sidebar
+- `docs/notes/components/core-listing-pages-logic.md`
+- `docs/notes/app/api/names-swr-route.md`, `description-swr-route.md`
+- `docs/README.md`
+
+### Patterns followed
+
+- Export prop/params types from converted modules (`PaginationProps`, `FilteringSidebarProps`, `UseSwrPaginationParams`)
+- `"use client"` on hook and pagination (hooks)
+- Preserve preload/cooldown comments from original `pagination.js`
+
+### Verification
+
+- `pnpm exec tsc --noEmit` — OK
+- `pnpm build` — OK
+
+### Next logical step
+
+Convert form primitives used by filters: `StyledCheckbox.jsx`, `StyledInput.jsx`. Then single-content pages `app/name/[name]/page.jsx`, `app/description/[id]/page.jsx`.
+
+---
+
+## 2026-06-07 — Docs: preserve listing-stack behavioral notes
+
+### What was changed and why
+
+Listing-stack `docs/notes/` files were too bare after TS migration. Expanded them with original inline comments from `useSwrPagination.js`, `pagination.js`, `FilteringSidebar.jsx`, and `CoreListingPagesLogic.jsx` (recovered via git). Added migration convention doc so future conversions move long comments into notes files.
+
+### Files created
+
+- `docs/notes/typescript/preserving-migration-notes.md`
+
+### Files modified
+
+- `docs/notes/hooks/useSwrPagination.md` — SWR infinite rationale, getKey, revalidate flags, liked-only mode
+- `docs/notes/components/pagination.md` — preload overrides, filter boundary useEffect, 50/page cap, rejected fixes
+- `docs/notes/components/filtering-sidebar.md` — quick-filter IDs, StyledCheckbox id bug, apply/reset flow
+- `docs/notes/components/core-listing-pages-logic.md` — two-layer pagination, slice/mutate, drawer, cooldowns
+- `docs/README.md` — link to preserving-migration-notes convention
+- `hooks/useSwrPagination.ts`, `pagination.tsx`, `FilteringSidebar.tsx` — restored short inline comments + doc pointers
+
+---
+
+## 2026-06-07 — Docs: code excerpts in listing-stack notes
+
+### What was changed and why
+
+User should not need to switch between docs and source. Added representative code blocks (with file-path comments) to listing-stack notes; updated preserving-migration-notes convention and docs README.
+
+### Files modified
+
+- `docs/notes/hooks/useSwrPagination.md`
+- `docs/notes/components/pagination.md`
+- `docs/notes/components/filtering-sidebar.md`
+- `docs/notes/components/core-listing-pages-logic.md`
+- `docs/notes/typescript/preserving-migration-notes.md`
+- `docs/README.md`
+
+---
+
+## 2026-06-07 — Restore inline comments in listing stack source
+
+### What was changed and why
+
+Re-added helpful inline comments stripped during TS conversion (pagination preload/UI, FilteringSidebar section labels, checkbox accessibility note on `value`, useSwrPagination getKey). Long bug history stays in docs; short pointers remain in code.
+
+### Files modified
+
+- `components/ShowingListOfContent/pagination.tsx`
+- `components/Filtering/FilteringSidebar.tsx`
+- `hooks/useSwrPagination.ts`
+- `docs/notes/typescript/preserving-migration-notes.md`

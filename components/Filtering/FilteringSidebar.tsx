@@ -1,6 +1,14 @@
+/**
+ * Filter drawer: quick filters, category/tag checkboxes, apply/reset.
+ * Notes: docs/notes/components/filtering-sidebar.md
+ */
 "use client";
 
-import { useState, useRef } from "react";
+import {
+  type ChangeEvent,
+  type Dispatch,
+  type SetStateAction,
+} from "react";
 import {
   Disclosure,
   DisclosureButton,
@@ -8,13 +16,23 @@ import {
 } from "@headlessui/react";
 import { ChevronUpIcon } from "@heroicons/react/20/solid";
 import GeneralButton from "@components/ReusableSmallComponents/buttons/GeneralButton";
-import { ButtonGroup } from "@mui/material";
 import StyledCheckbox from "@components/FormComponents/StyledCheckbox";
 import ClosingXButton from "@components/ReusableSmallComponents/buttons/ClosingXButton";
-import { useCategAndTags } from "@/context/CategoriesAndTagsContext";
 import { useCategoriesForDataType } from "@/hooks/useCategoriesForDataType";
+import type { ContentType } from "@/utils/api/checkIfValidContentType";
 
-function FilteringSidebar({
+export type FilteringSidebarProps = {
+  dataType: ContentType;
+  handleFilterChange: (e: ChangeEvent<HTMLInputElement>) => void;
+  handleApplyFilters: (reset?: boolean, quickSearchTags?: string[]) => void;
+  filterTagsIds: string[];
+  setFilterTagsIds: Dispatch<SetStateAction<string[]>>;
+  toggleDrawer: (open: boolean) => void;
+  isLoading: boolean;
+  remainingFilterCooldown: number;
+};
+
+export default function FilteringSidebar({
   dataType,
   handleFilterChange,
   handleApplyFilters,
@@ -23,11 +41,10 @@ function FilteringSidebar({
   toggleDrawer,
   isLoading,
   remainingFilterCooldown,
-  startCooldown,
-}) {
-  const { categoriesWithTags, tags } = useCategoriesForDataType(dataType);
+}: FilteringSidebarProps) {
+  const { categoriesWithTags } = useCategoriesForDataType(dataType);
 
-  const applyQuickFilter = (tagIds) => {
+  const applyQuickFilter = (tagIds: string[]) => {
     if (remainingFilterCooldown > 0 || isLoading) return;
 
     setFilterTagsIds(tagIds);
@@ -103,7 +120,7 @@ function FilteringSidebar({
       {/* **************** Normal filters  **************** */}
       <div className="  overflow-y-auto bg-primary px-2">
         {/* mapping through categories ex: gender, holidays */}
-        {categoriesWithTags.map((category, index) => {
+        {categoriesWithTags.map((category) => {
           return (
             <Disclosure key={category._id}>
               {/* defaultOpen will have the disclosure stay open*/}
@@ -134,33 +151,16 @@ function FilteringSidebar({
                   <DisclosurePanel className="px-4 pt-4 pb-2 text-sm text-gray-500">
                     <div className="space-y-6 ">
                       {/* mapping through category options and assigning them a button (ex: male, female, unisex)*/}
-
-                      {category.tags.map((option, index) => (
+                      {category.tags.map((option) => (
                         <StyledCheckbox
                           key={option._id}
-                          id={`filter-mobile-${index}`} // unique id for accessibility
                           label={option.tag} // visible text
-                          value={option._id}
+                          description=""
+                          value={option._id} // unique id for accessibility — StyledCheckbox sets id/htmlFor={value}, not index
                           checked={filterTagsIds.includes(option._id)}
                           onChange={handleFilterChange}
                           className="group px-2" // optional styling wrapper
                         />
-                        // <div
-                        //   key={option._id}
-                        //   className="flex items-center group px-2"
-                        // >
-                        //   {/* adds a checkbox*/}
-                        //   <input
-                        //     id={`filter-mobile-${index}`}
-                        //     name={`${option.tag}[]`}
-                        //     value={option._id}
-                        //     type="checkbox"
-                        //     onChange={handleFilterChange}
-                        //     className="h-4 w-4 rounded border-violet-300 text-amber-300 focus:ring-amber-600  group-hover:bg-subtleWhite bg-secondary"
-                        //     checked={filterTagsIds.includes(option._id)}
-                        //   />
-
-                        // </div>
                       ))}
                     </div>
                   </DisclosurePanel>
@@ -176,7 +176,7 @@ function FilteringSidebar({
           active
           className="text-center bg-subtleWhite"
           onClick={() => {
-            handleApplyFilters("reset");
+            handleApplyFilters(true);
             toggleDrawer(false);
           }}
           disabled={isLoading}
@@ -189,11 +189,9 @@ function FilteringSidebar({
           }
           className="text-center"
           onClick={() => onApplyClick()}
-          disabled={isLoading || remainingFilterCooldown}
+          disabled={isLoading || remainingFilterCooldown > 0}
         />
       </div>
     </div>
   );
 }
-
-export default FilteringSidebar;
