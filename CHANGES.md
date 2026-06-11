@@ -2917,7 +2917,43 @@ Converted delete-confirmation hook and moderation client caches to TypeScript. E
 
 ### Next logical step
 
-Convert `AddSuggestion.jsx` / `EditSuggestion.jsx`.
+Convert `DeleteContentNotification.jsx`, `AddReport.jsx` / `EditReport.js`.
+
+---
+
+## 2026-06-07 — TypeScript: `AddSuggestion`, `EditSuggestion`
+
+### What was changed and why
+
+Converted suggestion add/edit forms to TypeScript. Exported `SuggestionContentInfo` for `SuggestionDialog` and `useSuggest`. Fixed incorrect-tag checkbox toggle in `AddSuggestion` (was setting state to a single string). Comments/additional-comments state now uses strings.
+
+### Files created
+
+- `components/Suggestions/AddSuggestion.tsx`
+- `components/Suggestions/EditSuggestion.tsx`
+- `docs/notes/components/suggestion-forms.md`
+
+### Files removed
+
+- `components/Suggestions/AddSuggestion.jsx`
+- `components/Suggestions/EditSuggestion.jsx`
+
+### Files modified
+
+- `components/Suggestions/SuggestionDialog.tsx`
+- `hooks/useSuggest.ts`
+- `docs/README.md`
+- `docs/notes/hooks/useSuggest.md`
+- `docs/notes/models/moderation-and-thanks.md`
+
+### Verification
+
+- `pnpm exec tsc --noEmit` — OK
+- `pnpm build` — OK
+
+### Next logical step
+
+Convert `TagsSelectAndCheatSheet.jsx` or flag/suggestion API routes to TypeScript.
 
 ---
 

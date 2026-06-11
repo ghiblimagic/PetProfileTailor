@@ -32,7 +32,7 @@ Tag suggestion workflow: incorrect tags, suggested replacements, categories, opt
 
 **Routes:** `app/api/suggestion`, `app/api/user/suggestions`.
 
-**UI:** listing row menu → [`useSuggest.ts`](../../hooks/useSuggest.ts) → `SuggestionDialog`. Notes: [useSuggest.md](../hooks/useSuggest.md).
+**UI:** listing row menu → [`useSuggest.ts`](../../hooks/useSuggest.ts) → `SuggestionDialog` → [`AddSuggestion.tsx`](../../components/Suggestions/AddSuggestion.tsx) / [`EditSuggestion.tsx`](../../components/Suggestions/EditSuggestion.tsx). Notes: [useSuggest.md](../hooks/useSuggest.md), [suggestion-forms.md](../components/suggestion-forms.md).
 
 **Client cache:** [`SuggestionsContext.tsx`](../../context/SuggestionsContext.tsx) (`SuggestionsProvider` in [`SuggestionsWrapper.tsx`](../../wrappers/SuggestionsWrapper.jsx)) loads `/api/user/suggestions` and exposes `hasSuggested`, `getSuggestionStatus`, `addSuggestion`, `deleteSuggestion`.
 

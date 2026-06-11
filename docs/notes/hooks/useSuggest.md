@@ -11,10 +11,10 @@ Manages suggestion dialog visibility and the listing content passed to `Suggesti
 | Return | Type | Notes |
 |--------|------|-------|
 | `showSuggestionDialog` | `boolean` | Dialog open state |
-| `suggestionTarget` | `{ _id: string } \| null` | Full listing row passed to `SuggestionDialog` as `target` |
-| `openSuggestion` | `(content) => void` | Called from `SuggestButton` with `singleContent` |
+| `suggestionTarget` | `SuggestionContentInfo \| null` | Full listing row passed to `SuggestionDialog` as `target` |
+| `openSuggestion` | `(content: SuggestionContentInfo) => void` | Called from `SuggestButton` with `singleContent` |
 | `closeSuggestion` | `() => void` | Resets dialog + target |
 
 ## Consumer
 
-[`ContentListing.jsx`](../../../components/ShowingListOfContent/ContentListing.jsx) — `SuggestButton` → `openSuggestion(content)` → `SuggestionDialog`.
+[`ContentListing.tsx`](../../../components/ShowingListOfContent/ContentListing.tsx) — `SuggestButton` → `openSuggestion(content)` → `SuggestionDialog` → `AddSuggestion` / `EditSuggestion`. Form notes: [suggestion-forms.md](../components/suggestion-forms.md).

@@ -5,13 +5,12 @@ import AddSuggestion from "@/components/Suggestions/AddSuggestion";
 import { useSuggestions } from "@context/SuggestionsContext";
 import EditSuggestion from "@components/Suggestions/EditSuggestion";
 import type { ContentType } from "@/utils/api/checkIfValidContentType";
-
-type ListingContent = { _id: string };
+import type { SuggestionContentInfo } from "@/components/Suggestions/AddSuggestion";
 
 export type SuggestionDialogProps = {
   dataType: ContentType | string;
   open: boolean;
-  target: ListingContent | null;
+  target: SuggestionContentInfo | null;
   onClose: () => void;
   signedInUsersId?: string;
   contentId: string;

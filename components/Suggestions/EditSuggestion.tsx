@@ -1,6 +1,15 @@
+/**
+ * Edit or delete a pending suggestion inside SuggestionDialog.
+ * Notes: docs/notes/components/suggestion-forms.md
+ */
 "use client";
 
-import { useState, useEffect } from "react";
+import {
+  useState,
+  useEffect,
+  type ChangeEvent,
+  type FormEvent,
+} from "react";
 import GeneralButton from "@components/ReusableSmallComponents/buttons/GeneralButton";
 import { toast } from "react-toastify";
 import axios from "axios";
@@ -15,6 +24,40 @@ import LoadingSpinner from "@components/ui/LoadingSpinner";
 import DeleteContentNotification from "../DeletingData/DeleteContentNotification";
 import { useSession } from "next-auth/react";
 import MustLoginMessage from "../ui/MustLoginMessage";
+import type { ContentType } from "@/utils/api/checkIfValidContentType";
+import type { SuggestionContentInfo } from "@/components/Suggestions/AddSuggestion";
+
+type SuggestionTagRef = {
+  _id: string;
+  tag: string;
+};
+
+type FetchedSuggestion = {
+  _id: string;
+  contentType: string;
+  description?: string;
+  comments?: string;
+  incorrectNameTags?: string[];
+  incorrectDescriptionTags?: string[];
+  nameTagsSuggested?: SuggestionTagRef[];
+  descriptionTagsSuggested?: SuggestionTagRef[];
+};
+
+type SuggestionGetResponse = {
+  suggestion?: FetchedSuggestion;
+};
+
+type SuggestionPutResponse = {
+  updatedSuggestion: { _id: string };
+};
+
+export type EditSuggestionProps = {
+  dataType: ContentType | string;
+  suggestionBy?: string;
+  contentInfo: SuggestionContentInfo;
+  apisuggestionSubmission: string;
+  onClose?: () => void;
+};
 
 export default function EditSuggestion({
   dataType,
@@ -22,14 +65,14 @@ export default function EditSuggestion({
   contentInfo,
   apisuggestionSubmission,
   onClose,
-}) {
+}: EditSuggestionProps) {
   const { addSuggestion, deleteSuggestion } = useSuggestions();
   const { data: session } = useSession();
   const signedInUser = session?.user?.id;
 
   const [loading, setLoading] = useState(true);
-  const [comments, setComments] = useState([]);
-  const [incorrectTags, setIncorrectTags] = useState([]);
+  const [comments, setComments] = useState("");
+  const [incorrectTags, setIncorrectTags] = useState<string[]>([]);
   const [description, setDescription] = useState("");
   const [suggestionId, setSuggestionId] = useState("");
   const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
@@ -40,29 +83,29 @@ export default function EditSuggestion({
   useEffect(() => {
     const fetchSuggestion = async () => {
       try {
-        const res = await axios.get("/api/suggestion", {
+        const res = await axios.get<SuggestionGetResponse>("/api/suggestion", {
           params: { contentId: contentInfo._id, status: "pending" },
         });
-        // console.log("response", res.data);
+
         const existingSuggestion = res.data.suggestion;
 
         if (existingSuggestion) {
           const contentType = existingSuggestion.contentType;
 
-          setSuggestionId(existingSuggestion._id); // keep the id so we can update it later
+          setSuggestionId(existingSuggestion._id);
+          setDescription(existingSuggestion.description ?? "");
+          setComments(existingSuggestion.comments ?? "");
 
-          setDescription(existingSuggestion.description || "");
-          setComments(existingSuggestion.comments || "");
-
-          // incorrect tags
           if (contentType === "names") {
-            setIncorrectTags(existingSuggestion.incorrectNameTags || []);
+            setIncorrectTags(existingSuggestion.incorrectNameTags ?? []);
           } else if (contentType === "descriptions") {
-            setIncorrectTags(existingSuggestion.incorrectDescriptionTags || []);
+            setIncorrectTags(
+              existingSuggestion.incorrectDescriptionTags ?? [],
+            );
           }
-          // suggested tags
+
           if (contentType === "names") {
-            existingSuggestion.nameTagsSuggested.forEach((tag) => {
+            existingSuggestion.nameTagsSuggested?.forEach((tag) => {
               handleCheckboxChange({
                 id: tag._id,
                 label: tag.tag,
@@ -70,7 +113,7 @@ export default function EditSuggestion({
               });
             });
           } else if (contentType === "descriptions") {
-            existingSuggestion.descriptionTagsSuggested.forEach((tag) => {
+            existingSuggestion.descriptionTagsSuggested?.forEach((tag) => {
               handleCheckboxChange({
                 id: tag._id,
                 label: tag.tag,
@@ -87,11 +130,11 @@ export default function EditSuggestion({
     };
 
     fetchSuggestion();
-  }, [contentInfo]);
+    // handleCheckboxChange from useTags is stable enough for one-time hydration
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [contentInfo._id]);
 
-  // ################# EDIT #####################
-
-  const handleSubmitSuggestion = async (e) => {
+  const handleSubmitSuggestion = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     if (!suggestionBy) {
@@ -99,7 +142,7 @@ export default function EditSuggestion({
       return;
     }
 
-    let contentCreatedByUserId = contentInfo.createdBy._id;
+    const contentCreatedByUserId = contentInfo.createdBy._id;
 
     if (contentCreatedByUserId === suggestionBy) {
       toast.warn(
@@ -113,17 +156,15 @@ export default function EditSuggestion({
       contentId: contentInfo._id,
       suggestionId,
       contentCreator: contentCreatedByUserId,
-      suggestionBy: suggestionBy,
+      suggestionBy,
       incorrectTags,
       description,
-      comments: comments.toString(),
+      comments,
       tags: tagIds,
-      // api will use contentType to figure out if tags are names or description tags
     };
-    // console.log(suggestionSubmission);
 
     try {
-      const response = await axios.put(
+      const response = await axios.put<SuggestionPutResponse>(
         apisuggestionSubmission,
         suggestionSubmission,
       );
@@ -137,42 +178,40 @@ export default function EditSuggestion({
       );
 
       onClose?.();
-    } catch (error) {
+    } catch (error: unknown) {
+      const err = error as {
+        message?: string;
+        response?: { data?: { message?: string } };
+      };
       console.log("this is an error", error);
 
       toast.error(
-        `Ruh Roh! ${error.message} ${JSON.stringify(
-          error?.response?.data?.message,
+        `Ruh Roh! ${err.message ?? "Request failed"} ${JSON.stringify(
+          err.response?.data?.message,
         )}`,
       );
     }
   };
 
   function cancelSuggestionFormAndRevertSuggestionState() {
-    onClose?.(); // <-- close the dialog
+    onClose?.();
   }
 
-  // ################ DELETION #################
-
-  const handleDeletion = async (e) => {
-    e.preventDefault();
-
+  const handleDeletion = async () => {
     try {
-      const res = await axios.delete("/api/suggestion", {
-        data: { suggestionId: suggestionId },
+      await axios.delete("/api/suggestion", {
+        data: { suggestionId },
       });
-      // console.log("response", res.data);
 
       deleteSuggestion(dataType, contentInfo._id, suggestionId);
     } catch (err) {
-      console.error("Error fetching specific suggestion", err);
+      console.error("Error deleting suggestion", err);
     } finally {
       setLoading(false);
     }
 
     setShowDeleteConfirmation(false);
-    onClose();
-    // console.log("deleted");
+    onClose?.();
   };
 
   return (
@@ -234,8 +273,9 @@ export default function EditSuggestion({
                           <StyledCheckbox
                             key={tag._id}
                             label={tag.tag}
+                            description=""
                             checked={incorrectTags.includes(tag._id)}
-                            onChange={(e) => {
+                            onChange={(e: ChangeEvent<HTMLInputElement>) => {
                               if (e.target.checked) {
                                 setIncorrectTags((prev) => [...prev, tag._id]);
                               } else {
@@ -281,7 +321,7 @@ export default function EditSuggestion({
                   </p>
                   <StyledTextarea
                     onChange={(e) => setDescription(e.target.value)}
-                    maxLength="500"
+                    maxLength={500}
                     placeholder=""
                     ariaLabel="type-comments"
                     name="body"
@@ -304,7 +344,7 @@ export default function EditSuggestion({
                   <Field className="mt-6 mx-4">
                     <StyledTextarea
                       onChange={(e) => setComments(e.target.value)}
-                      maxLength="500"
+                      maxLength={500}
                       placeholder="Optional"
                       ariaLabel="type-comments"
                       name="body"
@@ -328,7 +368,7 @@ export default function EditSuggestion({
                   <GeneralButton
                     type="submit"
                     text="Submit"
-                    default
+                    disabled={!signedInUser}
                   />
                 </Field>
               </div>

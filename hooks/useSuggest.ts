@@ -3,15 +3,14 @@
  * Notes: docs/notes/hooks/useSuggest.md
  */
 import { useState } from "react";
-
-type ListingContent = { _id: string };
+import type { SuggestionContentInfo } from "@/components/Suggestions/AddSuggestion";
 
 export function useSuggest() {
   const [showSuggestionDialog, setShowSuggestionDialog] = useState(false);
   const [suggestionTarget, setSuggestionTarget] =
-    useState<ListingContent | null>(null);
+    useState<SuggestionContentInfo | null>(null);
 
-  function openSuggestion(content: ListingContent) {
+  function openSuggestion(content: SuggestionContentInfo) {
     setSuggestionTarget(content);
     setShowSuggestionDialog(true);
   }

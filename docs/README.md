@@ -42,6 +42,7 @@ Each source file with notes should have a one-line pointer at the top linking to
 | [`AddReport.tsx`](../components/Flagging/AddReport.tsx), [`EditReport.tsx`](../components/Flagging/EditReport.tsx) | [flag-report-forms.md](notes/components/flag-report-forms.md) |
 | [`DeleteContentNotification.tsx`](../components/DeletingData/DeleteContentNotification.tsx) | [delete-content-notification.md](notes/components/delete-content-notification.md) |
 | [`hooks/useSuggest.ts`](../hooks/useSuggest.ts) | [useSuggest.md](notes/hooks/useSuggest.md) |
+| [`AddSuggestion.tsx`](../components/Suggestions/AddSuggestion.tsx), [`EditSuggestion.tsx`](../components/Suggestions/EditSuggestion.tsx) | [suggestion-forms.md](notes/components/suggestion-forms.md) |
 | [`hooks/useDeleteConfirmation.ts`](../hooks/useDeleteConfirmation.ts) | [useDeleteConfirmation.md](notes/hooks/useDeleteConfirmation.md) |
 | [`context/ReportsContext.tsx`](../context/ReportsContext.tsx), [`context/SuggestionsContext.tsx`](../context/SuggestionsContext.tsx) | [moderation-and-thanks.md](notes/models/moderation-and-thanks.md) |
 | [`hooks/useEditHandler.ts`](../hooks/useEditHandler.ts), [`EditContent.tsx`](../components/EditingData/EditContent.tsx), [`EditButton.tsx`](../components/ReusableSmallComponents/buttons/EditButton.tsx) | [useEditHandler.md](notes/hooks/useEditHandler.md) |

@@ -1,6 +1,10 @@
+/**
+ * New suggestion submission form inside SuggestionDialog.
+ * Notes: docs/notes/components/suggestion-forms.md
+ */
 "use client";
 
-import { useState } from "react";
+import { useState, type ChangeEvent, type FormEvent } from "react";
 import GeneralButton from "@components/ReusableSmallComponents/buttons/GeneralButton";
 import { toast } from "react-toastify";
 import axios from "axios";
@@ -13,6 +17,31 @@ import { useTags } from "@/hooks/useTags";
 import TagsSelectAndCheatSheet from "../FormComponents/TagsSelectAndCheatSheet";
 import { useSession } from "next-auth/react";
 import MustLoginMessage from "@components/ui/MustLoginMessage";
+import type { ContentType } from "@/utils/api/checkIfValidContentType";
+
+export type SuggestionContentTag = {
+  _id: string;
+  tag: string;
+};
+
+export type SuggestionContentInfo = {
+  _id: string;
+  createdBy: { _id: string };
+  tags?: SuggestionContentTag[];
+  notes?: string;
+};
+
+type SuggestionPostResponse = {
+  suggestion: { _id: string };
+};
+
+export type AddSuggestionProps = {
+  dataType: ContentType | string;
+  suggestionBy?: string;
+  contentInfo: SuggestionContentInfo;
+  apisuggestionSubmission: string;
+  onClose?: () => void;
+};
 
 export default function AddSuggestion({
   dataType,
@@ -20,30 +49,41 @@ export default function AddSuggestion({
   contentInfo,
   apisuggestionSubmission,
   onClose,
-}) {
+}: AddSuggestionProps) {
   const { data: session } = useSession();
   const signedInUser = session?.user?.id;
 
   const { addSuggestion } = useSuggestions();
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
 
-  const [additionalCommentsState, setAdditionalCommentsState] = useState([]);
-  const [incorrectTags, setIncorrectTags] = useState([]);
+  const [additionalCommentsState, setAdditionalCommentsState] = useState("");
+  const [incorrectTags, setIncorrectTags] = useState<string[]>([]);
   const [descriptionSuggestions, setDescriptionSuggestions] = useState("");
 
   const { tagsToSubmit, tagIds, handleSelectChange, handleCheckboxChange } =
     useTags();
 
-  const handleSubmitSuggestion = async (e) => {
+  const toggleIncorrectTag = (tagId: string, checked: boolean) => {
+    if (checked) {
+      setIncorrectTags((prev) =>
+        prev.includes(tagId) ? prev : [...prev, tagId],
+      );
+    } else {
+      setIncorrectTags((prev) => prev.filter((id) => id !== tagId));
+    }
+  };
+
+  const handleSubmitSuggestion = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
 
     if (!suggestionBy) {
+      setLoading(false);
       toast.error(`Ruh Roh! You must be signed in to suggestion content`);
       return;
     }
 
-    let contentCreatedByUserId = contentInfo.createdBy._id;
+    const contentCreatedByUserId = contentInfo.createdBy._id;
 
     if (contentCreatedByUserId === suggestionBy) {
       toast.warn(
@@ -57,17 +97,15 @@ export default function AddSuggestion({
       contentType: dataType,
       contentId: contentInfo._id,
       contentCreator: contentCreatedByUserId,
-      suggestionBy: suggestionBy,
+      suggestionBy,
       incorrectTags,
       description: descriptionSuggestions,
-      comments: additionalCommentsState.toString(),
+      comments: additionalCommentsState,
       tags: tagIds,
-      // api will use contentType to figure out if tags are names or description tags
     };
-    // console.log(suggestionSubmission);
 
     try {
-      const response = await axios.post(
+      const response = await axios.post<SuggestionPostResponse>(
         apisuggestionSubmission,
         suggestionSubmission,
       );
@@ -80,19 +118,25 @@ export default function AddSuggestion({
       addSuggestion(dataType, contentInfo._id, response.data.suggestion._id);
 
       onClose?.();
-    } catch (error) {
+    } catch (error: unknown) {
       console.log("this is an error", error);
       setLoading(false);
+
+      const err = error as {
+        message?: string;
+        response?: { data?: { message?: string } };
+      };
+
       toast.error(
-        `Ruh Roh! ${error.message} ${JSON.stringify(
-          error?.response?.data?.message,
+        `Ruh Roh! ${err.message ?? "Request failed"} ${JSON.stringify(
+          err.response?.data?.message,
         )}`,
       );
     }
   };
 
   function cancelSuggestionFormAndRevertSuggestionState() {
-    onClose?.(); // <-- close the dialog
+    onClose?.();
   }
 
   return (
@@ -150,8 +194,11 @@ export default function AddSuggestion({
                     <StyledCheckbox
                       key={tag._id}
                       label={tag.tag}
+                      description=""
                       checked={incorrectTags.includes(tag._id)}
-                      onChange={(e) => setIncorrectTags(e.target.value)}
+                      onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                        toggleIncorrectTag(tag._id, e.target.checked)
+                      }
                       value={tag._id}
                       disabled={!signedInUser}
                     />
@@ -188,7 +235,7 @@ export default function AddSuggestion({
             </p>
             <StyledTextarea
               onChange={(e) => setDescriptionSuggestions(e.target.value)}
-              maxLength="500"
+              maxLength={500}
               placeholder=""
               ariaLabel="type-comments"
               name="body"
@@ -209,7 +256,7 @@ export default function AddSuggestion({
             <Field className="mt-6 mx-4">
               <StyledTextarea
                 onChange={(e) => setAdditionalCommentsState(e.target.value)}
-                maxLength="500"
+                maxLength={500}
                 placeholder="Optional"
                 ariaLabel="type-comments"
                 name="body"
@@ -229,8 +276,7 @@ export default function AddSuggestion({
             <GeneralButton
               type="submit"
               text="Submit"
-              default
-              disabled={!signedInUser}
+              disabled={!signedInUser || loading}
             />
           </Field>
         </div>
