@@ -7,6 +7,7 @@ Heavy design and learning notes for converted TypeScript modules live here so so
 | Doc type | Location | Example |
 |----------|----------|---------|
 | Module design notes | `docs/notes/<path>/<module>.md` | `docs/notes/utils/mongoDataCleanup.md` for `utils/mongoDataCleanup.ts` |
+| TypeScript conventions | [type-vs-interface.md](notes/typescript/type-vs-interface.md) | When to use `type` vs `interface` in this repo |
 | Operational changelog | [`CHANGES.md`](../CHANGES.md) | What changed, when, verification |
 | Testing | [`TESTING.md`](../TESTING.md) | Automated + manual verification checklists |
 

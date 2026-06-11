@@ -2990,6 +2990,26 @@ Convert `useCategoriesForDataType.js` / `CategoriesAndTagsContext.js` or flag/su
 
 ---
 
+## 2026-06-07 — Docs: `type` vs `interface`
+
+### What was changed and why
+
+Added a short TypeScript conventions note explaining when to use `type` vs `interface`, including how this repo’s migration has been choosing between them.
+
+### Files created
+
+- `docs/notes/typescript/type-vs-interface.md`
+
+### Files modified
+
+- `docs/README.md` (Conventions table link)
+
+### Verification
+
+- N/A (docs only)
+
+---
+
 ## 2026-06-07 — TypeScript: `DeleteContentNotification`, `AddReport`, `EditReport`
 
 ### What was changed and why
