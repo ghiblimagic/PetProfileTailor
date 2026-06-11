@@ -2497,3 +2497,32 @@ Converted listing thanks action button to `.tsx`. Typed `onClick`; added `aria-l
 ### Next logical step
 
 Convert `ShareButton.jsx` or `hooks/useThanksHandler.js`.
+
+---
+
+## 2026-06-07 — TypeScript: `ShareButton`
+
+### What was changed and why
+
+Converted listing share toggle button to `.tsx`. Typed `onClickShowShares` as `MouseEventHandler<HTMLButtonElement>`; optional `shareIconStyling`. Removed unused `useState` import and unused `shares` destructuring (kept optional prop for future use).
+
+### Files created
+
+- `components/ReusableSmallComponents/buttons/ShareButton.tsx`
+
+### Files removed
+
+- `components/ReusableSmallComponents/buttons/ShareButton.jsx`
+
+### Files modified
+
+- `docs/notes/app/api/togglelike-route.md`
+
+### Verification
+
+- `pnpm exec tsc --noEmit` — OK
+- `pnpm build` — OK
+
+### Next logical step
+
+Convert `hooks/useThanksHandler.js` or `components/ShowingListOfContent/ContentListing.jsx`.
