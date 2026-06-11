@@ -3668,3 +3668,15 @@ Converted add-descriptions page shell to TypeScript. Server component (no page-l
 ### Next logical step
 
 Convert `hooks/useSwrPagination.js` or `components/ShowingListOfContent/pagination.js`.
+
+---
+
+## 2026-06-07 — Remove dead `DashboardChartForFavDescriptions`
+
+### What was changed and why
+
+Deleted unused component — nothing imported it; render body was fully commented out. Fav descriptions on the dashboard use `ToggleOneContentPage` → `CoreListingPageLogic` with `restrictSwrToLikedNames` instead.
+
+### Files removed
+
+- `components/ShowingListOfContent/DashboardChartForFavDescriptions.jsx`
