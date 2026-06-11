@@ -18,4 +18,4 @@ Signed-in users submit new names or descriptions with tags and optional notes. B
 
 ## Pages
 
-`app/addnames/page.js`, `app/adddescriptions/page.js`, `app/fetchname/page.js`.
+`app/addnames/page.js`, `app/adddescriptions/page.js`, [`app/fetchname/page.tsx`](../../../app/fetchname/page.tsx) (lookup only).

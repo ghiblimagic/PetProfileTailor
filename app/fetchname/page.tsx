@@ -1,23 +1,25 @@
+/**
+ * Public name lookup: type a name and run duplicate check.
+ * Notes: docs/notes/app/fetchname-page.md
+ */
 "use client";
 
-import { useState, useEffect } from "react";
-
-import NewNameWithTagsData from "@components/AddingNewData/addingName";
+import { useState, useEffect, type ChangeEvent } from "react";
 import PageTitleWithImages from "@components/ReusableSmallComponents/TitlesOrHeadings/PageTitleWithImages";
-import { useSession } from "next-auth/react";
 import CheckIfContentExists from "@/components/AddingNewData/CheckIfContentExists";
 import regexInvalidInput from "@/utils/stringManipulation/check-for-valid-content";
 import WarningMessage from "@/components/ReusableSmallComponents/buttons/WarningMessage";
 
-function AddNewNameWithTags() {
-  const { data: session } = useSession();
+const MAX_NAME_LENGTH = 50;
+
+export default function FetchNamePage() {
   const [nameCheck, setNameCheck] = useState("");
   const [nameSubmissionMessage, setNameSubmissionMessage] = useState("");
   const [resetCheckContent, setResetCheckContent] = useState(false);
   const [checkIsProcessing, setCheckIsProcessing] = useState(false);
-  const [nameInvalidInput, setNameInvalidInput] = useState(null);
-
-  const maxContentLength = 50;
+  const [nameInvalidInput, setNameInvalidInput] = useState<string[] | null>(
+    null,
+  );
 
   useEffect(() => {
     setNameInvalidInput(regexInvalidInput(nameCheck));
@@ -42,8 +44,8 @@ function AddNewNameWithTags() {
             value={nameCheck}
             id="checkExists"
             disabled={checkIsProcessing}
-            maxLength="50"
-            onChange={(e) => {
+            maxLength={MAX_NAME_LENGTH}
+            onChange={(e: ChangeEvent<HTMLInputElement>) => {
               setNameCheck(e.target.value.trimStart());
               if (nameSubmissionMessage !== "") {
                 setNameSubmissionMessage("");
@@ -53,8 +55,8 @@ function AddNewNameWithTags() {
           />
           <span className="block mt-3">
             {`${
-              maxContentLength - nameCheck.length
-            }/${maxContentLength} characters left`}{" "}
+              MAX_NAME_LENGTH - nameCheck.length
+            }/${MAX_NAME_LENGTH} characters left`}{" "}
           </span>
         </div>
 
@@ -80,5 +82,3 @@ function AddNewNameWithTags() {
     </div>
   );
 }
-
-export default AddNewNameWithTags;

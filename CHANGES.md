@@ -3436,3 +3436,35 @@ Replaced `import Model from "..."; void Model` with `import "@/models/..."` wher
 ### Verification
 
 - `pnpm exec tsc --noEmit` — OK
+
+---
+
+## 2026-06-07 — TypeScript: `app/fetchname/page`
+
+### What was changed and why
+
+Converted public name-lookup page to TypeScript. Renamed default export to `FetchNamePage`. Removed unused imports (`addingName`, `useSession`). Typed input handler and `nameInvalidInput` state. `maxLength` as number constant.
+
+### Files created
+
+- `app/fetchname/page.tsx`
+- `docs/notes/app/fetchname-page.md`
+
+### Files removed
+
+- `app/fetchname/page.js`
+
+### Files modified
+
+- `docs/notes/components/check-if-content-exists.md`
+- `docs/notes/components/add-content-forms.md`
+- `docs/README.md`
+
+### Verification
+
+- `pnpm exec tsc --noEmit` — OK
+- `pnpm build` — OK
+
+### Next logical step
+
+Convert `app/addnames/page.js` or `app/profile/[profilename]/page.jsx`.

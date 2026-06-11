@@ -27,7 +27,7 @@ See [`docs/notes/app/api/check-if-content-exists.md`](../app/api/check-if-conten
 
 - [`addingName.tsx`](../../../components/AddingNewData/addingName.tsx)
 - [`addingdescription.tsx`](../../../components/AddingNewData/addingdescription.tsx)
-- [`app/fetchname/page.js`](../../../app/fetchname/page.js)
+- [`app/fetchname/page.tsx`](../../../app/fetchname/page.tsx)
 
 ## Notes
 
