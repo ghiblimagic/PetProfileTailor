@@ -1,13 +1,30 @@
-import { useState } from "react";
-import { useSWRConfig } from "swr";
+/**
+ * Delete confirmation dialog state + optimistic delete for list or standalone rows.
+ * Notes: docs/notes/hooks/useDeleteConfirmation.md
+ */
+import { useState, type Dispatch, type SetStateAction } from "react";
 import { toast } from "react-toastify";
+
+export type DeleteTarget = {
+  _id: string;
+  content?: string;
+};
+
+type SwrDeletePage = {
+  data: { _id: string }[];
+  totalDocs?: number;
+};
+
+type SwrMutate = (
+  updater?: (pages?: SwrDeletePage[]) => SwrDeletePage[],
+  shouldRevalidate?: boolean,
+) => void;
 
 export function useDeleteConfirmation() {
   const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
-  const [deleteTarget, setDeleteTarget] = useState(null);
-  const { mutate: globalMutate } = useSWRConfig();
+  const [deleteTarget, setDeleteTarget] = useState<DeleteTarget | null>(null);
 
-  function openDelete(target) {
+  function openDelete(target: DeleteTarget) {
     setDeleteTarget(target);
     setShowDeleteConfirmation(true);
   }
@@ -17,23 +34,15 @@ export function useDeleteConfirmation() {
     setShowDeleteConfirmation(false);
   }
 
-  /**
-   * Deletes a target either using SWR mutate or local state update
-   * @param {string} apiLink - API endpoint to call
-   * @param {string} signedInUsersId - user ID for backend validation
-   * @param {function} [customMutate] - optional SWR mutate function (for SWR mode)
-   * @param {function} [setLocalData] - optional state setter (standalone mode)
-   */
-
   async function confirmDelete(
-    apiLink,
-    signedInUsersId,
-    customMutate, //swr mode
-    setLocalData, // standalone mode
+    apiLink: string,
+    signedInUsersId: string,
+    customMutate?: SwrMutate,
+    setLocalData?: Dispatch<SetStateAction<DeleteTarget | null | undefined>>,
   ) {
     if (!deleteTarget) return;
+
     try {
-      // ✅ Local optimistic update
       if (setLocalData) {
         setLocalData((prev) => {
           if (!prev) return prev;
@@ -44,14 +53,13 @@ export function useDeleteConfirmation() {
         });
       }
 
-      // ✅ SWR optimistic update
       if (customMutate) {
         customMutate(
-          (pages) =>
+          (pages = []) =>
             pages.map((page) => ({
               ...page,
               data: page.data.filter((item) => item._id !== deleteTarget._id),
-              totalDocs: page.totalDocs - 1,
+              totalDocs: (page.totalDocs ?? page.data.length) - 1,
             })),
           false,
         );
@@ -68,12 +76,11 @@ export function useDeleteConfirmation() {
       if (!res.ok) throw new Error(`Failed with status ${res.status}`);
 
       if (customMutate) customMutate();
-      // revalidate all pages if swr was used
 
       toast.success("Content deleted successfully");
     } catch (err) {
       console.error("Delete failed", err);
-      // Rollback for local
+
       if (setLocalData) {
         setLocalData((prev) =>
           prev && prev._id === deleteTarget._id ? deleteTarget : prev,
@@ -81,7 +88,7 @@ export function useDeleteConfirmation() {
       }
 
       toast.error("Failed to delete content. Please try again.");
-      if (customMutate) customMutate(); // rollback SWR state
+      if (customMutate) customMutate();
     } finally {
       closeDelete();
     }

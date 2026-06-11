@@ -38,12 +38,7 @@ import type { LikeContentType } from "@/context/LikesContext";
 
 export type ContentListingItem = LikeableContent & EditableContent;
 
-type SwrPage = { data: ContentListingItem[] };
-
-type ModerationContextValue = {
-  getStatus: (type: string, contentId: string) => string | null;
-  getSuggestionStatus: (type: string, contentId: string) => string | null;
-};
+type SwrPage = { data: ContentListingItem[]; totalDocs?: number };
 
 export type ContentListingProps = {
   dataType: ContentType | string;
@@ -76,8 +71,8 @@ export default function ContentListing({
     confirmDelete,
   } = useDeleteConfirmation();
 
-  const { getStatus } = useReports() as ModerationContextValue;
-  const { getSuggestionStatus } = useSuggestions() as ModerationContextValue;
+  const { getStatus } = useReports();
+  const { getSuggestionStatus } = useSuggestions();
   const [localContent, setLocalContent] =
     useState<ContentListingItem>(singleContent);
 

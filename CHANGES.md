@@ -2879,3 +2879,42 @@ Clearer name for single-content pages that update row state instead of SWR cache
 ### Verification
 
 - `pnpm exec tsc --noEmit` — OK
+
+---
+
+## 2026-06-07 — TypeScript: `useDeleteConfirmation`, `ReportsContext`, `SuggestionsContext`
+
+### What was changed and why
+
+Converted delete-confirmation hook and moderation client caches to TypeScript. Exported `DeleteTarget`, `ReportsContextValue`, `ReportBucketType`, and `SuggestionsContextValue`. Removed temporary context casts from `ContentListing` and flag/suggest dialog components now that hooks are typed.
+
+### Files created
+
+- `hooks/useDeleteConfirmation.ts`
+- `context/ReportsContext.tsx`
+- `context/SuggestionsContext.tsx`
+- `docs/notes/hooks/useDeleteConfirmation.md`
+
+### Files removed
+
+- `hooks/useDeleteConfirmation.js`
+- `context/ReportsContext.js`
+- `context/SuggestionsContext.js`
+
+### Files modified
+
+- `components/ShowingListOfContent/ContentListing.tsx`
+- `components/Flagging/FlagButton.tsx`, `FlagDialog.tsx`
+- `components/Suggestions/SuggestionButton.tsx`, `SuggestionDialog.tsx`
+- `docs/README.md`
+- `docs/notes/models/moderation-and-thanks.md`
+- `docs/notes/hooks/useDeleteConfirmation.md`
+
+### Verification
+
+- `pnpm exec tsc --noEmit` — OK
+- `pnpm build` — OK
+
+### Next logical step
+
+Convert `components/DeletingData/DeleteContentNotification.jsx`, `AddReport.jsx` / `EditReport.js`, `AddSuggestion.jsx` / `EditSuggestion.jsx`.

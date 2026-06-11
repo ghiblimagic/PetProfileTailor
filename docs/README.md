@@ -40,6 +40,8 @@ Each source file with notes should have a one-line pointer at the top linking to
 | [`hooks/useThanksHandler.ts`](../hooks/useThanksHandler.ts) | [useThanksHandler.md](notes/hooks/useThanksHandler.md) |
 | [`hooks/useFlagging.ts`](../hooks/useFlagging.ts) | [useFlagging.md](notes/hooks/useFlagging.md) |
 | [`hooks/useSuggest.ts`](../hooks/useSuggest.ts) | [useSuggest.md](notes/hooks/useSuggest.md) |
+| [`hooks/useDeleteConfirmation.ts`](../hooks/useDeleteConfirmation.ts) | [useDeleteConfirmation.md](notes/hooks/useDeleteConfirmation.md) |
+| [`context/ReportsContext.tsx`](../context/ReportsContext.tsx), [`context/SuggestionsContext.tsx`](../context/SuggestionsContext.tsx) | [moderation-and-thanks.md](notes/models/moderation-and-thanks.md) |
 | [`hooks/useEditHandler.ts`](../hooks/useEditHandler.ts), [`EditContent.tsx`](../components/EditingData/EditContent.tsx), [`EditButton.tsx`](../components/ReusableSmallComponents/buttons/EditButton.tsx) | [useEditHandler.md](notes/hooks/useEditHandler.md) |
 | [`ContentListing.tsx`](../components/ShowingListOfContent/ContentListing.tsx) | [content-listing.md](notes/components/content-listing.md) |
 | [`models/Name.ts`](../models/Name.ts), [`Description.ts`](../models/Description.ts) | [name-and-description.md](notes/models/name-and-description.md) |

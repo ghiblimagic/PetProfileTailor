@@ -8,10 +8,6 @@ import type { ContentType } from "@/utils/api/checkIfValidContentType";
 
 type ListingContent = { _id: string };
 
-type SuggestionsContextValue = {
-  getSuggestionStatus: (type: string, contentId: string) => string | null;
-};
-
 export type SuggestionDialogProps = {
   dataType: ContentType | string;
   open: boolean;
@@ -29,7 +25,7 @@ export default function SuggestionDialog({
   signedInUsersId,
   contentId,
 }: SuggestionDialogProps) {
-  const { getSuggestionStatus } = useSuggestions() as SuggestionsContextValue;
+  const { getSuggestionStatus } = useSuggestions();
 
   if (!open || !target) return null;
 

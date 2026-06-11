@@ -8,10 +8,6 @@ import type { ContentType } from "@/utils/api/checkIfValidContentType";
 
 type ListingContent = { _id: string };
 
-type ReportsContextValue = {
-  hasReported: (type: string, contentId: string) => boolean;
-};
-
 export type FlagButtonProps = {
   content: ListingContent;
   dataType: ContentType | string;
@@ -21,7 +17,7 @@ export type FlagButtonProps = {
 
 const FlagButton = forwardRef<HTMLButtonElement, FlagButtonProps>(
   ({ content, onClick, dataType }, ref) => {
-    const { hasReported } = useReports() as ReportsContextValue;
+    const { hasReported } = useReports();
     const userHasAlreadyReported = hasReported(
       dataType,
       content._id.toString(),

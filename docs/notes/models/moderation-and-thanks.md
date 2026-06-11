@@ -34,6 +34,8 @@ Tag suggestion workflow: incorrect tags, suggested replacements, categories, opt
 
 **UI:** listing row menu → [`useSuggest.ts`](../../hooks/useSuggest.ts) → `SuggestionDialog`. Notes: [useSuggest.md](../hooks/useSuggest.md).
 
+**Client cache:** [`SuggestionsContext.tsx`](../../context/SuggestionsContext.tsx) (`SuggestionsProvider` in [`SuggestionsWrapper.tsx`](../../wrappers/SuggestionsWrapper.jsx)) loads `/api/user/suggestions` and exposes `hasSuggested`, `getSuggestionStatus`, `addSuggestion`, `deleteSuggestion`.
+
 ## Report
 
 Stores a snapshot `contentCopy` of flagged content plus `reportCategories` and moderation fields.
@@ -41,6 +43,8 @@ Stores a snapshot `contentCopy` of flagged content plus `reportCategories` and m
 **Routes:** `app/api/flag/flagreportsubmission`, `app/api/flag/getSpecificReport`, `app/api/user/reports`.
 
 **UI:** listing row menu → [`useFlagging.ts`](../../hooks/useFlagging.ts) → `FlagDialog`. Notes: [useFlagging.md](../hooks/useFlagging.md).
+
+**Client cache:** [`ReportsContext.tsx`](../../context/ReportsContext.tsx) (`ReportsProvider` in [`ReportsWrapper.tsx`](../../wrappers/ReportsWrapper.jsx)) loads `/api/user/reports` and exposes `hasReported`, `getStatus`, `addReport`, `deleteReport`.
 
 ## `fieldDescriptions` statics
 

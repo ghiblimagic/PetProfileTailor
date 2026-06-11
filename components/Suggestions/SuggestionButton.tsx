@@ -8,10 +8,6 @@ import type { ContentType } from "@/utils/api/checkIfValidContentType";
 
 type ListingContent = { _id: string };
 
-type SuggestionsContextValue = {
-  hasSuggested: (type: string, contentId: string) => boolean;
-};
-
 export type SuggestionButtonProps = {
   content: ListingContent;
   dataType: ContentType | string;
@@ -20,7 +16,7 @@ export type SuggestionButtonProps = {
 
 const SuggestionButton = forwardRef<HTMLButtonElement, SuggestionButtonProps>(
   ({ content, onClick, dataType }, ref) => {
-    const { hasSuggested } = useSuggestions() as SuggestionsContextValue;
+    const { hasSuggested } = useSuggestions();
     const userHasAlreadySuggested = hasSuggested(
       dataType,
       content._id.toString(),

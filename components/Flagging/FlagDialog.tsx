@@ -8,10 +8,6 @@ import type { ContentType } from "@/utils/api/checkIfValidContentType";
 
 type ListingContent = { _id: string };
 
-type ReportsContextValue = {
-  getStatus: (type: string, contentId: string) => string | null;
-};
-
 export type FlagDialogProps = {
   dataType: ContentType | string;
   open: boolean;
@@ -29,7 +25,7 @@ export default function FlagDialog({
   signedInUsersId,
   contentId,
 }: FlagDialogProps) {
-  const { getStatus } = useReports() as ReportsContextValue;
+  const { getStatus } = useReports();
   if (!open || !target) return null;
 
   const reportStatus = getStatus(dataType, contentId.toString());
