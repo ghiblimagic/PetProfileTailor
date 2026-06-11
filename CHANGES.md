@@ -3182,3 +3182,52 @@ Converted shared delete-confirmation UI and flag report add/edit forms to TypeSc
 ### Next logical step
 
 Convert `AddSuggestion.jsx` / `EditSuggestion.jsx`.
+
+---
+
+## 2026-06-07 — TypeScript: `CheckIfContentExists`
+
+### What was changed and why
+
+Converted duplicate-check UI to TypeScript. Exported `CheckIfContentExistsProps` and `CheckContentExistsResponse` typing. Fixed `contentCheck` when `value` is undefined (`(externalValue ?? internalContent).slice(0, 400)`). Optional `setCheckIsProcessing` guarded with `?.`. Removed unused imports and `console.log`. Removed temporary `.d.ts` shim.
+
+### Files created
+
+- `components/AddingNewData/CheckIfContentExists.tsx`
+- `docs/notes/components/check-if-content-exists.md`
+
+### Files removed
+
+- `components/AddingNewData/CheckIfContentExists.js`
+- `components/AddingNewData/CheckIfContentExists.d.ts`
+
+### Files modified
+
+- `docs/notes/components/add-content-forms.md`
+- `docs/notes/app/api/check-if-content-exists.md`
+- `docs/README.md`
+
+### Verification
+
+- `pnpm exec tsc --noEmit` — OK
+- `pnpm build` — OK
+
+### Next logical step
+
+Convert `CoreListingPagesLogic.jsx` or `app/fetchname/page.js`.
+
+---
+
+## 2026-06-07 — Tighten `CheckContentExistsResponse` type
+
+### What was changed and why
+
+Removed redundant `| string` from `type` union (it collapsed the literals to plain `string`). Added optional `error` to match 500 responses from the check-if-exists routes.
+
+### Files modified
+
+- `components/AddingNewData/CheckIfContentExists.tsx`
+
+### Verification
+
+- `pnpm exec tsc --noEmit` — OK

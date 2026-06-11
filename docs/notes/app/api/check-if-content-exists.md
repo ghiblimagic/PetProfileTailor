@@ -1,6 +1,6 @@
 # check-if-content-exists API routes
 
-Live duplicate / validation checks used by `CheckIfContentExists.js` while the user types or clicks search.
+Live duplicate / validation checks used by [`CheckIfContentExists.tsx`](../../../components/AddingNewData/CheckIfContentExists.tsx) while the user clicks search.
 
 ## Routes
 

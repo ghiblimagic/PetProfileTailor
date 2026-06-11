@@ -51,6 +51,7 @@ Each source file with notes should have a one-line pointer at the top linking to
 | [`hooks/useTags.ts`](../hooks/useTags.ts), [`TagsSelectAndCheatSheet.tsx`](../components/FormComponents/TagsSelectAndCheatSheet.tsx) | [useTags.md](notes/hooks/useTags.md), [tags-select-and-cheat-sheet.md](notes/components/tags-select-and-cheat-sheet.md) |
 | [`CategoriesAndTagsContext.tsx`](../context/CategoriesAndTagsContext.tsx), [`useCategoriesForDataType.ts`](../hooks/useCategoriesForDataType.ts), [`CategTagsWrapper.tsx`](../wrappers/CategTagsWrapper.tsx) | [categories-and-tags.md](notes/context/categories-and-tags.md) |
 | [`addingName.tsx`](../components/AddingNewData/addingName.tsx), [`addingdescription.tsx`](../components/AddingNewData/addingdescription.tsx) | [add-content-forms.md](notes/components/add-content-forms.md) |
+| [`CheckIfContentExists.tsx`](../components/AddingNewData/CheckIfContentExists.tsx) | [check-if-content-exists.md](notes/components/check-if-content-exists.md) |
 | [`ContentListing.tsx`](../components/ShowingListOfContent/ContentListing.tsx) | [content-listing.md](notes/components/content-listing.md) |
 | [`models/Name.ts`](../models/Name.ts), [`Description.ts`](../models/Description.ts) | [name-and-description.md](notes/models/name-and-description.md) |
 | [`utils/stringManipulation/findNormalizedMatch.ts`](../utils/stringManipulation/findNormalizedMatch.ts) | [findNormalizedMatch.md](notes/utils/stringManipulation/findNormalizedMatch.md) |
