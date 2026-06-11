@@ -2570,3 +2570,37 @@ Trimmed over-defensive types: `openThanks` now takes `contentId: string` only (m
 
 - `hooks/useThanksHandler.ts`
 - `docs/notes/hooks/useThanksHandler.md`
+
+---
+
+## 2026-06-07 — TypeScript: `useFlagging` and `useSuggest`
+
+### What was changed and why
+
+Converted listing dialog state hooks to `.ts`. Both store the full listing row (`{ _id: string }` minimum) passed from `FlagButton` / `SuggestButton`.
+
+### Files created
+
+- `hooks/useFlagging.ts`
+- `hooks/useSuggest.ts`
+- `docs/notes/hooks/useFlagging.md`
+- `docs/notes/hooks/useSuggest.md`
+
+### Files removed
+
+- `hooks/useFlagging.js`
+- `hooks/useSuggest.js`
+
+### Files modified
+
+- `docs/README.md`
+- `docs/notes/models/moderation-and-thanks.md`
+
+### Verification
+
+- `pnpm exec tsc --noEmit` — OK
+- `pnpm build` — OK
+
+### Next logical step
+
+Convert `components/ShowingListOfContent/ContentListing.jsx` or `hooks/useEditHandler.js`.

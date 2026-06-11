@@ -37,5 +37,7 @@ Each source file with notes should have a one-line pointer at the top linking to
 | [`models/NameLike.ts`](../models/NameLike.ts), [`DescriptionLike.ts`](../models/DescriptionLike.ts), [`Follow.ts`](../models/Follow.ts) | [likes-and-follows.md](notes/models/likes-and-follows.md) |
 | [`models/Thank.ts`](../models/Thank.ts), [`Suggestion.ts`](../models/Suggestion.ts), [`Report.ts`](../models/Report.ts) | [moderation-and-thanks.md](notes/models/moderation-and-thanks.md) |
 | [`hooks/useThanksHandler.ts`](../hooks/useThanksHandler.ts) | [useThanksHandler.md](notes/hooks/useThanksHandler.md) |
+| [`hooks/useFlagging.ts`](../hooks/useFlagging.ts) | [useFlagging.md](notes/hooks/useFlagging.md) |
+| [`hooks/useSuggest.ts`](../hooks/useSuggest.ts) | [useSuggest.md](notes/hooks/useSuggest.md) |
 | [`models/Name.ts`](../models/Name.ts), [`Description.ts`](../models/Description.ts) | [name-and-description.md](notes/models/name-and-description.md) |
 | [`utils/stringManipulation/findNormalizedMatch.ts`](../utils/stringManipulation/findNormalizedMatch.ts) | [findNormalizedMatch.md](notes/utils/stringManipulation/findNormalizedMatch.md) |

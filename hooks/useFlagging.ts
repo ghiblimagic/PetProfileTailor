@@ -1,11 +1,17 @@
+/**
+ * Flag/report dialog open/close state for listing rows.
+ * Notes: docs/notes/hooks/useFlagging.md
+ */
 import { useState } from "react";
+
+type ListingContent = { _id: string };
 
 export function useFlagging() {
   const [showFlagDialog, setShowFlagDialog] = useState(false);
-  const [flagTarget, setFlagTarget] = useState(null);
+  const [flagTarget, setFlagTarget] = useState<ListingContent | null>(null);
 
-  function openFlag(target) {
-    setFlagTarget(target);
+  function openFlag(content: ListingContent) {
+    setFlagTarget(content);
     setShowFlagDialog(true);
   }
 

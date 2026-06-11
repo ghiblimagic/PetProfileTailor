@@ -32,11 +32,15 @@ Tag suggestion workflow: incorrect tags, suggested replacements, categories, opt
 
 **Routes:** `app/api/suggestion`, `app/api/user/suggestions`.
 
+**UI:** listing row menu → [`useSuggest.ts`](../../hooks/useSuggest.ts) → `SuggestionDialog`. Notes: [useSuggest.md](../hooks/useSuggest.md).
+
 ## Report
 
 Stores a snapshot `contentCopy` of flagged content plus `reportCategories` and moderation fields.
 
 **Routes:** `app/api/flag/flagreportsubmission`, `app/api/flag/getSpecificReport`, `app/api/user/reports`.
+
+**UI:** listing row menu → [`useFlagging.ts`](../../hooks/useFlagging.ts) → `FlagDialog`. Notes: [useFlagging.md](../hooks/useFlagging.md).
 
 ## `fieldDescriptions` statics
 
