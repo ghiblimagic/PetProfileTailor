@@ -4138,3 +4138,59 @@ Removed dead `PostersImageUsernameProfileName` — superseded by inline author U
 ### Verification
 
 - No app imports to update; delete-only + docs.
+
+---
+
+## 2026-06-07 — TypeScript: admin stack + ParagraphRender
+
+### What was changed and why
+
+Converted admin context/wrapper, nav dropdown, and paragraph helper to TypeScript. Fixed `AdminWrapper` to pass `isAdminServer={isAdmin}` (was `isAdmin` prop name mismatch — server seed never reached provider). Removed unused `AdminProvider` import from `(admin)/layout.jsx`. Renamed default export to `AdminDropdownMenu` (file name match).
+
+### Files created
+
+- `context/AdminContext.tsx`
+- `wrappers/AdminWrapper.tsx`
+- `components/NavBar/NavBarPieces/DesktopNavBar/AdminDropdownMenu.tsx`
+- `components/ShowingListOfContent/ParagraphRenderBasedOnStringProperty.tsx`
+- `docs/notes/context/admin-context.md`
+- `docs/notes/components/paragraph-render.md`
+
+### Files removed
+
+- `context/AdminContext.js`
+- `wrappers/AdminWrapper.js`
+- `components/NavBar/NavBarPieces/DesktopNavBar/AdminDropdownMenu.js`
+- `components/ShowingListOfContent/ParagraphRenderBasedOnStringProperty.jsx`
+
+### Files modified
+
+- `app/(admin)/layout.jsx`
+- `docs/README.md`
+
+### Verification
+
+- `pnpm exec tsc --noEmit` — OK
+- `pnpm build` — OK
+
+### Next logical step
+
+Convert `(admin)/layout.jsx` and admin page.js files, or `NavBarNames.jsx`.
+
+---
+
+## 2026-06-07 — Remove unused `ParagraphRenderBasedOnStringProperty`
+
+### What was changed and why
+
+Deleted dead component — zero imports; description text lives in `ContentListing`.
+
+### Files removed
+
+- `components/ShowingListOfContent/ParagraphRenderBasedOnStringProperty.tsx`
+- `docs/notes/components/paragraph-render.md`
+
+### Files modified
+
+- `docs/notes/context/admin-context.md`
+- `docs/README.md`

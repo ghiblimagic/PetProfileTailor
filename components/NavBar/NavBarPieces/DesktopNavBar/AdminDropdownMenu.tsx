@@ -1,10 +1,14 @@
+/**
+ * Desktop nav admin links (category/tag CRUD pages).
+ * Notes: docs/notes/context/admin-context.md
+ */
 "use client";
 
 import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/react";
 import { ChevronDownIcon } from "@heroicons/react/20/solid";
 import Link from "next/link";
 
-export default function DropDownMenu() {
+export default function AdminDropdownMenu() {
   return (
     <Menu
       as="div"

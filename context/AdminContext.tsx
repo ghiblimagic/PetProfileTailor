@@ -1,17 +1,38 @@
+/**
+ * Admin role gate for `(admin)` routes — syncs server session with client session.
+ * Notes: docs/notes/context/admin-context.md
+ */
 "use client";
-import { createContext, useContext, useState, useEffect } from "react";
+
+import {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  type ReactNode,
+} from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 
-const AdminContext = createContext(null);
+export type AdminContextValue = {
+  isAdmin: boolean;
+};
 
-export function useAdmin() {
+const AdminContext = createContext<AdminContextValue | null>(null);
+
+export function useAdmin(): AdminContextValue {
   const context = useContext(AdminContext);
   if (!context) throw new Error("useAdmin must be used within AdminProvider");
   return context;
 }
 
-export function AdminProvider({ children, isAdminServer }) {
+export type AdminProviderProps = {
+  children: ReactNode;
+  /** Initial value from server layout (`getServerSession`) */
+  isAdminServer: boolean;
+};
+
+export function AdminProvider({ children, isAdminServer }: AdminProviderProps) {
   const { data: session, status } = useSession();
   const router = useRouter();
   const [isAdmin, setIsAdmin] = useState(isAdminServer);
