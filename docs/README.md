@@ -46,6 +46,7 @@ Each source file with notes should have a one-line pointer at the top linking to
 | [`not-found.tsx`](../app/not-found.tsx), [`global-error.tsx`](../app/global-error.tsx) | [error-pages.md](notes/app/error-pages.md) |
 | [`robots.txt/route.ts`](../app/robots.txt/route.ts), [`sitemap.xml/route.ts`](../app/sitemap.xml/route.ts) | [robots-sitemap-routes.md](notes/app/robots-sitemap-routes.md) |
 | [`fetchusers/page.tsx`](../app/fetchusers/page.tsx), [`test/page.tsx`](../app/test/page.tsx) | [fetchusers-page.md](notes/app/fetchusers-page.md), [test-page.md](notes/app/test-page.md) |
+| Auth routes (`login`, `register`, `forgotpassword`, `resetpassword`, `magiclink`) | [auth-pages.md](notes/app/auth-pages.md) |
 | [`app/(protected)/layout.tsx`](../app/(protected)/layout.tsx) | [protected-layout.md](notes/app/protected-layout.md) |
 | [`app/(admin)/`](../app/(admin)/) (layout + category/tag admin pages) | [admin-route-group.md](notes/app/admin-route-group.md) |
 | [`app/api/categories-and-tags/route.ts`](../app/api/categories-and-tags/route.ts) | [categories-and-tags-route.md](notes/app/api/categories-and-tags-route.md) |

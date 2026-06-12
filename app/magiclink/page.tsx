@@ -1,21 +1,19 @@
+/**
+ * Magic link confirmation screen after email sign-in request.
+ * Notes: docs/notes/app/auth-pages.md
+ */
 "use client";
 
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
-import React, { useEffect } from "react";
-import { useSession } from "next-auth/react";
-
-import { useRouter } from "next/navigation";
-
 import PageTitleWithImages from "@components/ReusableSmallComponents/TitlesOrHeadings/PageTitleWithImages";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPaw } from "@fortawesome/free-solid-svg-icons";
 import "@fortawesome/fontawesome-svg-core/styles.css";
-
 import NounBlackCatIcon from "@components/ReusableSmallComponents/iconsOrSvgImages/svgImages/NounBlackCatIcon";
 import MagicRabbitSVG from "@components/ReusableSmallComponents/iconsOrSvgImages/svgImages/MagicRabbitSVG";
 
-export default function LoginScreen() {
+export default function MagicLinkPage() {
   const searchParams = useSearchParams();
   const email = searchParams.get("email");
 
@@ -31,7 +29,7 @@ export default function LoginScreen() {
             <div className="text-center  mb-4 flex justify-center mt-2">
               <MagicRabbitSVG />
               <h2 className="text-4xl"> Magic link request sent! </h2>
-              <NounBlackCatIcon fill="purple" />
+              <NounBlackCatIcon />
             </div>
 
             <p className="text-center rounded-lg mb-2">
@@ -64,7 +62,6 @@ export default function LoginScreen() {
             <div className="flex items-center my-4 before:flex-1 before:border-t before:border-gray-300 before:mt-0.5 after:flex-1 after:border-t after:border-gray-300 after:mt-0.5"></div>
 
             {/* <!-- Registration Link--> */}
-
             <p className="text-sm font-semibold mt-2 pt-1 mb-0 text-center">
               <FontAwesomeIcon
                 className="fa-bounce text-yellow-300 mr-2 text-xl"
@@ -72,7 +69,7 @@ export default function LoginScreen() {
               />
               Don&apos;t have an account? Welcome! &nbsp;
               <Link
-                href={`/register`}
+                href="/register"
                 className="text-yellow-300 hover:text-indigo-200 focus:text-red-700 transition duration-200 ease-in-out"
               >
                 Register by clicking here

@@ -1,28 +1,34 @@
+/**
+ * Login form: credentials + magic link.
+ * Notes: docs/notes/app/auth-pages.md
+ */
 "use client";
 
-import React, { useEffect, useState, useRef } from "react";
-import { signIn, useSession } from "next-auth/react";
+import { useEffect, useState, useRef, type FormEvent } from "react";
+import { signIn, useSession, getCsrfToken } from "next-auth/react";
 import { useForm } from "react-hook-form";
 import { getError } from "@utils/error";
 import { toast } from "react-toastify";
-
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPaw } from "@fortawesome/free-solid-svg-icons";
 import "@fortawesome/fontawesome-svg-core/styles.css";
-
 import GeneralButton from "@components/ReusableSmallComponents/buttons/GeneralButton";
-
 import Image from "next/image";
 import NounBlackCatIcon from "@components/ReusableSmallComponents/iconsOrSvgImages/svgImages/NounBlackCatIcon";
 import RegisterInput from "@components/FormComponents/RegisterInput";
 import StyledInput from "@components/FormComponents/StyledInput";
 import LinkButton from "@components/ReusableSmallComponents/buttons/LinkButton";
 import { useRouter, useSearchParams } from "next/navigation";
-import { getCsrfToken } from "next-auth/react";
 import LoadingSpinner from "./ui/LoadingSpinner";
 import { useLocalStorageCooldown } from "@/hooks/useLocalStorageCooldown";
 
+type LoginFormValues = {
+  email: string;
+  password: string;
+};
+
 export default function Login() {
+  // useSession — grab session after page load / after sign-in (server layout only gates initial visit)
   const { data: session } = useSession();
   const { canClick, formattedTimer, trigger } = useLocalStorageCooldown(
     `lastRecheck-MagicLink}`,
@@ -54,7 +60,7 @@ export default function Login() {
 
   useEffect(() => {
     let isMounted = true;
-    getCsrfToken().then((token) => {
+    void getCsrfToken().then((token) => {
       if (isMounted) setCsrfToken(token ?? "");
     });
     return () => {
@@ -73,30 +79,72 @@ export default function Login() {
     handleSubmit,
     register,
     formState: { errors },
-  } = useForm();
+  } = useForm<LoginFormValues>();
 
-  const submitHandler = async ({ email, password }) => {
-    // console.log("email", email, "password", password);
+  const submitHandler = async ({ email, password }: LoginFormValues) => {
     if (!email || !password) return;
 
     try {
       setLoadingLogin(true);
       const result = await signIn("credentials", {
-        redirect: false,
-        //gets rid of callback url @10:20 https://www.youtube.com/watch?v=EFucgPdjeNg&t=594s&ab_channel=FullStackNiraj
+        redirect: false, // gets rid of callback url — https://www.youtube.com/watch?v=EFucgPdjeNg&t=594s
         email,
         password,
       });
-      if (result.error) {
+      if (result?.error) {
         setLoadingLogin(false);
         toast.error(result.error);
       } else {
         toast.success("Successfully signed in! Sending to dashboard");
+        setRedirect(true);
       }
-      setRedirect(true);
     } catch (err) {
       toast.error(getError(err));
       setLoadingLogin(false);
+    }
+  };
+
+  const handleMagicLinkSubmit = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const form = e.currentTarget;
+    const email = (form.elements.namedItem("email") as HTMLInputElement).value;
+    const honeypot = (form.elements.namedItem("website") as HTMLInputElement)
+      .value;
+
+    if (honeypot) {
+      console.warn("Bot detected — honeypot field was filled.");
+      return;
+    }
+
+    if (!email) {
+      toast.error("Please enter your email.");
+      return;
+    }
+
+    if (!canClick) {
+      toast.error("Please wait a few seconds before trying again.");
+      return;
+    }
+
+    setLoadingMagicLink(true);
+
+    try {
+      const result = await signIn("email", {
+        email,
+        redirect: false, // we'll handle redirect manually
+      });
+
+      if (result) {
+        // send to magic link page no matter the result (don't hint if email exists)
+        router.push(`/magiclink?email=${encodeURIComponent(email)}`);
+        toast("If this email exists, a magic link will be sent.");
+      }
+      trigger();
+    } catch (err) {
+      console.log("error in login", err);
+      toast.error("Something went wrong. Please try again.");
+    } finally {
+      setLoadingMagicLink(false);
     }
   };
 
@@ -129,8 +177,7 @@ export default function Login() {
               <div className="flex justify-center text-2xl my-4 "> Login </div>
 
               {/* <!-- Email input --> */}
-
-              <RegisterInput
+              <RegisterInput<LoginFormValues>
                 id="email"
                 label="Email"
                 type="email"
@@ -148,7 +195,7 @@ export default function Login() {
                 error={errors.email}
               />
 
-              <RegisterInput
+              <RegisterInput<LoginFormValues>
                 id="password"
                 label="Password"
                 type="password"
@@ -166,7 +213,6 @@ export default function Login() {
               />
 
               {/* ############# Forgot Password ################### */}
-
               <div className="flex justify-center mb-2">
                 <span> Forgot? </span>
 
@@ -191,69 +237,25 @@ export default function Login() {
             {loadingLogin && <LoadingSpinner />}
 
             {/* ################ Or Divider ##################### */}
-
             <div className="flex items-center my-4 before:flex-1 before:border-t before:border-gray-300 before:mt-0.5 after:flex-1 after:border-t after:border-gray-300 after:mt-0.5">
               <p className="text-center font-semibold mx-4 mb-0">Or</p>
             </div>
 
             {/* ################ Magic Link ##################### */}
-
             <section className="bg-secondary p-2 ">
               <div className="flex justify-center py-2">
-                <NounBlackCatIcon fill="purple" />
+                <NounBlackCatIcon />
               </div>
               <h4 className="text-center  pb-1 font-semibold ">
                 Login with a magic link
               </h4>
               <p className="text-center mb-2 pb-4 font-semibold border-b-2 border-white">
-                {" "}
-                (for registered users){" "}
+                (for registered users)
               </p>
 
               <form
                 className="text-center"
-                onSubmit={async (e) => {
-                  e.preventDefault();
-                  const form = e.currentTarget;
-                  const email = form.email.value;
-                  const honeypot = form.website.value;
-
-                  if (honeypot) {
-                    console.warn("Bot detected — honeypot field was filled.");
-                    return;
-                  }
-
-                  if (!email) return toast.error("Please enter your email.");
-                  setLoadingMagicLink(true);
-
-                  if (!canClick) {
-                    toast.error(
-                      "Please wait a few seconds before trying again.",
-                    );
-                    return;
-                  }
-
-                  try {
-                    const result = await signIn("email", {
-                      email,
-                      redirect: false, // we’ll handle redirect manually
-                    });
-
-                    if (result) {
-                      // we want them sent to the magic link, no matter the result
-                      router.push(
-                        `/magiclink?email=${encodeURIComponent(email)}`,
-                      );
-                      toast("If this email exists, a magic link will be sent.");
-                    }
-                    trigger(); // will start cooldown
-                  } catch (error) {
-                    console.log("error in login", error);
-                    toast.error("Something went wrong. Please try again.");
-                  } finally {
-                    setLoadingMagicLink(false);
-                  }
-                }}
+                onSubmit={handleMagicLinkSubmit}
               >
                 <input
                   name="csrfToken"
@@ -267,6 +269,7 @@ export default function Login() {
                   className="lg:min-w-64 mt-4 "
                 />
 
+                {/* honeypot — bots fill this; humans leave empty */}
                 <input
                   type="text"
                   name="website"
@@ -301,7 +304,6 @@ export default function Login() {
             {/* ################ Divider ##################### */}
 
             {/* <!-- Registration Link--> */}
-
             <section className="  my-4">
               <div className="font-semibold mt-2 pt-1 mb-0 text-center">
                 <FontAwesomeIcon
@@ -311,7 +313,7 @@ export default function Login() {
                 <p className="mb-4">Don&apos;t have an account? Welcome! </p>
 
                 <LinkButton
-                  href={`/register`}
+                  href="/register"
                   defaultStyle
                   text="Register"
                 />

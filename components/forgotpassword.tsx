@@ -1,6 +1,10 @@
+/**
+ * Forgot password form.
+ * Notes: docs/notes/app/auth-pages.md
+ */
 "use client";
 
-import React, { useState, useEffect } from "react";
+import { useState, useEffect, type FormEvent } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -9,28 +13,30 @@ import Link from "next/link";
 import Image from "next/image";
 import StyledInput from "./FormComponents/StyledInput";
 
+function isValidEmail(email: string) {
+  const emailRegex = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i;
+  return emailRegex.test(email);
+}
+
 export default function ForgotPassword() {
+  // useSession — redirect if user signs in while on this page
   const { data: session } = useSession();
   const router = useRouter();
-  //useSession needed in order to grab session after the page is loaded, aka so we can grab session once we login
 
   const [message, setMessage] = useState("");
   const [error, setError] = useState(false);
 
   useEffect(() => {
+    // if session exists, user is already signed in
     if (session?.user) {
       router.push("/dashboard");
     }
-  }, [session]);
-  //if the session exists, then the user is already signed in. So if this is true, push back to the homepage
+  }, [session, router]);
 
-  const isValidEmail = (email) => {
-    const emailRegex = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i;
-    return emailRegex.test(email);
-  };
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const email = e.target[0].value;
+    const email = (e.currentTarget.elements.namedItem("signinemail") as HTMLInputElement)
+      .value;
 
     if (!isValidEmail(email)) {
       setMessage("Email is invalid");
@@ -38,17 +44,16 @@ export default function ForgotPassword() {
     }
 
     try {
-      let res = await fetch("/api/forgotpassword", {
+      const res = await fetch("/api/forgotpassword", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          email,
-        }),
+        body: JSON.stringify({ email }),
       });
-      //for safety, we won't give any hints if this email exists in the database or not
-      if (res.status === 404 || res.status == 200) {
+
+      // for safety, we won't give any hints if this email exists in the database or not
+      if (res.status === 404 || res.status === 200) {
         setMessage(
           "If an account is registered to this email, a reset password link will be sent to this email",
         );
@@ -59,12 +64,12 @@ export default function ForgotPassword() {
           "Error reaching api path for forgot password, refresh page and try again",
         );
       }
-    } catch (message) {
+    } catch (err) {
       setMessage(
         "Error reaching api path for forgot password, refresh page and try again",
       );
       setError(true);
-      console.log(message);
+      console.log(err);
     }
   };
 
@@ -143,7 +148,6 @@ export default function ForgotPassword() {
               <div className="flex items-center my-4 before:flex-1 before:border-t before:border-gray-300 before:mt-0.5 after:flex-1 after:border-t after:border-gray-300 after:mt-0.5"></div>
 
               {/* <!-- Registration Link--> */}
-
               <p className="text-sm font-semibold mt-2 pt-1 mb-0 text-center">
                 <FontAwesomeIcon
                   className="fa-bounce text-yellow-300 mr-2 text-xl"
@@ -151,7 +155,7 @@ export default function ForgotPassword() {
                 />
                 Don&apos;t have an account? Welcome! &nbsp;
                 <Link
-                  href={`/register`}
+                  href="/register"
                   className="text-yellow-300 hover:text-indigo-200 focus:text-red-700 transition duration-200 ease-in-out"
                 >
                   Register by clicking here

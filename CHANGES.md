@@ -4396,6 +4396,53 @@ Preserved the original `[...nextauth]` comment explaining why the route exports 
 
 ---
 
+## 2026-06-07 — TypeScript: auth UI pages
+
+### What was changed and why
+
+Converted login, register, forgot password, reset password, and magic link screens to TypeScript. Register form was already TS; only the page wrapper moved.
+
+### Files created
+
+- `components/login.tsx`, `forgotpassword.tsx`, `ResetPassword.tsx`
+- `app/login/page.tsx`, `app/register/page.tsx`, `app/forgotpassword/page.tsx`
+- `app/resetpassword/[token]/page.tsx`, `app/magiclink/page.tsx`
+- `docs/notes/app/auth-pages.md`
+
+### Files removed
+
+- All corresponding `.js` / `.jsx` auth UI files
+
+### Files modified
+
+- `docs/README.md`
+
+### Problems encountered
+
+- `NounBlackCatIcon` no longer accepts `fill` prop — removed from login/magiclink.
+- Fixed missing `redirect` import on reset password page; cleaned dead code in `ResetPassword`.
+
+### Verification
+
+- `pnpm exec tsc --noEmit` — OK
+- `pnpm build` — OK
+
+### Next logical step
+
+Delete dead JS (`AddComment.js`, `removeDeletedContent.jsx`, etc.) or enable `strict: true`.
+
+---
+
+## 2026-06-07 — Auth UI: restore section skim comments
+
+Re-added `{/* <!-- … --> */}` / banner section comments in `login.tsx`, `forgotpassword.tsx`, `ResetPassword.tsx`, and `magiclink/page.tsx` for easier navigation.
+
+## 2026-06-07 — Auth UI: preserve behavioral notes
+
+Expanded `docs/notes/app/auth-pages.md` with implementation notes per `preserving-migration-notes.md`. Re-added short inline `//` comments in auth `.tsx` files (useSession timing, `redirect: false`, honeypot, forgot-password enumeration safety).
+
+---
+
 ## 2026-06-07 — TypeScript: profile/dashboard polish, error pages, meta routes
 
 ### What was changed and why

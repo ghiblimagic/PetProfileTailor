@@ -1,100 +1,126 @@
+/**
+ * Reset password form after email token verification.
+ * Notes: docs/notes/app/auth-pages.md
+ */
 "use client";
 
 import Link from "next/link";
-import React, { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { signIn, useSession } from "next-auth/react";
 import { useForm } from "react-hook-form";
 import axios from "axios";
 import { getError } from "@utils/error";
 import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
-
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPaw } from "@fortawesome/free-solid-svg-icons";
 import "@fortawesome/fontawesome-svg-core/styles.css";
-
 import Image from "next/image";
 
-export default function ResetPassword({ token }) {
+type ResetPasswordFormValues = {
+  password: string;
+  confirmPassword: string;
+};
+
+type VerifiedUser = {
+  _id: string;
+  name: string;
+  email: string;
+};
+
+export type ResetPasswordProps = {
+  token: string;
+};
+
+export default function ResetPassword({ token }: ResetPasswordProps) {
+  // useSession — redirect if already signed in
   const { data: session } = useSession();
-  //useSession needed in order to grab session after the page is loaded, aka so we can grab session once we login
+  const router = useRouter();
 
   const [message, setMessage] = useState("");
   const [error, setError] = useState(false);
-  const [verifiedapiran, setVerifiedapiran] = useState("");
-  const [user, setUser] = useState(null);
-  const [name, setName] = useState(null);
-  const [email, setEmail] = useState(null);
-  const [userid, setId] = useState(null);
-  const [passwordstate, setPasswordState] = useState(null);
-
-  const router = useRouter();
-  const { redirect } = router.query;
-
-  let userName = "";
-  let profileImage = "";
-
-  if (sessionFromServer) {
-    userName = sessionFromServer.user.name;
-    profileImage = sessionFromServer.user.profileImage;
-  }
-  //end of section for nav menu
+  const [name, setName] = useState<string | null>(null);
+  const [email, setEmail] = useState<string | null>(null);
+  const [userid, setId] = useState<string | null>(null);
+  const [passwordAfterReset, setPasswordAfterReset] = useState<string | null>(
+    null,
+  );
 
   const {
     handleSubmit,
     register,
     getValues,
     formState: { errors },
-  } = useForm();
+  } = useForm<ResetPasswordFormValues>();
 
   useEffect(() => {
     const verifyToken = async () => {
       try {
-        let res = await fetch("/api/verifyresetpasstoken", {
+        const res = await fetch("/api/verifyresetpasstoken", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({
-            token,
-          }),
+          body: JSON.stringify({ token }),
         });
-        // console.log(res);
+
         if (res.status === 404) {
           setMessage("Invalid reset token or token has expired");
           setError(true);
-          setVerifiedapiran(true);
-        }
-        if (res.status === 200) {
+        } else if (res.status === 200) {
           setMessage("");
-          setVerifiedapiran(true);
           setError(false);
-          const userData = await res.json();
-          setUser(userData);
+          const userData = (await res.json()) as VerifiedUser;
           setName(userData.name);
           setEmail(userData.email);
           setId(userData._id);
         }
-      } catch (error) {
+      } catch (err) {
         setMessage("Error, try again");
         setError(true);
-        console.log(error);
+        console.log(err);
       }
     };
-    verifyToken();
+    void verifyToken();
   }, [token]);
 
   useEffect(() => {
+    // if session exists, user is already signed in
     if (session?.user) {
       router.push("/dashboard");
     }
-  }, [router, session, redirect]);
-  //if the session exists, then the user is already signed in. So if this is true, push back to the homepage
-  //we need to use router (line 8) to redirect user
+  }, [router, session]);
 
-  const submitHandler = async ({ password }) => {
+  const loginAfterPasswordChange = useCallback(async () => {
+    if (!email || !passwordAfterReset) return;
+
     try {
-      let res = await axios.put("/api/auth/update", {
+      // signIn handled by nextauth route — redirect: false like login credentials
+      const result = await signIn("credentials", {
+        redirect: false, // gets rid of callback url — https://www.youtube.com/watch?v=EFucgPdjeNg&t=594s
+        email,
+        password: passwordAfterReset,
+      });
+      if (result?.error) {
+        toast.error(result.error);
+      } else {
+        toast.success("Successfully signed in! Sending to dashboard");
+        router.push("/dashboard");
+      }
+    } catch (err) {
+      toast.error(getError(err));
+    }
+  }, [email, passwordAfterReset, router]);
+
+  useEffect(() => {
+    if (passwordAfterReset != null) {
+      void loginAfterPasswordChange();
+    }
+  }, [passwordAfterReset, loginAfterPasswordChange]);
+
+  const submitHandler = async ({ password }: ResetPasswordFormValues) => {
+    try {
+      const res = await axios.put("/api/auth/update", {
         name,
         email,
         password,
@@ -105,51 +131,22 @@ export default function ResetPassword({ token }) {
           "There was an error with validating the name, email or userid of this account",
         );
         setError(true);
-      }
-      if (res.status === 400) {
+      } else if (res.status === 400) {
         setMessage(
           "There was an unexpected error in the request method of the update API route for the reset password page",
         );
         setError(true);
-      }
-      if (res.status === 200) {
+      } else if (res.status === 200) {
         setMessage("Password updated successfully");
         setError(false);
-        setPasswordState(password);
+        setPasswordAfterReset(password);
       }
-      // router.push("/login");
-    } catch (error) {
+    } catch (err) {
       setMessage(
         "There was an error with api route `auth update` for resetting your password, try again. If error persists contact us and send this error message",
       );
       setError(true);
-      console.log(error);
-    }
-  };
-
-  useEffect(() => {
-    if (passwordstate != null) {
-      loginAfterPasswordChange();
-    }
-  }, [passwordstate]);
-
-  const loginAfterPasswordChange = async () => {
-    try {
-      //import signIn on line 3 from nextAuth, which will be handled in the nextauth.js handler
-      // console.log(`this is password ${passwordstate}`);
-      const result = await signIn("credentials", {
-        redirect: false,
-        //gets rid of callback url @10:20 https://www.youtube.com/watch?v=EFucgPdjeNg&t=594s&ab_channel=FullStackNiraj
-        email,
-        password: passwordstate,
-      });
-      if (result.error) {
-        toast.error(result.error);
-      } else {
-        toast.success("Successfully signed in! Sending to dashboard");
-      }
-    } catch (err) {
-      toast.error(getError(err));
+      console.log(err);
     }
   };
 
@@ -182,11 +179,11 @@ export default function ResetPassword({ token }) {
 
               {/* <!-- Email input --> */}
               <div className="mb-6">
-                <label htmlFor="newpassword">Password</label>
+                <label htmlFor="password">Password</label>
                 <input
                   type="password"
                   disabled={error}
-                  //this way if the tokens expired ect, they can't enter a password
+                  // if token expired / invalid, don't allow entering a password
                   className="w-full border border-gray-300 text-black rounded px-3 py-2 mb-4 focus:outline-none focus:border-blue-400 focus:text-black disabled:bg-errorBackgroundColor disabled:placeholder-errorTextColor"
                   placeholder="password"
                   required
@@ -211,7 +208,9 @@ export default function ResetPassword({ token }) {
                     type="password"
                     id="confirmPassword"
                     {...register("confirmPassword", {
-                      validate: (value) => value === getValues("password"),
+                      validate: (value) =>
+                        value === getValues("password") ||
+                        "Passwords do not match",
                       minLength: {
                         value: 6,
                         message: "confirm password is more than 5 chars",
@@ -223,10 +222,6 @@ export default function ResetPassword({ token }) {
                       {errors.confirmPassword.message}
                     </div>
                   )}
-                  {errors.confirmPassword &&
-                    errors.confirmPassword.type === "validate" && (
-                      <div className="text-red-500 ">Password do not match</div>
-                    )}
                 </div>
 
                 {message && (
@@ -257,7 +252,6 @@ export default function ResetPassword({ token }) {
             <div className="flex items-center my-4 before:flex-1 before:border-t before:border-gray-300 before:mt-0.5 after:flex-1 after:border-t after:border-gray-300 after:mt-0.5"></div>
 
             {/* <!-- Registration Link--> */}
-
             <p className="text-sm font-semibold mt-2 pt-1 mb-0 text-center">
               <FontAwesomeIcon
                 className="fa-bounce text-yellow-300 mr-2 text-xl"
@@ -265,7 +259,7 @@ export default function ResetPassword({ token }) {
               />
               Don&apos;t have an account? Welcome! &nbsp;
               <Link
-                href={`/register`}
+                href="/register"
                 className="text-yellow-300 hover:text-indigo-200 focus:text-red-700 transition duration-200 ease-in-out"
               >
                 Register by clicking here
