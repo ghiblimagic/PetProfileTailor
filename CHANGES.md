@@ -4524,6 +4524,27 @@ Enabled full TypeScript strict mode now that app/components/hooks are converted.
 
 ### TODOs / next logical step
 
-- Delete stale `.js`/`.jsx` siblings left next to converted `.ts`/`.tsx` files (e.g. `app/page.js`, `components/login.jsx`) so only one module per route/component remains.
-- Remove remaining dead files (`hooks/useOnScreen.js`, `components/DeletingData/removeDeletedContent.jsx`, etc.) after confirming zero imports.
-- Consider `moduleResolution: "bundler"` and tightening `tsconfig` `include` (drop `**/*.js` from app code; keep `migrations/`).
+- Consider `moduleResolution: "bundler"`.
+
+---
+
+## 2026-06-07 — Legacy JS cleanup verification + `tsconfig` include tighten
+
+### What was built and why
+
+Confirmed the stale-JS cleanup pass: `app/`, `components/`, `hooks/`, `context/`, `wrappers/`, `lib/`, `models/`, and `app/api/` have **no** `.js`/`.jsx` on disk or in git (only TypeScript). Dead files (`useOnScreen.js`, `removeDeletedContent.jsx`, empty `AddComment.js`, commented `addingCategory.jsx`, superseded `AddDescriptionCategory.jsx`) were already removed in commit `67e5d13`. Tightened `tsconfig.json` `include` so TypeScript no longer scans wildcard `**/*.js` / `**/*.jsx` for app code — only `migrations/`, `codemods/`, `scripts/`, and root `*.config.js` remain JS in the repo (29 files).
+
+### Files modified
+
+- `tsconfig.json` — replaced `**/*.js` / `**/*.jsx` with explicit migration/codemod/script/config globs
+
+### Verification
+
+- Repo scan: **0** stale JS/JSX twins (no basename with both `.ts(x)` and `.js(x)`)
+- `git ls-files "*.js" "*.jsx"` — 29 files (migrations, codemods, config only)
+- `pnpm exec tsc --noEmit` — OK
+- `pnpm build` — OK
+
+### Next logical step
+
+- Optional: convert `next.config.js` / Tailwind / PostCSS to `.ts` or `.mjs` if you want zero root `.js` in `include`.

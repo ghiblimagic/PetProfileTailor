@@ -38,8 +38,10 @@
     "next-env.d.ts",
     "**/*.ts",
     "**/*.tsx",
-    "**/*.js",
-    "**/*.jsx",
+    "migrations/**/*.js",
+    "codemods/**/*.js",
+    "scripts/**/*.js",
+    "*.config.js",
     ".next/types/**/*.ts"
   ],
   "exclude": ["node_modules"]
