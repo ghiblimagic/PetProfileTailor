@@ -1,20 +1,18 @@
+/**
+ * Root layout — session, category/tag providers, nav, footer.
+ * Notes: docs/notes/app/root-layout.md
+ */
 import "../styles/globals.css";
 import { Analytics } from "@vercel/analytics/next";
-
 import "@etchteam/next-pagination/dist/index.css";
-
 import { getServerSession } from "next-auth";
 import { serverAuthOptions } from "@/lib/auth";
-
 import ToastProvider from "@/wrappers/ToastWrapper";
-
 import { SessionProviderWrapper } from "@/wrappers/SessionProviderWrapper";
 import NavLayoutwithSettingsMenu from "@/components/NavBar/NavLayoutwithSettingsMenu";
 import CategTagsWrapper from "@/wrappers/CategTagsWrapper";
-import { Suspense } from "react";
+import { Suspense, type ReactNode } from "react";
 import LoadingSkeleton from "@/components/LoadingScreen";
-import LinkButton from "@/components/ReusableSmallComponents/buttons/LinkButton";
-import Image from "next/image";
 
 // empty wrappers are needed for the providers, since providers need to be inside a client component to safely run hooks even with having "use client" at the top of the provider
 
@@ -24,19 +22,20 @@ import Image from "next/image";
 
 // Server layout: stays server component, just renders wrappers around {children}.
 import ReportsWrapper from "@/wrappers/ReportsWrapper";
-
 import LikesWrapper from "@/wrappers/LikesWrapper";
 import SuggestionsWrapper from "@/wrappers/SuggestionsWrapper";
 import GoToTopButton from "@/components/ReusableSmallComponents/buttons/GoToTopButton";
 import NotificationsWrapper from "@/wrappers/NotificationWrapper";
-
-import db from "@/utils/db";
+import dbConnect from "@utils/db";
 import NameCategory from "@/models/NameCategory";
 import DescriptionCategory from "@/models/DescriptionCategory";
 import { leanWithStrings } from "@/utils/mongoDataCleanup";
 import Footer from "@/components/footer/Footer";
+import type { CategoryWithTags } from "@/context/CategoriesAndTagsContext";
+import type { Metadata } from "next";
+import type { Session } from "next-auth";
 
-export const metadata = {
+export const metadata: Metadata = {
   metadataBase: new URL("https://homewardtails.com"),
   title:
     "Improve Adoption Rates by Creating Impactful, Fun, and Tailor-Fitted Pet Adoption Profiles!",
@@ -47,11 +46,16 @@ export const metadata = {
   },
 };
 
+type CachedCategories = {
+  names: CategoryWithTags[];
+  descriptions: CategoryWithTags[];
+};
+
 // 🧠 3-hour TTL cache
-let cachedCategories = null;
+let cachedCategories: CachedCategories | null = null;
 let lastFetched = 0;
 
-async function getCategoriesAndTagsWithTTL() {
+async function getCategoriesAndTagsWithTTL(): Promise<CachedCategories> {
   const THREE_HOURS = 3 * 60 * 60 * 1000;
   const now = Date.now();
 
@@ -59,7 +63,7 @@ async function getCategoriesAndTagsWithTTL() {
     return cachedCategories;
   }
 
-  await db.connect();
+  await dbConnect.connect();
 
   const [nameCategories, descCategories] = await Promise.all([
     leanWithStrings(NameCategory.find().populate("tags").sort({ order: 1 })),
@@ -68,23 +72,30 @@ async function getCategoriesAndTagsWithTTL() {
     ),
   ]);
 
-  cachedCategories = { names: nameCategories, descriptions: descCategories };
+  cachedCategories = {
+    names: nameCategories as unknown as CategoryWithTags[],
+    descriptions: descCategories as unknown as CategoryWithTags[],
+  };
   lastFetched = now;
 
   return cachedCategories;
 }
 
-export default async function RootLayout({ children }) {
+type RootLayoutProps = {
+  children: ReactNode;
+};
+
+export default async function RootLayout({ children }: RootLayoutProps) {
   const session = await getServerSession(serverAuthOptions);
-  const safeSession = session
+  const safeSession: Session | null = session
     ? {
         ...session,
-        user: session.user || {},
+        user: session.user || ({} as Session["user"]),
       }
     : null;
   //Guarantees session.user exists (or is an empty object).
 
-  await db.connect();
+  await dbConnect.connect();
 
   // Cached DB data
   const { names, descriptions } = await getCategoriesAndTagsWithTTL();

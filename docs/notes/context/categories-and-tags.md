@@ -7,7 +7,7 @@ Sources:
 
 ## Role
 
-Root layout loads populated categories from Mongo (`app/layout.js` → [`CategTagsWrapper.tsx`](../../../wrappers/CategTagsWrapper.tsx)). Client components read them via `useCategAndTags()` or `useCategoriesForDataType(dataType)`.
+Root layout loads populated categories from Mongo ([`app/layout.tsx`](../../../app/layout.tsx) → [`CategTagsWrapper.tsx`](../../../wrappers/CategTagsWrapper.tsx)). Client components read them via `useCategAndTags()` or `useCategoriesForDataType(dataType)`. See [root-layout.md](../app/root-layout.md).
 
 ## Types
 
@@ -31,4 +31,4 @@ export type CategoriesAndTagsResponse = {
 };
 ```
 
-Root layout duplicates this query in `getCategoriesAndTagsWithTTL()` ([`app/layout.js`](../../../app/layout.js)) and passes `nameCateg` / `descrCateg` into `CategTagsWrapper` — that is the main app path; the API route is the HTTP equivalent with Next `revalidate = 10800`.
+Root layout duplicates this query in `getCategoriesAndTagsWithTTL()` ([`app/layout.tsx`](../../../app/layout.tsx)) and passes `nameCateg` / `descrCateg` into `CategTagsWrapper` — that is the main app path; the API route is the HTTP equivalent with Next `revalidate = 10800`.

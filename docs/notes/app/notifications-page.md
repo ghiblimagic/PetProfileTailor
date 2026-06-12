@@ -22,7 +22,7 @@ Hooks stay mounted when switching tabs so SWR cache and pagination (`size`) pers
 
 ### `NotificationsProvider` / `useNotifications`
 
-[`context/notificationsContext.tsx`](../../../context/notificationsContext.tsx) wraps the app (via [`NotificationWrapper.tsx`](../../../wrappers/NotificationWrapper.tsx) in `app/layout.js`). On session load it `GET`s [`/api/user/notifications`](../../../app/api/user/notifications/route.ts) for unread counts (`names`, `descriptions`, `thanks`). `resetNotificationType(type)` fires `PATCH /api/notifications/{type}/mark-read` and zeros that badge in local state.
+[`context/notificationsContext.tsx`](../../../context/notificationsContext.tsx) wraps the app (via [`NotificationWrapper.tsx`](../../../wrappers/NotificationWrapper.tsx) in [`app/layout.tsx`](../../../app/layout.tsx)). On session load it `GET`s [`/api/user/notifications`](../../../app/api/user/notifications/route.ts) for unread counts (`names`, `descriptions`, `thanks`). `resetNotificationType(type)` fires `PATCH /api/notifications/{type}/mark-read` and zeros that badge in local state.
 
 [`NotificationsButton.tsx`](../../../components/Notifications/NotificationsButton.tsx) in the nav reads `notificationsTotal` and links to `/notifications` (badge via [`IconWithCount.tsx`](../../../components/ReusableSmallComponents/IconWithCount.tsx)).
 

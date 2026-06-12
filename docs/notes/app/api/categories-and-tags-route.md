@@ -44,7 +44,7 @@ export async function GET() {
 
 `export const revalidate = 10800` — route response may be cached by Next for **3 hours** (matches build output `Revalidate 3h`). Public read-only data; tags/categories change infrequently.
 
-This is separate from the **layout** TTL cache in [`app/layout.js`](../../../app/layout.js) (`getCategoriesAndTagsWithTTL` — also 3 hours in memory). Layout hydrates [`CategTagsWrapper`](../../../wrappers/CategTagsWrapper.tsx) → `CategoriesAndTagsProvider` on every page load; this API is for clients that fetch categories directly (or tooling).
+This is separate from the **layout** TTL cache in [`app/layout.tsx`](../../../app/layout.tsx) (`getCategoriesAndTagsWithTTL` — also 3 hours in memory). Layout hydrates [`CategTagsWrapper`](../../../wrappers/CategTagsWrapper.tsx) → `CategoriesAndTagsProvider` on every page load; this API is for clients that fetch categories directly (or tooling).
 
 ### Special behavior: populate + sort
 
