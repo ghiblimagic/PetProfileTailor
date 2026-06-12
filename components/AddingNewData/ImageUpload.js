@@ -13,7 +13,7 @@ import "@fortawesome/fontawesome-svg-core/styles.css";
 import Image from "next/image";
 import { useSession } from "next-auth/react";
 import LoadingSpinner from "../ui/LoadingSpinner";
-import SmallCenteredHeading from "@/components/ReusableSmallComponents/TitlesOrHeadings/SmallCenteredheading";
+import SmallCenteredHeading from "@/components/ReusableSmallComponents/TitlesOrHeadings/SmallCenteredHeading";
 
 function ImageUpload({ setAvatar = false, setShowDialog = false }) {
   const { data: session, update } = useSession();

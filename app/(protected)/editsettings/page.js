@@ -12,7 +12,7 @@ import { useRouter } from "next/navigation";
 import ImageUpload from "@components/AddingNewData/ImageUpload";
 import RegisterInput from "@components/FormComponents/RegisterInput";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
-import SmallCenteredHeading from "@/components/ReusableSmallComponents/TitlesOrHeadings/SmallCenteredheading";
+import SmallCenteredHeading from "@/components/ReusableSmallComponents/TitlesOrHeadings/SmallCenteredHeading";
 
 export default function ProfileScreen() {
   const {

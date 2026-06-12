@@ -1,4 +1,8 @@
-export default function NounBlackCatIcon({ props }) {
+/**
+ * Decorative cat SVG (login page).
+ * Notes: docs/notes/components/reusable-small-components.md
+ */
+export default function NounBlackCatIcon() {
   return (
     <svg
       width="50pt"

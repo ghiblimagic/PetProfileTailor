@@ -4075,3 +4075,66 @@ Deleted `CheckForMoreDataButton.tsx` — zero imports in the repo (dead code fro
 ### Files modified
 
 - `docs/notes/components/reusable-buttons.md`
+
+---
+
+## 2026-06-07 — TypeScript: `ReusableSmallComponents` (non-buttons)
+
+### What was changed and why
+
+Converted remaining JS/JSX in `components/ReusableSmallComponents/`: GifHover, list/heading helpers, ShowTime, icons/SVGs, author row. Renamed `SmallCenteredheading.jsx` → `SmallCenteredHeading.tsx`. Removed unused `Image` import from author row component. `PostersImageUsernameProfileName` still has zero external imports.
+
+### Files created
+
+- `components/ReusableSmallComponents/GifHover.tsx`
+- `components/ReusableSmallComponents/ListWithPawPrintIcon.tsx`
+- `components/ReusableSmallComponents/ShowTime.tsx`
+- `components/ReusableSmallComponents/PostersImageUsernameProfileName.tsx`
+- `components/ReusableSmallComponents/TitlesOrHeadings/WideCenteredHeading.tsx`
+- `components/ReusableSmallComponents/TitlesOrHeadings/SmallCenteredHeading.tsx`
+- `components/ReusableSmallComponents/iconsOrSvgImages/XSvgIcon.tsx`
+- `components/ReusableSmallComponents/iconsOrSvgImages/PawPrintIcon.tsx`
+- `components/ReusableSmallComponents/iconsOrSvgImages/svgImages/NounBlackCatIcon.tsx`
+- `components/ReusableSmallComponents/iconsOrSvgImages/svgImages/MagicRabbitSVG.tsx`
+- `docs/notes/components/reusable-small-components.md`
+
+### Files removed
+
+- All corresponding `.js` / `.jsx` in `ReusableSmallComponents/` (non-buttons)
+
+### Files modified
+
+- `app/(protected)/editsettings/page.js` — `SmallCenteredHeading` import path
+- `components/AddingNewData/ImageUpload.js` — same
+- `docs/README.md`
+
+### Verification
+
+- `pnpm exec tsc --noEmit` — OK
+- `pnpm build` — OK
+
+### Next logical step
+
+Convert auth pages (`login.jsx`, `register/page.js`) or `NavLayoutwithSettingsMenu.js`.
+
+---
+
+## 2026-06-07 — Delete `PostersImageUsernameProfileName`; backlog `ShowTime`
+
+### What was changed and why
+
+Removed dead `PostersImageUsernameProfileName` — superseded by inline author UI in `ContentListing`. Kept `ShowTime` for future use; added `docs/FUTURE.md` section to revisit timestamps on content rows and notification listings.
+
+### Files removed
+
+- `components/ReusableSmallComponents/PostersImageUsernameProfileName.tsx`
+
+### Files modified
+
+- `components/ReusableSmallComponents/ShowTime.tsx` — FUTURE.md pointer in header
+- `docs/FUTURE.md`
+- `docs/notes/components/reusable-small-components.md`
+
+### Verification
+
+- No app imports to update; delete-only + docs.

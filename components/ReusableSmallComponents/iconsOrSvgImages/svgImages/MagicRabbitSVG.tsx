@@ -1,4 +1,8 @@
-export default function MagicRabbitSVG({ props }) {
+/**
+ * Decorative rabbit SVG (magic link page).
+ * Notes: docs/notes/components/reusable-small-components.md
+ */
+export default function MagicRabbitSVG() {
   return (
     <svg
       width="50pt"

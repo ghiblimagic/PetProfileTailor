@@ -1,8 +1,19 @@
-import React from "react";
+/**
+ * Absolute-positioned modal close (X) button.
+ * Notes: docs/notes/components/reusable-small-components.md
+ */
 
 //needs to be in a relative parent
 
-export default function XSvgIcon({ onClickAction, screenReaderText }) {
+export type XSvgIconProps = {
+  onClickAction: () => void;
+  screenReaderText: string;
+};
+
+export default function XSvgIcon({
+  onClickAction,
+  screenReaderText,
+}: XSvgIconProps) {
   return (
     <button
       type="button"

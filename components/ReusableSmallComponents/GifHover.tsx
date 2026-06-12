@@ -1,7 +1,22 @@
+/**
+ * Image that swaps to GIF on hover.
+ * Notes: docs/notes/components/reusable-small-components.md
+ */
 "use client";
 
 import { useState } from "react";
 import Image from "next/image";
+
+export type GifHoverProps = {
+  gifSrc: string;
+  stillImageSrc: string;
+  className?: string;
+  layout?: string;
+  width?: number;
+  height?: number;
+  divStyling?: string;
+  alt?: string;
+};
 
 export default function GifHover({
   gifSrc,
@@ -12,15 +27,8 @@ export default function GifHover({
   height,
   divStyling,
   alt,
-}) {
+}: GifHoverProps) {
   const [hover, setHover] = useState(false);
-  const handleMouseEnterForImage = () => {
-    setHover(true);
-  };
-
-  const handleMouseLeaveForImage = () => {
-    setHover(false);
-  };
 
   return (
     <div className={divStyling}>
@@ -32,8 +40,8 @@ export default function GifHover({
         width={width}
         height={height}
         unoptimized
-        onMouseEnter={handleMouseEnterForImage}
-        onMouseLeave={handleMouseLeaveForImage}
+        onMouseEnter={() => setHover(true)}
+        onMouseLeave={() => setHover(false)}
         style={{
           maxWidth: "100%",
           height: "auto",
