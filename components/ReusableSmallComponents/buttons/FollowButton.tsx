@@ -1,47 +1,68 @@
+/**
+ * Follow / unfollow toggle for profile social lists.
+ * Notes: docs/notes/components/reusable-buttons.md
+ */
 "use client";
 
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import axios from "axios";
-
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faUserPlus } from "@fortawesome/free-solid-svg-icons";
 import "@fortawesome/fontawesome-svg-core/styles.css";
-import { toast, ToastContainer } from "react-toastify";
+import { toast } from "react-toastify";
+import type { Session } from "next-auth";
+import type { ChangeEvent } from "react";
+
+export type FollowButtonUser = {
+  _id: string;
+  followers?: Array<{ _id: string } | string>;
+};
+
+export type FollowButtonProps = {
+  data: FollowButtonUser;
+  session: Session | null;
+  apiLink?: string;
+  FollowIconStyling?: string;
+  FollowTextStyling?: string;
+};
 
 export default function FollowButton({
   data,
   session,
-  apiLink,
   FollowIconStyling,
   FollowTextStyling,
-}) {
+}: FollowButtonProps) {
   const [userFollowed, setUserFollowed] = useState(false);
-  let userToFollowId = data._id;
-  let userId = "";
+  const userToFollowId = data._id;
+  const userId = session?.user?.id ?? "";
 
   useEffect(() => {
-    if (session?.user) {
-      userId = session.user.id;
+    if (!data.followers) {
+      setUserFollowed(false);
+      return;
     }
 
-    let searchingInFollowers = data.followers.find(
-      (follower) => follower._id == userId || follower == userId,
+    const searchingInFollowers = data.followers.find(
+      (follower) =>
+        (typeof follower === "object" ? follower._id : follower) == userId,
     );
 
-    searchingInFollowers != undefined
-      ? setUserFollowed(true)
-      : setUserFollowed(false);
-  }, [userId]);
+    setUserFollowed(searchingInFollowers != undefined);
+  }, [userId, data.followers]);
 
-  const handleFollows = (e) => {
-    !session && toast.error("Please sign in to follow users");
-    let userId = session.user.id;
+  const handleFollows = (_e: ChangeEvent<HTMLInputElement>) => {
+    if (!session?.user?.id) {
+      toast.error("Please sign in to follow users");
+      return;
+    }
+
+    const currentUserId = session.user.id;
 
     const putFollows = async () => {
       try {
-        const response = await axios.put("/api/user/updatefollows/", {
+        await axios.put("/api/user/updatefollows/", {
           userToFollowId,
-          userId,
+          userId: currentUserId,
           userFollowed,
         });
 
@@ -50,7 +71,7 @@ export default function FollowButton({
         console.log("something went wrong :(", err);
       }
     };
-    putFollows();
+    void putFollows();
   };
 
   return (

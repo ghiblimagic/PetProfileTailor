@@ -1,8 +1,20 @@
-import React from "react";
+/**
+ * Back link with arrow icon (single-content pages).
+ * Notes: docs/notes/components/reusable-buttons.md
+ */
 import LinkButton from "./LinkButton";
 import { ArrowBigLeftIcon } from "lucide-react";
+import type { ComponentProps } from "react";
 
-export default function ReturnToPreviousPage({ href, text }) {
+export type ReturnToPreviousPageProps = {
+  href: ComponentProps<typeof LinkButton>["href"];
+  text: string;
+};
+
+export default function ReturnToPreviousPage({
+  href,
+  text,
+}: ReturnToPreviousPageProps) {
   return (
     <LinkButton
       icon={<ArrowBigLeftIcon className="inline-block" />}

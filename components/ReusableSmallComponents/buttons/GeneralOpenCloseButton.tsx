@@ -1,15 +1,24 @@
-import React from "react";
-import { ChevronDownIcon } from "@heroicons/react/20/solid";
+/**
+ * Tab-style toggle button (profile/dashboard content tabs).
+ * Notes: docs/notes/components/reusable-buttons.md
+ */
+export type GeneralOpenCloseButtonProps<T extends string> = {
+  state: T | null;
+  text: string;
+  value: T;
+  className?: string;
+  setState: (value: T) => void;
+  sideText?: string;
+};
 
-function generalOpenCloseButton({
+export default function GeneralOpenCloseButton<T extends string>({
   state,
   text,
   value,
   className,
   setState,
   sideText,
-}) {
-  console.log("sidetext", sideText);
+}: GeneralOpenCloseButtonProps<T>) {
   return (
     <button
       className={`hover:rounded-2xl
@@ -28,5 +37,3 @@ function generalOpenCloseButton({
     </button>
   );
 }
-
-export default generalOpenCloseButton;

@@ -25,6 +25,7 @@ Each source file with notes should have a one-line pointer at the top linking to
 | [`lib/checkBlocklist.ts`](../lib/checkBlocklist.ts) | [checkBlocklist.md](notes/lib/checkBlocklist.md) |
 | [`data/blockList.ts`](../data/blockList.ts) | [blockList.md](notes/data/blockList.md) |
 | [`components/ui/LoadingSpinner.tsx`](../components/ui/LoadingSpinner.tsx), [`MustLoginMessage.tsx`](../components/ui/MustLoginMessage.tsx) | [small-ui-components.md](notes/components/ui/small-ui-components.md) |
+| [`components/ReusableSmallComponents/buttons/`](../components/ReusableSmallComponents/buttons/) | [reusable-buttons.md](notes/components/reusable-buttons.md) |
 | YouTube embed + profile follow/follower modals | [youtube-and-social-lists.md](notes/components/showing-list-of-content/youtube-and-social-lists.md) |
 | [`app/actions/sendContactEmail.ts`](../app/actions/sendContactEmail.ts) | [sendContactEmail.md](notes/app/actions/sendContactEmail.md) |
 | [`components/Contact/ContactForm.tsx`](../components/Contact/ContactForm.tsx) | [sendContactEmail.md](notes/app/actions/sendContactEmail.md) (client form) |

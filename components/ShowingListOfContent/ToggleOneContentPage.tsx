@@ -4,8 +4,8 @@
  */
 "use client";
 
-import { useState, type ComponentType } from "react";
-import GeneralOpenCloseButton from "../ReusableSmallComponents/buttons/generalOpenCloseButton";
+import { useState } from "react";
+import GeneralOpenCloseButton from "../ReusableSmallComponents/buttons/GeneralOpenCloseButton";
 import CoreListingPageLogic from "../CoreListingPagesLogic";
 
 export type ToggleContentTab =
@@ -26,14 +26,6 @@ export type ToggleOneContentPageProps = {
   defaultOpen?: ToggleContentTab | null;
 };
 
-const TabButton = GeneralOpenCloseButton as ComponentType<{
-  text: string;
-  setState: (value: ToggleContentTab) => void;
-  className?: string;
-  value: ToggleContentTab;
-  state: ToggleContentTab | null;
-}>;
-
 export default function ToggleOneContentPage({
   contentList,
   swrForThisUserID,
@@ -51,7 +43,7 @@ export default function ToggleOneContentPage({
     <section>
       <div className="flex justify-center flex-wrap">
         {contentList.map((category) => (
-          <TabButton
+          <GeneralOpenCloseButton<ToggleContentTab>
             key={category.value}
             text={category.text}
             setState={handleContentClick}

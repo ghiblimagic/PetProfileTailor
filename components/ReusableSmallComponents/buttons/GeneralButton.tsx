@@ -1,6 +1,29 @@
+/**
+ * Primary app button — variant flags for color/style.
+ * Notes: docs/notes/components/reusable-buttons.md
+ */
 "use client";
 
-const GeneralButton = ({
+import type { ButtonHTMLAttributes, ReactNode } from "react";
+
+export type GeneralButtonProps = {
+  text?: string;
+  className?: string;
+  onClick?: ButtonHTMLAttributes<HTMLButtonElement>["onClick"];
+  subtle?: boolean;
+  warning?: boolean;
+  secondary?: boolean;
+  tertiary?: boolean;
+  plain?: boolean;
+  type?: ButtonHTMLAttributes<HTMLButtonElement>["type"];
+  active?: boolean;
+  disabled?: boolean;
+  children?: ReactNode;
+  dataModalToggle?: string;
+  ariaLabel?: string;
+};
+
+export default function GeneralButton({
   text,
   className,
   onClick,
@@ -15,7 +38,7 @@ const GeneralButton = ({
   children,
   dataModalToggle,
   ariaLabel,
-}) => {
+}: GeneralButtonProps) {
   const baseClasses =
     "font-bold my-3 py-1 px-4 border-b-4 rounded-2xl text-base";
 
@@ -53,6 +76,4 @@ const GeneralButton = ({
       {children && <span className="flex items-center">{children}</span>}
     </button>
   );
-};
-
-export default GeneralButton;
+}

@@ -1,13 +1,6 @@
 "use client";
 
-import type { ComponentType } from "react";
 import LinkButton from "@components/ReusableSmallComponents/buttons/LinkButton";
-
-const ShareLinkButton = LinkButton as ComponentType<{
-  href: string;
-  className?: string;
-  text: string;
-}>;
 import {
   EmailShareButton,
   EmailIcon,
@@ -57,7 +50,7 @@ export default function SharingOptionsBar({
           Copy link
         </button>
 
-        <ShareLinkButton
+        <LinkButton
           text="Go to link"
           href={localLink}
           className="bg-subtleWhite px-4 py-2

@@ -99,9 +99,6 @@ export default function UsersFollowingList({
                               <FollowButton
                                 data={person}
                                 session={sessionFromServer}
-                                apiLink={undefined}
-                                FollowIconStyling={undefined}
-                                FollowTextStyling={undefined}
                               />
                             </section>
                           )}

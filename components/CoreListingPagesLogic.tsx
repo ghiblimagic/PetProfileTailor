@@ -9,7 +9,6 @@ import {
   useState,
   useRef,
   type ChangeEvent,
-  type ComponentType,
 } from "react";
 import { Drawer } from "@mui/material";
 import GeneralButton from "@components/ReusableSmallComponents/buttons/GeneralButton";
@@ -23,13 +22,6 @@ import { useSwrPagination } from "@hooks/useSwrPagination";
 import startCooldown from "@utils/startCooldown";
 import Image from "next/image";
 import LinkButton from "./ReusableSmallComponents/buttons/LinkButton";
-
-const ContactLinkButton = LinkButton as ComponentType<{
-  href: string;
-  text: string;
-  className?: string;
-  subtle?: boolean;
-}>;
 import { useSession } from "next-auth/react";
 import LoadingSpinner from "./ui/LoadingSpinner";
 import type { ContentType } from "@/utils/api/checkIfValidContentType";
@@ -271,7 +263,7 @@ export default function CoreListingPageLogic({
               </li>
             </ol>
 
-            <ContactLinkButton
+            <LinkButton
               href="/contact"
               text="Contact"
               className="py-2"

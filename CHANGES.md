@@ -4012,3 +4012,66 @@ Deleted `SingleOpenGroup` — zero imports in the repo; accordion behavior lives
 ### Verification
 
 - No app imports to update; `tsc` / build not re-run (delete-only).
+
+---
+
+## 2026-06-07 — TypeScript: `ReusableSmallComponents/buttons`
+
+### What was changed and why
+
+Converted all remaining JS/JSX button primitives to `.tsx`. Merged `GeneralButton.d.ts` and `WarningMessage.d.ts` into source. Renamed `generalOpenCloseButton` → `GeneralOpenCloseButton.tsx` with generic tab typing. Removed `ComponentType` casts in `ToggleOneContentPage`, `SharingOptionsBar`, and `CoreListingPagesLogic`. Fixed `FollowButton` effect deps and sign-in guard; removed unused `ToastContainer`. Fixed stray quote in `DisabledButton` class string. Removed debug `console.log` from open/close tab button.
+
+### Files created
+
+- `components/ReusableSmallComponents/buttons/GeneralButton.tsx`
+- `components/ReusableSmallComponents/buttons/LinkButton.tsx`
+- `components/ReusableSmallComponents/buttons/DisabledButton.tsx`
+- `components/ReusableSmallComponents/buttons/ClosingXButton.tsx`
+- `components/ReusableSmallComponents/buttons/GoToTopButton.tsx`
+- `components/ReusableSmallComponents/buttons/CheckForMoreDataButton.tsx`
+- `components/ReusableSmallComponents/buttons/ReturnToPreviousPage.tsx`
+- `components/ReusableSmallComponents/buttons/GeneralOpenCloseButton.tsx`
+- `components/ReusableSmallComponents/buttons/WarningMessage.tsx`
+- `components/ReusableSmallComponents/buttons/FollowButton.tsx`
+- `docs/notes/components/reusable-buttons.md`
+
+### Files removed
+
+- All corresponding `.jsx` / `.js` / `.d.ts` in `buttons/`
+
+### Files modified
+
+- `components/ShowingListOfContent/ToggleOneContentPage.tsx`
+- `components/CoreListingPagesLogic.tsx`
+- `components/ReusableMediumComponents/SharingOptionsBar.tsx`
+- `components/ShowingListOfContent/UsersFollowingList.tsx`
+- `components/ShowingListOfContent/UsersFollowersList.tsx`
+- `docs/README.md`
+- `docs/notes/components/showing-list-of-content/youtube-and-social-lists.md`
+- `docs/notes/models/likes-and-follows.md`
+- `docs/notes/app/api/updatefollows-route.md`
+
+### Verification
+
+- `pnpm exec tsc --noEmit` — OK
+- `pnpm build` — OK
+
+### Next logical step
+
+Convert auth pages (`login.jsx`, `register/page.js`) or `NavLayoutwithSettingsMenu.js`.
+
+---
+
+## 2026-06-07 — Remove unused `CheckForMoreDataButton`
+
+### What was changed and why
+
+Deleted `CheckForMoreDataButton.tsx` — zero imports in the repo (dead code from an earlier pagination experiment).
+
+### Files removed
+
+- `components/ReusableSmallComponents/buttons/CheckForMoreDataButton.tsx`
+
+### Files modified
+
+- `docs/notes/components/reusable-buttons.md`

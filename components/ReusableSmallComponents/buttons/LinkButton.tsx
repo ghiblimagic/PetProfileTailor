@@ -1,6 +1,25 @@
+/**
+ * Next.js Link styled like GeneralButton.
+ * Notes: docs/notes/components/reusable-buttons.md
+ */
 "use client";
 
 import Link from "next/link";
+import type { ComponentProps, ReactNode } from "react";
+
+export type LinkButtonProps = {
+  href: ComponentProps<typeof Link>["href"];
+  className?: string;
+  text?: string;
+  defaultStyle?: boolean;
+  basic?: boolean;
+  subtle?: boolean;
+  icon?: ReactNode;
+  warning?: boolean;
+  active?: boolean;
+  disabled?: boolean;
+  classForDiv?: string;
+};
 
 export default function LinkButton({
   href,
@@ -13,8 +32,7 @@ export default function LinkButton({
   warning,
   active,
   disabled,
-  classForDiv,
-}) {
+}: LinkButtonProps) {
   const baseClasses =
     "font-bold my-3 py-1 px-4 border-b-4 rounded-2xl text-base";
 
