@@ -59,14 +59,6 @@ export default function Profile({
 
   // const [showFollowingList, setShowFollowingList] = useState(false);
 
-  function updateSetShowProfileEditPage() {
-    setShowProfileEditPage(!showProfileEditPage);
-  }
-
-  function updateSetProfileChange() {
-    setProfileChange(!profileChanged);
-  }
-
   // function showListOfFollowers() {
   //   setShowFollowersListPage(!showFollowersList);
   // }
@@ -212,17 +204,17 @@ export default function Profile({
           />
 
           <section className="my-2">
-            {showProfileEditPage && (
+            {showProfileEditPage && session && (
               <EditBioAndProfile
                 userData={userData}
                 sessionFromServer={session}
-                setShowProfileEditPage={updateSetShowProfileEditPage}
-                setProfileChange={updateSetProfileChange}
+                setShowProfileEditPage={setShowProfileEditPage}
+                setProfileChange={setProfileChange}
                 setLocation={setLocation}
-                location={location}
+                location={location ?? ""}
                 setBio={setBio}
-                bio={bio}
-                avatar={avatar}
+                bio={bio ?? ""}
+                avatar={avatar ?? ""}
                 setAvatar={setAvatar}
               />
             )}

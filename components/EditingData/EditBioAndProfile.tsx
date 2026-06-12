@@ -1,18 +1,35 @@
+/**
+ * Profile edit modal: bio, location, avatar upload.
+ * Notes: docs/notes/components/edit-bio-and-profile.md
+ */
 "use client";
 
-import React, { useState } from "react";
 import { toast } from "react-toastify";
 import axios from "axios";
-import XSvgIcon from "@components/ReusableSmallComponents/iconsOrSvgImages/XSvgIcon";
 import Image from "next/image";
+import type { Session } from "next-auth";
+import XSvgIcon from "@components/ReusableSmallComponents/iconsOrSvgImages/XSvgIcon";
 import ImageUpload from "@components/AddingNewData/ImageUpload";
 import GeneralButton from "../ReusableSmallComponents/buttons/GeneralButton";
 import StyledInput from "../FormComponents/StyledInput";
 import StyledTextarea from "../FormComponents/StyledTextarea";
+import type { ProfileUserData } from "@/components/profile";
+
+export type EditBioAndProfileProps = {
+  setShowProfileEditPage: (show: boolean) => void;
+  userData: ProfileUserData;
+  sessionFromServer: Session;
+  setProfileChange: (changed: boolean) => void;
+  setBio: (bio: string) => void;
+  bio: string;
+  setLocation: (location: string) => void;
+  location: string;
+  avatar: string;
+  setAvatar: (url: string) => void;
+};
 
 export default function EditBioAndProfile({
   setShowProfileEditPage,
-  userData,
   sessionFromServer,
   setProfileChange,
   setBio,
@@ -21,30 +38,27 @@ export default function EditBioAndProfile({
   location,
   avatar,
   setAvatar,
-}) {
+}: EditBioAndProfileProps) {
   const bioSubmission = async () => {
-    const bioSubmission = {
-      bio: bio,
-      location: location,
-      userid: sessionFromServer.user.id,
-    };
-
     await axios
       .put("/api/user/editbiolocationavatar", {
-        bioSubmission,
+        bioSubmission: {
+          bio,
+          location,
+          userid: sessionFromServer.user.id,
+        },
       })
-      .then((response) => {
-        //reloads page
+      .then(() => {
         setProfileChange(true);
         setShowProfileEditPage(false);
         toast.success("Profile successfully updated!");
       })
       .catch((error) => {
         console.log("there was an error when sending your edits", error);
-
-        toast.error(`Ruh Roh! Profile not updated`);
+        toast.error("Ruh Roh! Profile not updated");
       });
   };
+
   return (
     <div>
       <div
@@ -56,7 +70,6 @@ export default function EditBioAndProfile({
         <div className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"></div>
 
         <div className="fixed inset-0 z-10 overflow-y-auto">
-          {/* centers content */}
           <div
             className="            
             p-4 text-center sm:items-center sm:p-0 
@@ -65,8 +78,6 @@ export default function EditBioAndProfile({
           >
             <div>
               <div className="relative">
-                {/* X Button and SVG Icon */}
-
                 <XSvgIcon
                   screenReaderText="Close Edit Screen"
                   onClickAction={() => setShowProfileEditPage(false)}
@@ -77,35 +88,30 @@ export default function EditBioAndProfile({
                  border-2 border-violet-400 border-dotted 
                  p-4 shadow-lg max-w-3xl"
                 >
-                  {/* ##### NAME AREA ######*/}
                   <h4 className="text-subtleWhite mt-4"> location </h4>
 
                   <StyledInput
                     className="bg-secondary"
                     onChange={(e) => setLocation(e.target.value)}
                     value={location}
-                    maxLength="70"
+                    maxLength={70}
                     id="location"
                   />
 
                   <span className="text-subtleWhite">
-                    {" "}
                     {`${70 - location.length}/70 characters left`}
                   </span>
-
-                  {/* ##### DESCRIPTION AREA ######*/}
 
                   <h4 className="text-subtleWhite"> Bio </h4>
 
                   <StyledTextarea
                     onChange={(e) => setBio(e.target.value)}
                     required
-                    maxLength="400"
+                    maxLength={400}
                     value={bio}
                   />
 
                   <span className="text-subtleWhite">
-                    {" "}
                     {`${400 - bio.length}/400 characters left`}
                   </span>
 
@@ -126,7 +132,6 @@ export default function EditBioAndProfile({
                   </div>
 
                   <ImageUpload
-                    sessionFromServer={sessionFromServer}
                     setAvatar={setAvatar}
                     setShowDialog={setShowProfileEditPage}
                   />
@@ -134,7 +139,6 @@ export default function EditBioAndProfile({
               </div>
             </div>
 
-            {/* ###########                       buttons                     ############## */}
             <div
               className="bg-secondary px-4 py-3
                  sm:px-6 grid grid-cols-2 justify-items-center"
@@ -143,7 +147,7 @@ export default function EditBioAndProfile({
                 type="button"
                 text="save"
                 subtle
-                onClick={() => bioSubmission()}
+                onClick={() => void bioSubmission()}
                 className="justify-center w-28"
               />
 

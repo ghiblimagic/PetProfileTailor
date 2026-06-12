@@ -1,24 +1,24 @@
+/**
+ * Names/descriptions add counts table + treats/rank summary.
+ * Notes: docs/notes/components/ranking.md
+ */
 import RankingTotals from "./RankingTotals";
 
-export default function EngagementTable({
-  namesAdds,
+export type PointSystemListProps = {
+  namesAdds: number;
+  descriptionsAdds: number;
+};
 
+export default function PointSystemList({
+  namesAdds,
   descriptionsAdds,
-}) {
+}: PointSystemListProps) {
   const totalPoints = descriptionsAdds + namesAdds;
 
-  // console.log(
-  //   "namesAdd",
-  //   namesAdds,
-
-  //   "descriptionAdds",
-  //   descriptionsAdds,
-  // );
   return (
     <div className="w-full max-w-xl mx-auto ">
       <RankingTotals totalPoints={totalPoints} />
 
-      {/* Desktop Table */}
       <div className="hidden sm:block rounded-xl shadow-lg overflow-hidden pt-2 ">
         <table className="min-w-full text-gray-100  ">
           <thead className="">
@@ -36,19 +36,10 @@ export default function EngagementTable({
         </table>
       </div>
 
-      {/* Mobile Cards */}
       <div className="sm:hidden flex flex-col gap-4">
         {[
-          {
-            category: "Names",
-
-            Adds: namesAdds,
-          },
-          {
-            category: "Descriptions",
-
-            Adds: descriptionsAdds,
-          },
+          { category: "Names", adds: namesAdds },
+          { category: "Descriptions", adds: descriptionsAdds },
         ].map((cat) => (
           <div
             key={cat.category}
@@ -65,7 +56,7 @@ export default function EngagementTable({
 
             <div className="flex justify-between text-gray-100 mt-1 py-2 px-6 rounded-2xl bg-primary">
               <span>Adds:</span>
-              <span>{cat.Adds}</span>
+              <span>{cat.adds}</span>
             </div>
           </div>
         ))}

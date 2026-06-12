@@ -1,32 +1,18 @@
+/**
+ * Custom 404 page.
+ * Notes: docs/notes/app/error-pages.md
+ */
 "use client";
 
 import Image from "next/image";
 import { useState } from "react";
 import PageTitleWithImages from "@components/ReusableSmallComponents/TitlesOrHeadings/PageTitleWithImages";
-import ListWithPawPrintIcon from "@components/ReusableSmallComponents/ListWithPawPrintIcon";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faEnvelope, faMessage } from "@fortawesome/free-solid-svg-icons";
-import PawPrintIcon from "@components/ReusableSmallComponents/iconsOrSvgImages/PawPrintIcon";
-import GifHover from "@components/ReusableSmallComponents/GifHover";
-import Link from "next/link";
 import { usePrefersReducedMotion } from "@/hooks/usePrefersReducedMotions";
-import LinkButton from "@/components/ReusableSmallComponents/buttons/LinkButton";
-import GeneralButton from "@/components/ReusableSmallComponents/buttons/GeneralButton";
 import ErrorContactMessage from "@/components/Contact/ErrorContactMessage";
 
 export default function Custom404() {
-  //grab data from Session and rename data to session
-
   const prefersReducedMotion = usePrefersReducedMotion();
   const [hover, setHover] = useState(false);
-
-  const handleMouseEnterForImage = () => {
-    setHover(true);
-  };
-
-  const handleMouseLeaveForImage = () => {
-    setHover(false);
-  };
 
   const imageSrc = prefersReducedMotion || hover ? "/404.png" : "/404.gif";
 
@@ -43,8 +29,8 @@ export default function Custom404() {
 
       <div
         className="flex justify-center py-4"
-        onMouseEnter={handleMouseEnterForImage}
-        onMouseLeave={handleMouseLeaveForImage}
+        onMouseEnter={() => setHover(true)}
+        onMouseLeave={() => setHover(false)}
       >
         <Image
           src={imageSrc}

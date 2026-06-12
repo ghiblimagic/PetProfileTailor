@@ -4393,3 +4393,44 @@ Preserved the original `[...nextauth]` comment explaining why the route exports 
 - `docs/notes/lib/auth.md`
 - `app/api/auth/[...nextauth]/route.ts`
 - `CHANGES.md`
+
+---
+
+## 2026-06-07 — TypeScript: profile/dashboard polish, error pages, meta routes
+
+### What was changed and why
+
+Converted ranking/points UI, profile edit modal, error pages, robots/sitemap routes, and stub `fetchusers` / `test` pages to TypeScript.
+
+### Files created
+
+- `components/EditingData/EditBioAndProfile.tsx`
+- `components/Ranking/PointSystemList.tsx`, `RankingTotals.tsx`, `RankNames.tsx`
+- `components/Contact/ErrorContactMessage.tsx`
+- `app/not-found.tsx`, `app/global-error.tsx`
+- `app/robots.txt/route.ts`, `app/sitemap.xml/route.ts`
+- `app/fetchusers/page.tsx`, `app/test/page.tsx`
+- Docs under `docs/notes/components/` and `docs/notes/app/`
+
+### Files removed
+
+- All corresponding `.js` / `.jsx` for the above
+
+### Files modified
+
+- `components/profile.tsx` — pass real `setShowProfileEditPage` / `setProfileChange` setters (fix close/save toggling bug); guard modal with `session`
+- `docs/README.md`, `docs/notes/components/profile.md`
+
+### Problems encountered
+
+- `global-error` now includes required `<html>` / `<body>` wrapper per Next.js App Router.
+- `RankNames` simplified to `{ points: number }` (same math as old `Object.values` hack).
+
+### Verification
+
+- `pnpm exec tsc --noEmit` — OK
+- `pnpm build` — OK
+
+### Next logical step
+
+Auth UI (`login`, `register`, `forgotpassword`, `ResetPassword`, `magiclink`) or delete dead JS (`AddComment.js`, `removeDeletedContent.jsx`, etc.).

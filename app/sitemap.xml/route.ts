@@ -1,3 +1,7 @@
+/**
+ * Static sitemap.xml.
+ * Notes: docs/notes/app/robots-sitemap-routes.md
+ */
 export async function GET() {
   const baseUrl = "https://www.homewardtails.com";
 

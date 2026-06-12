@@ -1,12 +1,25 @@
+/**
+ * Treats count + rank label for dashboard/profile points.
+ * Notes: docs/notes/components/ranking.md
+ */
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCookieBite, faRankingStar } from "@fortawesome/free-solid-svg-icons";
-import RankNames from "./RankNames"; // assuming you have this component
+import type { IconDefinition } from "@fortawesome/fontawesome-svg-core";
+import RankNames from "./RankNames";
 
-export default function RankingTotals({ totalPoints }) {
-  function rankingLine(totalPoints, faIcon, label, rankNames) {
+export type RankingTotalsProps = {
+  totalPoints: number;
+};
+
+export default function RankingTotals({ totalPoints }: RankingTotalsProps) {
+  function rankingLine(
+    points: number,
+    faIcon: IconDefinition,
+    label: string,
+    rankNames: boolean,
+  ) {
     return (
       <div className="w-full   ">
-        {/* Icon and label */}
         <section className="flex  w-fit  mx-auto mb-4  ">
           <div className="flex  align-text-top">
             <div className="mr-2 text-right">
@@ -18,12 +31,11 @@ export default function RankingTotals({ totalPoints }) {
             <span className="inline-block  text-right">{label}:</span>
           </div>
 
-          {/* Rank or Total */}
           <div className="w-full text-left ml-1">
             {rankNames ? (
-              <RankNames points={totalPoints} />
+              <RankNames points={points} />
             ) : (
-              <span>{totalPoints}</span>
+              <span>{points}</span>
             )}
           </div>
         </section>
@@ -34,10 +46,7 @@ export default function RankingTotals({ totalPoints }) {
   return (
     <section className="overallStats mb-2 font-bold text-white mx-auto">
       <div className="w-full mx-auto space-y-2">
-        {/* Row 1: Treats */}
         {rankingLine(totalPoints, faCookieBite, "Treats", false)}
-        {/* Row 2: Rank */}
-
         {rankingLine(totalPoints, faRankingStar, "Rank", true)}
       </div>
     </section>

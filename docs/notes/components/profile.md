@@ -4,7 +4,7 @@ Source: [`components/profile.tsx`](../../../components/profile.tsx)
 
 ## Role
 
-Public profile view: avatar/bio card, add counts, [`ToggleOneContentPage`](../../../components/ShowingListOfContent/ToggleOneContentPage.tsx) for user's added names/descriptions, and optional [`EditBioAndProfile`](../../../components/EditingData/EditBioAndProfile.jsx) when viewing own profile.
+Public profile view: avatar/bio card, add counts, [`ToggleOneContentPage`](../../../components/ShowingListOfContent/ToggleOneContentPage.tsx) for user's added names/descriptions, and optional [`EditBioAndProfile`](../../../components/EditingData/EditBioAndProfile.tsx) when viewing own profile.
 
 ## Props (`ProfileProps`)
 

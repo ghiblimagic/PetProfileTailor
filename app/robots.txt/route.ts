@@ -1,3 +1,7 @@
+/**
+ * robots.txt for crawlers.
+ * Notes: docs/notes/app/robots-sitemap-routes.md
+ */
 export async function GET() {
   const content = `
 User-agent: *
