@@ -1,13 +1,26 @@
-import React, { useState } from "react";
+/**
+ * Lazy YouTube iframe with close button (landing page videos).
+ * Notes: docs/notes/components/showing-list-of-content/youtube-and-social-lists.md
+ */
+"use client";
+
+import { useState } from "react";
 import GeneralButton from "@components/ReusableSmallComponents/buttons/GeneralButton";
 import LoadingSpinner from "../ui/LoadingSpinner";
 
+export type YoutubeEmbedProps = {
+  embedId: string;
+  styling?: string;
+  title: string;
+  showVideoFunction: (open: boolean) => void;
+};
+
 export default function YoutubeEmbed({
   embedId,
-  styling,
+  styling = "",
   title,
   showVideoFunction,
-}) {
+}: YoutubeEmbedProps) {
   const [loaded, setLoaded] = useState(false);
 
   return (
@@ -28,7 +41,7 @@ export default function YoutubeEmbed({
         }`}
         width="mx-auto"
         src={`https://www.youtube-nocookie.com/embed/${embedId}`}
-        title={`${title}`}
+        title={title}
         allow="web-share"
         onLoad={() => setLoaded(true)}
         allowFullScreen

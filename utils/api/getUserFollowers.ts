@@ -4,7 +4,7 @@ import "@/models/User";
 import Follow from "@/models/Follow";
 import { leanWithStrings } from "@/utils/mongoDataCleanup";
 
-type FollowerUser = {
+export type FollowerUser = {
   _id: string;
   name?: string;
   profileName?: string;

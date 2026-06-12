@@ -3911,3 +3911,104 @@ Converted categories/tags API to TypeScript. Exported `CategoriesAndTagsResponse
 ### Next logical step
 
 Convert `app/layout.js` (still loads categories for `CategTagsWrapper`) or auth pages (`login.jsx`, `register/page.js`).
+
+---
+
+## 2026-06-07 — TypeScript: `app/layout`
+
+### What was changed and why
+
+Converted root server layout to TypeScript. Preserved metadata, 3-hour in-memory `getCategoriesAndTagsWithTTL` cache, `safeSession` normalization, provider wrapper tree, and inline layout comments. Dropped unused `LinkButton` / `Image` imports from the JS original. Typed cache with `CategoryWithTags[]` from context.
+
+### Files created
+
+- `app/layout.tsx`
+- `docs/notes/app/root-layout.md`
+
+### Files removed
+
+- `app/layout.js`
+
+### Files modified
+
+- `docs/README.md`
+- `docs/notes/context/categories-and-tags.md`
+- `docs/notes/app/api/categories-and-tags-route.md`
+- `docs/notes/app/notifications-page.md`
+- `docs/notes/app/api/user-likes-route.md`
+
+### Verification
+
+- `pnpm exec tsc --noEmit` — OK
+- `pnpm build` — OK
+
+### Next logical step
+
+Convert auth pages (`login.jsx`, `register/page.js`, `forgotpassword.jsx`, `ResetPassword.jsx`) or `(protected)/layout.jsx`.
+
+---
+
+## 2026-06-07 — TypeScript: blockList + small UI / social list components
+
+### What was changed and why
+
+Converted seven leaf modules: profanity data (`blockList`), shared loading/login UI, landing-page YouTube embed, profile follow/follower modals, and `SingleOpenGroup` accordion helper. Typed props with `FollowingUser` / `FollowerUser` / `Session`. Removed dead imports (`Image`, unused `framer-motion` in `SingleOpenGroup`, unused React hooks in following list).
+
+### Files created
+
+- `data/blockList.ts`
+- `components/ui/LoadingSpinner.tsx`
+- `components/ui/MustLoginMessage.tsx`
+- `components/ShowingListOfContent/YoutubeEmbed.tsx`
+- `components/ShowingListOfContent/UsersFollowingList.tsx`
+- `components/ShowingListOfContent/UsersFollowersList.tsx`
+- `components/ShowingListOfContent/SingleOpenGroup.tsx`
+- `docs/notes/data/blockList.md`
+- `docs/notes/components/ui/small-ui-components.md`
+- `docs/notes/components/showing-list-of-content/youtube-and-social-lists.md`
+
+### Files removed
+
+- `data/blockList.js`
+- `components/ui/LoadingSpinner.js`
+- `components/ui/MustLoginMessage.js`
+- `components/ShowingListOfContent/YoutubeEmbed.js`
+- `components/ShowingListOfContent/UsersFollowingList.js`
+- `components/ShowingListOfContent/UsersFollowersList.jsx`
+- `components/ShowingListOfContent/SingleOpenGroup.jsx`
+
+### Files modified
+
+- `utils/api/getUserFollowers.ts` — export `FollowerUser` type
+- `docs/README.md`
+- `docs/notes/lib/checkBlocklist.md`
+
+### Verification
+
+- `pnpm exec tsc --noEmit` — OK
+- `pnpm build` — OK
+
+### Next logical step
+
+Convert auth pages (`login.jsx`, `register/page.js`) or `FollowButton.jsx` / profile follow UI wiring.
+
+---
+
+## 2026-06-07 — Remove unused `SingleOpenGroup`
+
+### What was changed and why
+
+Deleted `SingleOpenGroup` — zero imports in the repo; accordion behavior lives in `ToggleOneContentPage` and `ToggleOneNotificationPage`.
+
+### Files removed
+
+- `components/ShowingListOfContent/SingleOpenGroup.tsx`
+
+### Files modified
+
+- `docs/notes/components/showing-list-of-content/youtube-and-social-lists.md`
+- `docs/README.md`
+
+### Verification
+
+- No app imports to update; `tsc` / build not re-run (delete-only).

@@ -1,3 +1,7 @@
+/**
+ * Profanity / slur word lists for `checkBlocklists`. Data only — no logic.
+ * Notes: docs/notes/data/blockList.md
+ */
 export const exactWordsBlocked = [
   "anal",
   "anus",

@@ -23,12 +23,16 @@ Each source file with notes should have a one-line pointer at the top linking to
 | [`jest.setup.ts`](../jest.setup.ts) | [jest-setup.md](notes/jest-setup.md) |
 | [`lib/auth.ts`](../lib/auth.ts) | [auth.md](notes/lib/auth.md) |
 | [`lib/checkBlocklist.ts`](../lib/checkBlocklist.ts) | [checkBlocklist.md](notes/lib/checkBlocklist.md) |
+| [`data/blockList.ts`](../data/blockList.ts) | [blockList.md](notes/data/blockList.md) |
+| [`components/ui/LoadingSpinner.tsx`](../components/ui/LoadingSpinner.tsx), [`MustLoginMessage.tsx`](../components/ui/MustLoginMessage.tsx) | [small-ui-components.md](notes/components/ui/small-ui-components.md) |
+| YouTube embed + profile follow/follower modals | [youtube-and-social-lists.md](notes/components/showing-list-of-content/youtube-and-social-lists.md) |
 | [`app/actions/sendContactEmail.ts`](../app/actions/sendContactEmail.ts) | [sendContactEmail.md](notes/app/actions/sendContactEmail.md) |
 | [`components/Contact/ContactForm.tsx`](../components/Contact/ContactForm.tsx) | [sendContactEmail.md](notes/app/actions/sendContactEmail.md) (client form) |
 | [`app/api/names/route.ts`](../app/api/names/route.ts) | [names-route.md](notes/app/api/names-route.md) |
 | [`app/api/names/swr/route.ts`](../app/api/names/swr/route.ts) | [names-swr-route.md](notes/app/api/names-swr-route.md) |
 | [`app/api/description/route.ts`](../app/api/description/route.ts) | [description-route.md](notes/app/api/description-route.md) |
 | [`app/api/description/swr/route.ts`](../app/api/description/swr/route.ts) | [description-swr-route.md](notes/app/api/description-swr-route.md) |
+| [`app/layout.tsx`](../app/layout.tsx) | [root-layout.md](notes/app/root-layout.md) |
 | [`app/api/categories-and-tags/route.ts`](../app/api/categories-and-tags/route.ts) | [categories-and-tags-route.md](notes/app/api/categories-and-tags-route.md) |
 | [`app/api/auth/signup/route.ts`](../app/api/auth/signup/route.ts) | [signup-route.md](notes/app/api/signup-route.md) |
 | Names + description check-if-exists routes | [check-if-content-exists.md](notes/app/api/check-if-content-exists.md) |

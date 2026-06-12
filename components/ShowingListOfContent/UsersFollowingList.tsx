@@ -1,15 +1,25 @@
-import React, { useEffect, useState } from "react";
+/**
+ * Modal list of users someone follows (profile page).
+ * Notes: docs/notes/components/showing-list-of-content/youtube-and-social-lists.md
+ */
 import XSvgIcon from "@components/ReusableSmallComponents/iconsOrSvgImages/XSvgIcon";
 import FollowButton from "@components/ReusableSmallComponents/buttons/FollowButton";
-import Image from "next/image";
 import ProfileImage from "@components/ReusableSmallComponents/ProfileImage";
 import GifHover from "@components/ReusableSmallComponents/GifHover";
+import type { FollowingUser } from "@/utils/api/getUserFollowing";
+import type { Session } from "next-auth";
+
+export type UsersFollowingListProps = {
+  setShowUsersListPage: (show: boolean) => void;
+  userData: FollowingUser[];
+  sessionFromServer: Session;
+};
 
 export default function UsersFollowingList({
   setShowUsersListPage,
   userData,
   sessionFromServer,
-}) {
+}: UsersFollowingListProps) {
   return (
     <>
       <div>
@@ -52,7 +62,7 @@ export default function UsersFollowingList({
                         key={person._id}
                         href={`${
                           process.env.NEXT_PUBLIC_BASE_FETCH_URL
-                        }profile/${person.profileName.toLowerCase()}`}
+                        }profile/${person.profileName?.toLowerCase() ?? ""}`}
                       >
                         <section
                           className="grid 
@@ -84,11 +94,14 @@ export default function UsersFollowingList({
 
                           <p>{person.bio}</p>
                           {/* makes it so you can't follow yourself */}
-                          {!(person._id == sessionFromServer.user.id) && (
+                          {!(person._id == sessionFromServer.user?.id) && (
                             <section>
                               <FollowButton
                                 data={person}
                                 session={sessionFromServer}
+                                apiLink={undefined}
+                                FollowIconStyling={undefined}
+                                FollowTextStyling={undefined}
                               />
                             </section>
                           )}

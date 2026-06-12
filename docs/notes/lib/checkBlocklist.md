@@ -4,7 +4,7 @@ Source: [`lib/checkBlocklist.ts`](../../lib/checkBlocklist.ts)
 
 Word blocklist for user-generated content (names, descriptions, bios, etc.). Consumed by [`utils/api/checkMultipleBlocklists.ts`](../../utils/api/checkMultipleBlocklists.ts), which API routes call before saving.
 
-Lists live in [`data/blockList.js`](../../data/blockList.js).
+Lists live in [`data/blockList.ts`](../../data/blockList.ts). See [blockList.md](../data/blockList.md).
 
 Input is **`content`** (display text), not `normalizedContent` — the check lowercases and tokenizes at runtime.
 
@@ -300,7 +300,7 @@ checkBlocklists("raccoon");
 // { allowed: true, blockedBy: null, type: null }
 ```
 
-Original dev notes also referenced `checkBlocklists("this is chinky")` blocking on `"chink"` — that depends on which list contains `chink` and whether it appears as a word or substring; see [`lib/checkBlocklist.test.ts`](../../lib/checkBlocklist.test.ts) for current expected behavior against [`data/blockList.js`](../../data/blockList.js).
+Original dev notes also referenced `checkBlocklists("this is chinky")` blocking on `"chink"` — that depends on which list contains `chink` and whether it appears as a word or substring; see [`lib/checkBlocklist.test.ts`](../../lib/checkBlocklist.test.ts) for current expected behavior against [`data/blockList.ts`](../../data/blockList.ts).
 
 ---
 

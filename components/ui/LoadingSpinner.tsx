@@ -1,4 +1,9 @@
+/**
+ * Centered loading indicator with reduced-motion fallback.
+ * Notes: docs/notes/components/ui/small-ui-components.md
+ */
 "use client";
+
 import { usePrefersReducedMotion } from "@/hooks/usePrefersReducedMotions";
 
 export default function LoadingSpinner() {
