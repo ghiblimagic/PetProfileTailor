@@ -29,6 +29,7 @@ Each source file with notes should have a one-line pointer at the top linking to
 | [`app/api/names/swr/route.ts`](../app/api/names/swr/route.ts) | [names-swr-route.md](notes/app/api/names-swr-route.md) |
 | [`app/api/description/route.ts`](../app/api/description/route.ts) | [description-route.md](notes/app/api/description-route.md) |
 | [`app/api/description/swr/route.ts`](../app/api/description/swr/route.ts) | [description-swr-route.md](notes/app/api/description-swr-route.md) |
+| [`app/api/categories-and-tags/route.ts`](../app/api/categories-and-tags/route.ts) | [categories-and-tags-route.md](notes/app/api/categories-and-tags-route.md) |
 | [`app/api/auth/signup/route.ts`](../app/api/auth/signup/route.ts) | [signup-route.md](notes/app/api/signup-route.md) |
 | Names + description check-if-exists routes | [check-if-content-exists.md](notes/app/api/check-if-content-exists.md) |
 | [`app/api/user/grabusersfollowing/[userid]/route.ts`](../app/api/user/grabusersfollowing/[userid]/route.ts) | [grabusersfollowing-route.md](notes/app/api/grabusersfollowing-route.md) |

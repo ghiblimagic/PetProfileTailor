@@ -3880,3 +3880,34 @@ Converted standalone detail routes to TypeScript. Renamed exports `Postid` → `
 ### Next logical step
 
 Convert `app/api/categories-and-tags/route.js`.
+
+---
+
+## 2026-06-07 — TypeScript: `app/api/categories-and-tags/route`
+
+### What was changed and why
+
+Converted categories/tags API to TypeScript. Exported `CategoriesAndTagsResponse`. Preserved `revalidate = 10800` and parallel `leanWithStrings` + populate queries. Documented relationship to layout `getCategoriesAndTagsWithTTL` cache.
+
+### Files created
+
+- `app/api/categories-and-tags/route.ts`
+- `docs/notes/app/api/categories-and-tags-route.md`
+
+### Files removed
+
+- `app/api/categories-and-tags/route.js`
+
+### Files modified
+
+- `docs/notes/context/categories-and-tags.md`
+- `docs/README.md`
+
+### Verification
+
+- `pnpm exec tsc --noEmit` — OK
+- `pnpm build` — OK
+
+### Next logical step
+
+Convert `app/layout.js` (still loads categories for `CategTagsWrapper`) or auth pages (`login.jsx`, `register/page.js`).

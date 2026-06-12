@@ -22,4 +22,13 @@ Root layout loads populated categories from Mongo (`app/layout.js` → [`CategTa
 
 ## API route
 
-`GET /api/categories-and-tags` — same shape as layout cache (`names`, `descriptions`).
+[`GET /api/categories-and-tags`](../../../app/api/categories-and-tags/route.ts) — same shape as layout cache (`names`, `descriptions`). See [categories-and-tags-route.md](../app/api/categories-and-tags-route.md) for `revalidate`, populate, and code.
+
+```ts
+export type CategoriesAndTagsResponse = {
+  names: CategoryWithTags[];
+  descriptions: CategoryWithTags[];
+};
+```
+
+Root layout duplicates this query in `getCategoriesAndTagsWithTTL()` ([`app/layout.js`](../../../app/layout.js)) and passes `nameCateg` / `descrCateg` into `CategTagsWrapper` — that is the main app path; the API route is the HTTP equivalent with Next `revalidate = 10800`.
