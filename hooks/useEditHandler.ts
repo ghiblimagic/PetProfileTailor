@@ -6,33 +6,31 @@ import { useState } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
 
-type ListingContent = { _id: string };
-
 export type EditSubmission = {
   content: string;
   notes: string;
   tags: string[];
 };
 
-type SwrPage = { data: ListingContent[] };
+type SwrPage<T extends { _id: string }> = { data: T[]; totalDocs?: number };
 
-export function useEditHandler({
+export function useEditHandler<T extends { _id: string }>({
   apiEndpoint,
   mutate,
   setLocalData,
 }: {
   apiEndpoint: string;
   mutate?: (
-    updater: (pages?: SwrPage[]) => SwrPage[],
+    updater?: (pages?: SwrPage<T>[]) => SwrPage<T>[],
     shouldRevalidate?: boolean,
   ) => void;
-  setLocalData: (item: ListingContent) => void;
+  setLocalData: (item: T) => void;
 }) {
   const [showEditDialog, setShowEditDialog] = useState(false);
-  const [editTarget, setEditTarget] = useState<ListingContent | null>(null);
+  const [editTarget, setEditTarget] = useState<T | null>(null);
   const [isSaving, setIsSaving] = useState(false);
 
-  const openEdit = (content: ListingContent) => {
+  const openEdit = (content: T) => {
     if (!content._id) {
       console.warn("openEdit called with invalid target!", content);
       return;
@@ -53,17 +51,17 @@ export function useEditHandler({
     setIsSaving(true);
 
     try {
-      const res = await axios.put<{ data?: ListingContent }>(apiEndpoint, {
+      const res = await axios.put<{ data?: T }>(apiEndpoint, {
         submission: {
           ...editedData,
           contentId: editTarget._id,
         },
       });
 
-      const updatedItem: ListingContent =
+      const updatedItem: T =
         res.data?.data ??
-        (res.data as ListingContent) ??
-        { ...editTarget, ...editedData };
+        (res.data as T) ??
+        ({ ...editTarget, ...editedData } as T);
 
       if (mutate) {
         mutate(

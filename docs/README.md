@@ -8,6 +8,7 @@ Heavy design and learning notes for converted TypeScript modules live here so so
 |----------|----------|---------|
 | Module design notes | `docs/notes/<path>/<module>.md` | `docs/notes/utils/mongoDataCleanup.md` for `utils/mongoDataCleanup.ts` |
 | TypeScript conventions | [type-vs-interface.md](notes/typescript/type-vs-interface.md) | When to use `type` vs `interface` in this repo |
+| Strict mode migration fixes | [strict-mode-fixes.md](notes/typescript/strict-mode-fixes.md) | All 21 `strict: true` errors: messages, causes, fixes |
 | Migration note preservation | [preserving-migration-notes.md](notes/typescript/preserving-migration-notes.md) | Move long JS comments into `docs/notes/` on TS conversion |
 | Operational changelog | [`CHANGES.md`](../CHANGES.md) | What changed, when, verification |
 | Post-migration backlog | [`FUTURE.md`](FUTURE.md) | Deferred improvements (e.g. likes SSR hydration) |

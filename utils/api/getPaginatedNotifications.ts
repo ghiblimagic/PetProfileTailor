@@ -1,4 +1,4 @@
-import type { Model, PopulateOptions } from "mongoose";
+import type { Document, Model, PopulateOptions } from "mongoose";
 import { leanWithStrings } from "../mongoDataCleanup";
 
 type PaginationOptions = {
@@ -16,8 +16,8 @@ export function parseNotificationPagination(
   };
 }
 
-export async function getPaginatedNotifications(
-  model: Model<unknown>,
+export async function getPaginatedNotifications<TDoc extends Document>(
+  model: Model<TDoc>,
   filter: Record<string, unknown> = {},
   populateOptions: PopulateOptions | PopulateOptions[] = [],
   { page = 1, limit = 25 }: PaginationOptions = {},

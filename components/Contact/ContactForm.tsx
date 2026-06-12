@@ -217,7 +217,7 @@ export default function ContactForm() {
               )}
               <ReCAPTCHA
                 sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_V2_SITE_KEY!}
-                onChange={(token) => setV2Token(token)}
+                onChange={(token: string | null) => setV2Token(token)}
               />
             </div>
           )}

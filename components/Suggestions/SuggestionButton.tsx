@@ -5,13 +5,12 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faLightbulb } from "@fortawesome/free-solid-svg-icons";
 import { useSuggestions } from "@context/SuggestionsContext";
 import type { ContentType } from "@/utils/api/checkIfValidContentType";
-
-type ListingContent = { _id: string };
+import type { SuggestionContentInfo } from "@/components/Suggestions/AddSuggestion";
 
 export type SuggestionButtonProps = {
-  content: ListingContent;
+  content: SuggestionContentInfo;
   dataType: ContentType | string;
-  onClick: (content: ListingContent) => void;
+  onClick: (content: SuggestionContentInfo) => void;
 };
 
 const SuggestionButton = forwardRef<HTMLButtonElement, SuggestionButtonProps>(

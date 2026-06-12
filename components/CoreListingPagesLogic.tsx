@@ -132,7 +132,7 @@ export default function CoreListingPageLogic({
   };
 
   const handleApplyFilters = (
-    reset: boolean,
+    reset = false,
     quickSearchTags?: string[],
   ) => {
     if (reset) {

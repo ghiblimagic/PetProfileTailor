@@ -4481,3 +4481,49 @@ Converted ranking/points UI, profile edit modal, error pages, robots/sitemap rou
 ### Next logical step
 
 Auth UI (`login`, `register`, `forgotpassword`, `ResetPassword`, `magiclink`) or delete dead JS (`AddComment.js`, `removeDeletedContent.jsx`, etc.).
+
+---
+
+## 2026-06-07 — `strict: true` + migration cleanup fixes
+
+### What was built and why
+
+Enabled full TypeScript strict mode now that app/components/hooks are converted. Fixed ~21 strict errors (mongoose model generics, SWR mutate signatures, react-select typing, form validators, module stubs) and aligned hook generics for edit/delete flows.
+
+### Files created
+
+- `types/modules.d.ts` — ambient declarations for `react-google-recaptcha` and `mongoose-unique-validator`
+
+### Files modified
+
+- `tsconfig.json` — `strict: true`
+- `utils/api/getPaginatedNotifications.ts` — generic `Model<TDoc extends Document>`
+- `hooks/useEditHandler.ts`, `hooks/useDeleteConfirmation.ts`, `hooks/useSwrPagination.ts` — optional SWR `mutate` updater; generic page/item types
+- `components/CoreListingPagesLogic.tsx` — optional `reset` default on `handleApplyFilters`
+- `components/ShowingListOfContent/ContentListing.tsx` — typed edit/delete/mutate wiring; explicit `ToggeableAlert` generics
+- `components/ReusableMediumComponents/ToggeableAlert.tsx` — generic dismiss state
+- `components/FormComponents/StyledSelect.tsx` — typed dynamic `react-select` import
+- `components/Suggestions/SuggestionButton.tsx` — `SuggestionContentInfo` props
+- `components/Register/RegisterForm.tsx`, `components/Contact/ContactForm.tsx` — reCAPTCHA + validate callback types
+- `components/EmailTemplates/EmailTemplateComponents/email-button.tsx` — typed props
+
+### Problems encountered
+
+- `ToggeableAlert` generic inference narrowed `boolean` to literal `true` inside `{flag && <Alert …>}` — fixed with explicit `<ToggeableAlert<boolean>>`.
+- `StyledSelect` `StylesConfig<…, true>` forced `isMulti` literal — widened to `boolean`.
+
+### Verification
+
+- `pnpm exec tsc --noEmit` — OK (`strict: true`)
+- `pnpm build` — OK
+
+### Docs
+
+- `docs/notes/typescript/strict-mode-fixes.md` — all 21 strict errors with messages, before/after code, and rationale
+- `docs/README.md` — index link added
+
+### TODOs / next logical step
+
+- Delete stale `.js`/`.jsx` siblings left next to converted `.ts`/`.tsx` files (e.g. `app/page.js`, `components/login.jsx`) so only one module per route/component remains.
+- Remove remaining dead files (`hooks/useOnScreen.js`, `components/DeletingData/removeDeletedContent.jsx`, etc.) after confirming zero imports.
+- Consider `moduleResolution: "bundler"` and tightening `tsconfig` `include` (drop `**/*.js` from app code; keep `migrations/`).

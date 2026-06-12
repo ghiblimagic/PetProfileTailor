@@ -58,7 +58,7 @@ export type UseSwrPaginationResult = {
   setSize: (size: number | ((size: number) => number)) => void;
   isValidating: boolean;
   mutate: (
-    updater: (pages?: SwrPage[]) => SwrPage[],
+    updater?: (pages?: SwrPage[]) => SwrPage[],
     shouldRevalidate?: boolean,
   ) => void;
 };

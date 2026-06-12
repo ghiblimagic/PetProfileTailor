@@ -7,7 +7,10 @@ interface EmailButtonTemplateProps {
   buttonText?: string;
 }
 
-export const EmailButtonTemplate = ({ buttonHref, buttonText }) => (
+export const EmailButtonTemplate = ({
+  buttonHref,
+  buttonText,
+}: EmailButtonTemplateProps) => (
   <Link
     style={link}
     href={buttonHref}

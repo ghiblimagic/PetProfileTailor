@@ -10,13 +10,13 @@ export type DeleteTarget = {
   content?: string;
 };
 
-type SwrDeletePage = {
-  data: { _id: string }[];
+type SwrPageLike<T extends { _id: string }> = {
+  data: T[];
   totalDocs?: number;
 };
 
-type SwrMutate = (
-  updater?: (pages?: SwrDeletePage[]) => SwrDeletePage[],
+type SwrMutate<T extends { _id: string } = { _id: string }> = (
+  updater?: (pages?: SwrPageLike<T>[]) => SwrPageLike<T>[],
   shouldRevalidate?: boolean,
 ) => void;
 
@@ -34,11 +34,11 @@ export function useDeleteConfirmation() {
     setShowDeleteConfirmation(false);
   }
 
-  async function confirmDelete(
+  async function confirmDelete<T extends { _id: string }>(
     apiLink: string,
     signedInUsersId: string,
-    customMutate?: SwrMutate,
-    setLocalData?: Dispatch<SetStateAction<DeleteTarget | null | undefined>>,
+    customMutate?: SwrMutate<T>,
+    setLocalData?: Dispatch<SetStateAction<T>>,
   ) {
     if (!deleteTarget) return;
 
@@ -83,7 +83,7 @@ export function useDeleteConfirmation() {
 
       if (setLocalData) {
         setLocalData((prev) =>
-          prev && prev._id === deleteTarget._id ? deleteTarget : prev,
+          prev && prev._id === deleteTarget._id ? (deleteTarget as T) : prev,
         );
       }
 

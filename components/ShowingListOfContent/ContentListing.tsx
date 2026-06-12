@@ -44,7 +44,7 @@ export type ContentListingProps = {
   dataType: ContentType | string;
   singleContent: ContentListingItem;
   mutate?: (
-    updater: (pages?: SwrPage[]) => SwrPage[],
+    updater?: (pages?: SwrPage[]) => SwrPage[],
     shouldRevalidate?: boolean,
   ) => void;
   mode?: "swr" | "standalone";
@@ -118,11 +118,10 @@ export default function ContentListing({
     openEdit,
     closeEdit,
     confirmEdit,
-  } = useEditHandler({
+  } = useEditHandler<ContentListingItem>({
     apiEndpoint: apiEndPoint,
     mutate,
-    setLocalData: (item) =>
-      setLocalContent(item as ContentListingItem),
+    setLocalData: setLocalContent,
   });
 
   const { showThanksDialog, openThanks, closeThanks } = useThanksHandler({
@@ -228,7 +227,7 @@ export default function ContentListing({
                                 content={singleContent}
                                 onupdateEditState={(item, e) => {
                                   e.stopPropagation();
-                                  if (item) openEdit(item);
+                                  if (item) openEdit(singleContent);
                                 }}
                                 className={`ml-2 mr-6 w-[90%] rounded-sm group flex items-center ${
                                   focus ? "bg-blue-500 text-white" : ""
@@ -375,7 +374,7 @@ export default function ContentListing({
         )}
 
         {showLikesSignInMessage && (
-          <ToggeableAlert
+          <ToggeableAlert<string | boolean>
             text="You must be signed in to like content"
             setToggleState={setShowLikesSignInMessage}
             toggleState={showLikesSignInMessage}
@@ -383,7 +382,7 @@ export default function ContentListing({
         )}
 
         {ideaFormToggled && userIsTheCreator && (
-          <ToggeableAlert
+          <ToggeableAlert<boolean>
             text="You cannot flag your own content 😜"
             setToggleState={setIdeaFormToggled}
             toggleState={ideaFormToggled}
@@ -391,7 +390,7 @@ export default function ContentListing({
         )}
 
         {ideaFormToggled && userAlreadySentIdea && (
-          <ToggeableAlert
+          <ToggeableAlert<boolean>
             text="We are in the process of reviewing your idea. Please wait for the prior report to be reviewed before submitting"
             setToggleState={setIdeaFormToggled}
             toggleState={ideaFormToggled}

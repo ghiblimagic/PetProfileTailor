@@ -7,8 +7,11 @@
 import { useMemo } from "react";
 import dynamic from "next/dynamic";
 import type { MultiValue, StylesConfig } from "react-select";
+import type ReactSelect from "react-select";
 
-const NoSSRSelect = dynamic(() => import("react-select"), { ssr: false });
+const NoSSRSelect = dynamic(() => import("react-select"), {
+  ssr: false,
+}) as typeof ReactSelect;
 
 // disable SSR completely to take care of this hydration Warning: Prop id did not match. Server: "react-select-2-live-region" Client: "react-select-3-live-region" Component Stack:
 
@@ -36,7 +39,7 @@ export type StyledSelectProps<T extends StyledSelectOption = StyledSelectOption>
     isSearchable?: boolean;
   };
 
-const selectStyles: StylesConfig<FormattedOption, true> = {
+const selectStyles: StylesConfig<FormattedOption, boolean> = {
   menu: (provided) => ({
     ...provided,
     backgroundColor: "rgb(20 2 35)", // dark purple
@@ -96,10 +99,13 @@ export default function StyledSelect<T extends StyledSelectOption>({
       isMulti={isMulti}
       isSearchable={isSearchable}
       styles={selectStyles}
-      onChange={(selected: MultiValue<FormattedOption>) => {
+      onChange={(selected) => {
+        const multi = (Array.isArray(selected) ? selected : []) as MultiValue<
+          FormattedOption
+        >;
         // react-select gives you the same objects from formattedOptions
         // strip the label/value props back down to your raw data if you like aka  // map react-select’s values back into raw objects
-        const normalized = (selected || []).map((s) => {
+        const normalized = multi.map((s) => {
           const { label: _label, value: _value, ...rest } = s;
           return rest as T;
         });

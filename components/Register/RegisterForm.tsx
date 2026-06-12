@@ -305,9 +305,13 @@ export default function RegisterForm() {
           register={register}
           validation={{
             required: "Please enter a profilename",
-            validate: (value: string) =>
-              value.match(/[^a-z\d&'-]+/) == null ||
-              `Invalid characters entered: ${value.match(/[^a-z\d&'-]+/g)}`,
+            validate: (value: string | boolean) => {
+              if (typeof value !== "string") return true;
+              return (
+                value.match(/[^a-z\d&'-]+/) == null ||
+                `Invalid characters entered: ${value.match(/[^a-z\d&'-]+/g)}`
+              );
+            },
           }}
           error={errors.profilename}
           inputStyling="w-full"
@@ -358,8 +362,10 @@ export default function RegisterForm() {
           register={register}
           validation={{
             required: passwordEntered && "This field is required",
-            validate: (value: string) =>
-              value === getValues("password") || "Passwords do not match",
+            validate: (value: string | boolean) => {
+              if (typeof value !== "string") return true;
+              return value === getValues("password") || "Passwords do not match";
+            },
             minLength: {
               value: 6,
               message: "Confirm password must be more than 5 chars",
@@ -380,7 +386,7 @@ export default function RegisterForm() {
           <div className="flex justify-center mb-4">
             <ReCAPTCHA
               sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_V2_SITE_KEY!}
-              onChange={(token) => setV2Token(token)}
+              onChange={(token: string | null) => setV2Token(token)}
             />
           </div>
         )}
