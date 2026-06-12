@@ -1,13 +1,22 @@
+/**
+ * Single name detail page — lookup by URL slug / normalizedContent.
+ * Notes: docs/notes/app/name-page.md
+ */
 import dbConnect from "@utils/db";
-import NameTag from "@/models/NameTag";
 import Names from "@models/Name";
 import { notFound } from "next/navigation";
 import { leanWithStrings } from "@/utils/mongoDataCleanup";
 import ContentListing from "@/components/ShowingListOfContent/ContentListing";
-
 import ReturnToPreviousPage from "@/components/ReusableSmallComponents/buttons/ReturnToPreviousPage";
+import type { ContentListingItem } from "@/components/ShowingListOfContent/ContentListing";
 
-export default async function Postid({ params }) {
+import "@/models/NameTag";
+
+type NamePageProps = {
+  params: Promise<{ name: string }>;
+};
+
+export default async function NamePage({ params }: NamePageProps) {
   const { name } = await params;
   const spaceAddedBackName = decodeURIComponent(name).replace(/\s+/g, "");
   // decodeURIComponent gets rid of %20, replaces with a space
@@ -38,14 +47,12 @@ export default async function Postid({ params }) {
         href="/fetchnames"
       />
 
-      {nameData && (
-        <ContentListing
-          singleContent={nameData}
-          dataType="names"
-          mode="standalone"
-          className="mt-4"
-        />
-      )}
+      <ContentListing
+        singleContent={nameData as unknown as ContentListingItem}
+        dataType="names"
+        mode="standalone"
+        className="mt-4"
+      />
     </div>
   );
 }

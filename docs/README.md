@@ -71,4 +71,6 @@ Each source file with notes should have a one-line pointer at the top linking to
 | [`profile.tsx`](../components/profile.tsx) | [profile.md](notes/components/profile.md) |
 | [`ContentListing.tsx`](../components/ShowingListOfContent/ContentListing.tsx) | [content-listing.md](notes/components/content-listing.md) |
 | [`models/Name.ts`](../models/Name.ts), [`Description.ts`](../models/Description.ts) | [name-and-description.md](notes/models/name-and-description.md) |
+| [`app/name/[name]/page.tsx`](../app/name/[name]/page.tsx) | [name-page.md](notes/app/name-page.md) |
+| [`app/description/[id]/page.tsx`](../app/description/[id]/page.tsx) | [description-page.md](notes/app/description-page.md) |
 | [`utils/stringManipulation/findNormalizedMatch.ts`](../utils/stringManipulation/findNormalizedMatch.ts) | [findNormalizedMatch.md](notes/utils/stringManipulation/findNormalizedMatch.md) |

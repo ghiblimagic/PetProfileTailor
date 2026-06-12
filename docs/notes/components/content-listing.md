@@ -4,7 +4,7 @@ Source: [`components/ShowingListOfContent/ContentListing.tsx`](../../../componen
 
 ## Role
 
-Renders one name or description row on listing pages ([`CoreListingPagesLogic.tsx`](../../../components/CoreListingPagesLogic.tsx), profile pages, single-content pages). See [core-listing-pages-logic.md](./core-listing-pages-logic.md).
+Renders one name or description row on listing pages ([`CoreListingPagesLogic.tsx`](../../../components/CoreListingPagesLogic.tsx), profile pages, single-content pages). Standalone pages: [name-page.md](../app/name-page.md), [description-page.md](../app/description-page.md). See [core-listing-pages-logic.md](./core-listing-pages-logic.md).
 
 ## Props
 

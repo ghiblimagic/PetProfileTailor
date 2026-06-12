@@ -3846,3 +3846,37 @@ Removed orphaned component — no imports anywhere. Flag report categories use `
 ### Files modified
 
 - `docs/notes/components/form-components.md` — removed section; note `AddReport` uses `StyledCheckbox` for categories
+
+---
+
+## 2026-06-07 — TypeScript: single-content pages (`name/[name]`, `description/[id]`)
+
+### What was changed and why
+
+Converted standalone detail routes to TypeScript. Renamed exports `Postid` → `NamePage` / `DescriptionPage`. Populate-only models via `import "@/models/NameTag"` / `DescriptionTag`. Description page: `mongoose.Types.ObjectId` + `isValid` → `notFound()` instead of `require("mongodb").ObjectId`. Dropped redundant Font Awesome CSS import on description page (children import it). `leanWithStrings` result cast `as unknown as ContentListingItem` for populate typing.
+
+### Files created
+
+- `app/name/[name]/page.tsx`
+- `app/description/[id]/page.tsx`
+- `docs/notes/app/name-page.md`
+- `docs/notes/app/description-page.md`
+
+### Files removed
+
+- `app/name/[name]/page.jsx`
+- `app/description/[id]/page.jsx`
+
+### Files modified
+
+- `docs/notes/components/content-listing.md`
+- `docs/README.md`
+
+### Verification
+
+- `pnpm exec tsc --noEmit` — OK
+- `pnpm build` — OK
+
+### Next logical step
+
+Convert `app/api/categories-and-tags/route.js`.

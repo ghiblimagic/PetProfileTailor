@@ -1,23 +1,33 @@
-import React from "react";
-
-import "@fortawesome/fontawesome-svg-core/styles.css";
-
+/**
+ * Single description detail page — lookup by Mongo _id.
+ * Notes: docs/notes/app/description-page.md
+ */
+import mongoose from "mongoose";
 import ContentListing from "@/components/ShowingListOfContent/ContentListing";
 import dbConnect from "@utils/db";
-import DescriptionTag from "@/models/DescriptionTag";
 import Descriptions from "@/models/Description";
 import { notFound } from "next/navigation";
-const ObjectId = require("mongodb").ObjectId;
 import { leanWithStrings } from "@/utils/mongoDataCleanup";
 import ReturnToPreviousPage from "@/components/ReusableSmallComponents/buttons/ReturnToPreviousPage";
+import type { ContentListingItem } from "@/components/ShowingListOfContent/ContentListing";
 
-export default async function Postid({ params }) {
+import "@/models/DescriptionTag";
+
+type DescriptionPageProps = {
+  params: Promise<{ id: string }>;
+};
+
+export default async function DescriptionPage({ params }: DescriptionPageProps) {
   const { id } = await params;
 
-  await dbConnect.connect();
-  const descriptionId = ObjectId(id);
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    notFound();
+  }
 
-  let description = await leanWithStrings(
+  await dbConnect.connect();
+  const descriptionId = new mongoose.Types.ObjectId(id);
+
+  const description = await leanWithStrings(
     Descriptions.findById(descriptionId)
       .populate({
         path: "createdBy",
@@ -40,7 +50,7 @@ export default async function Postid({ params }) {
 
       <ContentListing
         dataType="descriptions"
-        singleContent={description}
+        singleContent={description as unknown as ContentListingItem}
         mode="standalone"
         className="mt-4"
       />
