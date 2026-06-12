@@ -35,6 +35,9 @@ Each source file with notes should have a one-line pointer at the top linking to
 | [`app/api/description/route.ts`](../app/api/description/route.ts) | [description-route.md](notes/app/api/description-route.md) |
 | [`app/api/description/swr/route.ts`](../app/api/description/swr/route.ts) | [description-swr-route.md](notes/app/api/description-swr-route.md) |
 | [`app/layout.tsx`](../app/layout.tsx) | [root-layout.md](notes/app/root-layout.md) |
+| [`app/page.tsx`](../app/page.tsx), [`HeroTop.tsx`](../components/LandingPage/HeroTop.tsx) | [landing-page.md](notes/app/landing-page.md) |
+| [`app/(protected)/layout.tsx`](../app/(protected)/layout.tsx) | [protected-layout.md](notes/app/protected-layout.md) |
+| [`app/(admin)/`](../app/(admin)/) (layout + category/tag admin pages) | [admin-route-group.md](notes/app/admin-route-group.md) |
 | [`app/api/categories-and-tags/route.ts`](../app/api/categories-and-tags/route.ts) | [categories-and-tags-route.md](notes/app/api/categories-and-tags-route.md) |
 | [`app/api/auth/signup/route.ts`](../app/api/auth/signup/route.ts) | [signup-route.md](notes/app/api/signup-route.md) |
 | Names + description check-if-exists routes | [check-if-content-exists.md](notes/app/api/check-if-content-exists.md) |

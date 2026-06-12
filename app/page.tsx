@@ -1,31 +1,31 @@
-// import React from 'react';
-// import ReactDOM from 'react-dom';
-// these react imports added behind the scenes writing it like this isn't needed for nextjs
-
+/**
+ * Public landing page.
+ * Notes: docs/notes/app/landing-page.md
+ */
 "use client";
 
 import HeroTop from "@components/LandingPage/HeroTop";
 import MediaObjectLeft from "@components/ReusableMediumComponents/MediaObjectLeft";
 import MediaObjectRight from "@components/ReusableMediumComponents/MediaObjectRight";
-
 import Image from "next/image";
-
 import WideCenteredHeading from "@components/ReusableSmallComponents/TitlesOrHeadings/WideCenteredHeading";
-
 import YoutubeEmbed from "@components/ShowingListOfContent/YoutubeEmbed";
 import { useState } from "react";
 
-function HomePage() {
+type LandingVideoKey = "impactful" | "fun" | "tailor";
+
+export default function HomePage() {
   //for Nav menu profile name and image
   //let section exists in case the user is not signed in
 
   //end of section for nav menu
 
-  const [openVideo, setOpenVideo] = useState(null);
+  const [openVideo, setOpenVideo] = useState<LandingVideoKey | null>(null);
 
-  function handleVideoClick(videoKey) {
+  function handleVideoClick(videoKey: LandingVideoKey) {
     setOpenVideo(openVideo === videoKey ? null : videoKey);
   }
+
   return (
     <div className="w-screen sm:w-full ">
       <HeroTop
@@ -160,5 +160,3 @@ function HomePage() {
     </div>
   );
 }
-
-export default HomePage;

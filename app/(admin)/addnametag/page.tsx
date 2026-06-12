@@ -1,78 +1,84 @@
+/**
+ * Admin: add a name tag and attach to categories.
+ * Notes: docs/notes/app/admin-route-group.md
+ */
 "use client";
 
-import React, { useState } from "react";
+import { useState, type FormEvent } from "react";
 import axios from "axios";
-import Select from "react-select";
 import GeneralButton from "@components/ReusableSmallComponents/buttons/GeneralButton";
 import DisabledButton from "@components/ReusableSmallComponents/buttons/DisabledButton";
-import { useSession } from "next-auth/react";
-import { useCategoriesForDataType } from "@/hooks/useCategoriesForDataType";
-import { useAdmin } from "@/context/AdminContext";
 import StyledInput from "@components/FormComponents/StyledInput";
-import StyledSelect from "@/components/FormComponents/StyledSelect";
+import StyledSelect from "@components/FormComponents/StyledSelect";
+import { useCategoriesForDataType } from "@/hooks/useCategoriesForDataType";
+import { useSession } from "next-auth/react";
+import { useAdmin } from "@/context/AdminContext";
+import type { CategoryWithTags } from "@/context/CategoriesAndTagsContext";
 
-export default function AddDescriptionTag() {
+export default function AddNameTag() {
   const { isAdmin } = useAdmin();
-  const { categoriesWithTags, tagList } =
-    useCategoriesForDataType("descriptions");
   const { data: session } = useSession();
-  const [newDescriptionTag, setNewDescriptionTag] = useState("");
-  const [categoryList, setCategoryList] = useState([]);
-  const [categoriesChosen, setCategoriesChosen] = useState([]);
+  const { categoriesWithTags } = useCategoriesForDataType("names");
+  const [newNameTag, setNewNameTag] = useState("");
+  const [categoriesChosen, setCategoriesChosen] = useState<CategoryWithTags[]>(
+    [],
+  );
 
-  function handleDescriptionTagSubmission(e) {
+  function handleNameTagSubmission(e: FormEvent) {
     e.preventDefault();
+    if (!session?.user?.id) return;
 
-    if (!session) return null;
-
-    const descriptionTagSubmission = {
-      tag: newDescriptionTag,
+    const nameTagSubmission = {
+      tag: newNameTag,
       createdBy: session.user.id,
     };
-    // console.log(descriptionTagSubmission);
-    axios
-      .post("/api/descriptiontag", descriptionTagSubmission)
+
+    void axios
+      .post("/api/nametag", nameTagSubmission)
       .then((response) => {
-        let newDescriptionTagId = response.data._id;
-        addTagToCategories(newDescriptionTagId);
+        const newNameTagId = response.data._id as string;
+        addTagToCategories(newNameTagId);
       })
       .catch((error) => {
         console.log("this is error", error);
       });
   }
 
-  function addTagToCategories(newDescriptionTagId) {
+  function addTagToCategories(newNameTagId: string) {
     try {
-      axios.put("/api/descriptioncategory/edittags", {
-        newtagid: newDescriptionTagId,
-        categoriesToUpdate: categoriesChosen.map((option) => option._id),
+      void axios.put("/api/namecategories/edittags", {
+        newtagid: newNameTagId,
+        categoriesToUpdate: categoriesChosen,
       });
     } catch (err) {
       console.log("tag not added to categories :(", err);
     }
   }
+
   return (
     <div className=" mx-auto flex justify-center text-center">
-      <form onSubmit={handleDescriptionTagSubmission}>
+      <form
+        className="mx-2"
+        onSubmit={handleNameTagSubmission}
+      >
         <StyledInput
           type="text"
           id="categoryInput"
           className="text-secondary"
-          label="enter a description tag"
-          onChange={(e) => setNewDescriptionTag(e.target.value.toLowerCase())}
+          onChange={(e) => setNewNameTag(e.target.value)}
+          label="Enter a name tag to add"
         />
 
         {/* TAG AREA */}
         <label
           className="font-bold block mt-4 text-white"
-          htmlFor="descriptionTags"
+          htmlFor="categoryTags"
         >
           Categories
         </label>
 
         <StyledSelect
-          className="text-secondary mb-4"
-          id="descriptionTags"
+          id="categoryTags"
           options={categoriesWithTags}
           value={categoriesChosen}
           onChange={setCategoriesChosen}
@@ -85,6 +91,7 @@ export default function AddDescriptionTag() {
             text="Submit tag"
             type="submit"
             className="ml-2"
+            onClick={handleNameTagSubmission}
           />
         ) : (
           <div>

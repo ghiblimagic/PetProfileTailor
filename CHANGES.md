@@ -4235,3 +4235,55 @@ Converted primary header (mobile + desktop nav, profile menu) and four layout cl
 ### Next logical step
 
 Convert `(admin)/layout.jsx` + admin pages, landing (`app/page.js`, `HeroTop.jsx`), or `(protected)/layout.jsx`.
+
+---
+
+## 2026-06-07 — TypeScript: admin routes, landing page, protected layout
+
+### What was changed and why
+
+Converted the admin route group (layout + four category/tag forms), public landing page (`app/page` + `HeroTop`), and protected route-group layout to TypeScript. Added `.d.ts` stubs for `MediaObjectLeft` / `MediaObjectRight` so landing sections type-check without converting those JSX components yet.
+
+### Files created
+
+- `app/(admin)/layout.tsx`
+- `app/(admin)/addnamecategory/page.tsx`
+- `app/(admin)/adddescriptioncategory/page.tsx`
+- `app/(admin)/addnametag/page.tsx`
+- `app/(admin)/adddescriptiontag/page.tsx`
+- `app/(protected)/layout.tsx`
+- `app/page.tsx`
+- `components/LandingPage/HeroTop.tsx`
+- `components/ReusableMediumComponents/MediaObjectLeft.d.ts`
+- `components/ReusableMediumComponents/MediaObjectRight.d.ts`
+- `docs/notes/app/admin-route-group.md`
+- `docs/notes/app/landing-page.md`
+- `docs/notes/app/protected-layout.md`
+
+### Files removed
+
+- `app/(admin)/layout.jsx`
+- `app/(admin)/addnamecategory/page.js`
+- `app/(admin)/adddescriptioncategory/page.js`
+- `app/(admin)/addnametag/page.js`
+- `app/(admin)/adddescriptiontag/page.js`
+- `app/(protected)/layout.jsx`
+- `app/page.js`
+- `components/LandingPage/HeroTop.jsx`
+
+### Files modified
+
+- `docs/README.md`
+
+### Problems encountered
+
+- `app/page.tsx` failed `tsc` because inferred JSX props on `MediaObjectRight` required `credit` / `creditLink`. Fixed with optional props in `.d.ts` stubs (components still render correctly without credits).
+
+### Verification
+
+- `pnpm exec tsc --noEmit` — OK
+- `pnpm build` — OK
+
+### Next logical step
+
+Convert `MediaObjectLeft` / `MediaObjectRight` to `.tsx` (replace `.d.ts`), then `Footer`, `about/page.jsx`, `(protected)/editsettings/page.js`, or remaining `app/api/**/*.js`.

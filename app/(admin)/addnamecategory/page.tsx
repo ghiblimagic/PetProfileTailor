@@ -1,6 +1,10 @@
+/**
+ * Admin: add a name category.
+ * Notes: docs/notes/app/admin-route-group.md
+ */
 "use client";
 
-import React, { useState } from "react";
+import { useState, type FormEvent } from "react";
 import axios from "axios";
 import GeneralButton from "@components/ReusableSmallComponents/buttons/GeneralButton";
 import DisabledButton from "@components/ReusableSmallComponents/buttons/DisabledButton";
@@ -11,16 +15,16 @@ export default function AddNameCategory() {
   const { isAdmin } = useAdmin();
   const [newCategory, setNewCategory] = useState("");
 
-  function handleCategorySubmission(e) {
+  function handleCategorySubmission(e: FormEvent) {
     e.preventDefault();
 
     const categorySubmission = {
       category: newCategory,
     };
 
-    axios
+    void axios
       .post("/api/namecategories", categorySubmission)
-      .then((response) => {})
+      .then(() => {})
       .catch((error) => {
         console.log("this is error", error);
       });

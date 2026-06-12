@@ -1,9 +1,18 @@
+/**
+ * Admin route group — server session gate + AdminProvider.
+ * Notes: docs/notes/app/admin-route-group.md
+ */
+import type { ReactNode } from "react";
 import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
 import { serverAuthOptions } from "@/lib/auth";
 import AdminWrapper from "@/wrappers/AdminWrapper";
 
-export default async function ProtectedLayout({ children }) {
+type AdminLayoutProps = {
+  children: ReactNode;
+};
+
+export default async function AdminLayout({ children }: AdminLayoutProps) {
   const session = await getServerSession(serverAuthOptions);
 
   // console.log("session", session);

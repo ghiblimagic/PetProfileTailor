@@ -1,3 +1,7 @@
+/**
+ * Landing hero with video trigger buttons (Fun / Impactful / Fitting).
+ * Notes: docs/notes/app/landing-page.md
+ */
 "use client";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -11,21 +15,19 @@ import {
 import "@fortawesome/fontawesome-svg-core/styles.css";
 import { usePrefersReducedMotion } from "@/hooks/usePrefersReducedMotions";
 
-const HeroTop = ({
+export type HeroTopProps = {
+  updateImpactfulState: () => void;
+  updateFunState: () => void;
+  updateTailorState: () => void;
+};
+
+export default function HeroTop({
   updateImpactfulState,
   updateFunState,
   updateTailorState,
-}) => {
+}: HeroTopProps) {
   const [hover, setHover] = useState(false);
   const prefersReducedMotion = usePrefersReducedMotion();
-
-  const handleMouseEnterForImage = () => {
-    setHover(true);
-  };
-
-  const handleMouseLeaveForImage = () => {
-    setHover(false);
-  };
 
   const imageSrc =
     prefersReducedMotion || hover ? "/pugStillImage.png" : "/pugs.webp";
@@ -34,8 +36,8 @@ const HeroTop = ({
     <div
       className="hero min-h-fit font-serif 
   mx-auto overflow-hidden"
-      onMouseEnter={handleMouseEnterForImage}
-      onMouseLeave={handleMouseLeaveForImage}
+      onMouseEnter={() => setHover(true)}
+      onMouseLeave={() => setHover(false)}
     >
       <div className="hero-overlay  relative  z-10 opacity-20 ">
         <Image
@@ -73,6 +75,7 @@ const HeroTop = ({
               />
 
               <button
+                type="button"
                 className="btn  w-full mt-2 bg-secondary text-white hover:text-white border-b-4 border-subtleWhite hover:border-blue-700 hover:bg-blue-500 font-black text-sm h-10 rounded-full tracking-widest"
                 onClick={updateFunState}
               >
@@ -87,6 +90,7 @@ const HeroTop = ({
               />
 
               <button
+                type="button"
                 className="btn w-full mt-2 bg-secondary text-white hover:text-white border-b-4 border-subtleWhite hover:border-blue-700 hover:bg-blue-500 font-black text-sm  h-10 rounded-full tracking-widest focus:ring-white"
                 onClick={updateImpactfulState}
               >
@@ -101,6 +105,7 @@ const HeroTop = ({
                 color="white"
               />
               <button
+                type="button"
                 className="btn  w-full mt-2 bg-secondary text-white hover:text-white border-b-4 border-subtleWhite hover:border-blue-700 hover:bg-blue-500 font-black text-sm  h-10 rounded-full tracking-widest px-0"
                 onClick={updateTailorState}
               >
@@ -112,6 +117,4 @@ const HeroTop = ({
       </div>
     </div>
   );
-};
-
-export default HeroTop;
+}
