@@ -1,3 +1,7 @@
+/**
+ * react-toastify container for app-wide toasts.
+ * Notes: docs/notes/wrappers/layout-wrappers.md
+ */
 "use client";
 
 import { ToastContainer } from "react-toastify";

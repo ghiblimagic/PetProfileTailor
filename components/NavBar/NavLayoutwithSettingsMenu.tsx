@@ -1,3 +1,7 @@
+/**
+ * Primary site header: logo, desktop nav, notifications, profile menu.
+ * Notes: docs/notes/components/navbar.md
+ */
 "use client";
 
 import { useSession, signOut } from "next-auth/react";
@@ -6,7 +10,6 @@ import Image from "next/image";
 import Link from "next/link";
 // //Special jsx code that allows us to build links. Allows us to keep everything on a single page (makes it a SPA), rather than using a href="page link", which would make us lose any state and require that we get a new file sent from the server
 
-import React, { useState } from "react";
 import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/react";
 import "react-toastify/dist/ReactToastify.css";
 import MobileNavBar from "./NavBarPieces/MobileNavBar/MobileNavBar";
@@ -16,7 +19,6 @@ import "@fortawesome/fontawesome-svg-core/styles.css";
 
 import NotificationsButton from "@components/Notifications/NotificationsButton";
 
-import { forwardRef } from "react";
 import ProfileImage from "@components/ReusableSmallComponents/ProfileImage";
 import LinkButton from "@components/ReusableSmallComponents/buttons/LinkButton";
 
@@ -31,7 +33,7 @@ export default function NavLayoutwithSettingsMenu() {
   const MenuItemsStyling =
     "absolute right-0 mt-2 w-56 origin-top-right rounded-md bg-primary shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none";
 
-  const menuItemStyling = function (focus) {
+  const menuItemStyling = function (focus: boolean) {
     return `block px-4 py-2 text-sm text-gray-300 ${
       focus ? "bg-white/10 text-white" : ""
     }`;
@@ -39,12 +41,10 @@ export default function NavLayoutwithSettingsMenu() {
 
   let userName = "";
   let profileImageLink = "";
-  let signedInUsersId = "";
 
   if (session?.user) {
     userName = session.user.name || "";
     profileImageLink = session.user.profileImage || "";
-    signedInUsersId = session.user.id || "";
   }
 
   useEffect(() => {
@@ -53,7 +53,7 @@ export default function NavLayoutwithSettingsMenu() {
       // waits until the session has been fetched (authenticated)
       signOut(); // ensures cookies cleared if token nuked, aka for a banner user
     }
-  }, [session]);
+  }, [session, status]);
 
   return (
     <>
@@ -76,8 +76,8 @@ export default function NavLayoutwithSettingsMenu() {
               icon={
                 <Image
                   src="/icon.png"
-                  width="28"
-                  height="28"
+                  width={28}
+                  height={28}
                   priority
                   unoptimized
                   style={{ objectPosition: "center", objectFit: "scale-down" }}
@@ -90,7 +90,7 @@ export default function NavLayoutwithSettingsMenu() {
             {userName != "" && <NotificationsButton />}
 
             <div className="mr-2">
-              {userName != "" ? (
+              {userName != "" && session?.user ? (
                 <Menu
                   as="div"
                   className="relative inline-block text-left z-30"
@@ -136,7 +136,7 @@ export default function NavLayoutwithSettingsMenu() {
                           <Link
                             href={`${
                               process.env.NEXT_PUBLIC_BASE_FETCH_URL
-                            }profile/${session.user.profileName.toLowerCase()}`}
+                            }profile/${session.user.profileName!.toLowerCase()}`}
                             className={`flex items-center px-4 py-2 text-sm text-subtleWhite ${
                               focus ? "bg-white/10 text-subtleWhite" : ""
                             }`}

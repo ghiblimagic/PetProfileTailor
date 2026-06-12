@@ -1,9 +1,10 @@
+/**
+ * Desktop primary nav links + admin dropdown.
+ * Notes: docs/notes/components/navbar.md
+ */
 "use client";
 
-import { Menu, Transition } from "@headlessui/react";
-import { Fragment, useEffect, useRef, useState } from "react";
 import AddItemsDropDownMenu from "./AddItemsDropDownMenu";
-
 import "@fortawesome/fontawesome-svg-core/styles.css";
 import NavBarLink from "../NavBarLink";
 import { useSession } from "next-auth/react";
@@ -12,10 +13,9 @@ import FetchDropDownMenu from "./FetchDropDownMenu";
 
 //onclick wrapped in spans due to this error https://github.com/vercel/next.js/discussions/39212
 
-// HERE
-const NavBarNames = () => {
+export default function NavBarNames() {
   const { data: session } = useSession();
-  const { role, status, id: signedInUsersId } = session?.user || {};
+  const { role, status } = session?.user || {};
   const isAdmin = role === "admin" && status === "active";
 
   return (
@@ -25,28 +25,16 @@ const NavBarNames = () => {
       <section className="hidden lg:flex desktop-menu ">
         <ul className="flex justify-around w-full max-w-3xl mx-auto ">
           {/* w-full is needed for it to stretch, and then max-w-5xl limits it */}
-          <NavBarLink
-            href="/"
-            className=""
-          >
-            Home
-          </NavBarLink>
+          <NavBarLink href="/">Home</NavBarLink>
 
           <FetchDropDownMenu />
           <AddItemsDropDownMenu />
 
-          <NavBarLink
-            href="/about"
-            className=""
-          >
-            About
-          </NavBarLink>
+          <NavBarLink href="/about">About</NavBarLink>
 
           {isAdmin && <AdminDropdownMenu />}
         </ul>
       </section>
     </div>
   );
-};
-
-export default NavBarNames;
+}

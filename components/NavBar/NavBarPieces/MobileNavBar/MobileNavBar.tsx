@@ -1,9 +1,11 @@
+/**
+ * Mobile hamburger nav menu.
+ * Notes: docs/notes/components/navbar.md
+ */
 "use client";
 
-import React from "react";
 import { Menu, MenuItem, MenuItems, MenuButton } from "@headlessui/react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-
 import Link from "next/link";
 import { faBars } from "@fortawesome/free-solid-svg-icons";
 

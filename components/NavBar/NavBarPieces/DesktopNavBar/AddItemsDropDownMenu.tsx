@@ -1,17 +1,21 @@
+/**
+ * Desktop nav "Add" dropdown.
+ * Notes: docs/notes/components/navbar.md
+ */
 "use client";
 
 import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/react";
 import { ChevronDownIcon } from "@heroicons/react/20/solid";
 import Link from "next/link";
 
-export default function FetchDropDownMenu() {
+export default function AddItemsDropDownMenu() {
   return (
     <Menu
       as="div"
       className="relative inline-block text-left z-30"
     >
       <MenuButton className="inline-flex justify-center px-4 py-2 text-sm font-medium text-subtleWhite hover:border-b-4 focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75">
-        Fetch
+        Add
         <ChevronDownIcon
           aria-hidden="true"
           className="-mr-1 size-5 text-subtleWhite"
@@ -23,7 +27,7 @@ export default function FetchDropDownMenu() {
           <MenuItem>
             {({ focus }) => (
               <Link
-                href="/fetchnames"
+                href="/addnames"
                 className={`flex items-center px-4 py-2 text-sm text-subtleWhite ${
                   focus ? "bg-white/10 text-subtleWhite" : ""
                 }`}
@@ -38,27 +42,12 @@ export default function FetchDropDownMenu() {
               //<a> is a real DOM element, so Headless UI can attach refs for keyboard focus.
 
               <Link
-                href="/fetchname"
+                href="/adddescriptions"
                 className={`flex items-center px-4 py-2 text-sm text-subtleWhite ${
                   focus ? "bg-white/10 text-subtleWhite" : ""
                 }`}
               >
-                A Name
-              </Link>
-            )}
-          </MenuItem>
-
-          <MenuItem>
-            {({ focus }) => (
-              //<a> is a real DOM element, so Headless UI can attach refs for keyboard focus.
-
-              <Link
-                href="/fetchdescriptions"
-                className={`flex items-center px-4 py-2 text-sm text-subtleWhite ${
-                  focus ? "bg-white/10 text-subtleWhite" : ""
-                }`}
-              >
-                Descriptions
+                Description
               </Link>
             )}
           </MenuItem>

@@ -61,7 +61,7 @@ const safeSession: Session | null = session
 // Guarantees session.user exists (or is an empty object).
 ```
 
-Passed to [`SessionProviderWrapper`](../../../wrappers/SessionProviderWrapper.js) → `next-auth` `SessionProvider`.
+Passed to [`SessionProviderWrapper`](../../../wrappers/SessionProviderWrapper.tsx) → `next-auth` `SessionProvider`. See [layout-wrappers.md](../wrappers/layout-wrappers.md).
 
 ## Categories TTL cache (`getCategoriesAndTagsWithTTL`)
 

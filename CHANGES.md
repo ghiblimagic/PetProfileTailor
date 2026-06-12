@@ -4194,3 +4194,44 @@ Deleted dead component — zero imports; description text lives in `ContentListi
 
 - `docs/notes/context/admin-context.md`
 - `docs/README.md`
+
+---
+
+## 2026-06-07 — TypeScript: NavBar + layout wrappers
+
+### What was changed and why
+
+Converted primary header (mobile + desktop nav, profile menu) and four layout client wrappers to TypeScript. `NavBarLink` now uses `usePathname()` instead of broken `router.pathname` (App Router). Removed dead imports from nav modules. Renamed `AddItemsDropDownMenu` default export to match filename.
+
+### Files created
+
+- `components/NavBar/NavLayoutwithSettingsMenu.tsx`
+- `components/NavBar/NavBarPieces/NavBarLink.tsx`
+- `components/NavBar/NavBarPieces/DesktopNavBar/NavBarNames.tsx`
+- `components/NavBar/NavBarPieces/DesktopNavBar/AddItemsDropDownMenu.tsx`
+- `components/NavBar/NavBarPieces/DesktopNavBar/FetchDropDownMenu.tsx`
+- `components/NavBar/NavBarPieces/MobileNavBar/MobileNavBar.tsx`
+- `wrappers/SessionProviderWrapper.tsx`
+- `wrappers/ToastWrapper.tsx`
+- `wrappers/ReportsWrapper.tsx`
+- `wrappers/SuggestionsWrapper.tsx`
+- `docs/notes/components/navbar.md`
+- `docs/notes/wrappers/layout-wrappers.md`
+
+### Files removed
+
+- All corresponding `.js` / `.jsx` in `components/NavBar/` and the four wrapper files above
+
+### Files modified
+
+- `docs/README.md`
+- `docs/notes/app/root-layout.md`
+
+### Verification
+
+- `pnpm exec tsc --noEmit` — OK
+- `pnpm build` — OK
+
+### Next logical step
+
+Convert `(admin)/layout.jsx` + admin pages, landing (`app/page.js`, `HeroTop.jsx`), or `(protected)/layout.jsx`.
