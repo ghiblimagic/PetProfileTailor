@@ -1,17 +1,16 @@
+/**
+ * About page — mission, creator bio, contact links.
+ * Notes: docs/notes/app/about-page.md
+ */
 "use client";
 
-// need to mark it as useClient, because of the way Next passes errors to this component Error: Functions cannot be passed directly to Client Components unless you explicitly expose it by marking it with "use server". <... buildId=... assetPrefix="" initialCanonicalUrl=... initialTree=... initialHead=... globalErrorComponent={function} children=...>
-import Link from "next/link";
 import PageTitleWithImages from "@components/ReusableSmallComponents/TitlesOrHeadings/PageTitleWithImages";
-import ListWithPawPrintIcon from "@components/ReusableSmallComponents/ListWithPawPrintIcon";
-
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faBriefcase,
   faEnvelope,
   faMessage,
 } from "@fortawesome/free-solid-svg-icons";
-import PawPrintIcon from "@components/ReusableSmallComponents/iconsOrSvgImages/PawPrintIcon";
 import Image from "next/image";
 
 export default function About() {
@@ -53,7 +52,6 @@ export default function About() {
           {" "}
           About the Creator{" "}
         </h2>
-        {/*     section */}
         <div className="relative w-[240px] h-[240px] mx-auto">
           <Image
             src="/janet-spellman.webp"

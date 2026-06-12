@@ -1,8 +1,10 @@
-import React from "react";
+/**
+ * Site footer: logo, nav columns, credits.
+ * Notes: docs/notes/components/footer.md
+ */
 import Image from "next/image";
-import LinkButton from "../ReusableSmallComponents/buttons/LinkButton";
-import FooterLink from "./FooterLink";
 import Link from "next/link";
+import FooterLink from "./FooterLink";
 
 export default function Footer() {
   return (
@@ -17,8 +19,8 @@ export default function Footer() {
           >
             <Image
               src="/icon.png"
-              width="35"
-              height="35"
+              width={35}
+              height={35}
               priority
               unoptimized
               className="inline-block"
@@ -46,7 +48,7 @@ export default function Footer() {
 
         {/* ************* FIND ********* */}
         <div className="mt-2 w-56">
-          <h7 className="font-extrabold text-base mb-3 inline-block"> Find </h7>
+          <h6 className="font-extrabold text-base mb-3 inline-block"> Find </h6>
           <ul>
             <FooterLink href="/fetchnames">Names </FooterLink>
             <FooterLink href="/fetchname">A Name </FooterLink>
@@ -82,9 +84,9 @@ export default function Footer() {
         </div>
 
         <div className="flex flex-col mt-2 w-56">
-          <h7 className="font-extrabold text-base mb-3 inline-block">
+          <h6 className="font-extrabold text-base mb-3 inline-block">
             Credits
-          </h7>
+          </h6>
           <small>
             <a
               className="hover:underline hover:text-violet-300 block mt-1 text-sm"

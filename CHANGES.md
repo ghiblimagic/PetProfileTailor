@@ -4287,3 +4287,53 @@ Converted the admin route group (layout + four category/tag forms), public landi
 ### Next logical step
 
 Convert `MediaObjectLeft` / `MediaObjectRight` to `.tsx` (replace `.d.ts`), then `Footer`, `about/page.jsx`, `(protected)/editsettings/page.js`, or remaining `app/api/**/*.js`.
+
+---
+
+## 2026-06-07 — TypeScript: MediaObject, Footer, about, editsettings
+
+### What was changed and why
+
+Converted landing marketing blocks (`MediaObjectLeft`/`Right`), site footer, about page, and edit-settings profile form to TypeScript. Replaced temporary `.d.ts` stubs with real `.tsx` modules. Fixed `FooterLink` to use `usePathname()` (App Router). Removed dead code and legacy `ProfileScreen.auth`.
+
+### Files created
+
+- `components/ReusableMediumComponents/MediaObjectLeft.tsx`
+- `components/ReusableMediumComponents/MediaObjectRight.tsx`
+- `components/footer/Footer.tsx`
+- `components/footer/FooterLink.tsx`
+- `app/about/page.tsx`
+- `app/(protected)/editsettings/page.tsx`
+- `docs/notes/components/media-object.md`
+- `docs/notes/components/footer.md`
+- `docs/notes/app/about-page.md`
+- `docs/notes/app/editsettings-page.md`
+
+### Files removed
+
+- `components/ReusableMediumComponents/MediaObjectLeft.jsx`
+- `components/ReusableMediumComponents/MediaObjectRight.jsx`
+- `components/ReusableMediumComponents/MediaObjectLeft.d.ts`
+- `components/ReusableMediumComponents/MediaObjectRight.d.ts`
+- `components/footer/Footer.jsx`
+- `components/footer/FooterLink.jsx`
+- `app/about/page.jsx`
+- `app/(protected)/editsettings/page.js`
+
+### Files modified
+
+- `docs/README.md`
+- `docs/notes/app/landing-page.md`
+
+### Problems encountered
+
+- `Footer.tsx`: invalid `<h7>` elements failed `tsc`; replaced with `<h6>`.
+
+### Verification
+
+- `pnpm exec tsc --noEmit` — OK
+- `pnpm build` — OK
+
+### Next logical step
+
+Remaining `app/api/**/*.js`, auth UI (`login`, `register`, `forgotpassword`), `ImageUpload`, or `LoadingScreen.jsx`.

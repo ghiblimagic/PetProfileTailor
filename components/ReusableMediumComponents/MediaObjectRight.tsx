@@ -1,27 +1,40 @@
-import GeneralButton from "@components/ReusableSmallComponents/buttons/GeneralButton";
+/**
+ * Landing/marketing block: bullet list + link button left, image right.
+ * Notes: docs/notes/components/media-object.md
+ */
 import LinkButton from "@components/ReusableSmallComponents/buttons/LinkButton";
 import ListWithPawPrintIcon from "@components/ReusableSmallComponents/ListWithPawPrintIcon";
 import Image from "next/image";
+import type { ComponentProps } from "react";
 
-const MediaObjectRight = ({
+export type MediaObjectRightProps = {
+  image: string;
+  listOfText: string[];
+  buttonText: string;
+  buttonTextLink: ComponentProps<typeof LinkButton>["href"];
+  alttext: string;
+  imgwidth: string | number;
+  imgheight: string | number;
+  credit?: string;
+  creditLink?: string;
+  buttonStyle?: string;
+};
+
+export default function MediaObjectRight({
   image,
   listOfText,
   buttonText,
   buttonTextLink,
-
   alttext,
   imgwidth,
   imgheight,
   credit,
   creditLink,
   buttonStyle,
-}) => {
+}: MediaObjectRightProps) {
   return (
     <div className="flex justify-center my-6 flex-col md:flex-row sm:ml-2">
-      <div
-        className="max-w-md ml-4 mr-8 self-center 
-    "
-      >
+      <div className="max-w-md ml-4 mr-8 self-center ">
         <ul className="text-base md:text-lg text-white pb-8 ">
           {listOfText.map((sentence) => (
             <ListWithPawPrintIcon
@@ -47,14 +60,11 @@ const MediaObjectRight = ({
           )}
         </div>
       </div>
-      <div
-        className="self-center w-80 
-     "
-      >
+      <div className="self-center w-80 ">
         <Image
           className=""
-          width={imgwidth}
-          height={imgheight}
+          width={Number(imgwidth)}
+          height={Number(imgheight)}
           src={image}
           alt={alttext}
           sizes="100vw"
@@ -74,5 +84,4 @@ const MediaObjectRight = ({
       </div>
     </div>
   );
-};
-export default MediaObjectRight;
+}

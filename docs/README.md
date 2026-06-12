@@ -36,6 +36,10 @@ Each source file with notes should have a one-line pointer at the top linking to
 | [`app/api/description/swr/route.ts`](../app/api/description/swr/route.ts) | [description-swr-route.md](notes/app/api/description-swr-route.md) |
 | [`app/layout.tsx`](../app/layout.tsx) | [root-layout.md](notes/app/root-layout.md) |
 | [`app/page.tsx`](../app/page.tsx), [`HeroTop.tsx`](../components/LandingPage/HeroTop.tsx) | [landing-page.md](notes/app/landing-page.md) |
+| [`MediaObjectLeft.tsx`](../components/ReusableMediumComponents/MediaObjectLeft.tsx), [`MediaObjectRight.tsx`](../components/ReusableMediumComponents/MediaObjectRight.tsx) | [media-object.md](notes/components/media-object.md) |
+| [`Footer.tsx`](../components/footer/Footer.tsx), [`FooterLink.tsx`](../components/footer/FooterLink.tsx) | [footer.md](notes/components/footer.md) |
+| [`app/about/page.tsx`](../app/about/page.tsx) | [about-page.md](notes/app/about-page.md) |
+| [`app/(protected)/editsettings/page.tsx`](../app/(protected)/editsettings/page.tsx) | [editsettings-page.md](notes/app/editsettings-page.md) |
 | [`app/(protected)/layout.tsx`](../app/(protected)/layout.tsx) | [protected-layout.md](notes/app/protected-layout.md) |
 | [`app/(admin)/`](../app/(admin)/) (layout + category/tag admin pages) | [admin-route-group.md](notes/app/admin-route-group.md) |
 | [`app/api/categories-and-tags/route.ts`](../app/api/categories-and-tags/route.ts) | [categories-and-tags-route.md](notes/app/api/categories-and-tags-route.md) |

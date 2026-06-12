@@ -1,6 +1,10 @@
+/**
+ * Profile settings — name, email, password, avatar upload.
+ * Notes: docs/notes/app/editsettings-page.md
+ */
 "use client";
 
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 import { getError } from "@utils/error";
@@ -14,6 +18,14 @@ import RegisterInput from "@components/FormComponents/RegisterInput";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
 import SmallCenteredHeading from "@/components/ReusableSmallComponents/TitlesOrHeadings/SmallCenteredHeading";
 
+type EditSettingsFormValues = {
+  name: string;
+  email: string;
+  password: string;
+  confirmPassword: string;
+  userid: string;
+};
+
 export default function ProfileScreen() {
   const {
     handleSubmit,
@@ -21,7 +33,7 @@ export default function ProfileScreen() {
     getValues,
     setValue,
     formState: { errors },
-  } = useForm();
+  } = useForm<EditSettingsFormValues>();
 
   const [isSaving, setIsSaving] = useState(false);
 
@@ -31,9 +43,9 @@ export default function ProfileScreen() {
     if (!session?.user) {
       return;
     }
-    setValue("name", session.user.name);
+    setValue("name", session.user.name ?? "");
     setValue("userid", session.user.id);
-  }, [session.user, setValue]);
+  }, [session, setValue]);
 
   const router = useRouter();
 
@@ -47,11 +59,12 @@ export default function ProfileScreen() {
     return <LoadingSpinner />;
   }
 
-  if (!session?.user) {
-    return null; // redirect is in progress
-  }
-
-  const submitHandler = async ({ name, email, password, userid }) => {
+  const submitHandler = async ({
+    name,
+    email,
+    password,
+    userid,
+  }: EditSettingsFormValues) => {
     setIsSaving(true);
     try {
       await axios.put("/api/auth/update", {
@@ -95,7 +108,7 @@ export default function ProfileScreen() {
           <p className="text-white text-center py-2">
             You can change your name, email and/or password
           </p>
-          <RegisterInput
+          <RegisterInput<EditSettingsFormValues>
             id="name"
             label="Name"
             maxLength={30}
@@ -106,7 +119,7 @@ export default function ProfileScreen() {
             disabled={isSaving}
           />
 
-          <RegisterInput
+          <RegisterInput<EditSettingsFormValues>
             id="email"
             label="Email"
             type="email"
@@ -121,7 +134,7 @@ export default function ProfileScreen() {
             error={errors.email}
             disabled={isSaving}
           />
-          <RegisterInput
+          <RegisterInput<EditSettingsFormValues>
             id="password"
             label="New Password"
             type="password"
@@ -136,7 +149,7 @@ export default function ProfileScreen() {
             disabled={isSaving}
           />
 
-          <RegisterInput
+          <RegisterInput<EditSettingsFormValues>
             id="confirmPassword"
             label="Confirm New Password"
             type="password"
@@ -165,5 +178,3 @@ export default function ProfileScreen() {
     </div>
   );
 }
-
-ProfileScreen.auth = true;
