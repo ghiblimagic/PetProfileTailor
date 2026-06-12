@@ -1,3 +1,7 @@
+/**
+ * Description tags CRUD (GET public, POST admin).
+ * Notes: docs/notes/app/api/category-tag-routes.md
+ */
 import dbConnect from "@utils/db";
 import DescriptionTag from "@/models/DescriptionTag";
 import { checkIfAdmin } from "@/utils/api/checkIfAdmin";
@@ -10,27 +14,29 @@ export async function GET() {
     return Response.json(descriptionTags, { status: 200 });
   } catch (err) {
     console.error("Error fetching description tags:", err);
-    return Response.json({ error: err.message }, { status: 500 });
+    const message = err instanceof Error ? err.message : "Server error";
+    return Response.json({ error: message }, { status: 500 });
   }
 }
 
-export async function POST(req) {
+export async function POST(req: Request) {
   await dbConnect.connect();
 
-  const { ok, session, response } = await checkIfAdmin({ req });
-  if (!ok) return response;
+  const admin = await checkIfAdmin();
+  if (!admin.ok) return admin.response;
 
   try {
     const body = await req.json();
 
     const descriptionTag = await DescriptionTag.create({
       ...body,
-      createdBy: session.user.id,
+      createdBy: admin.session.user.id,
     });
 
     return Response.json(descriptionTag, { status: 201 });
   } catch (err) {
     console.error("Error creating description tag:", err);
-    return Response.json({ error: err.message }, { status: 500 });
+    const message = err instanceof Error ? err.message : "Server error";
+    return Response.json({ error: message }, { status: 500 });
   }
 }

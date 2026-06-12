@@ -4337,3 +4337,59 @@ Converted landing marketing blocks (`MediaObjectLeft`/`Right`), site footer, abo
 ### Next logical step
 
 Remaining `app/api/**/*.js`, auth UI (`login`, `register`, `forgotpassword`), `ImageUpload`, or `LoadingScreen.jsx`.
+
+---
+
+## 2026-06-07 — TypeScript: remaining API routes, ImageUpload, LoadingScreen
+
+### What was changed and why
+
+Converted the last 19 `app/api/**/*.js` route handlers (auth, user profile, category/tag admin, forgot/verify reset password, legacy name route) plus `ImageUpload` and `LoadingScreen`. **`app/api` is now fully TypeScript.** Stripped large Pages Router comment blocks; added grouped API notes under `docs/notes/app/api/`.
+
+### Files created
+
+- 19 `app/api/**/route.ts` files (see git for full list)
+- `app/api/auth/lib/mongodb.ts`
+- `components/AddingNewData/ImageUpload.tsx`
+- `components/LoadingScreen.tsx`
+- `docs/notes/app/api/category-tag-routes.md`, `user-profile-routes.md`, `auth-session-refresh-route.md`, `auth-update-route.md`, `forgotpassword-route.md`, `verifyresetpasstoken-route.md`, `auth-mongodb.md`, `name-likes-content-route.md`
+- `docs/notes/components/image-upload.md`, `loading-screen.md`
+
+### Files removed
+
+- All corresponding `.js` / `.jsx` listed above (zero `app/api/**/*.js` remain)
+
+### Files modified
+
+- `docs/README.md`
+- `docs/notes/lib/auth.md`
+
+### Problems encountered
+
+- `auth/update`: narrowed `getSessionForApis` union before accessing `session`.
+- `forgotpassword`: `resetTokenExpires` typed as `Date` on User model.
+- `names/likes/[contentId]`: GET used wrong param name (`id` → `contentId`); fixed bug from JS original.
+- Removed invalid `onClick` on `DisabledButton` in ImageUpload (prop not supported).
+
+### Verification
+
+- `pnpm exec tsc --noEmit` — OK
+- `pnpm build` — OK
+
+### Next logical step
+
+Auth UI pages (`login`, `register`, `forgotpassword`, `ResetPassword`, `magiclink`), `EditBioAndProfile.jsx`, or enable `strict: true` once remaining `components/**/*.jsx` are converted.
+
+---
+
+## 2026-06-07 — Docs: NextAuth App Router route note
+
+### What was changed and why
+
+Preserved the original `[...nextauth]` comment explaining why the route exports `NextAuth` as GET/POST instead of separate route logic. Placed in `docs/notes/lib/auth.md`; route file points to that section.
+
+### Files modified
+
+- `docs/notes/lib/auth.md`
+- `app/api/auth/[...nextauth]/route.ts`
+- `CHANGES.md`

@@ -1,3 +1,7 @@
+/**
+ * Full-area loading placeholder for root layout Suspense fallback.
+ * Notes: docs/notes/components/loading-screen.md
+ */
 export default function LoadingScreen() {
   return (
     <div className="flex justify-center items-center text-lg font-medium text-subtleWhite h-full">

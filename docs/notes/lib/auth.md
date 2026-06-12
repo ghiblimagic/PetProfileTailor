@@ -245,12 +245,27 @@ Replaces the old `AppUser` casts in `checkIfAdmin` / `checkOwnership`.
 
 ---
 
+## App Router `[...nextauth]` route
+
+Source: [`app/api/auth/[...nextauth]/route.ts`](../../app/api/auth/[...nextauth]/route.ts)
+
+Normally, App Router API routes require `route.ts` to export named handlers (`GET`, `POST`, `PUT`, etc.). The NextAuth catch-all is a special case: `NextAuth(serverAuthOptions)` returns a single handler that must be exported as **both** `GET` and `POST` — the framework wires `/api/auth/*` correctly from that pattern.
+
+```ts
+const handler = NextAuth(serverAuthOptions);
+export { handler as GET, handler as POST };
+```
+
+All provider config, callbacks, and adapters live in [`lib/auth.ts`](../../lib/auth.ts); the route file is only this thin wrapper.
+
+---
+
 ## Related files
 
 | File | Role |
 |------|------|
-| [`app/api/auth/[...nextauth]/route.js`](../../app/api/auth/[...nextauth]/route.js) | Exports GET/POST handler |
-| [`app/api/auth/lib/mongodb.js`](../../app/api/auth/lib/mongodb.js) | `clientPromise` for MongoDB adapter |
+| [`app/api/auth/[...nextauth]/route.ts`](../../app/api/auth/[...nextauth]/route.ts) | Exports GET/POST NextAuth handler (see above) |
+| [`app/api/auth/lib/mongodb.ts`](../../app/api/auth/lib/mongodb.ts) | `clientPromise` for MongoDB adapter |
 | [`utils/api/getSessionForApis.ts`](../../utils/api/getSessionForApis.ts) | API route session helper |
 | [`lib/resolveSignInCallback.ts`](../../lib/resolveSignInCallback.ts) | Pure signIn branching |
 | [`lib/resolveSignInCallback.test.ts`](../../lib/resolveSignInCallback.test.ts) | Unit tests for signIn branching |

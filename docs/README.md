@@ -40,6 +40,8 @@ Each source file with notes should have a one-line pointer at the top linking to
 | [`Footer.tsx`](../components/footer/Footer.tsx), [`FooterLink.tsx`](../components/footer/FooterLink.tsx) | [footer.md](notes/components/footer.md) |
 | [`app/about/page.tsx`](../app/about/page.tsx) | [about-page.md](notes/app/about-page.md) |
 | [`app/(protected)/editsettings/page.tsx`](../app/(protected)/editsettings/page.tsx) | [editsettings-page.md](notes/app/editsettings-page.md) |
+| Remaining API routes (auth, user profile, category/tag, forgot password) | [category-tag-routes.md](notes/app/api/category-tag-routes.md), [user-profile-routes.md](notes/app/api/user-profile-routes.md), [auth-session-refresh-route.md](notes/app/api/auth-session-refresh-route.md), [auth-update-route.md](notes/app/api/auth-update-route.md), [forgotpassword-route.md](notes/app/api/forgotpassword-route.md), [verifyresetpasstoken-route.md](notes/app/api/verifyresetpasstoken-route.md), [auth-mongodb.md](notes/app/api/auth-mongodb.md) |
+| [`ImageUpload.tsx`](../components/AddingNewData/ImageUpload.tsx), [`LoadingScreen.tsx`](../components/LoadingScreen.tsx) | [image-upload.md](notes/components/image-upload.md), [loading-screen.md](notes/components/loading-screen.md) |
 | [`app/(protected)/layout.tsx`](../app/(protected)/layout.tsx) | [protected-layout.md](notes/app/protected-layout.md) |
 | [`app/(admin)/`](../app/(admin)/) (layout + category/tag admin pages) | [admin-route-group.md](notes/app/admin-route-group.md) |
 | [`app/api/categories-and-tags/route.ts`](../app/api/categories-and-tags/route.ts) | [categories-and-tags-route.md](notes/app/api/categories-and-tags-route.md) |
