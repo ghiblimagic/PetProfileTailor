@@ -4785,3 +4785,50 @@ expect(checkbox).toBeChecked();
 
 - `RegisterForm` client validation (mock reCAPTCHA)
 - Thanks notifications E2E (still no Playwright coverage)
+
+---
+
+## 2026-06-07 — `RegisterForm` RTL tests
+
+### What was built and why
+
+Client-side validation and server error mapping for the register form — fills the gap between `validateSignupSubmission` unit tests and Playwright duplicate-email E2E.
+
+### Files created
+
+- `components/Register/RegisterForm.test.tsx`
+
+### Files modified
+
+- `TESTING.md` — Register form row in coverage table
+
+### Patterns
+
+- Mock stack: `next/image`, `next/navigation`, `next-auth/react`, reCAPTCHA v2/v3, `isE2eClientMode` (captcha bypass), `axios` via `vi.hoisted`
+- `fillRegisterForm` / `submitRegister` helpers for repeated form interaction
+- `form.noValidate = true` before submit so HTML5 `type="email"` does not block react-hook-form pattern errors in jsdom
+
+### Problems encountered
+
+**HTML5 email validation blocked RHF pattern test**
+
+`type="email"` + `not-an-email` prevented form submit in jsdom; `handleSubmit` never ran, so "Please enter a valid email" never rendered.
+
+Fix:
+
+```ts
+async function submitRegister(user) {
+  const form = document.querySelector("form");
+  if (form) form.noValidate = true;
+  await user.click(screen.getByRole("button", { name: /register/i }));
+}
+```
+
+### Verification
+
+- `pnpm test` — OK (29 files, 147 tests)
+
+### Next logical step
+
+- Thanks notifications E2E (`e2e/notifications.spec.ts` extension or new spec)
+- `RegisterInput` leaf tests (optional; mostly covered via `RegisterForm`)
