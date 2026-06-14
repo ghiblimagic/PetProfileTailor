@@ -15,7 +15,7 @@ import { faCircleXmark } from "@fortawesome/free-solid-svg-icons";
 import "@fortawesome/fontawesome-svg-core/styles.css";
 import Image from "next/image";
 import { useSession } from "next-auth/react";
-import LoadingSpinner from "../ui/LoadingSpinner";
+import LoadingSpinner from "../shared/ui/LoadingSpinner";
 import SmallCenteredHeading from "@/components/shared/typography/SmallCenteredHeading";
 import type { SessionRefreshResponse } from "@/app/api/auth/session/refresh/route";
 

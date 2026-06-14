@@ -19,7 +19,7 @@ import {
 import type { ContentType } from "@/utils/api/checkIfValidContentType";
 import { useSession } from "next-auth/react";
 import MustLoginMessage from "@components/shared/feedback/MustLoginMessage";
-import LoadingSpinner from "../ui/LoadingSpinner";
+import LoadingSpinner from "../shared/ui/LoadingSpinner";
 
 type ThanksContentInfo = {
   _id: string;

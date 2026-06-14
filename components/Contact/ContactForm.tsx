@@ -6,7 +6,7 @@ import {
   sendContactEmail,
   type ContactEmailState,
 } from "@/app/actions/sendContactEmail";
-import LoadingSpinner from "../ui/LoadingSpinner";
+import LoadingSpinner from "../shared/ui/LoadingSpinner";
 import StyledInput from "../FormComponents/StyledInput";
 import StyledTextarea from "../FormComponents/StyledTextarea";
 import GeneralButton from "../shared/actions/GeneralButton";

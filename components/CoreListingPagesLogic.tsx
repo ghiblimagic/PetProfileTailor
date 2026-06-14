@@ -23,7 +23,7 @@ import startCooldown from "@utils/startCooldown";
 import Image from "next/image";
 import LinkButton from "./shared/actions/LinkButton";
 import { useSession } from "next-auth/react";
-import LoadingSpinner from "./ui/LoadingSpinner";
+import LoadingSpinner from "./shared/ui/LoadingSpinner";
 import type { ContentType } from "@/utils/api/checkIfValidContentType";
 
 export type CoreListingPageLogicProps = {

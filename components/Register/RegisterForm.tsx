@@ -18,7 +18,7 @@ import {
 } from "@/utils/api/e2eTestMode";
 import type { SignupFieldErrors } from "@/utils/api/validateSignupSubmission";
 import RegisterInput from "@components/FormComponents/RegisterInput";
-import LoadingSpinner from "@/components/ui/LoadingSpinner";
+import LoadingSpinner from "@/components/shared/ui/LoadingSpinner";
 
 type RegisterFormValues = {
   name: string;

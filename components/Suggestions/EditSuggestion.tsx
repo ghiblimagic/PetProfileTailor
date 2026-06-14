@@ -20,7 +20,7 @@ import ClosingXButton from "@components/shared/actions/ClosingXButton";
 import { useSuggestions } from "@context/SuggestionsContext";
 import { useTags } from "@/hooks/useTags";
 import TagsSelectAndCheatSheet from "../FormComponents/TagsSelectAndCheatSheet";
-import LoadingSpinner from "@components/ui/LoadingSpinner";
+import LoadingSpinner from "@components/shared/ui/LoadingSpinner";
 import DeleteContentNotification from "../DeletingData/DeleteContentNotification";
 import { useSession } from "next-auth/react";
 import MustLoginMessage from "../shared/feedback/MustLoginMessage";

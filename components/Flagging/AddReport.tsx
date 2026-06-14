@@ -15,7 +15,7 @@ import ClosingXButton from "@components/shared/actions/ClosingXButton";
 import { useReports } from "@context/ReportsContext";
 import { useSession } from "next-auth/react";
 import MustLoginMessage from "@components/shared/feedback/MustLoginMessage";
-import LoadingSpinner from "../ui/LoadingSpinner";
+import LoadingSpinner from "../shared/ui/LoadingSpinner";
 import type { ContentType } from "@/utils/api/checkIfValidContentType";
 
 export type ReportContentInfo = {

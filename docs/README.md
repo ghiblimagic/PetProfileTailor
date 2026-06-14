@@ -25,7 +25,7 @@ Each source file with notes should have a one-line pointer at the top linking to
 | [`lib/auth.ts`](../lib/auth.ts) | [auth.md](notes/lib/auth.md) |
 | [`lib/checkBlocklist.ts`](../lib/checkBlocklist.ts) | [checkBlocklist.md](notes/lib/checkBlocklist.md) |
 | [`data/blockList.ts`](../data/blockList.ts) | [blockList.md](notes/data/blockList.md) |
-| [`components/ui/LoadingSpinner.tsx`](../components/ui/LoadingSpinner.tsx), [`skeleton.tsx`](../components/ui/skeleton.tsx) | [small-ui-components.md](notes/components/ui/small-ui-components.md) |
+| [`components/shared/ui/LoadingSpinner.tsx`](../components/shared/ui/LoadingSpinner.tsx), [`skeleton.tsx`](../components/shared/ui/skeleton.tsx) | [small-ui-components.md](notes/components/ui/small-ui-components.md) |
 | [`components/shared/feedback/MustLoginMessage.tsx`](../components/shared/feedback/MustLoginMessage.tsx) | [small-ui-components.md](notes/components/ui/small-ui-components.md) |
 | [`components/shared/`](../components/shared/) (actions, icons, typography, media, layout, feedback, content-actions) | [components/README.md](../components/README.md), [reusable-buttons.md](notes/components/reusable-buttons.md), [reusable-small-components.md](notes/components/reusable-small-components.md) |
 | YouTube embed + profile follow/follower modals | [youtube-and-social-lists.md](notes/components/showing-list-of-content/youtube-and-social-lists.md) |

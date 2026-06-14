@@ -8,7 +8,7 @@ import { useState, useEffect } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSearch } from "@fortawesome/free-solid-svg-icons";
 import GeneralButton from "@components/shared/actions/GeneralButton";
-import LoadingSpinner from "../ui/LoadingSpinner";
+import LoadingSpinner from "../shared/ui/LoadingSpinner";
 import ContentListing, {
   type ContentListingItem,
 } from "../ShowingListOfContent/ContentListing";

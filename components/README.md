@@ -13,7 +13,7 @@
 | Bulleted list row with paw icon | [`shared/lists/`](shared/lists/) |
 | Landing image + bullet block | [`shared/layout/`](shared/layout/) |
 | Like, follow, share on content | [`shared/content-actions/`](shared/content-actions/) |
-| Loading spinner, skeleton | [`ui/`](ui/) |
+| Loading spinner, skeleton | [`shared/ui/`](shared/ui/) |
 | Tied to one page, route, or feature | Feature folder (`Notifications/`, `Thanks/`, `FormComponents/`, …) |
 
 **Rule:** If it is generic and used in two or more features → `shared/{category}`. If it is tied to one feature → that feature folder.
@@ -29,7 +29,8 @@ shared/
 ├── media/            # ProfileImage, GifHover, ShowTime
 ├── lists/            # ListWithPawPrintIcon
 ├── layout/           # MediaObjectLeft, MediaObjectRight
-└── content-actions/  # Follow, like, share, SharingOptionsBar
+├── content-actions/  # Follow, like, share, SharingOptionsBar
+└── ui/               # LoadingSpinner, skeleton
 ```
 
 ## Legacy folders (removed)

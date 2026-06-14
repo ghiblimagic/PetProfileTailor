@@ -99,7 +99,7 @@ First `pnpm add` failed (`exit 1`) because pnpm `minimumReleaseAge` blocked pinn
 - `jest.config.ts`, `jest.setup.ts`, `TESTING.md`
 - `playwright.config.ts`, `e2e/login.spec.ts`
 - Unit tests: `utils/error.test.ts`, `utils/debounce.test.ts`, `utils/stringManipulation/normalizeString.test.ts`, `utils/api/checkIfValidContentType.test.ts`
-- Component test: `components/ui/skeleton.test.tsx`
+- Component test: `components/shared/ui/skeleton.test.tsx`
 
 ### Files modified
 
@@ -3957,7 +3957,7 @@ Converted seven leaf modules: profanity data (`blockList`), shared loading/login
 ### Files created
 
 - `data/blockList.ts`
-- `components/ui/LoadingSpinner.tsx`
+- `components/shared/ui/LoadingSpinner.tsx`
 - `components/shared/feedback/MustLoginMessage.tsx`
 - `components/ShowingListOfContent/YoutubeEmbed.tsx`
 - `components/ShowingListOfContent/UsersFollowingList.tsx`
@@ -3970,7 +3970,7 @@ Converted seven leaf modules: profanity data (`blockList`), shared loading/login
 ### Files removed
 
 - `data/blockList.js`
-- `components/ui/LoadingSpinner.js`
+- `components/shared/ui/LoadingSpinner.js`
 - `components/shared/feedback/MustLoginMessage.js`
 - `components/ShowingListOfContent/YoutubeEmbed.js`
 - `components/ShowingListOfContent/UsersFollowingList.js`
@@ -4950,3 +4950,28 @@ Replaced size-based `ReusableSmallComponents/` and `ReusableMediumComponents/` w
 ### Next logical step
 
 - Optional naming cleanup: `IconWithCount.tsx` → `IconBadge.tsx`, `ToggeableAlert` → `ToggleableAlert`
+
+---
+
+## 2026-06-07 — Move `components/ui/` into `shared/ui/`
+
+### What was built and why
+
+`LoadingSpinner` and `skeleton` are app-wide shared primitives — nesting them under `shared/ui/` matches the rest of the `shared/` taxonomy.
+
+### Files moved
+
+- `components/ui/LoadingSpinner.tsx` → `components/shared/ui/LoadingSpinner.tsx`
+- `components/ui/skeleton.tsx` + `skeleton.test.tsx` → `components/shared/ui/`
+
+### Files modified
+
+- ~16 import sites (`@components/shared/ui/...`, `../shared/ui/...`)
+- [`components/README.md`](components/README.md) — decision table + tree
+- [`components.json`](components.json) — shadcn `ui` alias → `@/components/shared/ui`
+- [`docs/README.md`](docs/README.md), [`small-ui-components.md`](docs/notes/components/ui/small-ui-components.md), [`TESTING.md`](TESTING.md)
+
+### Verification
+
+- `pnpm exec tsc --noEmit` — OK
+- `pnpm test` — OK (29 files, 147 tests)

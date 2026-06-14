@@ -19,7 +19,7 @@ import RegisterInput from "@components/FormComponents/RegisterInput";
 import StyledInput from "@components/FormComponents/StyledInput";
 import LinkButton from "@components/shared/actions/LinkButton";
 import { useRouter, useSearchParams } from "next/navigation";
-import LoadingSpinner from "./ui/LoadingSpinner";
+import LoadingSpinner from "./shared/ui/LoadingSpinner";
 import { useLocalStorageCooldown } from "@/hooks/useLocalStorageCooldown";
 
 type LoginFormValues = {

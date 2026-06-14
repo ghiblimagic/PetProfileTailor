@@ -2,7 +2,7 @@
 
 ## `LoadingSpinner`
 
-Source: [`components/ui/LoadingSpinner.tsx`](../../../components/ui/LoadingSpinner.tsx)
+Source: [`components/shared/ui/LoadingSpinner.tsx`](../../../components/shared/ui/LoadingSpinner.tsx)
 
 Centered loading state used across forms, listings, and embeds.
 
@@ -55,3 +55,9 @@ export default function MustLoginMessage({ text }: MustLoginMessageProps) {
 ```
 
 `text` is the verb phrase after “sign in to” — not a full sentence.
+
+## `Skeleton`
+
+Source: [`components/shared/ui/skeleton.tsx`](../../../components/shared/ui/skeleton.tsx)
+
+Pulse placeholder for loading layouts (shadcn-style primitive).
