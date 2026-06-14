@@ -4582,3 +4582,36 @@ Replaced Jest with Vitest for unit/component tests. Vitest aligns better with th
 - `pnpm test` — OK (20 files, 111 tests)
 - `pnpm exec tsc --noEmit` — OK
 - `pnpm build` — OK
+
+---
+
+## 2026-06-07 — First RTL batch + API auth guard tests
+
+### What was built and why
+
+Started the testing improvement plan: React Testing Library for leaf alert components, Vitest unit tests for `checkOwnership` / `checkIfAdmin` (high-risk API guards with no prior coverage).
+
+### Files created
+
+- `components/ReusableSmallComponents/buttons/WarningMessage.test.tsx`
+- `components/ReusableMediumComponents/ToggeableAlert.test.tsx`
+- `utils/api/checkOwnership.test.ts`
+- `utils/api/checkIfAdmin.test.ts`
+
+### Patterns
+
+- RTL: `userEvent` + small `useState` harnesses for dismiss behavior
+- API guards: `vi.hoisted` mock of `getSessionForApis` so tests do not import `lib/auth` / require `MONGODB_URI`
+
+### Files modified
+
+- `TESTING.md` — unit/component coverage table
+
+### Verification
+
+- `pnpm test` — OK (24 files, 126 tests)
+
+### Next logical step
+
+- `MustLoginMessage`, `StyledCheckbox`, `PreserveTextAfterSubmission` (more leaf RTL)
+- `CheckIfContentExists` with mocked `fetch`

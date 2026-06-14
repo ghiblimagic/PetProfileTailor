@@ -30,6 +30,16 @@ pnpm build
 
 Vitest + E2E green covers validation logic and the flows listed below. Manual checks on **dev** (`MONGODB_URI`) are only for what automation skips.
 
+### Unit + component (Vitest / RTL)
+
+| Area | Tests |
+|------|-------|
+| API auth guards | `checkOwnership.test.ts`, `checkIfAdmin.test.ts` |
+| Alert / validation UI | `WarningMessage.test.tsx`, `ToggeableAlert.test.tsx` |
+| Presentational | `skeleton.test.tsx` |
+
+RTL pattern: small harness with `useState` for dismiss flows; `userEvent` for clicks. API guards mock `getSessionForApis` via `vi.hoisted` (avoids loading `lib/auth` / Mongo).
+
 ---
 
 ## E2E (Playwright)
