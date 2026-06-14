@@ -4603,6 +4603,39 @@ Started the testing improvement plan: React Testing Library for leaf alert compo
 - RTL: `userEvent` + small `useState` harnesses for dismiss behavior
 - API guards: `vi.hoisted` mock of `getSessionForApis` so tests do not import `lib/auth` / require `MONGODB_URI`
 
+### Problems encountered
+
+**`checkOwnership` / `checkIfAdmin` — `MONGODB_URI not defined`**
+
+Importing `getSessionForApis` in the test file still loaded the real module → `lib/auth` → `utils/db` → throws without `MONGODB_URI`.
+
+Failed approach:
+
+```ts
+import { getSessionForApis } from "./getSessionForApis";
+vi.mock("./getSessionForApis");
+// vi.mocked(getSessionForApis) still evaluates real module graph
+```
+
+Fix — `vi.hoisted` mock before imports:
+
+```ts
+const mocks = vi.hoisted(() => ({
+  getSessionForApis: vi.fn(),
+}));
+
+vi.mock("./getSessionForApis", () => ({
+  getSessionForApis: mocks.getSessionForApis,
+}));
+
+import { checkOwnership } from "./checkOwnership";
+
+mocks.getSessionForApis.mockResolvedValue({
+  ok: true,
+  session: { user: { id: "creator-42", role: "user", status: "active" }, expires: "…" },
+});
+```
+
 ### Files modified
 
 - `TESTING.md` — unit/component coverage table
@@ -4615,3 +4648,140 @@ Started the testing improvement plan: React Testing Library for leaf alert compo
 
 - `MustLoginMessage`, `StyledCheckbox`, `PreserveTextAfterSubmission` (more leaf RTL)
 - `CheckIfContentExists` with mocked `fetch`
+
+---
+
+## 2026-06-07 — Second RTL batch (forms, gate, duplicate check)
+
+### What was built and why
+
+Continued RTL expansion: sign-in gate, checkbox components, and duplicate-check UI with mocked `fetch`. Added global `matchMedia` stub in `vitest.setup.ts` for `LoadingSpinner` during async check tests.
+
+### Files created
+
+- `components/ui/MustLoginMessage.test.tsx`
+- `components/FormComponents/StyledCheckbox.test.tsx`
+- `components/AddingNewData/preserveTextAfterSubmission.test.tsx`
+- `components/AddingNewData/CheckIfContentExists.test.tsx`
+
+### Files modified
+
+- `vitest.setup.ts` — `window.matchMedia` stub (guarded for jsdom only)
+- `docs/notes/vitest-setup.md`, `TESTING.md`
+
+### Patterns
+
+- `CheckIfContentExists` test harness restores parent `value` after child mount reset effect
+- `ContentListing` mocked to a stub for show-content flow
+- `vi.stubGlobal("fetch", …)` per test file
+
+### Problems encountered
+
+#### 1. `CheckIfContentExists` — duplicate/success messages never appeared
+
+On mount, `resetData("")` runs via `resetTrigger` effect and clears parent `value` through `onChange`. Search stays disabled when `contentCheck.length < 2`.
+
+Source (`CheckIfContentExists.tsx`):
+
+```ts
+useEffect(() => {
+  resetData(""); // calls parent onChange("") on mount
+}, [resetTrigger]);
+```
+
+Failed approach:
+
+```ts
+const [value, setValue] = useState(initial); // initial = "fluffy"
+// after child mount effect → value becomes ""
+```
+
+Fix (`CheckIfContentExists.test.tsx` harness):
+
+```ts
+const [value, setValue] = useState("");
+
+// Child resets parent value on mount; restore query text
+useEffect(() => {
+  setValue(initial);
+}, [initial]);
+```
+
+#### 2. `window.matchMedia is not a function`
+
+Search → `checkIsProcessing` → `LoadingSpinner` → `usePrefersReducedMotions` → `window.matchMedia` (missing in jsdom).
+
+```
+TypeError: window.matchMedia is not a function
+❯ hooks/usePrefersReducedMotions.ts
+```
+
+Fix (`vitest.setup.ts`):
+
+```ts
+if (typeof window !== "undefined") {
+  Object.defineProperty(window, "matchMedia", {
+    writable: true,
+    value: (query: string) => ({
+      matches: false,
+      media: query,
+      onchange: null,
+      addListener: () => {},
+      removeListener: () => {},
+      addEventListener: () => {},
+      removeEventListener: () => {},
+      dispatchEvent: () => false,
+    }),
+  });
+}
+```
+
+Without `typeof window !== "undefined"`, node-env suites fail:
+
+```
+ReferenceError: window is not defined
+❯ vitest.setup.ts (mongoDataCleanup.test.ts, @vitest-environment node)
+```
+
+#### 3. `StyledCheckbox` — `onChange` `target.checked` assertion failed
+
+Failed approach:
+
+```ts
+const onChange = vi.fn();
+render(
+  <StyledCheckbox label="Keep text" value="keep-text" checked={false} onChange={onChange} />,
+);
+await user.click(screen.getByRole("checkbox", { name: /keep text/i }));
+expect(onChange.mock.calls[0][0].target.checked).toBe(true); // got false
+```
+
+Fix — controlled wrapper + `toBeChecked()`:
+
+```tsx
+function ControlledCheckbox(props) {
+  const [checked, setChecked] = useState(false);
+  return (
+    <StyledCheckbox
+      {...props}
+      checked={checked}
+      onChange={(e) => setChecked(e.target.checked)}
+    />
+  );
+}
+
+render(<ControlledCheckbox label="Keep text" value="keep-text" />);
+const checkbox = screen.getByRole("checkbox", { name: /keep text/i });
+expect(checkbox).not.toBeChecked();
+await user.click(checkbox);
+expect(checkbox).toBeChecked();
+```
+
+### Verification
+
+- `pnpm test` — OK (28 files, 141 tests)
+
+### Next logical step
+
+- `RegisterForm` client validation (mock reCAPTCHA)
+- Thanks notifications E2E (still no Playwright coverage)

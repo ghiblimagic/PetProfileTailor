@@ -36,9 +36,11 @@ Vitest + E2E green covers validation logic and the flows listed below. Manual ch
 |------|-------|
 | API auth guards | `checkOwnership.test.ts`, `checkIfAdmin.test.ts` |
 | Alert / validation UI | `WarningMessage.test.tsx`, `ToggeableAlert.test.tsx` |
+| Form / gate UI | `MustLoginMessage.test.tsx`, `StyledCheckbox.test.tsx`, `preserveTextAfterSubmission.test.tsx` |
+| Duplicate check UI | `CheckIfContentExists.test.tsx` (mocked `fetch` + `ContentListing`) |
 | Presentational | `skeleton.test.tsx` |
 
-RTL pattern: small harness with `useState` for dismiss flows; `userEvent` for clicks. API guards mock `getSessionForApis` via `vi.hoisted` (avoids loading `lib/auth` / Mongo).
+RTL pattern: small harness with `useState` for dismiss flows; `userEvent` for clicks. API guards mock `getSessionForApis` via `vi.hoisted` (avoids loading `lib/auth` / Mongo). `CheckIfContentExists` harness restores parent `value` after the component’s mount `resetTrigger` effect clears it.
 
 ---
 

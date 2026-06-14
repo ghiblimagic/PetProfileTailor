@@ -8,6 +8,7 @@ Global Vitest setup run before every unit/component test file.
 
 1. **`@testing-library/jest-dom/vitest`** — registers DOM matchers (`.toBeInTheDocument()`, `.toHaveClass()`, etc.) on Vitest's `expect`. The package name still says "jest-dom"; the `/vitest` entry point wires matchers into Vitest instead of Jest.
 2. **`TextEncoder` / `TextDecoder` polyfill** — required when tests import mongoose/mongodb
+3. **`window.matchMedia` stub** — `LoadingSpinner` uses `usePrefersReducedMotions`; jsdom does not implement `matchMedia`
 
 ## TextEncoder polyfill
 
