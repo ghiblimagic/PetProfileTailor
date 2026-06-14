@@ -150,6 +150,9 @@ Playwright maps `MONGODB_URI_TEST` → `MONGODB_URI` when starting the server. `
 - Unauthenticated `GET` on names / descriptions / thanks → 401
 - Name notifications — `likedBy` and `contentId` populated (not bare ids; regression for populate model imports)
 - Description notifications — same populate shape after admin like
+- Thank notifications — admin `POST /api/thanks` on seeded name/description → user `GET /api/notifications/thanks` has populated `thanksBy` + content
+- Self-thank — `POST /api/thanks` on own content → 400
+- `PATCH /api/notifications/thanks/mark-read` → all thank notifications `read: true`
 - `PATCH /api/notifications/names/mark-read` → all name like notifications `read: true`
 
 ### Fixture data
@@ -207,7 +210,7 @@ E2E cannot exercise these (bypassed or skipped).
 - [ ] `/notifications` **UI** — mark read persists (E2E covers names mark-read **API** only)
 - [ ] `/notifications` UI — description and thanks tabs render populated rows
 - [ ] Profile follow / unfollow via **UI** (followers list is commented out on profile)
-- [ ] **Thanks** notifications — submit thank via UI/API → appears in `/api/notifications/thanks` (no E2E yet)
+- [ ] `/notifications` **UI** — thanks tab renders populated rows (E2E covers thanks **API** + mark-read only)
 - [ ] Thank, suggestion, report flows — submit without 500; lists load if exposed
 
 ### Data shape & listing UX

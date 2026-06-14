@@ -4832,3 +4832,36 @@ async function submitRegister(user) {
 
 - Thanks notifications E2E (`e2e/notifications.spec.ts` extension or new spec)
 - `RegisterInput` leaf tests (optional; mostly covered via `RegisterForm`)
+
+---
+
+## 2026-06-07 — Thanks notifications E2E
+
+### What was built and why
+
+Extended Playwright notification coverage for the thanks flow — previously only the unauthenticated 401 on `/api/notifications/thanks` was tested.
+
+### Files created
+
+- `e2e/helpers/thanks.ts` — `submitThanks`, `expectSelfThankRejected`
+
+### Files modified
+
+- `e2e/notifications.spec.ts` — thank populate (name + description), self-thank 400, `PATCH .../thanks/mark-read`
+- `TESTING.md` — E2E coverage list + manual checklist note
+
+### Patterns
+
+- Serial suite with like tests: admin submits thanks → regular user reads `/api/notifications/thanks`
+- Seeded `SEED_NAME` / `SEED_DESCRIPTION_START` (owned by playwright user) + admin as thanker
+- Mark-read test skips if no thank rows (same pattern as names mark-read)
+
+### Verification
+
+- `pnpm test` — OK (unit/component unchanged, 147 tests)
+- `pnpm test:e2e` — requires `MONGODB_URI_TEST` + seed; run locally against test DB
+
+### Next logical step
+
+- `/notifications` UI thanks tab (Playwright browser assertions)
+- Description/thanks `mark-read` UI persistence on `/notifications` page
