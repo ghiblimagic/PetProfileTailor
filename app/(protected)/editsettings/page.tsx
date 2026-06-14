@@ -9,14 +9,14 @@ import { useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 import { getError } from "@utils/error";
 import axios from "axios";
-import GeneralButton from "@components/shared/actions/GeneralButton";
+import GeneralButton from "@components/Shared/actions/GeneralButton";
 import Image from "next/image";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import ImageUpload from "@components/AddingNewData/ImageUpload";
 import RegisterInput from "@components/FormComponents/RegisterInput";
-import LoadingSpinner from "@/components/shared/ui/LoadingSpinner";
-import SmallCenteredHeading from "@/components/shared/typography/SmallCenteredHeading";
+import LoadingSpinner from "@/components/Shared/ui/LoadingSpinner";
+import SmallCenteredHeading from "@/components/Shared/typography/SmallCenteredHeading";
 
 type EditSettingsFormValues = {
   name: string;

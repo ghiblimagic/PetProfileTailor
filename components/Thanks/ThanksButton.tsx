@@ -5,8 +5,8 @@
 "use client";
 
 import type { MouseEventHandler } from "react";
-import ContainerForLikeShareFlag from "../shared/content-actions/ContainerForLikeShareFlag";
-import Thanks from "@components/shared/icons/svg/thanks";
+import ContainerForLikeShareFlag from "../Shared/content-actions/ContainerForLikeShareFlag";
+import Thanks from "@components/Shared/icons/svg/thanks";
 
 export type ThanksButtonProps = {
   onClick: MouseEventHandler<HTMLButtonElement>;

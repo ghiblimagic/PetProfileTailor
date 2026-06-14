@@ -12,14 +12,14 @@ import { toast } from "react-toastify";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPaw } from "@fortawesome/free-solid-svg-icons";
 import "@fortawesome/fontawesome-svg-core/styles.css";
-import GeneralButton from "@components/shared/actions/GeneralButton";
+import GeneralButton from "@components/Shared/actions/GeneralButton";
 import Image from "next/image";
-import NounBlackCatIcon from "@components/shared/icons/svg/NounBlackCatIcon";
+import NounBlackCatIcon from "@components/Shared/icons/svg/NounBlackCatIcon";
 import RegisterInput from "@components/FormComponents/RegisterInput";
 import StyledInput from "@components/FormComponents/StyledInput";
-import LinkButton from "@components/shared/actions/LinkButton";
+import LinkButton from "@components/Shared/actions/LinkButton";
 import { useRouter, useSearchParams } from "next/navigation";
-import LoadingSpinner from "./shared/ui/LoadingSpinner";
+import LoadingSpinner from "./Shared/ui/LoadingSpinner";
 import { useLocalStorageCooldown } from "@/hooks/useLocalStorageCooldown";
 
 type LoginFormValues = {

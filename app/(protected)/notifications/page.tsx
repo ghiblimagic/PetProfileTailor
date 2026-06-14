@@ -11,7 +11,7 @@ import { serverAuthOptions } from "@/lib/auth";
 import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
 import ToggleOneNotificationPage from "@/components/Notifications/ToggleOneNotificationPage";
-import PageTitleWithImages from "@/components/shared/typography/PageTitleWithImages";
+import PageTitleWithImages from "@/components/Shared/typography/PageTitleWithImages";
 import { getPaginatedNotifications } from "@/utils/api/getPaginatedNotifications";
 import type { NotificationTabConfig } from "@/components/Notifications/ToggleOneNotificationPage";
 

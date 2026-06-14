@@ -8,7 +8,7 @@ import { useEffect, useState, type SubmitEvent, type ChangeEvent } from "react";
 import axios from "axios";
 import Image from "next/image";
 import { toast } from "react-toastify";
-import WarningMessage from "@components/shared/feedback/WarningMessage";
+import WarningMessage from "@components/Shared/feedback/WarningMessage";
 import regexInvalidInput from "@/utils/stringManipulation/check-for-valid-content";
 import TagsSelectAndCheatSheet from "@components/FormComponents/TagsSelectAndCheatSheet";
 import { useTags } from "@hooks/useTags";
@@ -16,7 +16,7 @@ import StyledTextarea from "@components/FormComponents/StyledTextarea";
 import { useSession } from "next-auth/react";
 import CheckIfContentExists from "./CheckIfContentExists";
 import PreserveTextAfterSubmission from "./preserveTextAfterSubmission";
-import ToggeableAlert from "../shared/feedback/ToggeableAlert";
+import ToggeableAlert from "../Shared/feedback/ToggeableAlert";
 
 export default function NewNameWithTagsData() {
   const [newName, setNewName] = useState("");

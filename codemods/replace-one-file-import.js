@@ -1,5 +1,5 @@
 /**
- * Codemod to replace ../shared/... imports
+ * Codemod to replace ../Shared/... imports
  * with @components/...
  */
 

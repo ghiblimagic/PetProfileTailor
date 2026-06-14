@@ -2,8 +2,8 @@
 
 Sources:
 
-- [`Footer.tsx`](../../../components/footer/Footer.tsx)
-- [`FooterLink.tsx`](../../../components/footer/FooterLink.tsx)
+- [`Footer.tsx`](../../../components/Footer/Footer.tsx)
+- [`FooterLink.tsx`](../../../components/Footer/FooterLink.tsx)
 
 ## Role
 

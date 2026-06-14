@@ -19,8 +19,8 @@ import "@fortawesome/fontawesome-svg-core/styles.css";
 
 import NotificationsButton from "@components/Notifications/NotificationsButton";
 
-import ProfileImage from "@components/shared/media/ProfileImage";
-import LinkButton from "@components/shared/actions/LinkButton";
+import ProfileImage from "@components/Shared/media/ProfileImage";
+import LinkButton from "@components/Shared/actions/LinkButton";
 
 export default function NavLayoutwithSettingsMenu() {
   // Use client-side session for reactive updates

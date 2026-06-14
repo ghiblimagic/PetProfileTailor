@@ -4,8 +4,8 @@
  */
 "use client";
 
-import XSvgIcon from "@components/shared/icons/XSvgIcon";
-import GeneralButton from "@components/shared/actions/GeneralButton";
+import XSvgIcon from "@components/Shared/icons/XSvgIcon";
+import GeneralButton from "@components/Shared/actions/GeneralButton";
 
 export type DeleteContentNotificationProps = {
   setShowDeleteConfirmation: (show: boolean) => void;

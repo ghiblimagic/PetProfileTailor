@@ -5,8 +5,8 @@
 "use client";
 
 import { useState } from "react";
-import GeneralButton from "@components/shared/actions/GeneralButton";
-import LoadingSpinner from "../shared/ui/LoadingSpinner";
+import GeneralButton from "@components/Shared/actions/GeneralButton";
+import LoadingSpinner from "../Shared/ui/LoadingSpinner";
 
 export type YoutubeEmbedProps = {
   embedId: string;

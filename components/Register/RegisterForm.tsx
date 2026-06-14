@@ -6,7 +6,7 @@ import { useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 import { useRouter, useSearchParams } from "next/navigation";
 import axios, { isAxiosError } from "axios";
-import GeneralButton from "@components/shared/actions/GeneralButton";
+import GeneralButton from "@components/Shared/actions/GeneralButton";
 import Image from "next/image";
 import "@fortawesome/fontawesome-svg-core/styles.css";
 import { usePrefersReducedMotion } from "@/hooks/usePrefersReducedMotions";
@@ -18,7 +18,7 @@ import {
 } from "@/utils/api/e2eTestMode";
 import type { SignupFieldErrors } from "@/utils/api/validateSignupSubmission";
 import RegisterInput from "@components/FormComponents/RegisterInput";
-import LoadingSpinner from "@/components/shared/ui/LoadingSpinner";
+import LoadingSpinner from "@/components/Shared/ui/LoadingSpinner";
 
 type RegisterFormValues = {
   name: string;

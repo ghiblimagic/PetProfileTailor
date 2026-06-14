@@ -6,8 +6,8 @@
 
 import { useState, type FormEvent } from "react";
 import axios from "axios";
-import GeneralButton from "@components/shared/actions/GeneralButton";
-import DisabledButton from "@components/shared/actions/DisabledButton";
+import GeneralButton from "@components/Shared/actions/GeneralButton";
+import DisabledButton from "@components/Shared/actions/DisabledButton";
 import StyledInput from "@components/FormComponents/StyledInput";
 import StyledSelect from "@components/FormComponents/StyledSelect";
 import { useCategoriesForDataType } from "@/hooks/useCategoriesForDataType";

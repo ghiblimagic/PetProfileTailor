@@ -2,7 +2,7 @@
  * Add-description page shell — title + `addingdescription` form.
  * Notes: docs/notes/app/adddescriptions-page.md
  */
-import PageTitleWithImages from "@components/shared/typography/PageTitleWithImages";
+import PageTitleWithImages from "@components/Shared/typography/PageTitleWithImages";
 import AddingDescription from "@components/AddingNewData/addingdescription";
 
 export default function AddDescriptionsPage() {

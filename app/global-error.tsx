@@ -5,7 +5,7 @@
 "use client";
 
 import Image from "next/image";
-import PageTitleWithImages from "@components/shared/typography/PageTitleWithImages";
+import PageTitleWithImages from "@components/Shared/typography/PageTitleWithImages";
 import ErrorContactMessage from "@/components/Contact/ErrorContactMessage";
 
 type GlobalErrorProps = {

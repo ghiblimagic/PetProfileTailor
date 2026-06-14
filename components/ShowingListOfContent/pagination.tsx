@@ -5,7 +5,7 @@
 "use client";
 
 import { useEffect, useState, useRef, useMemo } from "react";
-import GeneralButton from "@components/shared/actions/GeneralButton";
+import GeneralButton from "@components/Shared/actions/GeneralButton";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faChevronCircleRight } from "@fortawesome/free-solid-svg-icons";
 import startCooldown from "@utils/startCooldown";

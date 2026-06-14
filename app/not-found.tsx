@@ -6,7 +6,7 @@
 
 import Image from "next/image";
 import { useState } from "react";
-import PageTitleWithImages from "@components/shared/typography/PageTitleWithImages";
+import PageTitleWithImages from "@components/Shared/typography/PageTitleWithImages";
 import { usePrefersReducedMotion } from "@/hooks/usePrefersReducedMotions";
 import ErrorContactMessage from "@/components/Contact/ErrorContactMessage";
 

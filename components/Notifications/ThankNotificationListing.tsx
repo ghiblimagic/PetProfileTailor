@@ -7,8 +7,8 @@
 import React, { useEffect, useRef, useState } from "react";
 import { formatDistanceStrict } from "date-fns";
 import Link from "next/link";
-import ProfileImage from "../shared/media/ProfileImage";
-import Thanks from "@components/shared/icons/svg/thanks";
+import ProfileImage from "../Shared/media/ProfileImage";
+import Thanks from "@components/Shared/icons/svg/thanks";
 import { useRouter } from "next/navigation";
 import type { NotificationListingProps } from "./NotifListingWrapper";
 

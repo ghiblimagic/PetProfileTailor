@@ -5,8 +5,8 @@
 "use client";
 
 import type { ComponentType, ReactNode } from "react";
-import LoadingSpinner from "@components/shared/ui/LoadingSpinner";
-import GeneralButton from "@components/shared/actions/GeneralButton";
+import LoadingSpinner from "@components/Shared/ui/LoadingSpinner";
+import GeneralButton from "@components/Shared/actions/GeneralButton";
 import Image from "next/image";
 import { useLocalStorageCooldown } from "@/hooks/useLocalStorageCooldown";
 import type {

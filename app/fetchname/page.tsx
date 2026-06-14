@@ -5,10 +5,10 @@
 "use client";
 
 import { useState, useEffect, type ChangeEvent } from "react";
-import PageTitleWithImages from "@components/shared/typography/PageTitleWithImages";
+import PageTitleWithImages from "@components/Shared/typography/PageTitleWithImages";
 import CheckIfContentExists from "@/components/AddingNewData/CheckIfContentExists";
 import regexInvalidInput from "@/utils/stringManipulation/check-for-valid-content";
-import WarningMessage from "@/components/shared/feedback/WarningMessage";
+import WarningMessage from "@/components/Shared/feedback/WarningMessage";
 
 const MAX_NAME_LENGTH = 50;
 

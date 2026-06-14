@@ -5,12 +5,12 @@
 "use client";
 
 import { useState, type SubmitEvent } from "react";
-import GeneralButton from "@components/shared/actions/GeneralButton";
+import GeneralButton from "@components/Shared/actions/GeneralButton";
 import { toast } from "react-toastify";
 import axios from "axios";
 import { Field } from "@headlessui/react";
 import StyledCheckbox from "@components/FormComponents/StyledCheckbox";
-import ClosingXButton from "@components/shared/actions/ClosingXButton";
+import ClosingXButton from "@components/Shared/actions/ClosingXButton";
 import {
   thanksOptionsProfessional,
   thanksOptionsPetOwners,
@@ -18,8 +18,8 @@ import {
 } from "@/data/ThanksOptions";
 import type { ContentType } from "@/utils/api/checkIfValidContentType";
 import { useSession } from "next-auth/react";
-import MustLoginMessage from "@components/shared/feedback/MustLoginMessage";
-import LoadingSpinner from "../shared/ui/LoadingSpinner";
+import MustLoginMessage from "@components/Shared/feedback/MustLoginMessage";
+import LoadingSpinner from "../Shared/ui/LoadingSpinner";
 
 type ThanksContentInfo = {
   _id: string;

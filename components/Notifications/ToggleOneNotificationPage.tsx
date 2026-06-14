@@ -14,8 +14,8 @@ import {
 } from "@/hooks/useSwrSimple";
 import LikesContentListing from "./LikeNotificationListing";
 import NotifListingWrapper from "./NotifListingWrapper";
-import IconOpenCloseButton from "../shared/actions/iconOpenCloseButton";
-import type { IconBadgeName } from "../shared/icons/IconWithCount";
+import IconOpenCloseButton from "../Shared/actions/iconOpenCloseButton";
+import type { IconBadgeName } from "../Shared/icons/IconWithCount";
 
 export type NotificationModelType = SwrModelType;
 

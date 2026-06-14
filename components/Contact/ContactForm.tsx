@@ -6,10 +6,10 @@ import {
   sendContactEmail,
   type ContactEmailState,
 } from "@/app/actions/sendContactEmail";
-import LoadingSpinner from "../shared/ui/LoadingSpinner";
+import LoadingSpinner from "../Shared/ui/LoadingSpinner";
 import StyledInput from "../FormComponents/StyledInput";
 import StyledTextarea from "../FormComponents/StyledTextarea";
-import GeneralButton from "../shared/actions/GeneralButton";
+import GeneralButton from "../Shared/actions/GeneralButton";
 
 // for bots that send messages too quickly
 

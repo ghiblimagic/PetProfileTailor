@@ -2,7 +2,7 @@
 
 ## `LoadingSpinner`
 
-Source: [`components/shared/ui/LoadingSpinner.tsx`](../../../components/shared/ui/LoadingSpinner.tsx)
+Source: [`components/Shared/ui/LoadingSpinner.tsx`](../../../components/Shared/ui/LoadingSpinner.tsx)
 
 Centered loading state used across forms, listings, and embeds.
 
@@ -32,7 +32,7 @@ export default function LoadingSpinner() {
 
 ## `MustLoginMessage`
 
-Source: [`components/shared/feedback/MustLoginMessage.tsx`](../../../components/shared/feedback/MustLoginMessage.tsx)
+Source: [`components/Shared/feedback/MustLoginMessage.tsx`](../../../components/Shared/feedback/MustLoginMessage.tsx)
 
 Red banner for gated actions (reports, suggestions, thanks, etc.).
 
@@ -58,6 +58,6 @@ export default function MustLoginMessage({ text }: MustLoginMessageProps) {
 
 ## `Skeleton`
 
-Source: [`components/shared/ui/skeleton.tsx`](../../../components/shared/ui/skeleton.tsx)
+Source: [`components/Shared/ui/skeleton.tsx`](../../../components/Shared/ui/skeleton.tsx)
 
 Pulse placeholder for loading layouts (shadcn-style primitive).

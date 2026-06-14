@@ -4,7 +4,7 @@ Source: [`app/api/user/updatefollows/route.ts`](../../../app/api/user/updatefoll
 
 ## Overview
 
-`PUT /api/user/updatefollows` — toggles a follow edge for the authenticated user. Called by [`FollowButton.tsx`](../../../components/shared/content-actions/FollowButton.tsx).
+`PUT /api/user/updatefollows` — toggles a follow edge for the authenticated user. Called by [`FollowButton.tsx`](../../../components/Shared/content-actions/FollowButton.tsx).
 
 ## Request body
 

@@ -2,10 +2,10 @@
  * Modal list of users someone follows (profile page).
  * Notes: docs/notes/components/showing-list-of-content/youtube-and-social-lists.md
  */
-import XSvgIcon from "@components/shared/icons/XSvgIcon";
-import FollowButton from "@components/shared/content-actions/FollowButton";
-import ProfileImage from "@components/shared/media/ProfileImage";
-import GifHover from "@components/shared/media/GifHover";
+import XSvgIcon from "@components/Shared/icons/XSvgIcon";
+import FollowButton from "@components/Shared/content-actions/FollowButton";
+import ProfileImage from "@components/Shared/media/ProfileImage";
+import GifHover from "@components/Shared/media/GifHover";
 import type { FollowingUser } from "@/utils/api/getUserFollowing";
 import type { Session } from "next-auth";
 

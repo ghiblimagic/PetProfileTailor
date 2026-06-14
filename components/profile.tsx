@@ -13,9 +13,9 @@ import EditBioAndProfile from "@components/EditingData/EditBioAndProfile";
 import ToggleOneContentPage, {
   type ToggleContentListItem,
 } from "./ShowingListOfContent/ToggleOneContentPage";
-import GeneralButton from "./shared/actions/GeneralButton";
+import GeneralButton from "./Shared/actions/GeneralButton";
 import { useSession } from "next-auth/react";
-import ProfileImage from "./shared/media/ProfileImage";
+import ProfileImage from "./Shared/media/ProfileImage";
 
 export type ProfileUserData = {
   _id: string;
