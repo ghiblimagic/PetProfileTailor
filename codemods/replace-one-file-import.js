@@ -1,5 +1,5 @@
 /**
- * Codemod to replace ../ReusableSmallComponents/... imports
+ * Codemod to replace ../shared/... imports
  * with @components/...
  */
 

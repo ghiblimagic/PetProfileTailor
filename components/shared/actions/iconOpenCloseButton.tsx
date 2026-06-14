@@ -4,7 +4,7 @@
  */
 "use client";
 
-import IconBadge, { type IconBadgeName } from "../IconWithCount";
+import IconBadge, { type IconBadgeName } from "../icons/IconWithCount";
 
 export type IconOpenCloseButtonProps<T extends string> = {
   state: T | null;

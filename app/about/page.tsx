@@ -4,7 +4,7 @@
  */
 "use client";
 
-import PageTitleWithImages from "@components/ReusableSmallComponents/TitlesOrHeadings/PageTitleWithImages";
+import PageTitleWithImages from "@components/shared/typography/PageTitleWithImages";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faBriefcase,

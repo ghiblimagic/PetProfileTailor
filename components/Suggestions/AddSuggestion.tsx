@@ -5,18 +5,18 @@
 "use client";
 
 import { useState, type ChangeEvent, type SubmitEvent } from "react";
-import GeneralButton from "@components/ReusableSmallComponents/buttons/GeneralButton";
+import GeneralButton from "@components/shared/actions/GeneralButton";
 import { toast } from "react-toastify";
 import axios from "axios";
 import { Field } from "@headlessui/react";
 import StyledTextarea from "@components/FormComponents/StyledTextarea";
 import StyledCheckbox from "@components/FormComponents/StyledCheckbox";
-import ClosingXButton from "@components/ReusableSmallComponents/buttons/ClosingXButton";
+import ClosingXButton from "@components/shared/actions/ClosingXButton";
 import { useSuggestions } from "@context/SuggestionsContext";
 import { useTags } from "@/hooks/useTags";
 import TagsSelectAndCheatSheet from "../FormComponents/TagsSelectAndCheatSheet";
 import { useSession } from "next-auth/react";
-import MustLoginMessage from "@components/ui/MustLoginMessage";
+import MustLoginMessage from "@components/shared/feedback/MustLoginMessage";
 import type { ContentType } from "@/utils/api/checkIfValidContentType";
 
 export type SuggestionContentTag = {

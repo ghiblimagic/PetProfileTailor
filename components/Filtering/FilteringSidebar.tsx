@@ -15,9 +15,9 @@ import {
   DisclosurePanel,
 } from "@headlessui/react";
 import { ChevronUpIcon } from "@heroicons/react/20/solid";
-import GeneralButton from "@components/ReusableSmallComponents/buttons/GeneralButton";
+import GeneralButton from "@components/shared/actions/GeneralButton";
 import StyledCheckbox from "@components/FormComponents/StyledCheckbox";
-import ClosingXButton from "@components/ReusableSmallComponents/buttons/ClosingXButton";
+import ClosingXButton from "@components/shared/actions/ClosingXButton";
 import { useCategoriesForDataType } from "@/hooks/useCategoriesForDataType";
 import type { ContentType } from "@/utils/api/checkIfValidContentType";
 

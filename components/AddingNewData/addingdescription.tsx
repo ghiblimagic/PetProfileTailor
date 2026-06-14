@@ -7,7 +7,7 @@
 import { useState, type SubmitEvent, type ChangeEvent } from "react";
 import axios from "axios";
 import Image from "next/image";
-import WarningMessage from "../ReusableSmallComponents/buttons/WarningMessage";
+import WarningMessage from "../shared/feedback/WarningMessage";
 import { toast } from "react-toastify";
 import TagsSelectAndCheatSheet from "../FormComponents/TagsSelectAndCheatSheet";
 import { useTags } from "@/hooks/useTags";

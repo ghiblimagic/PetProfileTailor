@@ -5,10 +5,10 @@
 "use client";
 
 import HeroTop from "@components/LandingPage/HeroTop";
-import MediaObjectLeft from "@components/ReusableMediumComponents/MediaObjectLeft";
-import MediaObjectRight from "@components/ReusableMediumComponents/MediaObjectRight";
+import MediaObjectLeft from "@components/shared/layout/MediaObjectLeft";
+import MediaObjectRight from "@components/shared/layout/MediaObjectRight";
 import Image from "next/image";
-import WideCenteredHeading from "@components/ReusableSmallComponents/TitlesOrHeadings/WideCenteredHeading";
+import WideCenteredHeading from "@components/shared/typography/WideCenteredHeading";
 import YoutubeEmbed from "@components/ShowingListOfContent/YoutubeEmbed";
 import { useState } from "react";
 

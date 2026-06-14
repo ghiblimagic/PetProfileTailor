@@ -51,7 +51,7 @@ All three use `{ timestamps: true }` and explicit MongoDB collection names (thir
 | `Follow` | `migrations/followersIntoFollowDb.js` | Copy `User.followers[]` into `follows` collection |
 | `Follow` | `app/api/user/grabusersfollowing/[userid]/route.ts` | List who a user follows (`getUserFollowing`) |
 
-**Note:** [`FollowButton.tsx`](../../components/ReusableSmallComponents/buttons/FollowButton.tsx) calls `app/api/user/updatefollows` — that creates/deletes `Follow` documents in the `follows` collection.
+**Note:** [`FollowButton.tsx`](../../components/shared/content-actions/FollowButton.tsx) calls `app/api/user/updatefollows` — that creates/deletes `Follow` documents in the `follows` collection.
 
 ---
 

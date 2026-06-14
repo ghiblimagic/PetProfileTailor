@@ -11,7 +11,7 @@ import Select, { type StylesConfig } from "react-select";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPaw } from "@fortawesome/free-solid-svg-icons";
 import { useCategoriesForDataType } from "@/hooks/useCategoriesForDataType";
-import GeneralButton from "../ReusableSmallComponents/buttons/GeneralButton";
+import GeneralButton from "../shared/actions/GeneralButton";
 import type { TagOption, TagCheckboxChange } from "@/hooks/useTags";
 import type { ContentType } from "@/utils/api/checkIfValidContentType";
 

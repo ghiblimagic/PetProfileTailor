@@ -2,8 +2,8 @@
  * Landing/marketing block: image left, bullet list + link button right.
  * Notes: docs/notes/components/media-object.md
  */
-import ListWithPawPrintIcon from "@components/ReusableSmallComponents/ListWithPawPrintIcon";
-import LinkButton from "@components/ReusableSmallComponents/buttons/LinkButton";
+import ListWithPawPrintIcon from "@components/shared/lists/ListWithPawPrintIcon";
+import LinkButton from "@components/shared/actions/LinkButton";
 import Image from "next/image";
 import type { ComponentProps } from "react";
 

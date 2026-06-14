@@ -5,11 +5,11 @@
 "use client";
 
 import Link from "next/link";
-import PageTitleWithImages from "@components/ReusableSmallComponents/TitlesOrHeadings/PageTitleWithImages";
-import ListWithPawPrintIcon from "@components/ReusableSmallComponents/ListWithPawPrintIcon";
+import PageTitleWithImages from "@components/shared/typography/PageTitleWithImages";
+import ListWithPawPrintIcon from "@components/shared/lists/ListWithPawPrintIcon";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEnvelope, faMessage } from "@fortawesome/free-solid-svg-icons";
-import PawPrintIcon from "@components/ReusableSmallComponents/iconsOrSvgImages/PawPrintIcon";
+import PawPrintIcon from "@components/shared/icons/PawPrintIcon";
 import Image from "next/image";
 
 export default function TestPage() {

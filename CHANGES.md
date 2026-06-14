@@ -1367,7 +1367,7 @@ Converted the register form to TypeScript as part of the signup-route migration.
 
 - `components/Register/RegisterForm.tsx`
 - `components/FormComponents/RegisterInput.d.ts`
-- `components/ReusableSmallComponents/buttons/GeneralButton.d.ts`
+- `components/shared/actions/GeneralButton.d.ts`
 
 ### Files removed
 
@@ -1754,7 +1754,7 @@ Converted contact page wrapper to TypeScript. Renamed default export `CustomErro
 ### Files created
 
 - `app/contact/page.tsx`
-- `components/ReusableSmallComponents/TitlesOrHeadings/PageTitleWithImages.d.ts`
+- `components/shared/typography/PageTitleWithImages.d.ts`
 
 ### Files removed
 
@@ -1783,12 +1783,12 @@ Convert `app/(protected)/notifications/page.jsx` or `app/api/user/likes/route.js
 
 ### Files created
 
-- `components/ReusableSmallComponents/TitlesOrHeadings/PageTitleWithImages.tsx`
+- `components/shared/typography/PageTitleWithImages.tsx`
 
 ### Files removed
 
-- `components/ReusableSmallComponents/TitlesOrHeadings/PageTitleWithImages.jsx`
-- `components/ReusableSmallComponents/TitlesOrHeadings/PageTitleWithImages.d.ts`
+- `components/shared/typography/PageTitleWithImages.jsx`
+- `components/shared/typography/PageTitleWithImages.d.ts`
 
 ### Verification
 
@@ -2259,7 +2259,7 @@ Converted debounced optimistic-toggle hook to `.ts`, replacing the interim `.d.t
 
 ### Next logical step
 
-Convert `hooks/useLocalStorageCooldown.js` or `components/ReusableSmallComponents/buttons/LikesButtonAndLikesLogic.js`.
+Convert `hooks/useLocalStorageCooldown.js` or `components/shared/content-actions/LikesButtonAndLikesLogic.js`.
 
 ---
 
@@ -2288,7 +2288,7 @@ Converted localStorage cooldown hook to `.ts`. Exported `UseLocalStorageCooldown
 
 ### Next logical step
 
-Convert `components/ReusableSmallComponents/buttons/LikesButtonAndLikesLogic.js` or `components/ReusableSmallComponents/IconWithCount.jsx`.
+Convert `components/shared/content-actions/LikesButtonAndLikesLogic.js` or `components/shared/icons/IconWithCount.jsx`.
 
 ---
 
@@ -2300,11 +2300,11 @@ Converted listing like button to `.tsx`. Exported `LikesButtonAndLikesLogicProps
 
 ### Files created
 
-- `components/ReusableSmallComponents/buttons/LikesButtonAndLikesLogic.tsx`
+- `components/shared/content-actions/LikesButtonAndLikesLogic.tsx`
 
 ### Files removed
 
-- `components/ReusableSmallComponents/buttons/LikesButtonAndLikesLogic.js`
+- `components/shared/content-actions/LikesButtonAndLikesLogic.js`
 
 ### Files modified
 
@@ -2317,7 +2317,7 @@ Converted listing like button to `.tsx`. Exported `LikesButtonAndLikesLogicProps
 
 ### Next logical step
 
-Convert `components/ShowingListOfContent/ContentListing.jsx` or `components/ReusableSmallComponents/IconWithCount.jsx`.
+Convert `components/ShowingListOfContent/ContentListing.jsx` or `components/shared/icons/IconWithCount.jsx`.
 
 ---
 
@@ -2329,11 +2329,11 @@ Converted icon + unread badge component to `.tsx` (default export still `IconBad
 
 ### Files created
 
-- `components/ReusableSmallComponents/IconWithCount.tsx`
+- `components/shared/icons/IconWithCount.tsx`
 
 ### Files removed
 
-- `components/ReusableSmallComponents/IconWithCount.jsx`
+- `components/shared/icons/IconWithCount.jsx`
 
 ### Files modified
 
@@ -2358,15 +2358,15 @@ Converted `thanks.jsx` → `thanks.tsx`; removed unused `props` destructuring th
 
 ### Files created
 
-- `components/ReusableSmallComponents/iconsOrSvgImages/svgImages/thanks.tsx`
+- `components/shared/icons/svg/thanks.tsx`
 
 ### Files removed
 
-- `components/ReusableSmallComponents/iconsOrSvgImages/svgImages/thanks.jsx`
+- `components/shared/icons/svg/thanks.jsx`
 
 ### Files modified
 
-- `components/ReusableSmallComponents/IconWithCount.tsx`
+- `components/shared/icons/IconWithCount.tsx`
 - `components/Notifications/ThankNotificationListing.tsx`
 - `docs/notes/app/notifications-page.md`
 
@@ -2389,11 +2389,11 @@ Converted profile avatar component to `.tsx` with optional `href` and `onClick`.
 
 ### Files created
 
-- `components/ReusableSmallComponents/ProfileImage.tsx`
+- `components/shared/media/ProfileImage.tsx`
 
 ### Files removed
 
-- `components/ReusableSmallComponents/ProfileImage.js`
+- `components/shared/media/ProfileImage.js`
 
 ### Files modified
 
@@ -2420,11 +2420,11 @@ Converted notifications tab button to `.tsx`. Generic `IconOpenCloseButtonProps<
 
 ### Files created
 
-- `components/ReusableSmallComponents/buttons/iconOpenCloseButton.tsx`
+- `components/shared/actions/iconOpenCloseButton.tsx`
 
 ### Files removed
 
-- `components/ReusableSmallComponents/buttons/iconOpenCloseButton.jsx`
+- `components/shared/actions/iconOpenCloseButton.jsx`
 
 ### Files modified
 
@@ -2450,11 +2450,11 @@ Converted shared like/share/thanks action chrome wrapper to `.tsx` with typed `c
 
 ### Files created
 
-- `components/ReusableSmallComponents/buttons/ContainerForLikeShareFlag.tsx`
+- `components/shared/content-actions/ContainerForLikeShareFlag.tsx`
 
 ### Files removed
 
-- `components/ReusableSmallComponents/buttons/ContainerForLikeShareFlag.jsx`
+- `components/shared/content-actions/ContainerForLikeShareFlag.jsx`
 
 ### Files modified
 
@@ -2508,11 +2508,11 @@ Converted listing share toggle button to `.tsx`. Typed `onClickShowShares` as `M
 
 ### Files created
 
-- `components/ReusableSmallComponents/buttons/ShareButton.tsx`
+- `components/shared/content-actions/ShareButton.tsx`
 
 ### Files removed
 
-- `components/ReusableSmallComponents/buttons/ShareButton.jsx`
+- `components/shared/content-actions/ShareButton.jsx`
 
 ### Files modified
 
@@ -2645,13 +2645,13 @@ Converted three small listing/UI helpers to TypeScript. `ToggeableAlert` typed `
 
 ### Files created
 
-- `components/ReusableMediumComponents/ToggeableAlert.tsx`
+- `components/shared/feedback/ToggeableAlert.tsx`
 - `utils/stringManipulation/addHashToArrayString.ts`
 - `components/Thanks/ThanksDialog.tsx`
 
 ### Files removed
 
-- `components/ReusableMediumComponents/ToggeableAlert.jsx`
+- `components/shared/feedback/ToggeableAlert.jsx`
 - `utils/stringManipulation/addHashToArrayString.jsx`
 - `components/Thanks/ThanksDialog.jsx`
 
@@ -2770,13 +2770,13 @@ Converted listing row delete/edit menu buttons and edit dialog to `.tsx`. Export
 ### Files created
 
 - `components/DeletingData/DeleteButton.tsx`
-- `components/ReusableSmallComponents/buttons/EditButton.tsx`
+- `components/shared/actions/EditButton.tsx`
 - `components/EditingData/EditContent.tsx`
 
 ### Files removed
 
 - `components/DeletingData/DeleteButton.jsx`
-- `components/ReusableSmallComponents/buttons/EditButton.jsx`
+- `components/shared/actions/EditButton.jsx`
 - `components/EditingData/EditContent.jsx`
 
 ### Files modified
@@ -2805,7 +2805,7 @@ Converted remaining non-TS components imported by `ContentListing.jsx` before li
 
 ### Files created
 
-- `components/ReusableMediumComponents/SharingOptionsBar.tsx`
+- `components/shared/content-actions/SharingOptionsBar.tsx`
 - `components/DeletingData/DeleteDialog.tsx`
 - `components/Flagging/FlagButton.tsx`
 - `components/Flagging/FlagDialog.tsx`
@@ -2814,7 +2814,7 @@ Converted remaining non-TS components imported by `ContentListing.jsx` before li
 
 ### Files removed
 
-- `components/ReusableMediumComponents/SharingOptionsBar.jsx`
+- `components/shared/content-actions/SharingOptionsBar.jsx`
 - `components/DeletingData/DeleteDialog.jsx`
 - `components/Flagging/FlagButton.js`
 - `components/Flagging/FlagDialog.js`
@@ -3002,7 +3002,7 @@ Converted categories wrapper and add name/description forms to TypeScript. Fixed
 - `components/AddingNewData/addingName.tsx`
 - `components/AddingNewData/addingdescription.tsx`
 - `components/AddingNewData/CheckIfContentExists.d.ts`
-- `components/ReusableSmallComponents/buttons/WarningMessage.d.ts`
+- `components/shared/feedback/WarningMessage.d.ts`
 - `docs/notes/components/add-content-forms.md`
 
 ### Files removed
@@ -3958,7 +3958,7 @@ Converted seven leaf modules: profanity data (`blockList`), shared loading/login
 
 - `data/blockList.ts`
 - `components/ui/LoadingSpinner.tsx`
-- `components/ui/MustLoginMessage.tsx`
+- `components/shared/feedback/MustLoginMessage.tsx`
 - `components/ShowingListOfContent/YoutubeEmbed.tsx`
 - `components/ShowingListOfContent/UsersFollowingList.tsx`
 - `components/ShowingListOfContent/UsersFollowersList.tsx`
@@ -3971,7 +3971,7 @@ Converted seven leaf modules: profanity data (`blockList`), shared loading/login
 
 - `data/blockList.js`
 - `components/ui/LoadingSpinner.js`
-- `components/ui/MustLoginMessage.js`
+- `components/shared/feedback/MustLoginMessage.js`
 - `components/ShowingListOfContent/YoutubeEmbed.js`
 - `components/ShowingListOfContent/UsersFollowingList.js`
 - `components/ShowingListOfContent/UsersFollowersList.jsx`
@@ -4023,16 +4023,16 @@ Converted all remaining JS/JSX button primitives to `.tsx`. Merged `GeneralButto
 
 ### Files created
 
-- `components/ReusableSmallComponents/buttons/GeneralButton.tsx`
-- `components/ReusableSmallComponents/buttons/LinkButton.tsx`
-- `components/ReusableSmallComponents/buttons/DisabledButton.tsx`
-- `components/ReusableSmallComponents/buttons/ClosingXButton.tsx`
-- `components/ReusableSmallComponents/buttons/GoToTopButton.tsx`
+- `components/shared/actions/GeneralButton.tsx`
+- `components/shared/actions/LinkButton.tsx`
+- `components/shared/actions/DisabledButton.tsx`
+- `components/shared/actions/ClosingXButton.tsx`
+- `components/shared/actions/GoToTopButton.tsx`
 - `components/ReusableSmallComponents/buttons/CheckForMoreDataButton.tsx`
-- `components/ReusableSmallComponents/buttons/ReturnToPreviousPage.tsx`
-- `components/ReusableSmallComponents/buttons/GeneralOpenCloseButton.tsx`
-- `components/ReusableSmallComponents/buttons/WarningMessage.tsx`
-- `components/ReusableSmallComponents/buttons/FollowButton.tsx`
+- `components/shared/actions/ReturnToPreviousPage.tsx`
+- `components/shared/actions/GeneralOpenCloseButton.tsx`
+- `components/shared/feedback/WarningMessage.tsx`
+- `components/shared/content-actions/FollowButton.tsx`
 - `docs/notes/components/reusable-buttons.md`
 
 ### Files removed
@@ -4043,7 +4043,7 @@ Converted all remaining JS/JSX button primitives to `.tsx`. Merged `GeneralButto
 
 - `components/ShowingListOfContent/ToggleOneContentPage.tsx`
 - `components/CoreListingPagesLogic.tsx`
-- `components/ReusableMediumComponents/SharingOptionsBar.tsx`
+- `components/shared/content-actions/SharingOptionsBar.tsx`
 - `components/ShowingListOfContent/UsersFollowingList.tsx`
 - `components/ShowingListOfContent/UsersFollowersList.tsx`
 - `docs/README.md`
@@ -4086,16 +4086,16 @@ Converted remaining JS/JSX in `components/ReusableSmallComponents/`: GifHover, l
 
 ### Files created
 
-- `components/ReusableSmallComponents/GifHover.tsx`
-- `components/ReusableSmallComponents/ListWithPawPrintIcon.tsx`
-- `components/ReusableSmallComponents/ShowTime.tsx`
+- `components/shared/media/GifHover.tsx`
+- `components/shared/lists/ListWithPawPrintIcon.tsx`
+- `components/shared/media/ShowTime.tsx`
 - `components/ReusableSmallComponents/PostersImageUsernameProfileName.tsx`
-- `components/ReusableSmallComponents/TitlesOrHeadings/WideCenteredHeading.tsx`
-- `components/ReusableSmallComponents/TitlesOrHeadings/SmallCenteredHeading.tsx`
-- `components/ReusableSmallComponents/iconsOrSvgImages/XSvgIcon.tsx`
-- `components/ReusableSmallComponents/iconsOrSvgImages/PawPrintIcon.tsx`
-- `components/ReusableSmallComponents/iconsOrSvgImages/svgImages/NounBlackCatIcon.tsx`
-- `components/ReusableSmallComponents/iconsOrSvgImages/svgImages/MagicRabbitSVG.tsx`
+- `components/shared/typography/WideCenteredHeading.tsx`
+- `components/shared/typography/SmallCenteredHeading.tsx`
+- `components/shared/icons/XSvgIcon.tsx`
+- `components/shared/icons/PawPrintIcon.tsx`
+- `components/shared/icons/svg/NounBlackCatIcon.tsx`
+- `components/shared/icons/svg/MagicRabbitSVG.tsx`
 - `docs/notes/components/reusable-small-components.md`
 
 ### Files removed
@@ -4131,7 +4131,7 @@ Removed dead `PostersImageUsernameProfileName` — superseded by inline author U
 
 ### Files modified
 
-- `components/ReusableSmallComponents/ShowTime.tsx` — FUTURE.md pointer in header
+- `components/shared/media/ShowTime.tsx` — FUTURE.md pointer in header
 - `docs/FUTURE.md`
 - `docs/notes/components/reusable-small-components.md`
 
@@ -4254,8 +4254,8 @@ Converted the admin route group (layout + four category/tag forms), public landi
 - `app/(protected)/layout.tsx`
 - `app/page.tsx`
 - `components/LandingPage/HeroTop.tsx`
-- `components/ReusableMediumComponents/MediaObjectLeft.d.ts`
-- `components/ReusableMediumComponents/MediaObjectRight.d.ts`
+- `components/shared/layout/MediaObjectLeft.d.ts`
+- `components/shared/layout/MediaObjectRight.d.ts`
 - `docs/notes/app/admin-route-group.md`
 - `docs/notes/app/landing-page.md`
 - `docs/notes/app/protected-layout.md`
@@ -4298,8 +4298,8 @@ Converted landing marketing blocks (`MediaObjectLeft`/`Right`), site footer, abo
 
 ### Files created
 
-- `components/ReusableMediumComponents/MediaObjectLeft.tsx`
-- `components/ReusableMediumComponents/MediaObjectRight.tsx`
+- `components/shared/layout/MediaObjectLeft.tsx`
+- `components/shared/layout/MediaObjectRight.tsx`
 - `components/footer/Footer.tsx`
 - `components/footer/FooterLink.tsx`
 - `app/about/page.tsx`
@@ -4311,10 +4311,10 @@ Converted landing marketing blocks (`MediaObjectLeft`/`Right`), site footer, abo
 
 ### Files removed
 
-- `components/ReusableMediumComponents/MediaObjectLeft.jsx`
-- `components/ReusableMediumComponents/MediaObjectRight.jsx`
-- `components/ReusableMediumComponents/MediaObjectLeft.d.ts`
-- `components/ReusableMediumComponents/MediaObjectRight.d.ts`
+- `components/shared/layout/MediaObjectLeft.jsx`
+- `components/shared/layout/MediaObjectRight.jsx`
+- `components/shared/layout/MediaObjectLeft.d.ts`
+- `components/shared/layout/MediaObjectRight.d.ts`
 - `components/footer/Footer.jsx`
 - `components/footer/FooterLink.jsx`
 - `app/about/page.jsx`
@@ -4501,7 +4501,7 @@ Enabled full TypeScript strict mode now that app/components/hooks are converted.
 - `hooks/useEditHandler.ts`, `hooks/useDeleteConfirmation.ts`, `hooks/useSwrPagination.ts` — optional SWR `mutate` updater; generic page/item types
 - `components/CoreListingPagesLogic.tsx` — optional `reset` default on `handleApplyFilters`
 - `components/ShowingListOfContent/ContentListing.tsx` — typed edit/delete/mutate wiring; explicit `ToggeableAlert` generics
-- `components/ReusableMediumComponents/ToggeableAlert.tsx` — generic dismiss state
+- `components/shared/feedback/ToggeableAlert.tsx` — generic dismiss state
 - `components/FormComponents/StyledSelect.tsx` — typed dynamic `react-select` import
 - `components/Suggestions/SuggestionButton.tsx` — `SuggestionContentInfo` props
 - `components/Register/RegisterForm.tsx`, `components/Contact/ContactForm.tsx` — reCAPTCHA + validate callback types
@@ -4593,8 +4593,8 @@ Started the testing improvement plan: React Testing Library for leaf alert compo
 
 ### Files created
 
-- `components/ReusableSmallComponents/buttons/WarningMessage.test.tsx`
-- `components/ReusableMediumComponents/ToggeableAlert.test.tsx`
+- `components/shared/feedback/WarningMessage.test.tsx`
+- `components/shared/feedback/ToggeableAlert.test.tsx`
 - `utils/api/checkOwnership.test.ts`
 - `utils/api/checkIfAdmin.test.ts`
 
@@ -4659,7 +4659,7 @@ Continued RTL expansion: sign-in gate, checkbox components, and duplicate-check 
 
 ### Files created
 
-- `components/ui/MustLoginMessage.test.tsx`
+- `components/shared/feedback/MustLoginMessage.test.tsx`
 - `components/FormComponents/StyledCheckbox.test.tsx`
 - `components/AddingNewData/preserveTextAfterSubmission.test.tsx`
 - `components/AddingNewData/CheckIfContentExists.test.tsx`
@@ -4899,3 +4899,54 @@ Browser-level coverage for `/notifications` Thanks tab — populated rows and th
 
 - `/notifications` descriptions tab UI rows
 - Names tab mark-read badge UI (API mark-read already covered)
+
+---
+
+## 2026-06-07 — Component folder reorg (`shared/`)
+
+### What was built and why
+
+Replaced size-based `ReusableSmallComponents/` and `ReusableMediumComponents/` with purpose-based `components/shared/` so new contributors know where generic UI lives.
+
+### Files created
+
+- [`components/README.md`](components/README.md) — “where to put new code” decision guide
+- `components/shared/{actions,feedback,icons,typography,media,lists,layout,content-actions}/` — 33 moved components + tests
+
+### Files removed
+
+- `components/ReusableSmallComponents/` (entire tree)
+- `components/ReusableMediumComponents/` (entire tree)
+
+### Files modified
+
+- ~74 source/doc files — import paths updated to `@components/shared/...`
+- [`docs/README.md`](docs/README.md), [`reusable-buttons.md`](docs/notes/components/reusable-buttons.md), [`reusable-small-components.md`](docs/notes/components/reusable-small-components.md)
+- [`TESTING.md`](TESTING.md) — test file paths in coverage table
+
+### Mapping
+
+| Old | New |
+|-----|-----|
+| `ReusableSmallComponents/buttons/*` (generic) | `shared/actions/` |
+| `WarningMessage`, `ToggeableAlert`, `ui/MustLoginMessage` | `shared/feedback/` |
+| icons, `IconWithCount` | `shared/icons/` |
+| headings | `shared/typography/` |
+| `ProfileImage`, `GifHover`, `ShowTime` | `shared/media/` |
+| `ListWithPawPrintIcon` | `shared/lists/` |
+| `MediaObject*` | `shared/layout/` |
+| like/follow/share | `shared/content-actions/` |
+
+### Problems encountered
+
+- **`iconOpenCloseButton`** relative import `../IconWithCount` broke after move → `../icons/IconWithCount`
+- **`EditSuggestion`** still imported `../ui/MustLoginMessage` after `MustLoginMessage` moved to `shared/feedback/`
+
+### Verification
+
+- `pnpm exec tsc --noEmit` — OK
+- `pnpm test` — OK (29 files, 147 tests)
+
+### Next logical step
+
+- Optional naming cleanup: `IconWithCount.tsx` → `IconBadge.tsx`, `ToggeableAlert` → `ToggleableAlert`

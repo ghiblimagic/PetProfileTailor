@@ -9,7 +9,7 @@ import {
 import LoadingSpinner from "../ui/LoadingSpinner";
 import StyledInput from "../FormComponents/StyledInput";
 import StyledTextarea from "../FormComponents/StyledTextarea";
-import GeneralButton from "../ReusableSmallComponents/buttons/GeneralButton";
+import GeneralButton from "../shared/actions/GeneralButton";
 
 // for bots that send messages too quickly
 

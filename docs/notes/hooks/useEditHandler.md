@@ -27,7 +27,7 @@ Manages edit-dialog visibility, target content, and PUT submission for listing r
 
 ## Consumer
 
-[`ContentListing.jsx`](../../../components/ShowingListOfContent/ContentListing.jsx) → [`EditButton.tsx`](../../../components/ReusableSmallComponents/buttons/EditButton.tsx) → [`EditContent.tsx`](../../../components/EditingData/EditContent.tsx).
+[`ContentListing.jsx`](../../../components/ShowingListOfContent/ContentListing.jsx) → [`EditButton.tsx`](../../../components/shared/actions/EditButton.tsx) → [`EditContent.tsx`](../../../components/EditingData/EditContent.tsx).
 
 ## API routes
 

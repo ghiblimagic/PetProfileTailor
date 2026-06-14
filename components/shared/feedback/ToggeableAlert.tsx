@@ -1,7 +1,7 @@
 "use client";
 
 import type { Dispatch, SetStateAction } from "react";
-import GeneralButton from "@components/ReusableSmallComponents/buttons/GeneralButton";
+import GeneralButton from "@components/shared/actions/GeneralButton";
 
 export type ToggeableAlertProps<T extends boolean | string = boolean | string> =
   {

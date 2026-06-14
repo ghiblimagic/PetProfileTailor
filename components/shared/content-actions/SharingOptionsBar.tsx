@@ -1,6 +1,6 @@
 "use client";
 
-import LinkButton from "@components/ReusableSmallComponents/buttons/LinkButton";
+import LinkButton from "@components/shared/actions/LinkButton";
 import {
   EmailShareButton,
   EmailIcon,

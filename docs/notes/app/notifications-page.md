@@ -10,7 +10,7 @@ Server page: `app/(protected)/notifications/page.tsx`. Client tabs: `components/
 
 ## `ToggleOneNotificationPage` (client)
 
-Tab buttons: [`iconOpenCloseButton.tsx`](../../../components/ReusableSmallComponents/buttons/iconOpenCloseButton.tsx) + [`IconWithCount.tsx`](../../../components/ReusableSmallComponents/IconWithCount.tsx) unread badge.
+Tab buttons: [`iconOpenCloseButton.tsx`](../../../components/shared/actions/iconOpenCloseButton.tsx) + [`IconWithCount.tsx`](../../../components/shared/icons/IconWithCount.tsx) unread badge.
 
 | Tab | SWR key | Fetch timing |
 |-----|---------|--------------|
@@ -24,7 +24,7 @@ Hooks stay mounted when switching tabs so SWR cache and pagination (`size`) pers
 
 [`context/notificationsContext.tsx`](../../../context/notificationsContext.tsx) wraps the app (via [`NotificationWrapper.tsx`](../../../wrappers/NotificationWrapper.tsx) in [`app/layout.tsx`](../../../app/layout.tsx)). On session load it `GET`s [`/api/user/notifications`](../../../app/api/user/notifications/route.ts) for unread counts (`names`, `descriptions`, `thanks`). `resetNotificationType(type)` fires `PATCH /api/notifications/{type}/mark-read` and zeros that badge in local state.
 
-[`NotificationsButton.tsx`](../../../components/Notifications/NotificationsButton.tsx) in the nav reads `notificationsTotal` and links to `/notifications` (badge via [`IconWithCount.tsx`](../../../components/ReusableSmallComponents/IconWithCount.tsx)).
+[`NotificationsButton.tsx`](../../../components/Notifications/NotificationsButton.tsx) in the nav reads `notificationsTotal` and links to `/notifications` (badge via [`IconWithCount.tsx`](../../../components/shared/icons/IconWithCount.tsx)).
 
 ### Unread badge → mark-read
 
@@ -40,8 +40,8 @@ Effect cleanup sets `canceled = true` if the user switches tabs before the timer
 
 | Tab | Component |
 |-----|-----------|
-| Names / Descriptions | [`LikeNotificationListing.tsx`](../../../components/Notifications/LikeNotificationListing.tsx) (`LikesContentListing`) — populated `likedBy` + `contentId`; [`ProfileImage.tsx`](../../../components/ReusableSmallComponents/ProfileImage.tsx) uses `onClick` (no `href`) inside outer `Link`; intersection observer fades row after ~1.2s in view |
-| Thanks | [`ThankNotificationListing.tsx`](../../../components/Notifications/ThankNotificationListing.tsx) (`ThanksContentListing`) — populated `thanksBy`, `nameId` / `descriptionId`, message list; cat icon [`thanks.tsx`](../../../components/ReusableSmallComponents/iconsOrSvgImages/svgImages/thanks.tsx) |
+| Names / Descriptions | [`LikeNotificationListing.tsx`](../../../components/Notifications/LikeNotificationListing.tsx) (`LikesContentListing`) — populated `likedBy` + `contentId`; [`ProfileImage.tsx`](../../../components/shared/media/ProfileImage.tsx) uses `onClick` (no `href`) inside outer `Link`; intersection observer fades row after ~1.2s in view |
+| Thanks | [`ThankNotificationListing.tsx`](../../../components/Notifications/ThankNotificationListing.tsx) (`ThanksContentListing`) — populated `thanksBy`, `nameId` / `descriptionId`, message list; cat icon [`thanks.tsx`](../../../components/shared/icons/svg/thanks.tsx) |
 
 Shared list UI: [`NotifListingWrapper.tsx`](../../../components/Notifications/NotifListingWrapper.tsx) — renders `ListingComponent` rows, **load more** (while `!SWRisReachingEnd`), empty message when idle with no docs, and end-of-list digging-dog UI. When `SWRisReachingEnd`, shows **Recheck** with a 2-minute [`useLocalStorageCooldown`](../../../hooks/useLocalStorageCooldown.ts) per `swrType` (`lastRecheck-notifications{thanks|names|descriptions}`); recheck calls `swrHook.mutate()`.
 

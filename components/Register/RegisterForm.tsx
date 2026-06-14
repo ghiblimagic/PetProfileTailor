@@ -6,7 +6,7 @@ import { useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 import { useRouter, useSearchParams } from "next/navigation";
 import axios, { isAxiosError } from "axios";
-import GeneralButton from "@components/ReusableSmallComponents/buttons/GeneralButton";
+import GeneralButton from "@components/shared/actions/GeneralButton";
 import Image from "next/image";
 import "@fortawesome/fontawesome-svg-core/styles.css";
 import { usePrefersReducedMotion } from "@/hooks/usePrefersReducedMotions";

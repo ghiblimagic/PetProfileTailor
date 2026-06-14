@@ -1,10 +1,10 @@
 # Reusable button components
 
-Source folder: [`components/ReusableSmallComponents/buttons/`](../../../components/ReusableSmallComponents/buttons/)
+Source folder: [`components/shared/actions/`](../../../components/shared/actions/) (and [`shared/content-actions/`](../../../components/shared/content-actions/) for like/follow/share). See also [`components/README.md`](../../../components/README.md).
 
 ## `GeneralButton`
 
-[`GeneralButton.tsx`](../../../components/ReusableSmallComponents/buttons/GeneralButton.tsx) — primary `<button>` with mutually combinable style flags (`subtle`, `warning`, `secondary`, `tertiary`, `plain`, `active`, `disabled`). Default: yellow CTA.
+[`GeneralButton.tsx`](../../../components/shared/actions/GeneralButton.tsx) — primary `<button>` with mutually combinable style flags (`subtle`, `warning`, `secondary`, `tertiary`, `plain`, `active`, `disabled`). Default: yellow CTA.
 
 ```tsx
 <GeneralButton text="Submit" type="submit" onClick={handleSubmit} />
@@ -15,19 +15,19 @@ Source folder: [`components/ReusableSmallComponents/buttons/`](../../../componen
 
 ## `LinkButton`
 
-[`LinkButton.tsx`](../../../components/ReusableSmallComponents/buttons/LinkButton.tsx) — `next/link` with same visual variants (`defaultStyle`, `basic`, `subtle`, `warning`, `active`, `disabled`). Optional `icon` before `text`.
+[`LinkButton.tsx`](../../../components/shared/actions/LinkButton.tsx) — `next/link` with same visual variants (`defaultStyle`, `basic`, `subtle`, `warning`, `active`, `disabled`). Optional `icon` before `text`.
 
 ## `DisabledButton`
 
-[`DisabledButton.tsx`](../../../components/ReusableSmallComponents/buttons/DisabledButton.tsx) — always-disabled submit button for invalid admin forms.
+[`DisabledButton.tsx`](../../../components/shared/actions/DisabledButton.tsx) — always-disabled submit button for invalid admin forms.
 
 ## `ClosingXButton`
 
-[`ClosingXButton.tsx`](../../../components/ReusableSmallComponents/buttons/ClosingXButton.tsx) — `GeneralButton` preset: `plain`, `text="X"`.
+[`ClosingXButton.tsx`](../../../components/shared/actions/ClosingXButton.tsx) — `GeneralButton` preset: `plain`, `text="X"`.
 
 ## `GoToTopButton`
 
-[`GoToTopButton.tsx`](../../../components/ReusableSmallComponents/buttons/GoToTopButton.tsx)
+[`GoToTopButton.tsx`](../../../components/shared/actions/GoToTopButton.tsx)
 
 ### Special behavior: body scroll container
 
@@ -42,7 +42,7 @@ Mounted in [`app/layout.tsx`](../../../app/layout.tsx) with `top="280"` scroll t
 
 ## `GeneralOpenCloseButton`
 
-[`GeneralOpenCloseButton.tsx`](../../../components/ReusableSmallComponents/buttons/GeneralOpenCloseButton.tsx) — generic tab toggle (`state === value` → bottom border). Used by [`ToggleOneContentPage.tsx`](../../../components/ShowingListOfContent/ToggleOneContentPage.tsx).
+[`GeneralOpenCloseButton.tsx`](../../../components/shared/actions/GeneralOpenCloseButton.tsx) — generic tab toggle (`state === value` → bottom border). Used by [`ToggleOneContentPage.tsx`](../../../components/ShowingListOfContent/ToggleOneContentPage.tsx).
 
 ```tsx
 <GeneralOpenCloseButton<ToggleContentTab>
@@ -53,15 +53,15 @@ Mounted in [`app/layout.tsx`](../../../app/layout.tsx) with `top="280"` scroll t
 />
 ```
 
-Sibling: [`iconOpenCloseButton.tsx`](../../../components/ReusableSmallComponents/buttons/iconOpenCloseButton.tsx) (notifications tabs + badge).
+Sibling: [`iconOpenCloseButton.tsx`](../../../components/shared/actions/iconOpenCloseButton.tsx) (notifications tabs + badge).
 
 ## `WarningMessage`
 
-[`WarningMessage.tsx`](../../../components/ReusableSmallComponents/buttons/WarningMessage.tsx) — red banner. Optional `state` setter shows dismiss `XSvgIcon` that clears to `""`.
+[`WarningMessage.tsx`](../../../components/shared/feedback/WarningMessage.tsx) — red banner. Optional `state` setter shows dismiss `XSvgIcon` that clears to `""`.
 
 ## `FollowButton`
 
-[`FollowButton.tsx`](../../../components/ReusableSmallComponents/buttons/FollowButton.tsx) — follow/unfollow via hidden checkbox + `PUT /api/user/updatefollows/`. Initial state from `data.followers` array.
+[`FollowButton.tsx`](../../../components/shared/content-actions/FollowButton.tsx) — follow/unfollow via hidden checkbox + `PUT /api/user/updatefollows/`. Initial state from `data.followers` array.
 
 ## Already TypeScript
 
@@ -75,4 +75,4 @@ Sibling: [`iconOpenCloseButton.tsx`](../../../components/ReusableSmallComponents
 
 ## `ReturnToPreviousPage`
 
-[`ReturnToPreviousPage.tsx`](../../../components/ReusableSmallComponents/buttons/ReturnToPreviousPage.tsx) — `LinkButton` + `ArrowBigLeftIcon` for name/description detail pages.
+[`ReturnToPreviousPage.tsx`](../../../components/shared/actions/ReturnToPreviousPage.tsx) — `LinkButton` + `ArrowBigLeftIcon` for name/description detail pages.

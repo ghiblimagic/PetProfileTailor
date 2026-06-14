@@ -2,7 +2,7 @@
  * Shared “reload or contact” block for error pages.
  * Notes: docs/notes/app/error-pages.md
  */
-import LinkButton from "../ReusableSmallComponents/buttons/LinkButton";
+import LinkButton from "../shared/actions/LinkButton";
 
 export default function ErrorContactMessage() {
   return (

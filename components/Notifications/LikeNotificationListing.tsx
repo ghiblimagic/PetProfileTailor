@@ -7,7 +7,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { formatDistanceStrict } from "date-fns";
 import Link from "next/link";
-import ProfileImage from "../ReusableSmallComponents/ProfileImage";
+import ProfileImage from "../shared/media/ProfileImage";
 import { useRouter } from "next/navigation";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faHeart } from "@fortawesome/free-solid-svg-icons";

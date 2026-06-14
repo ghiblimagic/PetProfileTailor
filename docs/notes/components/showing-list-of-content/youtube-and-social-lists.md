@@ -49,8 +49,8 @@ export type UsersFollowingListProps = {
 ```
 
 - Profile links: `NEXT_PUBLIC_BASE_FETCH_URL` + `profile/{profileName.toLowerCase()}`.
-- Hides [`FollowButton`](../../../components/ReusableSmallComponents/buttons/FollowButton.tsx) when `person._id == sessionFromServer.user?.id`.
-- Empty state: kitten/puppy [`GifHover`](../../../components/ReusableSmallComponents/GifHover.tsx).
+- Hides [`FollowButton`](../../../components/shared/content-actions/FollowButton.tsx) when `person._id == sessionFromServer.user?.id`.
+- Empty state: kitten/puppy [`GifHover`](../../../components/shared/media/GifHover.tsx).
 
 Currently wired in [`profile.tsx`](../../../components/profile.tsx) but **commented out** in JSX.
 

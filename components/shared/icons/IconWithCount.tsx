@@ -6,7 +6,7 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBell, faHeart } from "@fortawesome/free-solid-svg-icons";
 import type { SizeProp } from "@fortawesome/fontawesome-svg-core";
-import Thanks from "@components/ReusableSmallComponents/iconsOrSvgImages/svgImages/thanks";
+import Thanks from "@components/shared/icons/svg/thanks";
 
 export type IconBadgeName = "faBell" | "faHeart" | "thanks";
 

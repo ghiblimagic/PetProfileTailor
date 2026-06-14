@@ -6,14 +6,14 @@
 
 import { useState } from "react";
 import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/react";
-import LikesButtonAndLikesLogic from "@components/ReusableSmallComponents/buttons/LikesButtonAndLikesLogic";
+import LikesButtonAndLikesLogic from "@components/shared/content-actions/LikesButtonAndLikesLogic";
 import DeleteButton from "@components/DeletingData/DeleteButton";
-import EditButton from "@components/ReusableSmallComponents/buttons/EditButton";
+import EditButton from "@components/shared/actions/EditButton";
 import EditContent from "../EditingData/EditContent";
-import ShareButton from "@components/ReusableSmallComponents/buttons/ShareButton";
-import SharingOptionsBar from "../ReusableMediumComponents/SharingOptionsBar";
-import ProfileImage from "@components/ReusableSmallComponents/ProfileImage";
-import ToggeableAlert from "../ReusableMediumComponents/ToggeableAlert";
+import ShareButton from "@components/shared/content-actions/ShareButton";
+import SharingOptionsBar from "../shared/content-actions/SharingOptionsBar";
+import ProfileImage from "@components/shared/media/ProfileImage";
+import ToggeableAlert from "../shared/feedback/ToggeableAlert";
 import addHashToArrayString from "@utils/stringManipulation/addHashToArrayString";
 import { Ellipsis } from "lucide-react";
 import { useDeleteConfirmation } from "@hooks/useDeleteConfirmation";

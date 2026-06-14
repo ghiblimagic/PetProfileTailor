@@ -24,7 +24,7 @@ import LoadingSkeleton from "@/components/LoadingScreen";
 import ReportsWrapper from "@/wrappers/ReportsWrapper";
 import LikesWrapper from "@/wrappers/LikesWrapper";
 import SuggestionsWrapper from "@/wrappers/SuggestionsWrapper";
-import GoToTopButton from "@/components/ReusableSmallComponents/buttons/GoToTopButton";
+import GoToTopButton from "@/components/shared/actions/GoToTopButton";
 import NotificationsWrapper from "@/wrappers/NotificationWrapper";
 import dbConnect from "@utils/db";
 import NameCategory from "@/models/NameCategory";

@@ -7,7 +7,7 @@ import Names from "@models/Name";
 import { notFound } from "next/navigation";
 import { leanWithStrings } from "@/utils/mongoDataCleanup";
 import ContentListing from "@/components/ShowingListOfContent/ContentListing";
-import ReturnToPreviousPage from "@/components/ReusableSmallComponents/buttons/ReturnToPreviousPage";
+import ReturnToPreviousPage from "@/components/shared/actions/ReturnToPreviousPage";
 import type { ContentListingItem } from "@/components/ShowingListOfContent/ContentListing";
 
 import "@/models/NameTag";

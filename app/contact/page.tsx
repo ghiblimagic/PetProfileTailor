@@ -1,6 +1,6 @@
 "use client";
 
-import PageTitleWithImages from "@components/ReusableSmallComponents/TitlesOrHeadings/PageTitleWithImages";
+import PageTitleWithImages from "@components/shared/typography/PageTitleWithImages";
 import ContactForm from "@components/Contact/ContactForm";
 import { GoogleReCaptchaProvider } from "react-google-recaptcha-v3";
 

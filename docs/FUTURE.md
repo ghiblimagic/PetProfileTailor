@@ -53,7 +53,7 @@ Ideas deferred until after the **TypeScript migration** is in a stable place. No
 
 **Today**
 
-- [`ShowTime.tsx`](../components/ReusableSmallComponents/ShowTime.tsx) exists but has **no imports**.
+- [`ShowTime.tsx`](../components/shared/media/ShowTime.tsx) exists but has **no imports**.
 - [`ContentListing.tsx`](../components/ShowingListOfContent/ContentListing.tsx) shows creator `ProfileImage` + name + `@profileName` from populated `createdBy` — **no** `createdAt` / timestamp on listing rows.
 - [`LikeNotificationListing.tsx`](../components/Notifications/LikeNotificationListing.tsx) and [`ThankNotificationListing.tsx`](../components/Notifications/ThankNotificationListing.tsx) format `createdAt` inline with `toLocaleString`, not `ShowTime`.
 - Removed unused `PostersImageUsernameProfileName` (superseded by `ContentListing` inline markup).

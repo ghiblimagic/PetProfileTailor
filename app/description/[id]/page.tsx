@@ -8,7 +8,7 @@ import dbConnect from "@utils/db";
 import Descriptions from "@/models/Description";
 import { notFound } from "next/navigation";
 import { leanWithStrings } from "@/utils/mongoDataCleanup";
-import ReturnToPreviousPage from "@/components/ReusableSmallComponents/buttons/ReturnToPreviousPage";
+import ReturnToPreviousPage from "@/components/shared/actions/ReturnToPreviousPage";
 import type { ContentListingItem } from "@/components/ShowingListOfContent/ContentListing";
 
 import "@/models/DescriptionTag";

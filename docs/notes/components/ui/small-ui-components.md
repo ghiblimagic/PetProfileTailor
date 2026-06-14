@@ -32,7 +32,7 @@ export default function LoadingSpinner() {
 
 ## `MustLoginMessage`
 
-Source: [`components/ui/MustLoginMessage.tsx`](../../../components/ui/MustLoginMessage.tsx)
+Source: [`components/shared/feedback/MustLoginMessage.tsx`](../../../components/shared/feedback/MustLoginMessage.tsx)
 
 Red banner for gated actions (reports, suggestions, thanks, etc.).
 

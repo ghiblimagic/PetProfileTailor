@@ -25,9 +25,9 @@ Each source file with notes should have a one-line pointer at the top linking to
 | [`lib/auth.ts`](../lib/auth.ts) | [auth.md](notes/lib/auth.md) |
 | [`lib/checkBlocklist.ts`](../lib/checkBlocklist.ts) | [checkBlocklist.md](notes/lib/checkBlocklist.md) |
 | [`data/blockList.ts`](../data/blockList.ts) | [blockList.md](notes/data/blockList.md) |
-| [`components/ui/LoadingSpinner.tsx`](../components/ui/LoadingSpinner.tsx), [`MustLoginMessage.tsx`](../components/ui/MustLoginMessage.tsx) | [small-ui-components.md](notes/components/ui/small-ui-components.md) |
-| [`components/ReusableSmallComponents/buttons/`](../components/ReusableSmallComponents/buttons/) | [reusable-buttons.md](notes/components/reusable-buttons.md) |
-| [`components/ReusableSmallComponents/`](../components/ReusableSmallComponents/) (images, headings, icons) | [reusable-small-components.md](notes/components/reusable-small-components.md) |
+| [`components/ui/LoadingSpinner.tsx`](../components/ui/LoadingSpinner.tsx), [`skeleton.tsx`](../components/ui/skeleton.tsx) | [small-ui-components.md](notes/components/ui/small-ui-components.md) |
+| [`components/shared/feedback/MustLoginMessage.tsx`](../components/shared/feedback/MustLoginMessage.tsx) | [small-ui-components.md](notes/components/ui/small-ui-components.md) |
+| [`components/shared/`](../components/shared/) (actions, icons, typography, media, layout, feedback, content-actions) | [components/README.md](../components/README.md), [reusable-buttons.md](notes/components/reusable-buttons.md), [reusable-small-components.md](notes/components/reusable-small-components.md) |
 | YouTube embed + profile follow/follower modals | [youtube-and-social-lists.md](notes/components/showing-list-of-content/youtube-and-social-lists.md) |
 | [`app/actions/sendContactEmail.ts`](../app/actions/sendContactEmail.ts) | [sendContactEmail.md](notes/app/actions/sendContactEmail.md) |
 | [`components/Contact/ContactForm.tsx`](../components/Contact/ContactForm.tsx) | [sendContactEmail.md](notes/app/actions/sendContactEmail.md) (client form) |
@@ -37,7 +37,7 @@ Each source file with notes should have a one-line pointer at the top linking to
 | [`app/api/description/swr/route.ts`](../app/api/description/swr/route.ts) | [description-swr-route.md](notes/app/api/description-swr-route.md) |
 | [`app/layout.tsx`](../app/layout.tsx) | [root-layout.md](notes/app/root-layout.md) |
 | [`app/page.tsx`](../app/page.tsx), [`HeroTop.tsx`](../components/LandingPage/HeroTop.tsx) | [landing-page.md](notes/app/landing-page.md) |
-| [`MediaObjectLeft.tsx`](../components/ReusableMediumComponents/MediaObjectLeft.tsx), [`MediaObjectRight.tsx`](../components/ReusableMediumComponents/MediaObjectRight.tsx) | [media-object.md](notes/components/media-object.md) |
+| [`MediaObjectLeft.tsx`](../components/shared/layout/MediaObjectLeft.tsx), [`MediaObjectRight.tsx`](../components/shared/layout/MediaObjectRight.tsx) | [media-object.md](notes/components/media-object.md) |
 | [`Footer.tsx`](../components/footer/Footer.tsx), [`FooterLink.tsx`](../components/footer/FooterLink.tsx) | [footer.md](notes/components/footer.md) |
 | [`app/about/page.tsx`](../app/about/page.tsx) | [about-page.md](notes/app/about-page.md) |
 | [`app/(protected)/editsettings/page.tsx`](../app/(protected)/editsettings/page.tsx) | [editsettings-page.md](notes/app/editsettings-page.md) |
@@ -78,7 +78,7 @@ Each source file with notes should have a one-line pointer at the top linking to
 | [`AddSuggestion.tsx`](../components/Suggestions/AddSuggestion.tsx), [`EditSuggestion.tsx`](../components/Suggestions/EditSuggestion.tsx) | [suggestion-forms.md](notes/components/suggestion-forms.md) |
 | [`hooks/useDeleteConfirmation.ts`](../hooks/useDeleteConfirmation.ts) | [useDeleteConfirmation.md](notes/hooks/useDeleteConfirmation.md) |
 | [`context/ReportsContext.tsx`](../context/ReportsContext.tsx), [`context/SuggestionsContext.tsx`](../context/SuggestionsContext.tsx) | [moderation-and-thanks.md](notes/models/moderation-and-thanks.md) |
-| [`hooks/useEditHandler.ts`](../hooks/useEditHandler.ts), [`EditContent.tsx`](../components/EditingData/EditContent.tsx), [`EditButton.tsx`](../components/ReusableSmallComponents/buttons/EditButton.tsx) | [useEditHandler.md](notes/hooks/useEditHandler.md) |
+| [`hooks/useEditHandler.ts`](../hooks/useEditHandler.ts), [`EditContent.tsx`](../components/EditingData/EditContent.tsx), [`EditButton.tsx`](../components/shared/actions/EditButton.tsx) | [useEditHandler.md](notes/hooks/useEditHandler.md) |
 | [`hooks/useTags.ts`](../hooks/useTags.ts), [`TagsSelectAndCheatSheet.tsx`](../components/FormComponents/TagsSelectAndCheatSheet.tsx) | [useTags.md](notes/hooks/useTags.md), [tags-select-and-cheat-sheet.md](notes/components/tags-select-and-cheat-sheet.md) |
 | [`CategoriesAndTagsContext.tsx`](../context/CategoriesAndTagsContext.tsx), [`useCategoriesForDataType.ts`](../hooks/useCategoriesForDataType.ts), [`CategTagsWrapper.tsx`](../wrappers/CategTagsWrapper.tsx) | [categories-and-tags.md](notes/context/categories-and-tags.md) |
 | [`context/AdminContext.tsx`](../context/AdminContext.tsx), [`AdminWrapper.tsx`](../wrappers/AdminWrapper.tsx), [`AdminDropdownMenu.tsx`](../components/NavBar/NavBarPieces/DesktopNavBar/AdminDropdownMenu.tsx) | [admin-context.md](notes/context/admin-context.md) |

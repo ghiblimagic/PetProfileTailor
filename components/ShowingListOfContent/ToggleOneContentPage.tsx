@@ -5,7 +5,7 @@
 "use client";
 
 import { useState } from "react";
-import GeneralOpenCloseButton from "../ReusableSmallComponents/buttons/GeneralOpenCloseButton";
+import GeneralOpenCloseButton from "../shared/actions/GeneralOpenCloseButton";
 import CoreListingPageLogic from "../CoreListingPagesLogic";
 
 export type ToggleContentTab =

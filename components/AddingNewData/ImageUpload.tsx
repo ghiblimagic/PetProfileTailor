@@ -8,15 +8,15 @@ import { useState, useRef, type ChangeEvent } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import GeneralButton from "@components/ReusableSmallComponents/buttons/GeneralButton";
-import DisabledButton from "@components/ReusableSmallComponents/buttons/DisabledButton";
+import GeneralButton from "@components/shared/actions/GeneralButton";
+import DisabledButton from "@components/shared/actions/DisabledButton";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCircleXmark } from "@fortawesome/free-solid-svg-icons";
 import "@fortawesome/fontawesome-svg-core/styles.css";
 import Image from "next/image";
 import { useSession } from "next-auth/react";
 import LoadingSpinner from "../ui/LoadingSpinner";
-import SmallCenteredHeading from "@/components/ReusableSmallComponents/TitlesOrHeadings/SmallCenteredHeading";
+import SmallCenteredHeading from "@/components/shared/typography/SmallCenteredHeading";
 import type { SessionRefreshResponse } from "@/app/api/auth/session/refresh/route";
 
 type CloudinaryUploadResponse = {

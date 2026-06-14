@@ -6,12 +6,12 @@
 
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
-import PageTitleWithImages from "@components/ReusableSmallComponents/TitlesOrHeadings/PageTitleWithImages";
+import PageTitleWithImages from "@components/shared/typography/PageTitleWithImages";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPaw } from "@fortawesome/free-solid-svg-icons";
 import "@fortawesome/fontawesome-svg-core/styles.css";
-import NounBlackCatIcon from "@components/ReusableSmallComponents/iconsOrSvgImages/svgImages/NounBlackCatIcon";
-import MagicRabbitSVG from "@components/ReusableSmallComponents/iconsOrSvgImages/svgImages/MagicRabbitSVG";
+import NounBlackCatIcon from "@components/shared/icons/svg/NounBlackCatIcon";
+import MagicRabbitSVG from "@components/shared/icons/svg/MagicRabbitSVG";
 
 export default function MagicLinkPage() {
   const searchParams = useSearchParams();

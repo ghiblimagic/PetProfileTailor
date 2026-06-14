@@ -2,8 +2,8 @@
 
 Sources:
 
-- [`MediaObjectLeft.tsx`](../../../components/ReusableMediumComponents/MediaObjectLeft.tsx)
-- [`MediaObjectRight.tsx`](../../../components/ReusableMediumComponents/MediaObjectRight.tsx)
+- [`MediaObjectLeft.tsx`](../../../components/shared/layout/MediaObjectLeft.tsx)
+- [`MediaObjectRight.tsx`](../../../components/shared/layout/MediaObjectRight.tsx)
 
 ## Role
 

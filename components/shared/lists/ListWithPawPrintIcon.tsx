@@ -2,7 +2,7 @@
  * List item with paw icon prefix.
  * Notes: docs/notes/components/reusable-small-components.md
  */
-import PawPrintIcon from "./iconsOrSvgImages/PawPrintIcon";
+import PawPrintIcon from "../icons/PawPrintIcon";
 
 export type ListWithPawPrintIconProps = {
   text: string;

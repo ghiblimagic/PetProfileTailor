@@ -11,9 +11,9 @@ import {
   type ChangeEvent,
 } from "react";
 import { Drawer } from "@mui/material";
-import GeneralButton from "@components/ReusableSmallComponents/buttons/GeneralButton";
+import GeneralButton from "@components/shared/actions/GeneralButton";
 import FilteringSidebar from "@components/Filtering/FilteringSidebar";
-import PageTitleWithImages from "@components/ReusableSmallComponents/TitlesOrHeadings/PageTitleWithImages";
+import PageTitleWithImages from "@components/shared/typography/PageTitleWithImages";
 import ContentListing, {
   type ContentListingItem,
 } from "@/components/ShowingListOfContent/ContentListing";
@@ -21,7 +21,7 @@ import Pagination from "@components/ShowingListOfContent/pagination";
 import { useSwrPagination } from "@hooks/useSwrPagination";
 import startCooldown from "@utils/startCooldown";
 import Image from "next/image";
-import LinkButton from "./ReusableSmallComponents/buttons/LinkButton";
+import LinkButton from "./shared/actions/LinkButton";
 import { useSession } from "next-auth/react";
 import LoadingSpinner from "./ui/LoadingSpinner";
 import type { ContentType } from "@/utils/api/checkIfValidContentType";

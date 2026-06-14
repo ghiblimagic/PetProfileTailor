@@ -5,7 +5,7 @@
 "use client";
 
 import NewNameWithTagsData from "@components/AddingNewData/addingName";
-import PageTitleWithImages from "@components/ReusableSmallComponents/TitlesOrHeadings/PageTitleWithImages";
+import PageTitleWithImages from "@components/shared/typography/PageTitleWithImages";
 import { useSession } from "next-auth/react";
 
 export default function AddNamesPage() {

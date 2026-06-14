@@ -10,20 +10,20 @@ import {
   type ChangeEvent,
   type SubmitEvent,
 } from "react";
-import GeneralButton from "@components/ReusableSmallComponents/buttons/GeneralButton";
+import GeneralButton from "@components/shared/actions/GeneralButton";
 import { toast } from "react-toastify";
 import axios from "axios";
 import { Field } from "@headlessui/react";
 import StyledTextarea from "@components/FormComponents/StyledTextarea";
 import StyledCheckbox from "@components/FormComponents/StyledCheckbox";
-import ClosingXButton from "@components/ReusableSmallComponents/buttons/ClosingXButton";
+import ClosingXButton from "@components/shared/actions/ClosingXButton";
 import { useSuggestions } from "@context/SuggestionsContext";
 import { useTags } from "@/hooks/useTags";
 import TagsSelectAndCheatSheet from "../FormComponents/TagsSelectAndCheatSheet";
 import LoadingSpinner from "@components/ui/LoadingSpinner";
 import DeleteContentNotification from "../DeletingData/DeleteContentNotification";
 import { useSession } from "next-auth/react";
-import MustLoginMessage from "../ui/MustLoginMessage";
+import MustLoginMessage from "../shared/feedback/MustLoginMessage";
 import type { ContentType } from "@/utils/api/checkIfValidContentType";
 import type { SuggestionContentInfo } from "@/components/Suggestions/AddSuggestion";
 

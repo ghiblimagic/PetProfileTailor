@@ -8,7 +8,7 @@ import Link from "next/link";
 import { useState, useEffect } from "react";
 import { useNotifications } from "@/context/notificationsContext";
 import "@fortawesome/fontawesome-svg-core/styles.css";
-import IconBadge from "../ReusableSmallComponents/IconWithCount";
+import IconBadge from "../shared/icons/IconWithCount";
 
 export default function NotificationsButton() {
   const { notificationsTotal } = useNotifications();

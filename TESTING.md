@@ -35,8 +35,8 @@ Vitest + E2E green covers validation logic and the flows listed below. Manual ch
 | Area | Tests |
 |------|-------|
 | API auth guards | `checkOwnership.test.ts`, `checkIfAdmin.test.ts` |
-| Alert / validation UI | `WarningMessage.test.tsx`, `ToggeableAlert.test.tsx` |
-| Form / gate UI | `MustLoginMessage.test.tsx`, `StyledCheckbox.test.tsx`, `preserveTextAfterSubmission.test.tsx` |
+| Alert / validation UI | `shared/feedback/WarningMessage.test.tsx`, `shared/feedback/ToggeableAlert.test.tsx` |
+| Form / gate UI | `shared/feedback/MustLoginMessage.test.tsx`, `StyledCheckbox.test.tsx`, `preserveTextAfterSubmission.test.tsx` |
 | Duplicate check UI | `CheckIfContentExists.test.tsx` (mocked `fetch` + `ContentListing`) |
 | Register form | `RegisterForm.test.tsx` (client validation + server field errors; mocked auth/captcha/axios) |
 | Presentational | `skeleton.test.tsx` |

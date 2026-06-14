@@ -2,7 +2,7 @@
  * Red validation / submission banner with optional dismiss.
  * Notes: docs/notes/components/reusable-buttons.md
  */
-import XSvgIcon from "../iconsOrSvgImages/XSvgIcon";
+import XSvgIcon from "../icons/XSvgIcon";
 import type { Dispatch, SetStateAction } from "react";
 
 export type WarningMessageProps = {
