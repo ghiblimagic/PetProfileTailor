@@ -2,7 +2,7 @@
 
 ## Stack
 
-- **Jest** — unit tests (pure logic, no browser)
+- **Vitest** — unit tests (pure logic, no browser)
 - **React Testing Library** — component tests
 - **Playwright** — E2E on test DB (`MONGODB_URI_TEST`)
 
@@ -10,9 +10,9 @@
 
 | Command | Purpose |
 |---------|---------|
-| `pnpm test` | Jest once |
-| `pnpm test:watch` | Jest watch |
-| `pnpm test:ci` | Jest + coverage |
+| `pnpm test` | Vitest once |
+| `pnpm test:watch` | Vitest watch |
+| `pnpm test:ci` | Vitest + coverage |
 | `pnpm test:e2e` | Playwright (build + start test server) |
 | `pnpm test:e2e:local` | Playwright only (server already on :3000) |
 | `pnpm seed:e2e` | Seed test DB (user, admin, name, descriptions) |
@@ -28,7 +28,7 @@ pnpm test:e2e        # needs: playwright install, seed:e2e, MONGODB_URI_TEST in 
 pnpm build
 ```
 
-Jest + E2E green covers validation logic and the flows listed below. Manual checks on **dev** (`MONGODB_URI`) are only for what automation skips.
+Vitest + E2E green covers validation logic and the flows listed below. Manual checks on **dev** (`MONGODB_URI`) are only for what automation skips.
 
 ---
 

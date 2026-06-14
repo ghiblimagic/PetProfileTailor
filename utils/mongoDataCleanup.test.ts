@@ -1,5 +1,5 @@
 /**
- * @jest-environment node
+ * @vitest-environment node
  */
 import mongoose from "mongoose";
 import { leanWithStrings } from "./mongoDataCleanup";

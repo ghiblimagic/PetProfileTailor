@@ -7,10 +7,10 @@ import {
 } from "./findNormalizedMatch";
 
 function mockModel<T>(result: T) {
-  const populate = jest.fn().mockResolvedValue(result);
+  const populate = vi.fn().mockResolvedValue(result);
   return {
-    findOne: jest.fn().mockReturnValue({ populate }),
-    find: jest.fn().mockReturnValue({ populate }),
+    findOne: vi.fn().mockReturnValue({ populate }),
+    find: vi.fn().mockReturnValue({ populate }),
     populate,
   };
 }
@@ -42,11 +42,11 @@ describe("findExactNormalized", () => {
 
 describe("findStartNormalized", () => {
   beforeEach(() => {
-    jest.spyOn(console, "log").mockImplementation(() => {});
+    vi.spyOn(console, "log").mockImplementation(() => {});
   });
 
   afterEach(() => {
-    jest.restoreAllMocks();
+    vi.restoreAllMocks();
   });
 
   it("uses an anchored regex on the first 400 normalized chars", async () => {

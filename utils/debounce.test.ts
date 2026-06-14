@@ -2,38 +2,38 @@ import { debounce } from "./debounce";
 
 describe("debounce", () => {
   beforeEach(() => {
-    jest.useFakeTimers();
+    vi.useFakeTimers();
   });
 
   afterEach(() => {
-    jest.useRealTimers();
+    vi.useRealTimers();
   });
 
   it("delays calling the function until after the wait period", () => {
-    const fn = jest.fn();
+    const fn = vi.fn();
     const debounced = debounce(fn, 500);
 
     debounced("a");
     expect(fn).not.toHaveBeenCalled();
 
-    jest.advanceTimersByTime(500);
+    vi.advanceTimersByTime(500);
     expect(fn).toHaveBeenCalledTimes(1);
     expect(fn).toHaveBeenCalledWith("a");
   });
 
   it("cancel prevents a pending call", () => {
-    const fn = jest.fn();
+    const fn = vi.fn();
     const debounced = debounce(fn, 500);
 
     debounced("a");
     debounced.cancel();
 
-    jest.advanceTimersByTime(500);
+    vi.advanceTimersByTime(500);
     expect(fn).not.toHaveBeenCalled();
   });
 
   it("flush fires a pending call immediately", () => {
-    const fn = jest.fn();
+    const fn = vi.fn();
     const debounced = debounce(fn, 500);
 
     debounced("a");
@@ -42,7 +42,7 @@ describe("debounce", () => {
     expect(fn).toHaveBeenCalledTimes(1);
     expect(fn).toHaveBeenCalledWith("a");
 
-    jest.advanceTimersByTime(500);
+    vi.advanceTimersByTime(500);
     expect(fn).toHaveBeenCalledTimes(1);
   });
 });

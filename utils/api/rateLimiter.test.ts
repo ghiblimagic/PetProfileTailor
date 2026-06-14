@@ -6,11 +6,11 @@ import {
 
 describe("RateLimiter", () => {
   beforeEach(() => {
-    jest.useFakeTimers();
+    vi.useFakeTimers();
   });
 
   afterEach(() => {
-    jest.useRealTimers();
+    vi.useRealTimers();
   });
 
   it("allows requests under the limit", () => {
@@ -31,7 +31,7 @@ describe("RateLimiter", () => {
 
     const status = limiter.getStatus("ip-2", options);
     const waitMs = status.resetTime - Date.now() + 5;
-    jest.advanceTimersByTime(waitMs);
+    vi.advanceTimersByTime(waitMs);
 
     expect(limiter.check("ip-2", options).allowed).toBe(true);
   });

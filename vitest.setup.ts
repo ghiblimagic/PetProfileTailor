@@ -1,5 +1,5 @@
-/** Deep design notes: docs/notes/jest-setup.md */
+/** Deep design notes: docs/notes/vitest-setup.md */
 import { TextDecoder, TextEncoder } from "util";
-import "@testing-library/jest-dom";
+import "@testing-library/jest-dom/vitest";
 
 Object.assign(global, { TextDecoder, TextEncoder });

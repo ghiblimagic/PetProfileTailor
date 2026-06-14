@@ -4548,3 +4548,37 @@ Confirmed the stale-JS cleanup pass: `app/`, `components/`, `hooks/`, `context/`
 ### Next logical step
 
 - Optional: convert `next.config.js` / Tailwind / PostCSS to `.ts` or `.mjs` if you want zero root `.js` in `include`.
+
+---
+
+## 2026-06-07 — Jest → Vitest migration
+
+### What was built and why
+
+Replaced Jest with Vitest for unit/component tests. Vitest aligns better with the Vite/ESM toolchain and is a natural fit for a Next 15 + TypeScript codebase. Playwright E2E unchanged.
+
+### Files created
+
+- `vitest.config.ts` — jsdom default, path aliases, excludes `e2e/` and migration folders
+- `vitest.setup.ts` — `@testing-library/jest-dom/vitest` + TextEncoder polyfill
+- `vitest.env.d.ts` — `vitest/globals` types for `describe` / `it` / `vi`
+- `docs/notes/vitest-setup.md`
+
+### Files removed
+
+- `jest.config.ts`, `jest.setup.ts`, `docs/notes/jest-setup.md`
+
+### Files modified
+
+- `package.json` — `vitest`, `@vitejs/plugin-react`, `jsdom`, `@vitest/coverage-v8`; removed `jest`, `jest-environment-jsdom`, `@types/jest`; scripts `test` / `test:watch` / `test:ci`
+- `tsconfig.json` — include `vitest.env.d.ts`
+- `utils/debounce.test.ts`, `utils/startCooldown.test.ts`, `utils/api/rateLimiter.test.ts`, `utils/stringManipulation/findNormalizedMatch.test.ts` — `jest.*` → `vi.*`
+- `utils/mongoDataCleanup.test.ts` — `@vitest-environment node`
+- `TESTING.md`, `docs/README.md`
+
+### Verification
+
+- `pnpm install` — OK
+- `pnpm test` — OK (20 files, 111 tests)
+- `pnpm exec tsc --noEmit` — OK
+- `pnpm build` — OK

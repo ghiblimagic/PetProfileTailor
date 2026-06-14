@@ -4,11 +4,11 @@ import startCooldown from "./startCooldown";
 
 describe("startCooldown", () => {
   beforeEach(() => {
-    jest.useFakeTimers();
+    vi.useFakeTimers();
   });
 
   afterEach(() => {
-    jest.useRealTimers();
+    vi.useRealTimers();
   });
 
   it("counts down and clears the interval at zero", () => {
@@ -26,12 +26,12 @@ describe("startCooldown", () => {
     expect(result.current.intervalRef.current).not.toBeNull();
 
     act(() => {
-      jest.advanceTimersByTime(1000);
+      vi.advanceTimersByTime(1000);
     });
     expect(result.current.remaining).toBe(2);
 
     act(() => {
-      jest.advanceTimersByTime(2000);
+      vi.advanceTimersByTime(2000);
     });
     expect(result.current.remaining).toBe(0);
     expect(result.current.intervalRef.current).toBeNull();

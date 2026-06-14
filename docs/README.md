@@ -21,7 +21,7 @@ Each source file with notes should have a one-line pointer at the top linking to
 | Source | Notes |
 |--------|-------|
 | [`utils/mongoDataCleanup.ts`](../utils/mongoDataCleanup.ts) | [mongoDataCleanup.md](notes/utils/mongoDataCleanup.md) |
-| [`jest.setup.ts`](../jest.setup.ts) | [jest-setup.md](notes/jest-setup.md) |
+| [`vitest.setup.ts`](../vitest.setup.ts) | [vitest-setup.md](notes/vitest-setup.md) |
 | [`lib/auth.ts`](../lib/auth.ts) | [auth.md](notes/lib/auth.md) |
 | [`lib/checkBlocklist.ts`](../lib/checkBlocklist.ts) | [checkBlocklist.md](notes/lib/checkBlocklist.md) |
 | [`data/blockList.ts`](../data/blockList.ts) | [blockList.md](notes/data/blockList.md) |
