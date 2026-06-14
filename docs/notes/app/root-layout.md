@@ -22,7 +22,7 @@ export const metadata: Metadata = {
 ```tsx
 <SessionProviderWrapper session={safeSession}>
   <CategTagsWrapper descrCateg={descriptions} nameCateg={names}>
-    <LikesWrapper>
+    <LikesWrapper initialLikes={initialLikes}>
       <NotificationsWrapper>
         <ReportsWrapper>
           <SuggestionsWrapper>
@@ -98,6 +98,20 @@ async function getCategoriesAndTagsWithTTL(): Promise<CachedCategories> {
 
 Hydrates [`CategTagsWrapper`](../../../wrappers/CategTagsWrapper.tsx) → [`CategoriesAndTagsProvider`](../../../context/CategoriesAndTagsContext.tsx). See [categories-and-tags.md](../context/categories-and-tags.md).
 
+## Likes server prefetch
+
+When `session.user.id` exists, layout calls [`getUserLikesForUserId`](../../../utils/api/getUserLikes.ts) and passes the result to `LikesWrapper`:
+
+```ts
+const initialLikes = session?.user?.id
+  ? await getUserLikesForUserId(session.user.id)
+  : null;
+
+<LikesWrapper initialLikes={initialLikes}>
+```
+
+[`LikesProvider`](../../../context/LikesContext.tsx) seeds `likesRef` from `initialLikes` so heart icons match on first paint; skips the redundant client `GET /api/user/likes` on that load. Client-only login still fetches via the API. See [user-likes-route.md](./api/user-likes-route.md).
+
 `RootLayout` also calls `await dbConnect.connect()` before reading cache — ensures connection before render (duplicate with cache miss path is harmless).
 
 ## Main layout CSS notes
@@ -117,4 +131,4 @@ Hydrates [`CategTagsWrapper`](../../../wrappers/CategTagsWrapper.tsx) → [`Cate
 
 - [categories-and-tags.md](../context/categories-and-tags.md)
 - [categories-and-tags-route.md](./api/categories-and-tags-route.md)
-- [`docs/FUTURE.md`](../../FUTURE.md) — Option B: server-fetch likes into `LikesWrapper`
+- [user-likes-route.md](./api/user-likes-route.md)

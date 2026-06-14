@@ -4999,3 +4999,54 @@ Top-level component folders now match the repo convention (`Notifications/`, `Fo
 
 - `pnpm exec tsc --noEmit` — OK
 - `pnpm test` — OK (29 files, 147 tests)
+
+---
+
+## 2026-06-07 — Likes server prefetch (Option B)
+
+### What was built and why
+
+Signed-in users saw wrong heart state until client `GET /api/user/likes` finished. Root layout now prefetches likes and seeds `LikesProvider` on first paint (see `docs/FUTURE.md` Option B).
+
+### Files created
+
+- `utils/api/getUserLikes.ts` — `getUserLikesForUserId`
+- `utils/api/userLikesResponse.ts` — types + `buildLikesMapsFromResponse`
+- `utils/api/getUserLikes.test.ts` — map builder unit tests
+
+### Files modified
+
+- `app/api/user/likes/route.ts` — thin handler; delegates to `getUserLikesForUserId`
+- `context/LikesContext.tsx` — optional `initialLikes`; skip first client fetch when server-seeded
+- `wrappers/LikesWrapper.tsx` — passes `initialLikes` prop
+- `app/layout.tsx` — prefetch when session has user id
+- `docs/notes/app/api/user-likes-route.md`, `docs/notes/app/root-layout.md`, `docs/FUTURE.md`, `docs/README.md`
+
+### Patterns
+
+- One fetch helper for API route + server layout (same shape as `UserLikesResponse`)
+- Client fetch still runs after client-only login; toggles still use `addLike` / `deleteLike`
+- No page-level `NameLikes` props on listing pages
+
+### Verification
+
+- `pnpm exec tsc --noEmit` — OK
+- `pnpm test` — OK (30 files, 149 tests)
+
+### Next logical step
+
+- Manual: signed-in listing page — hearts correct on first paint without flash
+
+---
+
+## 2026-06-07 — Restore LikesContext inline comments
+
+### What changed
+
+Re-added explanatory comments removed during likes prefetch refactor: `recentLikesRef` session deltas, logout reset, SSR skip-fetch, AbortController/magic-link note, legacy `getLikeStatus` sketch, usage examples at file bottom. Updated bottom example to current `addLike("names", contentId)` signature.
+
+### Files modified
+
+- `context/LikesContext.tsx`
+- `utils/api/getUserLikes.ts` — parallel query comment
+- `app/api/user/likes/route.ts` — session comment

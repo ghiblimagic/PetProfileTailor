@@ -13,7 +13,10 @@ import {
   type MutableRefObject,
 } from "react";
 import { useSession } from "next-auth/react";
-import type { UserLikesResponse } from "@/app/api/user/likes/route";
+import {
+  buildLikesMapsFromResponse,
+  type UserLikesResponse,
+} from "@/utils/api/userLikesResponse";
 
 export type LikeContentType = "names" | "descriptions";
 
@@ -51,15 +54,25 @@ export function useLikes(): LikesContextValue {
   return context;
 }
 
-export function LikesProvider({ children }: { children: ReactNode }) {
+type LikesProviderProps = {
+  children: ReactNode;
+  /** Server-prefetched likes from root layout — skips first client fetch when present. */
+  initialLikes?: UserLikesResponse | null;
+};
+
+export function LikesProvider({ children, initialLikes }: LikesProviderProps) {
   const { data: session, status } = useSession();
   const userId = session?.user?.id;
 
-  const likesRef = useRef<LikesRefData>(emptyLikesRef());
+  // Hydrate from server prefetch when layout passed initialLikes (correct hearts on first paint)
+  const likesRef = useRef<LikesRefData>(
+    initialLikes ? buildLikesMapsFromResponse(initialLikes) : emptyLikesRef(),
+  );
   const recentLikesRef = useRef<RecentLikesRef>({}); // track like adjustments for this session
   // object keyed by contentId, with values -1, 0, or 1
   // { [nameId]: 1 | 0 | -1 }
   // tracks if the likes count has to be updated, important for if the user navigates backwards
+  const skipInitialFetchRef = useRef(initialLikes != null);
 
   useEffect(() => {
     if (status === "loading") return;
@@ -68,30 +81,27 @@ export function LikesProvider({ children }: { children: ReactNode }) {
       // reset likes when logged out
       likesRef.current = emptyLikesRef();
       recentLikesRef.current = {};
+      skipInitialFetchRef.current = false; // next login should fetch (unless new SSR prefetch)
       return;
     }
 
-    //controller ensures that if your page unmounts or the fetch is canceled during redirect/hydration, the promise cleanly aborts
-    // for example when logging in with magic links I kept getting the:
-    //TypeError: NetworkError when attempting to fetch resource.
+    // Root layout already seeded likesRef — skip redundant GET on this mount
+    if (skipInitialFetchRef.current) {
+      skipInitialFetchRef.current = false;
+      return;
+    }
 
+    // controller ensures that if your page unmounts or the fetch is canceled during redirect/hydration, the promise cleanly aborts
+    // for example when logging in with magic links I kept getting the:
+    // TypeError: NetworkError when attempting to fetch resource.
     const controller = new AbortController();
 
-    // fetch likes for the logged-in user
+    // fetch likes for the logged-in user (client-only login — no SSR initialLikes)
     fetch("/api/user/likes", { cache: "no-store", signal: controller.signal })
       .then((res) => res.json())
       .then((data: UserLikesResponse) => {
         if (!controller.signal.aborted) {
-          const names = data?.names || [];
-          const descriptions = data?.descriptions || [];
-
-          likesRef.current = {
-            names: new Map(names.map((r) => [r.contentId.toString(), null])),
-            descriptions: new Map(
-              descriptions.map((r) => [r.contentId.toString(), null]),
-            ),
-          };
-
+          likesRef.current = buildLikesMapsFromResponse(data);
           recentLikesRef.current = {};
         }
       })
@@ -108,11 +118,8 @@ export function LikesProvider({ children }: { children: ReactNode }) {
     return Array.from(likesRef.current[type]?.keys() || []);
   };
 
-  // console.log("likesRef in context", likesRef);
-
   const hasLiked = (type: LikeContentType, contentId: string): boolean => {
     return likesRef.current[type]?.has(contentId.toString()) ?? false;
-    // has returns a boolean, true or false
   };
 
   // const getLikeStatus = (type, contentId) => {
@@ -126,13 +133,6 @@ export function LikesProvider({ children }: { children: ReactNode }) {
   };
 
   const deleteLike = (type: LikeContentType, contentId: string) => {
-    // console.log(
-    //   "delete like type",
-    //   type,
-
-    //   "delete contentID",
-    //   contentId,
-    // );
     likesRef.current[type]?.delete(contentId.toString());
   };
 
@@ -152,14 +152,14 @@ export function LikesProvider({ children }: { children: ReactNode }) {
   );
 }
 
-//  likesRef usage
+// likesRef usage
 // const { likesRef } = useLikes();
 // console.log(likesRef.current.names); // Map of name likes
 
-// hasLiked and Add Like
+// hasLiked and addLike
 // if (!hasLiked("names", contentId)) {
-//   addLike("names", contentId, likeId, "pending");
+//   addLike("names", contentId);
 // }
 
-//  status usage
-// const status = getLikeStatus("users", userId);
+// status usage (legacy — maps no longer store status)
+// const status = getLikeStatus("names", contentId);

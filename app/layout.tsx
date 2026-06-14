@@ -31,6 +31,7 @@ import NameCategory from "@/models/NameCategory";
 import DescriptionCategory from "@/models/DescriptionCategory";
 import { leanWithStrings } from "@/utils/mongoDataCleanup";
 import Footer from "@/components/Footer/Footer";
+import { getUserLikesForUserId } from "@/utils/api/getUserLikes";
 import type { CategoryWithTags } from "@/context/CategoriesAndTagsContext";
 import type { Metadata } from "next";
 import type { Session } from "next-auth";
@@ -100,6 +101,10 @@ export default async function RootLayout({ children }: RootLayoutProps) {
   // Cached DB data
   const { names, descriptions } = await getCategoriesAndTagsWithTTL();
 
+  const initialLikes = session?.user?.id
+    ? await getUserLikesForUserId(session.user.id)
+    : null;
+
   return (
     <html
       lang="en"
@@ -111,7 +116,7 @@ export default async function RootLayout({ children }: RootLayoutProps) {
             descrCateg={descriptions}
             nameCateg={names}
           >
-            <LikesWrapper>
+            <LikesWrapper initialLikes={initialLikes}>
               <NotificationsWrapper>
                 <ReportsWrapper>
                   <SuggestionsWrapper>
