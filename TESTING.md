@@ -155,6 +155,12 @@ Playwright maps `MONGODB_URI_TEST` → `MONGODB_URI` when starting the server. `
 - `PATCH /api/notifications/thanks/mark-read` → all thank notifications `read: true`
 - `PATCH /api/notifications/names/mark-read` → all name like notifications `read: true`
 
+**`e2e/notifications-ui.spec.ts`**
+
+- Thanks tab — admin thanks seeded name → row shows thanker name, message, and `SEED_NAME`
+- Thanks tab — unread badge clears after tab stays open (~3s mark-read timer)
+- Thanks tab — admin thanks seeded description → row shows truncated description text
+
 ### Fixture data
 
 Shared seed content lives in **`e2e/fixtures/seed-data.json`** (imported by `scripts/seed-e2e.mjs` and Playwright via `e2e/fixtures/seed-data.ts`). Tests use constants like `SEED_NAME` — not hardcoded strings — so duplicate checks stay in sync with the DB.
@@ -208,9 +214,8 @@ E2E cannot exercise these (bypassed or skipped).
 
 - [ ] Like toggle on name detail UI — rapid double-click → one like, no 500
 - [ ] `/notifications` **UI** — mark read persists (E2E covers names mark-read **API** only)
-- [ ] `/notifications` UI — description and thanks tabs render populated rows
+- [ ] `/notifications` UI — descriptions tab renders populated rows (E2E covers thanks tab UI + thanks API)
 - [ ] Profile follow / unfollow via **UI** (followers list is commented out on profile)
-- [ ] `/notifications` **UI** — thanks tab renders populated rows (E2E covers thanks **API** + mark-read only)
 - [ ] Thank, suggestion, report flows — submit without 500; lists load if exposed
 
 ### Data shape & listing UX

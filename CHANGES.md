@@ -4865,3 +4865,37 @@ Extended Playwright notification coverage for the thanks flow — previously onl
 
 - `/notifications` UI thanks tab (Playwright browser assertions)
 - Description/thanks `mark-read` UI persistence on `/notifications` page
+
+---
+
+## 2026-06-07 — Notifications thanks tab UI E2E
+
+### What was built and why
+
+Browser-level coverage for `/notifications` Thanks tab — populated rows and the 3s mark-read badge clear that the API-only tests could not assert.
+
+### Files created
+
+- `e2e/notifications-ui.spec.ts` — thanks tab rows (name + description), unread badge clears after tab stays open
+- `e2e/helpers/notifications-ui.ts` — `gotoNotificationsPage`, `openThanksTab`, `thanksUnreadBadge`, `leaveThanksTabBeforeMarkRead`
+
+### Files modified
+
+- `TESTING.md` — E2E coverage + manual checklist (thanks UI covered; descriptions tab UI still manual)
+
+### Patterns
+
+- Serial suite: name row test leaves Thanks tab before 3s timer so mark-read test still has unread badge
+- Row locator: filter `div` by `thanked you` + content text; assert admin display name + default thank message
+- Description row uses `SEED_DESCRIPTION_START.slice(0, 60) + "..."` to match `ThankNotificationListing` truncation
+- Mark-read UI: `expect.poll` on badge count after `openThanksTab` + 3s client timer (`test.setTimeout(60_000)`)
+
+### Verification
+
+- `pnpm test` — OK (147 unit/component tests)
+- `pnpm test:e2e e2e/notifications-ui.spec.ts` — requires `MONGODB_URI_TEST` + seed
+
+### Next logical step
+
+- `/notifications` descriptions tab UI rows
+- Names tab mark-read badge UI (API mark-read already covered)
