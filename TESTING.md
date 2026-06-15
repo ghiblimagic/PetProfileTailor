@@ -35,14 +35,14 @@ Vitest + E2E green covers validation logic and the flows listed below. Manual ch
 | Area | Tests |
 |------|-------|
 | API auth guards | `checkOwnership.test.ts`, `checkIfAdmin.test.ts` |
-| User likes prefetch | `getUserLikes.test.ts` (`buildLikesMapsFromResponse`) |
+| User likes prefetch | `getUserLikes.test.ts` (`buildLikesMapsFromResponse`), `LikesContext.test.tsx` (SSR hydrate, fetch, logout) |
 | Alert / validation UI | `Shared/feedback/WarningMessage.test.tsx`, `Shared/feedback/ToggeableAlert.test.tsx` |
 | Form / gate UI | `Shared/feedback/MustLoginMessage.test.tsx`, `StyledCheckbox.test.tsx`, `preserveTextAfterSubmission.test.tsx` |
 | Duplicate check UI | `CheckIfContentExists.test.tsx` (mocked `fetch` + `ContentListing`) |
 | Register form | `RegisterForm.test.tsx` (client validation + server field errors; mocked auth/captcha/axios) |
-| Presentational | `Shared/ui/skeleton.test.tsx` |
+| Presentational | `Shared/ui/skeleton.test.tsx`, `Shared/media/ShowTime.test.tsx`, `Shared/lists/ListWithPawPrintIcon.test.tsx` |
 
-RTL pattern: small harness with `useState` for dismiss flows; `userEvent` for clicks. API guards mock `getSessionForApis` via `vi.hoisted` (avoids loading `lib/auth` / Mongo). `CheckIfContentExists` harness restores parent `value` after the component’s mount `resetTrigger` effect clears it.
+RTL pattern: small harness with `useState` for dismiss flows; `userEvent` for clicks. API guards mock `getSessionForApis` via `vi.hoisted` (avoids loading `lib/auth` / Mongo). `CheckIfContentExists` harness restores parent `value` after the component’s mount `resetTrigger` effect clears it. `LikesContext` uses ref-based maps — tests capture `useLikes()` API imperatively and poll for async fetch (mutations do not re-render consumers).
 
 ---
 

@@ -5050,3 +5050,32 @@ Re-added explanatory comments removed during likes prefetch refactor: `recentLik
 - `context/LikesContext.tsx`
 - `utils/api/getUserLikes.ts` — parallel query comment
 - `app/api/user/likes/route.ts` — session comment
+
+---
+
+## 2026-06-07 — RTL batch: LikesContext, ShowTime, ListWithPawPrintIcon
+
+### What was built and why
+
+Expanded Vitest coverage after likes server prefetch — context behavior, plus two untested shared components.
+
+### Files created
+
+- `context/LikesContext.test.tsx` — SSR hydrate, client fetch, add/delete, logout, post-login fetch
+- `components/Shared/media/ShowTime.test.tsx` — mocked `Intl.DateTimeFormat`, styling
+- `components/Shared/lists/ListWithPawPrintIcon.test.tsx` — text + `className`
+
+### Patterns
+
+- `LikesContext` stores state in refs — tests use `LikesCapture` + imperative `hasLiked` / `getLikedIds`, and `LikesPoll` for async fetch (no re-render on ref mutation)
+- `vi.hoisted` mock of `useSession`; `fetch` stubbed globally
+- `ShowTime` — mock `Intl.DateTimeFormat` to avoid locale flakiness
+
+### Verification
+
+- `pnpm test` — OK (33 files, 159 tests)
+
+### Next logical step
+
+- `useLikeState` hook tests (mock `useLikes` + toggle API)
+- E2E: descriptions tab UI on `/notifications`
