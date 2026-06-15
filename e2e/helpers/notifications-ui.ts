@@ -12,6 +12,10 @@ export function namesTabButton(page: Page) {
   return page.getByRole("button", { name: /Names/i });
 }
 
+export function namesUnreadBadge(page: Page) {
+  return namesTabButton(page).locator("span.bg-blue-700");
+}
+
 export function thanksUnreadBadge(page: Page) {
   return thanksTabButton(page).locator("span.bg-blue-700");
 }
@@ -75,4 +79,8 @@ export async function gotoNotificationsPage(page: Page): Promise<void> {
 /** Switch away from Thanks before the 3s mark-read timer fires. */
 export async function leaveThanksTabBeforeMarkRead(page: Page): Promise<void> {
   await page.getByRole("button", { name: /Names/i }).click();
+}
+
+export async function leaveNamesTabBeforeMarkRead(page: Page): Promise<void> {
+  await openThanksTab(page);
 }

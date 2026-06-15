@@ -14,7 +14,9 @@ import {
 import {
   gotoNotificationsPage,
   leaveThanksTabBeforeMarkRead,
+  leaveNamesTabBeforeMarkRead,
   notificationRow,
+  namesUnreadBadge,
   openDescriptionsTab,
   openThanksTab,
   thanksUnreadBadge,
@@ -162,5 +164,27 @@ test.describe("Notifications UI", () => {
 
     await expect(row).toBeVisible({ timeout: 15_000 });
     await expect(row).toContainText(getPlaywrightAdminDisplayName());
+
+    await leaveNamesTabBeforeMarkRead(page);
+  });
+
+  test("names tab mark-read clears unread badge after tab stays open", async ({
+    page,
+  }) => {
+    test.setTimeout(60_000);
+
+    await loginWithCredentials(page);
+    await gotoNotificationsPage(page);
+
+    const badge = namesUnreadBadge(page);
+    await expect(badge).toBeVisible({ timeout: 15_000 });
+
+    await expect(
+      notificationRow(page, /Liked •/i, SEED_NAME),
+    ).toBeVisible({ timeout: 15_000 });
+
+    await expect
+      .poll(async () => badge.count(), { timeout: 12_000 })
+      .toBe(0);
   });
 });

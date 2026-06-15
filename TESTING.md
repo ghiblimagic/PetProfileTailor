@@ -36,7 +36,7 @@ Vitest + E2E green covers validation logic and the flows listed below. Manual ch
 |------|-------|
 | API auth guards | `checkOwnership.test.ts`, `checkIfAdmin.test.ts` |
 | User likes prefetch | `getUserLikes.test.ts`, `LikesContext.test.tsx` (SSR hydrate, fetch, logout) |
-| Like toggle hook | `useLikeState.test.ts` (optimistic count, rollback; mocked `useToggleState`) |
+| Like toggle hook | `useLikeState.test.ts` (optimistic count, rollback; mocked `useToggleState`); `useToggleState.test.ts` (debounce POST, rollback, rate limit, in-flight guard) |
 | Shared actions | `Shared/actions/GeneralButton.test.tsx` |
 | Alert / validation UI | `Shared/feedback/WarningMessage.test.tsx`, `Shared/feedback/ToggeableAlert.test.tsx` |
 | Form / gate UI | `Shared/feedback/MustLoginMessage.test.tsx`, `StyledCheckbox.test.tsx`, `preserveTextAfterSubmission.test.tsx` |
@@ -165,6 +165,7 @@ Playwright maps `MONGODB_URI_TEST` → `MONGODB_URI` when starting the server. `
 - Thanks tab — admin thanks seeded description → row shows truncated description text
 - Descriptions tab — admin likes seeded description → row shows admin name + truncated content + `Liked •`
 - Names tab — admin likes seeded name → row shows admin name + `SEED_NAME` + `Liked •` (default tab on page load)
+- Names tab — unread badge clears after tab stays open (~3s mark-read timer)
 
 **Note — duplicate notification rows (strict mode):** Serial reruns of `notifications-ui.spec.ts` leave multiple thank/like rows for the same seeded content in the test DB. A locator like `row.getByText('E2E Admin')` can then match two elements and Playwright throws a strict mode violation.
 
