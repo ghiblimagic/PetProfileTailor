@@ -23,7 +23,7 @@ import {
   lookupSeededDescription,
   lookupSeededName,
 } from "./helpers/seed-lookup";
-import { ensureDescriptionLiked } from "./helpers/likes";
+import { ensureDescriptionLiked, ensureNameLiked } from "./helpers/likes";
 import { submitThanks } from "./helpers/thanks";
 
 const DEFAULT_THANK_MESSAGE = "Made me smile or laugh";
@@ -136,6 +136,29 @@ test.describe("Notifications UI", () => {
     await openDescriptionsTab(page);
 
     const row = notificationRow(page, /Liked •/i, TRUNCATED_DESCRIPTION);
+
+    await expect(row).toBeVisible({ timeout: 15_000 });
+    await expect(row).toContainText(getPlaywrightAdminDisplayName());
+  });
+
+  test("names tab renders populated like row after admin like", async ({
+    page,
+  }) => {
+    const seeded = await lookupSeededName(page.request, SEED_NAME);
+
+    await loginWithAdminCredentials(page);
+    await ensureNameLiked(page.request, seeded.id, {
+      _id: seeded.creatorId,
+      name: seeded.createdBy.name,
+      profileName: seeded.createdBy.profileName,
+    });
+
+    await signOutViaNav(page);
+    await loginWithCredentials(page);
+    await gotoNotificationsPage(page);
+    // Names tab is SSR default — list is visible without clicking the tab
+
+    const row = notificationRow(page, /Liked •/i, SEED_NAME);
 
     await expect(row).toBeVisible({ timeout: 15_000 });
     await expect(row).toContainText(getPlaywrightAdminDisplayName());

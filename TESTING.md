@@ -164,6 +164,7 @@ Playwright maps `MONGODB_URI_TEST` → `MONGODB_URI` when starting the server. `
 - Thanks tab — unread badge clears after tab stays open (~3s mark-read timer)
 - Thanks tab — admin thanks seeded description → row shows truncated description text
 - Descriptions tab — admin likes seeded description → row shows admin name + truncated content + `Liked •`
+- Names tab — admin likes seeded name → row shows admin name + `SEED_NAME` + `Liked •` (default tab on page load)
 
 **Note — duplicate notification rows (strict mode):** Serial reruns of `notifications-ui.spec.ts` leave multiple thank/like rows for the same seeded content in the test DB. A locator like `row.getByText('E2E Admin')` can then match two elements and Playwright throws a strict mode violation.
 

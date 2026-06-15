@@ -5131,3 +5131,26 @@ Serial `notifications-ui.spec.ts` reruns append thank/like rows to the test DB. 
 - `e2e/helpers/notifications-ui.ts` — `notificationRow`
 - `e2e/notifications-ui.spec.ts` — all row assertions
 - `TESTING.md` — duplicate-row / strict-mode note under `notifications-ui.spec.ts`
+
+### Next logical step
+
+- `useToggleState` unit tests with fake timers + mocked fetch
+- `/notifications` UI — names tab mark-read badge (API covered)
+
+---
+
+## 2026-06-07 — Names tab UI E2E (`notifications-ui.spec.ts`)
+
+### What was built and why
+
+Browser assertion for name like notifications — API was covered in `notifications.spec.ts`; names tab is the SSR default on `/notifications` so no tab click is required.
+
+### Files modified
+
+- `e2e/notifications-ui.spec.ts` — admin like on `SEED_NAME` → user sees `Liked •` row
+- `e2e/helpers/notifications-ui.ts` — `namesTabButton`, `openNamesTab` (for future tab-switch tests)
+- `TESTING.md` — E2E coverage bullet
+
+### Verification
+
+- `pnpm test:e2e e2e/notifications-ui.spec.ts` — requires `MONGODB_URI_TEST` + seed
