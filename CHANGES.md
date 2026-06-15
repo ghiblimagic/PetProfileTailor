@@ -5205,5 +5205,28 @@ Browser assertion for name like notifications — API was covered in `notificati
 
 ### Next logical step
 
-- Descriptions tab mark-read UI E2E (thanks + names covered)
+- Like toggle on name detail UI — rapid double-click E2E
+
+---
+
+## 2026-06-08 — Descriptions tab mark-read (API + UI E2E)
+
+### What was built and why
+
+Completes the notifications tab trilogy: thanks and names already had mark-read UI + persist-after-reload; descriptions had list UI only, no `PATCH descriptions/mark-read` API test.
+
+### Files modified
+
+- `e2e/helpers/notifications-ui.ts` — `descriptionsUnreadBadge`, `leaveDescriptionsTabBeforeMarkRead`
+- `e2e/notifications-ui.spec.ts` — mark-read + reload persist test; descriptions like row leaves tab before timer
+- `e2e/notifications.spec.ts` — `PATCH /api/notifications/descriptions/mark-read`
+- `TESTING.md` — API + UI coverage bullets
+
+### Verification
+
+- `pnpm exec playwright test e2e/notifications-ui.spec.ts e2e/notifications.spec.ts --list` — 16 tests listed
+- `pnpm test:e2e e2e/notifications-ui.spec.ts` — run locally with seed
+
+### Next logical step
+
 - Like toggle on name detail UI — rapid double-click E2E

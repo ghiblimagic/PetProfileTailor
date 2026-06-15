@@ -15,7 +15,9 @@ import {
   gotoNotificationsPage,
   leaveThanksTabBeforeMarkRead,
   leaveNamesTabBeforeMarkRead,
+  leaveDescriptionsTabBeforeMarkRead,
   notificationRow,
+  descriptionsUnreadBadge,
   namesUnreadBadge,
   openDescriptionsTab,
   openThanksTab,
@@ -146,6 +148,33 @@ test.describe("Notifications UI", () => {
 
     await expect(row).toBeVisible({ timeout: 15_000 });
     await expect(row).toContainText(getPlaywrightAdminDisplayName());
+
+    await leaveDescriptionsTabBeforeMarkRead(page);
+  });
+
+  test("descriptions tab mark-read clears unread badge after tab stays open", async ({
+    page,
+  }) => {
+    test.setTimeout(60_000);
+
+    await loginWithCredentials(page);
+    await gotoNotificationsPage(page);
+
+    const badge = descriptionsUnreadBadge(page);
+    await expect(badge).toBeVisible({ timeout: 15_000 });
+
+    await openDescriptionsTab(page);
+    await expect(
+      notificationRow(page, /Liked •/i, TRUNCATED_DESCRIPTION),
+    ).toBeVisible({ timeout: 15_000 });
+
+    await expect
+      .poll(async () => badge.count(), { timeout: 12_000 })
+      .toBe(0);
+
+    await reloadNotificationsPage(page);
+    await openDescriptionsTab(page);
+    await expect(descriptionsUnreadBadge(page)).toHaveCount(0);
   });
 
   test("names tab renders populated like row after admin like", async ({

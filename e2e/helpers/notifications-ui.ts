@@ -20,6 +20,10 @@ export function thanksUnreadBadge(page: Page) {
   return thanksTabButton(page).locator("span.bg-blue-700");
 }
 
+export function descriptionsUnreadBadge(page: Page) {
+  return descriptionsTabButton(page).locator("span.bg-blue-700");
+}
+
 /** Opens Thanks tab and waits for the list API to finish. */
 export async function openThanksTab(page: Page): Promise<void> {
   const thanksResponse = page.waitForResponse(
@@ -97,4 +101,9 @@ export async function leaveThanksTabBeforeMarkRead(page: Page): Promise<void> {
 
 export async function leaveNamesTabBeforeMarkRead(page: Page): Promise<void> {
   await openThanksTab(page);
+}
+
+/** Switch away from Descriptions before the 3s mark-read timer fires. */
+export async function leaveDescriptionsTabBeforeMarkRead(page: Page): Promise<void> {
+  await namesTabButton(page).click();
 }

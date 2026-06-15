@@ -157,6 +157,7 @@ Playwright maps `MONGODB_URI_TEST` → `MONGODB_URI` when starting the server. `
 - Self-thank — `POST /api/thanks` on own content → 400
 - `PATCH /api/notifications/thanks/mark-read` → all thank notifications `read: true`
 - `PATCH /api/notifications/names/mark-read` → all name like notifications `read: true`
+- `PATCH /api/notifications/descriptions/mark-read` → all description like notifications `read: true`
 
 **`e2e/notifications-ui.spec.ts`**
 
@@ -164,6 +165,7 @@ Playwright maps `MONGODB_URI_TEST` → `MONGODB_URI` when starting the server. `
 - Thanks tab — unread badge clears after tab stays open (~3s mark-read timer); **persists after page reload**
 - Thanks tab — admin thanks seeded description → row shows truncated description text
 - Descriptions tab — admin likes seeded description → row shows admin name + truncated content + `Liked •`
+- Descriptions tab — unread badge clears after tab stays open (~3s mark-read timer); **persists after page reload**
 - Names tab — admin likes seeded name → row shows admin name + `SEED_NAME` + `Liked •` (default tab on page load)
 - Names tab — unread badge clears after tab stays open (~3s mark-read timer); **persists after page reload**
 

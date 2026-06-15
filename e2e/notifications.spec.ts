@@ -253,5 +253,35 @@ test.describe("Notifications API", () => {
 
       expect(afterJson.every((n) => n.read === true)).toBeTruthy();
     });
+
+    test("PATCH descriptions mark-read sets read on like notifications", async ({
+      page,
+    }) => {
+      await loginWithCredentials(page);
+
+      const before = await page.request.get("/api/notifications/descriptions");
+      expect(before.ok()).toBeTruthy();
+      const beforeJson = (await before.json()) as LikeNotification[];
+
+      test.skip(
+        beforeJson.length === 0,
+        "No description notifications in test DB — run after like tests or re-seed",
+      );
+
+      const hasUnread = beforeJson.some((n) => n.read === false);
+      expect(hasUnread).toBeTruthy();
+
+      const patch = await page.request.patch(
+        "/api/notifications/descriptions/mark-read",
+      );
+      expect(patch.ok()).toBeTruthy();
+      expect(await patch.json()).toEqual({ success: true });
+
+      const after = await page.request.get("/api/notifications/descriptions");
+      expect(after.ok()).toBeTruthy();
+      const afterJson = (await after.json()) as LikeNotification[];
+
+      expect(afterJson.every((n) => n.read === true)).toBeTruthy();
+    });
   });
 });
