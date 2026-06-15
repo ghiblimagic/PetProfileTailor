@@ -76,6 +76,20 @@ export async function gotoNotificationsPage(page: Page): Promise<void> {
   ).toBeVisible({ timeout: 15_000 });
 }
 
+/** Reload `/notifications` and wait for unread counts to refetch. */
+export async function reloadNotificationsPage(page: Page): Promise<void> {
+  const notificationsResponse = page.waitForResponse(
+    (response) =>
+      response.url().includes("/api/user/notifications") &&
+      response.request().method() === "GET" &&
+      response.ok(),
+  );
+  await Promise.all([notificationsResponse, page.reload()]);
+  await expect(
+    page.getByText("Notifications", { exact: true }),
+  ).toBeVisible({ timeout: 15_000 });
+}
+
 /** Switch away from Thanks before the 3s mark-read timer fires. */
 export async function leaveThanksTabBeforeMarkRead(page: Page): Promise<void> {
   await page.getByRole("button", { name: /Names/i }).click();

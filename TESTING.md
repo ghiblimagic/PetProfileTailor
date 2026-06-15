@@ -36,7 +36,7 @@ Vitest + E2E green covers validation logic and the flows listed below. Manual ch
 |------|-------|
 | API auth guards | `checkOwnership.test.ts`, `checkIfAdmin.test.ts` |
 | User likes prefetch | `getUserLikes.test.ts`, `LikesContext.test.tsx` (SSR hydrate, fetch, logout) |
-| Like toggle hook | `useLikeState.test.ts` (optimistic count, rollback; mocked `useToggleState`); `useToggleState.test.ts` (debounce POST, rollback, rate limit, in-flight guard) |
+| Like toggle hook | `useLikeState.test.ts` (optimistic count, rollback; mocked `useToggleState`); `useToggleState.test.ts` (debounce POST, rollback, rate limit, in-flight guard); `useApiRateLimiter.test.ts` (limit, window reset) |
 | Shared actions | `Shared/actions/GeneralButton.test.tsx` |
 | Alert / validation UI | `Shared/feedback/WarningMessage.test.tsx`, `Shared/feedback/ToggeableAlert.test.tsx` |
 | Form / gate UI | `Shared/feedback/MustLoginMessage.test.tsx`, `StyledCheckbox.test.tsx`, `preserveTextAfterSubmission.test.tsx` |
@@ -161,11 +161,11 @@ Playwright maps `MONGODB_URI_TEST` → `MONGODB_URI` when starting the server. `
 **`e2e/notifications-ui.spec.ts`**
 
 - Thanks tab — admin thanks seeded name → row shows thanker name, message, and `SEED_NAME`
-- Thanks tab — unread badge clears after tab stays open (~3s mark-read timer)
+- Thanks tab — unread badge clears after tab stays open (~3s mark-read timer); **persists after page reload**
 - Thanks tab — admin thanks seeded description → row shows truncated description text
 - Descriptions tab — admin likes seeded description → row shows admin name + truncated content + `Liked •`
 - Names tab — admin likes seeded name → row shows admin name + `SEED_NAME` + `Liked •` (default tab on page load)
-- Names tab — unread badge clears after tab stays open (~3s mark-read timer)
+- Names tab — unread badge clears after tab stays open (~3s mark-read timer); **persists after page reload**
 
 **Note — duplicate notification rows (strict mode):** Serial reruns of `notifications-ui.spec.ts` leave multiple thank/like rows for the same seeded content in the test DB. A locator like `row.getByText('E2E Admin')` can then match two elements and Playwright throws a strict mode violation.
 
@@ -229,7 +229,7 @@ E2E cannot exercise these (bypassed or skipped).
 ### Social & notifications (beyond E2E API smoke)
 
 - [ ] Like toggle on name detail UI — rapid double-click → one like, no 500
-- [ ] `/notifications` **UI** — mark read persists (E2E covers names mark-read **API** only)
+- [ ] `/notifications` **UI** — mark read persists — **partial:** thanks + names tab badges covered in `notifications-ui.spec.ts` (reload after mark-read)
 - [ ] Profile follow / unfollow via **UI** (followers list is commented out on profile)
 - [ ] Thank, suggestion, report flows — submit without 500; lists load if exposed
 
@@ -239,7 +239,7 @@ E2E cannot exercise these (bypassed or skipped).
 - [ ] `/name/[name]`, `/description/[id]` — render with related data (tags, creator)
 - [ ] `/fetchnames` or `/fetchdescriptions` — pagination spam **next** → ~15s cooldown
 - [ ] Same pages — rapid sort/filter → ~3s cooldown
-- [ ] `useApiRateLimiter` / like button — rapid clicks throttled
+- [ ] `useApiRateLimiter` / like button — rapid clicks throttled — **unit:** `useApiRateLimiter.test.ts`; UI double-click E2E still open
 
 ### Misc utils (no E2E yet)
 

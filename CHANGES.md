@@ -5183,26 +5183,27 @@ Browser assertion for name like notifications — API was covered in `notificati
 
 ---
 
-## 2026-06-07 — `useToggleState` unit tests + names tab mark-read E2E
+## 2026-06-08 — `useApiRateLimiter` tests + mark-read persists after reload
 
 ### What was built and why
 
-- **`hooks/useToggleState.test.ts`** — covers optimistic flip, debounced POST, `onApplyOptimistic` / `onRollback`, rate-limit skip, and in-flight toggle guard. Mocks `useApiRateLimiter`; fake timers for 500ms debounce; absolute `apiUrl` so unmount `flush` does not hit invalid relative URLs in Node.
-- **Names tab mark-read UI** — mirrors thanks-tab badge test; names tab is SSR default so no tab click needed.
+- **`hooks/useApiRateLimiter.test.ts`** — limit enforcement, window reset via `setInterval`, default options.
+- **Mark-read persist** — thanks and names mark-read E2E tests now reload `/notifications` after badge clears and assert badge stays absent (DB `read: true` survives refetch).
+- **`reloadNotificationsPage`** helper waits for `GET /api/user/notifications` after reload.
 
 ### Files created / modified
 
-- `hooks/useToggleState.test.ts` (new)
-- `e2e/notifications-ui.spec.ts` — names tab mark-read test
-- `e2e/helpers/notifications-ui.ts` — `namesUnreadBadge`
-- `TESTING.md` — coverage bullets
+- `hooks/useApiRateLimiter.test.ts` (new)
+- `e2e/helpers/notifications-ui.ts` — `reloadNotificationsPage`
+- `e2e/notifications-ui.spec.ts` — persist assertions on thanks + names mark-read tests
+- `TESTING.md` — coverage + checklist updates
 
 ### Verification
 
-- `pnpm test hooks/useToggleState.test.ts` — 6 passed
+- `pnpm test hooks/useApiRateLimiter.test.ts` — 4 passed
 - `pnpm test:e2e e2e/notifications-ui.spec.ts` — run locally with seed
 
 ### Next logical step
 
-- `/notifications` UI — mark read persists after reload (manual checklist item)
-- Optional: `useApiRateLimiter` unit tests
+- Descriptions tab mark-read UI E2E (thanks + names covered)
+- Like toggle on name detail UI — rapid double-click E2E

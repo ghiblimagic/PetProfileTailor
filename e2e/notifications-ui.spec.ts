@@ -19,6 +19,7 @@ import {
   namesUnreadBadge,
   openDescriptionsTab,
   openThanksTab,
+  reloadNotificationsPage,
   thanksUnreadBadge,
 } from "./helpers/notifications-ui";
 import {
@@ -84,6 +85,10 @@ test.describe("Notifications UI", () => {
     await expect
       .poll(async () => badge.count(), { timeout: 12_000 })
       .toBe(0);
+
+    await reloadNotificationsPage(page);
+    await openThanksTab(page);
+    await expect(thanksUnreadBadge(page)).toHaveCount(0);
   });
 
   test("thanks tab renders populated description thank row", async ({
@@ -186,5 +191,8 @@ test.describe("Notifications UI", () => {
     await expect
       .poll(async () => badge.count(), { timeout: 12_000 })
       .toBe(0);
+
+    await reloadNotificationsPage(page);
+    await expect(namesUnreadBadge(page)).toHaveCount(0);
   });
 });
