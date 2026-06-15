@@ -5079,3 +5079,55 @@ Expanded Vitest coverage after likes server prefetch — context behavior, plus 
 
 - `useLikeState` hook tests (mock `useLikes` + toggle API)
 - E2E: descriptions tab UI on `/notifications`
+
+---
+
+## 2026-06-07 — useLikeState, GeneralButton tests + descriptions tab E2E
+
+### What was built and why
+
+Follow-up testing batch: like toggle optimistic logic, primary button component, descriptions notifications UI.
+
+### Files created
+
+- `hooks/useLikeState.test.ts` — count + `addLike`/`deleteLike` via mocked `useToggleState`
+- `components/Shared/actions/GeneralButton.test.tsx` — click, disabled, aria-label, children, warning variant
+
+### Files modified
+
+- `e2e/helpers/notifications-ui.ts` — `openDescriptionsTab`, `descriptionsTabButton`
+- `e2e/notifications-ui.spec.ts` — descriptions tab like row after admin like
+- `TESTING.md` — coverage table + E2E list; descriptions tab removed from manual checklist
+
+### Patterns
+
+- `useLikeState` tests capture `onApplyOptimistic` / `onRollback` from mocked `useToggleState` (avoids debounce/fetch)
+- Descriptions UI row locator: `Liked •` + truncated `SEED_DESCRIPTION_START`
+
+### Verification
+
+- `pnpm test` — OK (35 files, 168 tests)
+- `pnpm test:e2e e2e/notifications-ui.spec.ts` — requires `MONGODB_URI_TEST` + seed
+
+### Next logical step
+
+- Names tab UI row on `/notifications` (API already covered)
+- `useToggleState` unit tests with fake timers + mocked fetch
+
+---
+
+## 2026-06-07 — Fix notifications UI E2E strict mode (duplicate rows)
+
+### Problem
+
+Serial `notifications-ui.spec.ts` reruns append thank/like rows to the test DB. `row.getByText('E2E Admin')` matched **two** description thank rows → Playwright strict mode violation.
+
+### Fix
+
+`notificationRow()` helper uses `.first()` on filtered rows; assertions use `toContainText` on that single row.
+
+### Files modified
+
+- `e2e/helpers/notifications-ui.ts` — `notificationRow`
+- `e2e/notifications-ui.spec.ts` — all row assertions
+- `TESTING.md` — duplicate-row / strict-mode note under `notifications-ui.spec.ts`

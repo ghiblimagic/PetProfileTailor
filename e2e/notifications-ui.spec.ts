@@ -14,6 +14,8 @@ import {
 import {
   gotoNotificationsPage,
   leaveThanksTabBeforeMarkRead,
+  notificationRow,
+  openDescriptionsTab,
   openThanksTab,
   thanksUnreadBadge,
 } from "./helpers/notifications-ui";
@@ -21,6 +23,7 @@ import {
   lookupSeededDescription,
   lookupSeededName,
 } from "./helpers/seed-lookup";
+import { ensureDescriptionLiked } from "./helpers/likes";
 import { submitThanks } from "./helpers/thanks";
 
 const DEFAULT_THANK_MESSAGE = "Made me smile or laugh";
@@ -51,15 +54,11 @@ test.describe("Notifications UI", () => {
     await gotoNotificationsPage(page);
     await openThanksTab(page);
 
-    const row = page
-      .locator("div")
-      .filter({ hasText: /thanked you/i })
-      .filter({ hasText: SEED_NAME });
+    const row = notificationRow(page, /thanked you/i, SEED_NAME);
 
-    await expect(row.getByText(getPlaywrightAdminDisplayName())).toBeVisible({
-      timeout: 15_000,
-    });
-    await expect(row.getByText(DEFAULT_THANK_MESSAGE)).toBeVisible();
+    await expect(row).toBeVisible({ timeout: 15_000 });
+    await expect(row).toContainText(getPlaywrightAdminDisplayName());
+    await expect(row).toContainText(DEFAULT_THANK_MESSAGE);
 
     await leaveThanksTabBeforeMarkRead(page);
   });
@@ -76,7 +75,9 @@ test.describe("Notifications UI", () => {
     await expect(badge).toBeVisible({ timeout: 15_000 });
 
     await openThanksTab(page);
-    await expect(page.getByText(SEED_NAME)).toBeVisible({ timeout: 15_000 });
+    await expect(
+      notificationRow(page, /thanked you/i, SEED_NAME),
+    ).toBeVisible({ timeout: 15_000 });
 
     await expect
       .poll(async () => badge.count(), { timeout: 12_000 })
@@ -103,14 +104,40 @@ test.describe("Notifications UI", () => {
     await gotoNotificationsPage(page);
     await openThanksTab(page);
 
-    const row = page
-      .locator("div")
-      .filter({ hasText: /thanked you/i })
-      .filter({ hasText: TRUNCATED_DESCRIPTION });
+    const row = notificationRow(
+      page,
+      /thanked you/i,
+      TRUNCATED_DESCRIPTION,
+    );
 
-    await expect(row.getByText(getPlaywrightAdminDisplayName())).toBeVisible({
-      timeout: 15_000,
+    await expect(row).toBeVisible({ timeout: 15_000 });
+    await expect(row).toContainText(getPlaywrightAdminDisplayName());
+    await expect(row).toContainText(DEFAULT_THANK_MESSAGE);
+  });
+
+  test("descriptions tab renders populated like row after admin like", async ({
+    page,
+  }) => {
+    const seeded = await lookupSeededDescription(
+      page.request,
+      SEED_DESCRIPTION_START,
+    );
+
+    await loginWithAdminCredentials(page);
+    await ensureDescriptionLiked(page.request, seeded.id, {
+      _id: seeded.creatorId,
+      name: seeded.createdBy.name,
+      profileName: seeded.createdBy.profileName,
     });
-    await expect(row.getByText(DEFAULT_THANK_MESSAGE)).toBeVisible();
+
+    await signOutViaNav(page);
+    await loginWithCredentials(page);
+    await gotoNotificationsPage(page);
+    await openDescriptionsTab(page);
+
+    const row = notificationRow(page, /Liked •/i, TRUNCATED_DESCRIPTION);
+
+    await expect(row).toBeVisible({ timeout: 15_000 });
+    await expect(row).toContainText(getPlaywrightAdminDisplayName());
   });
 });

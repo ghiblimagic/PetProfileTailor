@@ -4,6 +4,10 @@ export function thanksTabButton(page: Page) {
   return page.getByRole("button", { name: /Thanks/i });
 }
 
+export function descriptionsTabButton(page: Page) {
+  return page.getByRole("button", { name: /Descriptions/i });
+}
+
 export function thanksUnreadBadge(page: Page) {
   return thanksTabButton(page).locator("span.bg-blue-700");
 }
@@ -17,6 +21,33 @@ export async function openThanksTab(page: Page): Promise<void> {
       response.ok(),
   );
   await Promise.all([thanksResponse, thanksTabButton(page).click()]);
+}
+
+/** Opens Descriptions tab and waits for the list API to finish. */
+export async function openDescriptionsTab(page: Page): Promise<void> {
+  const descriptionsResponse = page.waitForResponse(
+    (response) =>
+      response.url().includes("/api/notifications/descriptions") &&
+      response.request().method() === "GET" &&
+      response.ok(),
+  );
+  await Promise.all([
+    descriptionsResponse,
+    descriptionsTabButton(page).click(),
+  ]);
+}
+
+/** First matching notification row (serial E2E reruns append duplicate rows in test DB). */
+export function notificationRow(
+  page: Page,
+  actionText: RegExp,
+  contentSnippet: string,
+) {
+  return page
+    .locator("div")
+    .filter({ hasText: actionText })
+    .filter({ hasText: contentSnippet })
+    .first();
 }
 
 export async function gotoNotificationsPage(page: Page): Promise<void> {
