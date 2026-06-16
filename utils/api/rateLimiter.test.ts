@@ -42,6 +42,13 @@ describe("RateLimiter", () => {
       maxRequests: 3,
     });
   });
+
+  it("exposes likeToggle preset shared with client and togglelike routes", () => {
+    expect(rateLimitPresets.likeToggle).toEqual({
+      windowMs: 120_000,
+      maxRequests: 3,
+    });
+  });
 });
 
 describe("getClientIP", () => {

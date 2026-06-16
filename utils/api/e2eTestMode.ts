@@ -6,6 +6,10 @@ export function isE2eClientMode(): boolean {
   return process.env.NEXT_PUBLIC_E2E_TEST_MODE === "true";
 }
 
+export function isE2eServerMode(): boolean {
+  return process.env.E2E_TEST_MODE === "true";
+}
+
 export function isE2eCaptchaBypass(captchaToken: string | null | undefined): boolean {
   return (
     process.env.E2E_TEST_MODE === "true" &&

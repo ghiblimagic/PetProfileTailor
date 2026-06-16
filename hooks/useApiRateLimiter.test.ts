@@ -21,6 +21,7 @@ describe("useApiRateLimiter", () => {
     expect(result.current.count).toBe(0);
     expect(result.current.limit).toBe(LIMIT);
     expect(result.current.canSend()).toBe(true);
+    expect(result.current.remainingSeconds).toBe(0);
   });
 
   it("blocks sends after the limit is reached", () => {
@@ -36,9 +37,11 @@ describe("useApiRateLimiter", () => {
 
     expect(result.current.count).toBe(LIMIT);
     expect(result.current.canSend()).toBe(false);
+    expect(result.current.remainingSeconds).toBeGreaterThan(0);
+    expect(result.current.isRateLimited).toBe(true);
   });
 
-  it("resets count after the window interval elapses", () => {
+  it("resets after the window elapses", () => {
     const { result } = renderHook(() =>
       useApiRateLimiter({ limit: LIMIT, windowMs: WINDOW_MS }),
     );
@@ -52,11 +55,32 @@ describe("useApiRateLimiter", () => {
     expect(result.current.canSend()).toBe(false);
 
     act(() => {
-      vi.advanceTimersByTime(WINDOW_MS);
+      vi.advanceTimersByTime(WINDOW_MS + 1000);
     });
 
-    expect(result.current.count).toBe(0);
     expect(result.current.canSend()).toBe(true);
+    expect(result.current.count).toBe(0);
+    expect(result.current.remainingSeconds).toBe(0);
+  });
+
+  it("applyServerCooldown blocks until retry elapses", () => {
+    const { result } = renderHook(() =>
+      useApiRateLimiter({ limit: LIMIT, windowMs: WINDOW_MS }),
+    );
+
+    act(() => {
+      result.current.applyServerCooldown(30);
+    });
+
+    expect(result.current.canSend()).toBe(false);
+    expect(result.current.remainingSeconds).toBe(30);
+
+    act(() => {
+      vi.advanceTimersByTime(30_000 + 1000);
+    });
+
+    expect(result.current.canSend()).toBe(true);
+    expect(result.current.remainingSeconds).toBe(0);
   });
 
   it("uses default limit and window when options are omitted", () => {

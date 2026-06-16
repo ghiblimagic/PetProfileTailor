@@ -62,6 +62,8 @@ export function useLikeState({
   const {
     active: liked,
     isProcessing,
+    isRateLimited,
+    remainingSeconds,
     toggle,
   } = useToggleState<RecentLikeDelta>({
     initialActive: initialLiked,
@@ -105,5 +107,5 @@ export function useLikeState({
     },
   });
 
-  return { liked, likeCount, isProcessing, toggleLike: toggle };
+  return { liked, likeCount, isProcessing, isRateLimited, remainingSeconds, toggleLike: toggle };
 }

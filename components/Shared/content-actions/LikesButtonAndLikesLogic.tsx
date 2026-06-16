@@ -40,7 +40,7 @@ export default function LikesButtonAndLikesLogic({
 
   // console.log("signedInUsersId in likes button", signedInUsersId);
   // console.log("datatype in likesbutton", dataType);
-  const { liked, likeCount, isProcessing, toggleLike } = useLikeState({
+  const { liked, likeCount, isProcessing, isRateLimited, remainingSeconds, toggleLike } = useLikeState({
     data,
     dataType,
     userId: signedInUsersId,
@@ -60,7 +60,7 @@ export default function LikesButtonAndLikesLogic({
     <ContainerForLikeShareFlag>
       <button
         className="w-full"
-        disabled={isProcessing}
+        disabled={isProcessing || isRateLimited}
         onClick={() => toggleLikeIfSignedIn()}
         style={{ background: "transparent", border: "none", cursor: "pointer" }}
         aria-label={liked ? "Unlike" : "Like"}
@@ -73,6 +73,11 @@ export default function LikesButtonAndLikesLogic({
 
         <span className={`${HeartIconTextStyling}`}>{likeCount}</span>
       </button>
+      {remainingSeconds > 0 && (
+        <p className="text-subtleWhite text-xs text-center leading-tight mt-0.5">
+          Please wait {remainingSeconds} sec{remainingSeconds !== 1 ? "s" : ""}
+        </p>
+      )}
     </ContainerForLikeShareFlag>
   );
 }

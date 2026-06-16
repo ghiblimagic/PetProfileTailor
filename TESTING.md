@@ -147,6 +147,9 @@ Playwright maps `MONGODB_URI_TEST` → `MONGODB_URI` when starting the server. `
 - Self-like → excluded from notifications API
 - Admin follow regular user via API
 - `grabusersfollowing` lists followed users from Follow collection
+- Name detail — rapid double-click like button → one debounced `togglelike` POST, no 5xx; count delta ≤ 1
+- Name detail — like → pause 200ms → unlike → one POST after settle; heart and count return to initial
+- `togglelike` — 4th POST with production rate limit (strict E2E header) → 429 + `retryAfterSeconds`
 
 **`e2e/notifications.spec.ts`**
 
@@ -230,7 +233,7 @@ E2E cannot exercise these (bypassed or skipped).
 
 ### Social & notifications (beyond E2E API smoke)
 
-- [ ] Like toggle on name detail UI — rapid double-click → one like, no 500
+- [ ] Like toggle on name detail UI — rapid double-click → one like, no 500 — **E2E:** `e2e/social.spec.ts` (burst + like/unlike settle); behavior documented in [`togglelike-route.md`](docs/notes/app/api/togglelike-route.md)
 - [ ] `/notifications` **UI** — mark read persists — **partial:** thanks + names tab badges covered in `notifications-ui.spec.ts` (reload after mark-read)
 - [ ] Profile follow / unfollow via **UI** (followers list is commented out on profile)
 - [ ] Thank, suggestion, report flows — submit without 500; lists load if exposed

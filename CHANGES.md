@@ -5229,4 +5229,186 @@ Completes the notifications tab trilogy: thanks and names already had mark-read 
 
 ### Next logical step
 
-- Like toggle on name detail UI — rapid double-click E2E
+- Follow / unfollow via FollowButton UI
+
+---
+
+## 2026-06-08 — Fix like double-click E2E (OS dblclick interval)
+
+### Problem
+
+`likeButton.dblclick()` used the OS double-click gap (~500ms), matching `useToggleState` debounce — two separate `togglelike` POSTs.
+
+### Fix
+
+`rapidDoubleClick()` in `e2e/helpers/likes.ts` — two `mouse.click` calls at button center with no intentional delay.
+
+---
+
+## 2026-06-08 — Name detail like double-click E2E (`social.spec.ts`)
+
+### What was built and why
+
+Browser test for debounced `togglelike` on `/name/[name]`: rapid double-click sends one POST after 500ms debounce, no 5xx, like count changes by at most 1.
+
+### Files modified
+
+- `e2e/helpers/likes.ts` — `ensureNameUnliked`, `nameDetailLikeButton`
+- `e2e/social.spec.ts` — double-click debounce test (admin, seeded name)
+- `TESTING.md` — `social.spec` bullet + manual checklist note
+
+### Verification
+
+- `pnpm exec playwright test e2e/social.spec.ts --list` — 5 tests listed
+- `pnpm test:e2e e2e/social.spec.ts` — run locally with seed
+
+### Next logical step
+
+- Follow / unfollow via FollowButton UI
+
+---
+
+## 2026-06-08 — Like debounce docs + settle-then-POST tests
+
+### What was built and why
+
+Documented and tested the existing client contract: optimistic UI on every click, one `togglelike` POST 500ms after the user stops clicking. No Option C click-blocking.
+
+### Files modified
+
+- `docs/notes/app/api/togglelike-route.md` — mermaid sequence diagram, lockout table, edge cases, stack, test index
+- `hooks/useToggleState.ts` — client contract comment block
+- `hooks/useToggleState.test.ts` — burst coalescing, like-then-unlike before settle, separate bursts
+- `e2e/social.spec.ts` — like → pause 200ms → unlike → one POST E2E
+- `TESTING.md` — social.spec bullets + checklist link to togglelike doc
+
+### Verification
+
+- `pnpm test hooks/useToggleState.test.ts` — 9 passed
+- `pnpm exec playwright test e2e/social.spec.ts --list` — 6 tests listed
+
+### Next logical step
+
+- Follow / unfollow via FollowButton UI
+
+---
+
+## 2026-06-08 — Fix useToggleState flush on every optimistic re-render
+
+### Problem
+
+`useEffect` for `beforeunload` / unmount flush listed `canSend` in deps. `useApiRateLimiter` recreates `canSend` every render, so each `setActive` from a like click ran effect cleanup → `debouncedCommit.flush()` → immediate POST. Like → unlike within 500ms sent **two** POSTs instead of one.
+
+### Fix
+
+- `canSendRef` / `registerSendRef` for stable reads inside debounce and flush
+- Flush effect deps: `[debouncedCommit]` only
+- Unit test: rerender after toggle → still one POST
+- E2E: `likeThenUnlikeWithinDebounce` helper (mouse clicks)
+
+### Files modified
+
+- `hooks/useToggleState.ts`
+- `hooks/useToggleState.test.ts`
+- `e2e/helpers/likes.ts`, `e2e/social.spec.ts`
+- `docs/notes/app/api/togglelike-route.md`
+
+---
+
+## 2026-06-08 — togglelike doc: edge cases Handled? column
+
+### What changed
+
+[`docs/notes/app/api/togglelike-route.md`](docs/notes/app/api/togglelike-route.md) edge cases table now includes **Handled?** (Yes / Partial / No) for each scenario, plus rows for fetch rollback, tab close flush, and logged-out gate.
+
+---
+
+## 2026-06-08 — Like toggle rate limit (client + server)
+
+### What was built and why
+
+Harden like toggles against abuse without lying in the UI: **3 POSTs / 2 minutes** per user, shared preset on client and server. Client blocks clicks **before** optimistic UI and shows pagination-style “Please wait X secs”; server returns **429** + `retryAfterSeconds` if bypassed (multi-tab / direct API).
+
+### Files created
+
+- `utils/api/likeToggleRateLimit.ts` — `checkLikeToggleRateLimit`, `likeToggleRateLimitResponse`
+
+### Files modified
+
+- `utils/api/rateLimiter.ts` — `LIKE_TOGGLE_RATE_LIMIT`, `rateLimitPresets.likeToggle`
+- `utils/api/rateLimiter.test.ts` — preset assertion
+- `app/api/names/likes/[contentId]/togglelike/route.ts` — 429 after auth
+- `app/api/description/likes/[contentId]/togglelike/route.ts` — 429 + `getSessionForApis({ req })` fix
+- `hooks/useApiRateLimiter.ts` — sliding window, `remainingSeconds`, `applyServerCooldown`, `isRateLimited`
+- `hooks/useApiRateLimiter.test.ts` — updated coverage
+- `hooks/useToggleState.ts` — block before optimistic UI; 429 rollback + server cooldown
+- `hooks/useToggleState.test.ts` — rate limit block, 429 rollback tests
+- `hooks/useLikeState.ts` — pass through `isRateLimited`, `remainingSeconds`
+- `components/Shared/content-actions/LikesButtonAndLikesLogic.tsx` — disabled + cooldown message
+- `docs/notes/app/api/togglelike-route.md` — 429 section, edge case row, locked-vs-not table
+
+### Patterns followed
+
+- Same rate-limit UX as pagination (`useApiRateLimiter` + “Please wait X secs”)
+- Shared `LIKE_TOGGLE_RATE_LIMIT` constant imported by client hook and server helper
+- Rollback on 429 matches fetch-failure path (no `registerSend` on failed commit)
+
+### Verification
+
+- `pnpm test hooks/useApiRateLimiter.test.ts hooks/useToggleState.test.ts utils/api/rateLimiter.test.ts hooks/useLikeState.test.ts` — 26 passed
+- `pnpm exec tsc --noEmit`
+
+### Next logical step
+
+- Follow / unfollow via FollowButton UI E2E
+
+---
+
+## 2026-06-08 — Fix social E2E like setup hitting togglelike rate limit
+
+### Problem
+
+Serial `social.spec.ts` tests share the in-memory server rate limiter (3 POSTs / 2 min per user). Test 6 failed in `ensureNameUnliked` with **429** after tests 1 and 5 consumed the admin quota. Helpers also blind-toggled (2 POSTs when already in target state).
+
+### Fix
+
+- [`e2e/helpers/likes.ts`](e2e/helpers/likes.ts) — `GET /api/user/likes` before setup; POST only when state must change
+- [`utils/api/likeToggleRateLimit.ts`](utils/api/likeToggleRateLimit.ts) — relaxed cap (50 / 2 min) when `E2E_TEST_MODE`; production unchanged
+- [`utils/api/e2eTestMode.ts`](utils/api/e2eTestMode.ts) — `isE2eServerMode()`
+
+### Verification
+
+- `pnpm test:e2e e2e/social.spec.ts`
+
+
+### What changed
+
+[`docs/notes/app/api/togglelike-route.md`](docs/notes/app/api/togglelike-route.md) — OS double-click at the debounce boundary is **Yes (acceptable)**, not a sync bug: two POSTs (like then unlike) leave UI and DB aligned; only an extra API call / rate-limit slot. Clarified that OS timing at ~500ms behaves like two intentional bursts.
+
+### Files modified
+
+- `docs/notes/app/api/togglelike-route.md`
+
+---
+
+## 2026-06-08 — E2E: togglelike 429 on 4th POST (production rate limit)
+
+### What was built and why
+
+Verify server **429** on the real `togglelike` route without breaking serial UI tests that use the relaxed E2E cap.
+
+### Files created
+
+- `app/api/test/e2e/reset-like-toggle-rate-limit/route.ts` — E2E-only; clears in-memory counter for signed-in user
+
+### Files modified
+
+- `utils/api/likeToggleRateLimit.ts` — `x-e2e-strict-like-rate-limit: 1` header applies production cap; `resetLikeToggleRateLimit`
+- `app/api/names/likes/[contentId]/togglelike/route.ts`, `app/api/description/likes/[contentId]/togglelike/route.ts` — `checkLikeToggleRateLimitForRequest`
+- `e2e/helpers/likes.ts` — `resetLikeToggleRateLimitForSession`, `postNameToggleLikeWithProductionRateLimit`
+- `e2e/social.spec.ts` — 4 strict POSTs → `[200, 200, 200, 429]`
+- `docs/notes/app/api/togglelike-route.md`, `TESTING.md`
+
+### Verification
+
+- `pnpm test:e2e e2e/social.spec.ts` — 7 passed

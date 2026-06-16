@@ -6,6 +6,10 @@ import mongoose from "mongoose";
 import NameLikes from "@/models/NameLike";
 import Names from "@/models/Name";
 import { getSessionForApis } from "@/utils/api/getSessionForApis";
+import {
+  checkLikeToggleRateLimitForRequest,
+  likeToggleRateLimitResponse,
+} from "@/utils/api/likeToggleRateLimit";
 
 type RouteContext = {
   params: Promise<{ contentId: string }>;
@@ -39,6 +43,11 @@ export async function POST(req: Request, { params }: RouteContext) {
 
   if (!likedBy) {
     return Response.json({ error: "userId required" }, { status: 400 });
+  }
+
+  const rateCheck = checkLikeToggleRateLimitForRequest(likedBy, req);
+  if (!rateCheck.allowed) {
+    return likeToggleRateLimitResponse(rateCheck.resetTime);
   }
 
   const dbSession = await mongoose.startSession();

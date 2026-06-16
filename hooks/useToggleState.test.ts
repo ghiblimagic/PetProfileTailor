@@ -5,14 +5,18 @@ import { useToggleState } from "./useToggleState";
 const mocks = vi.hoisted(() => ({
   canSend: vi.fn(() => true),
   registerSend: vi.fn(),
+  applyServerCooldown: vi.fn(),
 }));
 
 vi.mock("./useApiRateLimiter", () => ({
   useApiRateLimiter: () => ({
     canSend: mocks.canSend,
     registerSend: mocks.registerSend,
+    applyServerCooldown: mocks.applyServerCooldown,
     count: 0,
     limit: 3,
+    remainingSeconds: 0,
+    isRateLimited: false,
   }),
 }));
 
@@ -114,9 +118,8 @@ describe("useToggleState", () => {
     errorSpy.mockRestore();
   });
 
-  it("skips API call when rate limit blocks send", async () => {
+  it("does not apply optimistic update when rate limit blocks toggle", async () => {
     mocks.canSend.mockReturnValue(false);
-    const warnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
 
     const { result } = renderHook(() => useToggleState(defaultOptions));
 
@@ -125,12 +128,36 @@ describe("useToggleState", () => {
     });
     await advanceDebounce();
 
+    expect(result.current.active).toBe(false);
     expect(fetch).not.toHaveBeenCalled();
-    expect(warnSpy).toHaveBeenCalledWith(
-      "Rate limit reached, skipping API call",
+  });
+
+  it("rolls back and applies server cooldown on 429", async () => {
+    const onRollback = vi.fn();
+    const onApplyOptimistic = vi.fn(() => "rollback-token");
+    vi.mocked(fetch).mockResolvedValueOnce({
+      ok: false,
+      status: 429,
+      json: async () => ({ retryAfterSeconds: 90 }),
+    } as Response);
+
+    const { result } = renderHook(() =>
+      useToggleState({
+        ...defaultOptions,
+        onApplyOptimistic,
+        onRollback,
+      }),
     );
 
-    warnSpy.mockRestore();
+    await act(async () => {
+      await result.current.toggle();
+    });
+    await advanceDebounce();
+
+    expect(result.current.active).toBe(false);
+    expect(onRollback).toHaveBeenCalledWith("rollback-token");
+    expect(mocks.applyServerCooldown).toHaveBeenCalledWith(90);
+    expect(mocks.registerSend).not.toHaveBeenCalled();
   });
 
   it("ignores toggle while a commit is in flight", async () => {
@@ -167,5 +194,80 @@ describe("useToggleState", () => {
     });
 
     expect(result.current.isProcessing).toBe(false);
+  });
+
+  it("coalesces multiple rapid toggles into one POST with final state", async () => {
+    const { result } = renderHook(() => useToggleState(defaultOptions));
+
+    await act(async () => {
+      await result.current.toggle();
+      await result.current.toggle();
+      await result.current.toggle();
+    });
+
+    expect(result.current.active).toBe(true);
+    expect(fetch).not.toHaveBeenCalled();
+
+    await advanceDebounce();
+
+    expect(fetch).toHaveBeenCalledTimes(1);
+    expect(result.current.active).toBe(true);
+  });
+
+  it("does not flush pending debounce on optimistic re-render", async () => {
+    const { result, rerender } = renderHook(() =>
+      useToggleState(defaultOptions),
+    );
+
+    await act(async () => {
+      await result.current.toggle();
+    });
+    rerender();
+    await advanceDebounce();
+
+    expect(fetch).toHaveBeenCalledTimes(1);
+  });
+
+  it("like then unlike before settle sends one POST with final unlike state", async () => {
+    const { result } = renderHook(() => useToggleState(defaultOptions));
+
+    await act(async () => {
+      await result.current.toggle();
+    });
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(200);
+    });
+    await act(async () => {
+      await result.current.toggle();
+    });
+
+    expect(result.current.active).toBe(false);
+    expect(fetch).not.toHaveBeenCalled();
+
+    await advanceDebounce();
+
+    expect(fetch).toHaveBeenCalledTimes(1);
+    expect(result.current.active).toBe(false);
+  });
+
+  it("separate bursts separated by 500ms send multiple POSTs", async () => {
+    const { result } = renderHook(() => useToggleState(defaultOptions));
+
+    await act(async () => {
+      await result.current.toggle();
+    });
+    await advanceDebounce();
+    expect(fetch).toHaveBeenCalledTimes(1);
+
+    await act(async () => {
+      await result.current.toggle();
+    });
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(100);
+    });
+    await advanceDebounce();
+
+    expect(fetch).toHaveBeenCalledTimes(2);
+    expect(result.current.active).toBe(false);
   });
 });
