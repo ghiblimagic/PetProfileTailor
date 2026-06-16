@@ -1,4 +1,10 @@
 import { test, expect } from "@playwright/test";
+import {
+  SEED_DESCRIPTION_START,
+  SEED_DESCRIPTION_START_PREFIX,
+  SEED_NAME,
+} from "./fixtures/seed-data";
+import { lookupSeededDescription, lookupSeededName } from "./helpers/seed-lookup";
 
 test.describe("Browse smoke", () => {
   test("/fetchnames loads without server error", async ({ page }) => {
@@ -34,5 +40,33 @@ test.describe("Browse smoke", () => {
       expect(typeof item._id).toBe("string");
       expect(item.__v).toBeUndefined();
     }
+  });
+
+  test("name detail page renders seeded name and creator", async ({ page }) => {
+    const seeded = await lookupSeededName(page.request, SEED_NAME);
+
+    const response = await page.goto(`/name/${SEED_NAME}`);
+    expect(response?.status()).toBeLessThan(500);
+
+    await expect(page.getByText(SEED_NAME, { exact: false })).toBeVisible({
+      timeout: 15_000,
+    });
+    await expect(
+      page.getByText(`@${seeded.createdBy.profileName}`, { exact: false }),
+    ).toBeVisible();
+  });
+
+  test("description detail page renders seeded content", async ({ page }) => {
+    const seeded = await lookupSeededDescription(
+      page.request,
+      SEED_DESCRIPTION_START,
+    );
+
+    const response = await page.goto(`/description/${seeded.id}`);
+    expect(response?.status()).toBeLessThan(500);
+
+    await expect(
+      page.getByText(SEED_DESCRIPTION_START_PREFIX, { exact: false }),
+    ).toBeVisible({ timeout: 15_000 });
   });
 });

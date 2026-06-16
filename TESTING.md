@@ -36,6 +36,9 @@ Vitest + E2E green covers validation logic and the flows listed below. Manual ch
 |------|-------|
 | API auth guards | `checkOwnership.test.ts`, `checkIfAdmin.test.ts`, `getSessionForApis.test.ts`, `lib/auth.test.ts` (callbacks + credentials `authorize`; `resolveSignInCallback.test.ts` for signIn branching) |
 | User likes prefetch | `getUserLikes.test.ts`, `LikesContext.test.tsx` (SSR hydrate, fetch, logout) |
+| Notifications context | `notificationsContext.test.tsx` (fetch counts, logout clear, `resetNotificationType` PATCH) |
+| Client cooldown | `useLocalStorageCooldown.test.ts` (localStorage gate, trigger, countdown) |
+| Moderation dialog hooks | `useSuggest.test.ts`, `useFlagging.test.ts` (open/close state) |
 | Like toggle hook | `useLikeState.test.ts` (optimistic count, rollback; mocked `useToggleState`); `useToggleState.test.ts` (debounce POST, rollback, rate limit, in-flight guard); `useApiRateLimiter.test.ts` (limit, window reset) |
 | Shared actions | `Shared/actions/GeneralButton.test.tsx` |
 | Alert / validation UI | `Shared/feedback/WarningMessage.test.tsx`, `Shared/feedback/ToggeableAlert.test.tsx` |
@@ -72,6 +75,17 @@ Playwright maps `MONGODB_URI_TEST` → `MONGODB_URI` when starting the server. `
 
 - `/fetchnames` loads (no 500)
 - `/fetchdescriptions` loads (no 500)
+- `POST /api/names/swr` — `_id` values are strings; no `__v`
+- `/name/[name]` — seeded name + creator profile render
+- `/description/[id]` — seeded description content renders
+
+**`e2e/moderation.spec.ts`**
+
+- Admin `POST /api/suggestion` on user-owned name → 201 (or idempotent skip if pending)
+- Self-suggestion on own name → 400
+- User `POST /api/flag/flagreportsubmission` on admin-owned name → 201 (or idempotent skip)
+- Self-report on own name → 400
+- Unauthenticated suggestion → 401
 
 **`e2e/contact.spec.ts`**
 
@@ -125,10 +139,6 @@ Playwright maps `MONGODB_URI_TEST` → `MONGODB_URI` when starting the server. `
 **`e2e/editsettings.spec.ts`**
 
 - Clear name → client validation error (`Please enter a name`)
-
-**`e2e/browse.spec.ts`** (also page load above)
-
-- `POST /api/names/swr` — `_id` values are strings; no `__v`
 
 **`e2e/admin.spec.ts`**
 
@@ -243,12 +253,12 @@ E2E cannot exercise these (bypassed or skipped).
 - [ ] Like toggle on name detail UI — rapid double-click → one like, no 500 — **E2E:** `e2e/social.spec.ts` (burst + like/unlike settle); behavior documented in [`togglelike-route.md`](docs/notes/app/api/togglelike-route.md)
 - [ ] `/notifications` **UI** — mark read persists — **partial:** thanks + names tab badges covered in `notifications-ui.spec.ts` (reload after mark-read)
 - [ ] Profile follow / unfollow via **UI** — **deferred:** followers/following modals commented out on profile; track in [`docs/FUTURE.md`](docs/FUTURE.md) (re-enable UI, then Playwright on `FollowButton`)
-- [ ] Thank, suggestion, report flows — submit without 500; lists load if exposed — **partial:** thank submit via UI — **E2E:** `e2e/thanks-ui.spec.ts` (name + description dialog → POST + notifications)
+- [ ] Thank, suggestion, report flows — submit without 500; lists load if exposed — **partial:** thank UI — `e2e/thanks-ui.spec.ts`; suggestion/report API — `e2e/moderation.spec.ts`
 
 ### Data shape & listing UX
 
 - [ ] DevTools → Network — other APIs (`leanWithStrings`) still return string `_id`; no `__v`
-- [ ] `/name/[name]`, `/description/[id]` — render with related data (tags, creator)
+- [ ] `/name/[name]`, `/description/[id]` — render with related data (tags, creator) — **partial:** `e2e/browse.spec.ts` (name + description detail smoke)
 - [ ] `/fetchnames` or `/fetchdescriptions` — pagination spam **next** → ~15s cooldown
 - [ ] Same pages — rapid sort/filter → ~3s cooldown
 - [ ] `useApiRateLimiter` / like button — rapid clicks throttled — **unit:** `useApiRateLimiter.test.ts`; UI double-click E2E still open

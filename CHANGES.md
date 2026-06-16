@@ -5486,3 +5486,34 @@ Smoke tests for the API session helper and NextAuth callbacks — closes the gap
 ### Next logical step
 
 - Optional: integration test for `[...nextauth]` route (heavier; callbacks already covered)
+
+---
+
+## 2026-06-08 — Tier 2 tests (notifications context, moderation, detail smoke)
+
+### What was built and why
+
+Second testing tier from backlog: notification badge context, cooldown/suggestion/flagging hooks, moderation API E2E, and browse detail page smoke.
+
+### Files created
+
+- `context/notificationsContext.test.tsx`
+- `hooks/useLocalStorageCooldown.test.ts`
+- `hooks/useSuggest.test.ts`, `hooks/useFlagging.test.ts`
+- `e2e/moderation.spec.ts`, `e2e/helpers/moderation.ts`
+
+### Files modified
+
+- `e2e/browse.spec.ts` — name/description detail render tests
+- `TESTING.md`
+
+### Verification
+
+- `pnpm test context/notificationsContext.test.tsx hooks/useLocalStorageCooldown.test.ts hooks/useSuggest.test.ts hooks/useFlagging.test.ts` — 11 passed
+- `pnpm test:e2e e2e/moderation.spec.ts e2e/browse.spec.ts` — 10 passed
+
+### Next logical step (tier 2 remaining)
+
+- Pagination/sort cooldown UI E2E on `/fetchnames`
+- `useSwrSimple` unit tests (mock `useSWRInfinite`)
+- Suggestion/report **UI** E2E (dialog submit like thanks-ui)
