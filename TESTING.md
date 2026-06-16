@@ -195,6 +195,12 @@ Playwright maps `MONGODB_URI_TEST` → `MONGODB_URI` when starting the server. `
 - Name detail — user opens ⋮ menu → Report on admin-owned name → Spam checkbox submit or edit form if pending
 - Name detail — content owner ⋮ menu shows Delete only (no Suggestion/Report)
 
+**`e2e/fetchnames-cooldown.spec.ts`**
+
+- `/fetchnames` — sort dropdown change → ~3s cooldown (disabled select + wait option text)
+- `/fetchnames` — filter quick apply → ~5s cooldown (`Wait Ns`, disabled apply/quick buttons)
+- `/fetchnames` — pagination next at SWR chunk edge → ~15s cooldown — **skipped** when test DB has &lt; 51 names (seed-only DB)
+
 **Note — duplicate notification rows (strict mode):** Serial reruns of `notifications-ui.spec.ts` leave multiple thank/like rows for the same seeded content in the test DB. A locator like `row.getByText('E2E Admin')` can then match two elements and Playwright throws a strict mode violation.
 
 **Fix:** `notificationRow()` in [`e2e/helpers/notifications-ui.ts`](e2e/helpers/notifications-ui.ts) filters rows then uses `.first()`. Assertions use `toContainText` on that single row instead of nested `getByText`.
@@ -265,8 +271,8 @@ E2E cannot exercise these (bypassed or skipped).
 
 - [ ] DevTools → Network — other APIs (`leanWithStrings`) still return string `_id`; no `__v`
 - [ ] `/name/[name]`, `/description/[id]` — render with related data (tags, creator) — **partial:** `e2e/browse.spec.ts` (name + description detail smoke)
-- [ ] `/fetchnames` or `/fetchdescriptions` — pagination spam **next** → ~15s cooldown
-- [ ] Same pages — rapid sort/filter → ~3s cooldown
+- [ ] `/fetchnames` or `/fetchdescriptions` — pagination spam **next** → ~15s cooldown — **partial:** sort + filter cooldown UI — `e2e/fetchnames-cooldown.spec.ts`; pagination cooldown skips when DB &lt; 51 names
+- [ ] Same pages — rapid sort/filter → ~3s cooldown — **partial:** `e2e/fetchnames-cooldown.spec.ts`
 - [ ] `useApiRateLimiter` / like button — rapid clicks throttled — **unit:** `useApiRateLimiter.test.ts`; UI double-click E2E still open
 
 ### Misc utils (no E2E yet)

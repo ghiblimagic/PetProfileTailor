@@ -5514,7 +5514,37 @@ Second testing tier from backlog: notification badge context, cooldown/suggestio
 
 ### Next logical step (tier 2 remaining)
 
-- Pagination/sort cooldown UI E2E on `/fetchnames`
+- `useSwrSimple` unit tests (mock `useSWRInfinite`)
+- Admin category **UI** E2E
+
+---
+
+## 2026-06-08 — Fetchnames cooldown UI E2E (`fetchnames-cooldown.spec.ts`)
+
+### What was built and why
+
+Tier 2 item: Playwright coverage for sort (~3s), filter (~5s), and pagination (~15s) cooldown UX on `/fetchnames`.
+
+### Files created
+
+- `e2e/fetchnames-cooldown.spec.ts`
+- `e2e/helpers/fetchnames-ui.ts`
+
+### Files modified
+
+- `TESTING.md`, `CHANGES.md`
+
+### Notes
+
+- Pagination cooldown test requires 51+ names (second SWR chunk preload). Skips on seed-only E2E DB (~2 names).
+- Sort cooldown text lives in a disabled `<option>` — assert `toContainText` on the option, not page-visible text.
+
+### Verification
+
+- `pnpm test:e2e e2e/fetchnames-cooldown.spec.ts` — 2 passed, 1 skipped (pagination on seed DB)
+
+### Next logical step (tier 2 remaining)
+
 - `useSwrSimple` unit tests (mock `useSWRInfinite`)
 - Admin category **UI** E2E
 
@@ -5549,6 +5579,5 @@ Tier 2 remaining item: Playwright coverage for suggestion and report dialogs via
 
 ### Next logical step (tier 2 remaining)
 
-- Pagination/sort cooldown UI E2E on `/fetchnames`
 - `useSwrSimple` unit tests (mock `useSWRInfinite`)
 - Admin category **UI** E2E
