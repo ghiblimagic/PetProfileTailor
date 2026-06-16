@@ -5764,3 +5764,32 @@ Tier 3 backlog item: Playwright coverage for attaching a new tag to categories v
 - `/addnames` with tags on detail page — `TESTING.md` manual backlog
 - Edit category/tag UI — no edit routes yet
 
+---
+
+## 2026-06-08 — Add names with tags E2E (`addnames.spec.ts`)
+
+### What was built and why
+
+Manual backlog item: submit a name with tags via `/addnames` and assert hashed tags render on `/name/[name]`.
+
+### Files created
+
+- `e2e/helpers/addnames-ui.ts` — tags cheat-sheet helpers, `submitNameWithTags`
+
+### Files modified
+
+- `e2e/fixtures/seed-data.json` — `nameTagForAddNames`: `e2e-name-tag`
+- `e2e/fixtures/seed-data.ts` — `SEED_NAME_TAG_FOR_ADD_NAMES` export
+- `scripts/seed-e2e.mjs` — seed name tag on `e2e name attach` category
+- `e2e/addnames.spec.ts` — tag on detail page test
+- `TESTING.md`, `CHANGES.md`
+
+### Patterns
+
+- Tags cheat sheet (same as description filter UI): Open → category disclosure → tag label click
+- Assert `#e2e-name-tag` via `addHashToArrayString` output on detail page
+
+### Verification
+
+- `pnpm seed:e2e` then `pnpm test:e2e e2e/addnames.spec.ts` — 10 passed
+

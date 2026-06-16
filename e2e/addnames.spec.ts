@@ -4,6 +4,11 @@ import {
   SEED_NAME,
   SEED_NAME_DUPLICATE_VARIANT,
 } from "./fixtures/seed-data";
+import {
+  hashedTagText,
+  SEED_NAME_TAG_FOR_ADD_NAMES,
+  submitNameWithTags,
+} from "./helpers/addnames-ui";
 
 test.describe("Add names page", () => {
   test("logged-out visitor sees sign-in gate and disabled submit", async ({
@@ -111,5 +116,26 @@ test.describe("Add names page (authenticated)", () => {
     await expect(page.getByText(uniqueName, { exact: false })).toBeVisible({
       timeout: 15_000,
     });
+  });
+
+  test("submitted name with tag shows tag on detail page", async ({ page }) => {
+    const uniqueName = `E2ETag${Date.now().toString(36)}`;
+
+    await page.goto("/addnames");
+    const status = await submitNameWithTags(page, uniqueName);
+    expect(status).toBe(201);
+
+    await expect(page.getByText("Successfully added name", { exact: false })).toBeVisible({
+      timeout: 15_000,
+    });
+
+    const response = await page.goto(`/name/${uniqueName}`);
+    expect(response?.status()).toBeLessThan(500);
+    await expect(page.getByText(uniqueName, { exact: false })).toBeVisible({
+      timeout: 15_000,
+    });
+    await expect(
+      page.getByText(hashedTagText(SEED_NAME_TAG_FOR_ADD_NAMES), { exact: true }),
+    ).toBeVisible({ timeout: 15_000 });
   });
 });

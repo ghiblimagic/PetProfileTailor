@@ -25,7 +25,8 @@
     "nameBulkPrefix": "E2Epaginationbulkname",
     "descriptionFilterCategory": "e2e filter",
     "descriptionFilterTag": "e2e-filter-tag",
-    "nameTagAttachCategory": "e2e name attach"
+    "nameTagAttachCategory": "e2e name attach",
+    "nameTagForAddNames": "e2e-name-tag"
   },
   "admin": {
     "defaultEmail": "e2e-admin@example.com",

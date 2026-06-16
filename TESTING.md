@@ -120,6 +120,7 @@ Playwright maps `MONGODB_URI_TEST` → `MONGODB_URI` when starting the server. `
 - Blocklisted name `butt` alone → rejected
 - `fluffy butt` → allowed (blocklisted word not alone)
 - Created name → `/name/[name]` loads
+- Name with seeded tag (`e2e-name-tag` via tags cheat sheet) → `#e2e-name-tag` on `/name/[name]` (requires `pnpm seed:e2e` before E2E server start)
 
 **`e2e/adddescriptions.spec.ts`**
 
@@ -230,7 +231,7 @@ pnpm test:e2e e2e/notifications-ui.spec.ts
 
 Shared seed content lives in **`e2e/fixtures/seed-data.json`** (imported by `scripts/seed-e2e.mjs` and Playwright via `e2e/fixtures/seed-data.ts`). Tests use constants like `SEED_NAME` — not hardcoded strings — so duplicate checks stay in sync with the DB.
 
-**Listing cooldown seed** (`listingCooldown` in `seed-data.json`): bulk names/descriptions (51+ total each), description filter category `e2e filter` + tag `e2e-filter-tag`, name category `e2e name attach` (react-select attach tests). Re-run `pnpm seed:e2e` after changing fixture counts. Root layout caches categories for 3 hours in-process — attach tests need categories present when the test server starts.
+**Listing cooldown seed** (`listingCooldown` in `seed-data.json`): bulk names/descriptions (51+ total each), description filter category `e2e filter` + tag `e2e-filter-tag`, name category `e2e name attach` with tag `e2e-name-tag` (add-names + react-select attach tests). Re-run `pnpm seed:e2e` after changing fixture counts. Root layout caches categories for 3 hours in-process — tag picker tests need categories/tags present when the test server starts.
 
 ### Where tests live
 
@@ -268,7 +269,7 @@ E2E cannot exercise these (bypassed or skipped).
 
 ### Content depth (tags, normalization)
 
-- [ ] `/addnames` — name with **tags** → appears on `/name/[name]` with tags/categories
+- [ ] `/addnames` — name with **tags** → appears on `/name/[name]` with tags/categories — **covered:** `e2e/addnames.spec.ts` (cheat-sheet tag `e2e-name-tag`)
 - [ ] Name normalization — spaces/punctuation/case variants → same duplicate behavior (UI search/add flows beyond case duplicate)
 - [ ] Edit own content → `likedByCount` unchanged unless liking
 
