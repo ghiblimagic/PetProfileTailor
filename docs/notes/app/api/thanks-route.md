@@ -19,6 +19,14 @@ Canonical value is `"descriptions"` (paired with `"names"`). POST sets `descript
 
 [`ThanksButton.tsx`](../../../components/Thanks/ThanksButton.tsx) → [`useThanksHandler.ts`](../../../hooks/useThanksHandler.ts) → [`ThanksDialog.tsx`](../../../components/Thanks/ThanksDialog.tsx) → [`AddThanks.tsx`](../../../components/Thanks/AddThanks.tsx).
 
+### Tests
+
+| Layer | File | What it covers |
+|-------|------|----------------|
+| E2E (API) | `e2e/notifications.spec.ts` | Thank populate, self-thank 400, mark-read |
+| E2E (UI) | `e2e/thanks-ui.spec.ts` | Dialog submit on name/description detail, owner notifications, self-thank button hidden |
+| E2E helpers | `e2e/helpers/thanks-ui.ts` | `openThanksDialog`, `submitThanksDialog`, toast assertion |
+
 ## Related
 
 - [notifications-routes.md](notifications-routes.md) — thank notification list + mark-read

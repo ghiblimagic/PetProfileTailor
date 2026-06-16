@@ -5427,3 +5427,31 @@ Documented deferred Playwright coverage for `FollowButton` when profile follow/f
 - `TESTING.md`
 - `docs/notes/app/api/updatefollows-route.md`
 - `docs/README.md`
+
+---
+
+## 2026-06-08 — Thanks flow UI E2E (`thanks-ui.spec.ts`)
+
+### What was built and why
+
+Playwright coverage for the full thanks UI path: `ThanksButton` → dialog → tag selection → `POST /api/thanks`, owner notification visibility, and self-thank button hidden on own content.
+
+### Files created
+
+- `e2e/thanks-ui.spec.ts`
+- `e2e/helpers/thanks-ui.ts`
+
+### Files modified
+
+- `e2e/helpers/thanks.ts` — export `DEFAULT_THANK_MESSAGE`
+- `components/Thanks/ThanksDialog.tsx` — backdrop `aria-hidden` no longer wraps `DialogPanel` (a11y + testability)
+- `docs/notes/app/api/thanks-route.md` — tests table
+- `TESTING.md`
+
+### Verification
+
+- `pnpm test:e2e e2e/thanks-ui.spec.ts` — 4 passed
+
+### Next logical step
+
+- Suggestion / report flows via UI E2E (if exposed on listing pages)

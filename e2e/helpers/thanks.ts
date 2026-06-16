@@ -1,6 +1,6 @@
 import { expect, type APIRequestContext } from "@playwright/test";
 
-const DEFAULT_THANK_MESSAGE = "Made me smile or laugh";
+export const DEFAULT_THANK_MESSAGE = "Made me smile or laugh";
 
 export async function submitThanks(
   request: APIRequestContext,

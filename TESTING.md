@@ -172,6 +172,13 @@ Playwright maps `MONGODB_URI_TEST` → `MONGODB_URI` when starting the server. `
 - Names tab — admin likes seeded name → row shows admin name + `SEED_NAME` + `Liked •` (default tab on page load)
 - Names tab — unread badge clears after tab stays open (~3s mark-read timer); **persists after page reload**
 
+**`e2e/thanks-ui.spec.ts`**
+
+- Name detail — admin submits thank via `ThanksButton` dialog → `POST /api/thanks` 2xx + success toast
+- Notifications — content owner sees UI-submitted name thank on Thanks tab
+- Name detail — content owner does not see Thank button (self-thank UI guard)
+- Description detail — admin submits thank via dialog → owner sees row on Thanks tab
+
 **Note — duplicate notification rows (strict mode):** Serial reruns of `notifications-ui.spec.ts` leave multiple thank/like rows for the same seeded content in the test DB. A locator like `row.getByText('E2E Admin')` can then match two elements and Playwright throws a strict mode violation.
 
 **Fix:** `notificationRow()` in [`e2e/helpers/notifications-ui.ts`](e2e/helpers/notifications-ui.ts) filters rows then uses `.first()`. Assertions use `toContainText` on that single row instead of nested `getByText`.
@@ -236,7 +243,7 @@ E2E cannot exercise these (bypassed or skipped).
 - [ ] Like toggle on name detail UI — rapid double-click → one like, no 500 — **E2E:** `e2e/social.spec.ts` (burst + like/unlike settle); behavior documented in [`togglelike-route.md`](docs/notes/app/api/togglelike-route.md)
 - [ ] `/notifications` **UI** — mark read persists — **partial:** thanks + names tab badges covered in `notifications-ui.spec.ts` (reload after mark-read)
 - [ ] Profile follow / unfollow via **UI** — **deferred:** followers/following modals commented out on profile; track in [`docs/FUTURE.md`](docs/FUTURE.md) (re-enable UI, then Playwright on `FollowButton`)
-- [ ] Thank, suggestion, report flows — submit without 500; lists load if exposed
+- [ ] Thank, suggestion, report flows — submit without 500; lists load if exposed — **partial:** thank submit via UI — **E2E:** `e2e/thanks-ui.spec.ts` (name + description dialog → POST + notifications)
 
 ### Data shape & listing UX
 
