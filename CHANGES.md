@@ -5455,3 +5455,34 @@ Playwright coverage for the full thanks UI path: `ThanksButton` → dialog → t
 ### Next logical step
 
 - Suggestion / report flows via UI E2E (if exposed on listing pages)
+
+---
+
+## 2026-06-08 — Unit tests: `getSessionForApis` + `lib/auth.ts`
+
+### What was built and why
+
+Smoke tests for the API session helper and NextAuth callbacks — closes the gap called out in `TESTING.md` for `lib/auth` without loading Mongo in consumers.
+
+### Files created
+
+- `utils/api/getSessionForApis.test.ts` — `getServerSession` mock; 401 vs ok; passes `serverAuthOptions`
+- `lib/auth.test.ts` — `signIn`, `jwt`, `session` callbacks; credentials `authorize` (banned, password, success)
+
+### Files modified
+
+- `docs/notes/lib/auth.md` — test index
+- `TESTING.md` — API auth guards row + migration checklist note
+
+### Patterns followed
+
+- `vi.hoisted` mocks for `getServerSession`, `User`, `db`, `bcryptjs` (same as `checkOwnership.test.ts`)
+- `resolveSignInCallback` remains separately tested; `signIn` callback test asserts delegation
+
+### Verification
+
+- `pnpm test utils/api/getSessionForApis.test.ts lib/auth.test.ts` — 19 passed
+
+### Next logical step
+
+- Optional: integration test for `[...nextauth]` route (heavier; callbacks already covered)

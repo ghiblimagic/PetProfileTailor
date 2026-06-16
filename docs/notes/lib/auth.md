@@ -269,4 +269,6 @@ All provider config, callbacks, and adapters live in [`lib/auth.ts`](../../lib/a
 | [`utils/api/getSessionForApis.ts`](../../utils/api/getSessionForApis.ts) | API route session helper |
 | [`lib/resolveSignInCallback.ts`](../../lib/resolveSignInCallback.ts) | Pure signIn branching |
 | [`lib/resolveSignInCallback.test.ts`](../../lib/resolveSignInCallback.test.ts) | Unit tests for signIn branching |
+| [`lib/auth.test.ts`](../../lib/auth.test.ts) | Unit tests for `signIn` / `jwt` / `session` callbacks and credentials `authorize` |
+| [`utils/api/getSessionForApis.test.ts`](../../utils/api/getSessionForApis.test.ts) | Unit tests for API session helper (401 vs ok) |
 | [`TESTING.md`](../../TESTING.md) | Manual auth guard checks |

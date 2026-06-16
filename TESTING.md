@@ -34,7 +34,7 @@ Vitest + E2E green covers validation logic and the flows listed below. Manual ch
 
 | Area | Tests |
 |------|-------|
-| API auth guards | `checkOwnership.test.ts`, `checkIfAdmin.test.ts` |
+| API auth guards | `checkOwnership.test.ts`, `checkIfAdmin.test.ts`, `getSessionForApis.test.ts`, `lib/auth.test.ts` (callbacks + credentials `authorize`; `resolveSignInCallback.test.ts` for signIn branching) |
 | User likes prefetch | `getUserLikes.test.ts`, `LikesContext.test.tsx` (SSR hydrate, fetch, logout) |
 | Like toggle hook | `useLikeState.test.ts` (optimistic count, rollback; mocked `useToggleState`); `useToggleState.test.ts` (debounce POST, rollback, rate limit, in-flight guard); `useApiRateLimiter.test.ts` (limit, window reset) |
 | Shared actions | `Shared/actions/GeneralButton.test.tsx` |
@@ -266,7 +266,7 @@ E2E cannot exercise these (bypassed or skipped).
 3. Add E2E only for stable user flows not needing captcha/email
 4. `pnpm test` + `pnpm build`; `pnpm test:e2e` if you touched covered flows
 
-Block high-risk areas (`lib/auth.ts`, rate limiter, ownership) without unit smoke tests.
+Block high-risk areas (`lib/auth.ts`, rate limiter, ownership) without unit smoke tests. **`lib/auth.test.ts`**, **`getSessionForApis.test.ts`**, and **`resolveSignInCallback.test.ts`** cover auth guards; ownership/admin use mocked `getSessionForApis`.
 
 ---
 
