@@ -2,6 +2,10 @@ import seedData from "./seed-data.json";
 
 export const SEED_NAME = seedData.name.content;
 export const SEED_NAME_DUPLICATE_VARIANT = seedData.name.duplicateVariant;
+export const SEED_NAME_WITH_SPACES =
+  seedData.name.normalizationVariants.withSpaces;
+export const SEED_NAME_WITH_PUNCTUATION =
+  seedData.name.normalizationVariants.withPunctuation;
 export const SEED_NAME_ADMIN = seedData.nameAdmin.content;
 
 export const SEED_DESCRIPTION_START =

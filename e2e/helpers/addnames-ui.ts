@@ -54,3 +54,18 @@ export async function submitNameWithTags(
 export function hashedTagText(tag: string): string {
   return `#${tag}`;
 }
+
+export async function clickNameExistsSearch(page: Page): Promise<void> {
+  await page
+    .getByRole("button", { name: "Search" })
+    .filter({ has: page.locator("svg") })
+    .click();
+}
+
+export async function submitNameForDuplicateCheck(
+  page: Page,
+  name: string,
+): Promise<void> {
+  await page.locator("#nameInput").fill(name);
+  await page.getByRole("button", { name: "Add name" }).click();
+}

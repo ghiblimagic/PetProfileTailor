@@ -1,7 +1,11 @@
 {
   "name": {
     "content": "E2ESeedName",
-    "duplicateVariant": "E2ESEEDNAME"
+    "duplicateVariant": "E2ESEEDNAME",
+    "normalizationVariants": {
+      "withSpaces": "E2E Seed Name",
+      "withPunctuation": "E2E-Seed!Name"
+    }
   },
   "nameAdmin": {
     "content": "E2EAdminSeedName"

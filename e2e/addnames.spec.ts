@@ -3,10 +3,14 @@ import { getPlaywrightCredentials, loginWithCredentials } from "./helpers/auth";
 import {
   SEED_NAME,
   SEED_NAME_DUPLICATE_VARIANT,
+  SEED_NAME_WITH_PUNCTUATION,
+  SEED_NAME_WITH_SPACES,
 } from "./fixtures/seed-data";
 import {
+  clickNameExistsSearch,
   hashedTagText,
   SEED_NAME_TAG_FOR_ADD_NAMES,
+  submitNameForDuplicateCheck,
   submitNameWithTags,
 } from "./helpers/addnames-ui";
 
@@ -61,8 +65,53 @@ test.describe("Add names page (authenticated)", () => {
 
   test("rejects duplicate of seeded normalized name", async ({ page }) => {
     await page.goto("/addnames");
-    await page.locator("#nameInput").fill(SEED_NAME_DUPLICATE_VARIANT);
-    await page.getByRole("button", { name: "Add name" }).click();
+    await submitNameForDuplicateCheck(page, SEED_NAME_DUPLICATE_VARIANT);
+
+    await expect(page.getByText(/already exists/i)).toBeVisible({
+      timeout: 15_000,
+    });
+  });
+
+  test("rejects duplicate when spaces differ from seeded name", async ({
+    page,
+  }) => {
+    await page.goto("/addnames");
+    await submitNameForDuplicateCheck(page, SEED_NAME_WITH_SPACES);
+
+    await expect(page.getByText(/already exists/i)).toBeVisible({
+      timeout: 15_000,
+    });
+  });
+
+  test("rejects duplicate when punctuation differs from seeded name", async ({
+    page,
+  }) => {
+    await page.goto("/addnames");
+    await submitNameForDuplicateCheck(page, SEED_NAME_WITH_PUNCTUATION);
+
+    await expect(page.getByText(/already exists/i)).toBeVisible({
+      timeout: 15_000,
+    });
+  });
+
+  test("check-if-exists finds duplicate for spaced variant of seeded name", async ({
+    page,
+  }) => {
+    await page.goto("/addnames");
+    await page.locator("#nameInput").fill(SEED_NAME_WITH_SPACES);
+    await clickNameExistsSearch(page);
+
+    await expect(page.getByText(/already exists/i)).toBeVisible({
+      timeout: 15_000,
+    });
+  });
+
+  test("check-if-exists finds duplicate for punctuation variant of seeded name", async ({
+    page,
+  }) => {
+    await page.goto("/addnames");
+    await page.locator("#nameInput").fill(SEED_NAME_WITH_PUNCTUATION);
+    await clickNameExistsSearch(page);
 
     await expect(page.getByText(/already exists/i)).toBeVisible({
       timeout: 15_000,

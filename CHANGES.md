@@ -5793,3 +5793,27 @@ Manual backlog item: submit a name with tags via `/addnames` and assert hashed t
 
 - `pnpm seed:e2e` then `pnpm test:e2e e2e/addnames.spec.ts` — 10 passed
 
+### Next logical step
+
+- `adddescriptions` with tags (symmetric to names) or edit `likedByCount` on content edit — `TESTING.md` manual backlog
+
+---
+
+## 2026-06-08 — Name normalization E2E (`addnames.spec.ts`)
+
+### What was built and why
+
+Manual backlog: spaces and punctuation variants of `E2ESeedName` must duplicate on submit and on check-if-exists search (case variant was already covered).
+
+### Files modified
+
+- `e2e/fixtures/seed-data.json` — `normalizationVariants.withSpaces` / `withPunctuation`
+- `e2e/fixtures/seed-data.ts` — exports
+- `e2e/helpers/addnames-ui.ts` — `clickNameExistsSearch`, `submitNameForDuplicateCheck`
+- `e2e/addnames.spec.ts` — 4 normalization tests
+- `TESTING.md`, `CHANGES.md`
+
+### Verification
+
+- `pnpm test:e2e e2e/addnames.spec.ts` — 14 passed
+

@@ -116,6 +116,7 @@ Playwright maps `MONGODB_URI_TEST` → `MONGODB_URI` when starting the server. `
 - Invalid `@` in name → client-side warning
 - Submit unique name → success toast
 - Duplicate of seeded name (`SEED_NAME_DUPLICATE_VARIANT`) → 409
+- Duplicate when spaces/punctuation differ (`E2E Seed Name`, `E2E-Seed!Name`) → 409 on submit + check-if-exists search
 - Seeded name → `/name/[name]` loads
 - Blocklisted name `butt` alone → rejected
 - `fluffy butt` → allowed (blocklisted word not alone)
@@ -270,7 +271,7 @@ E2E cannot exercise these (bypassed or skipped).
 ### Content depth (tags, normalization)
 
 - [ ] `/addnames` — name with **tags** → appears on `/name/[name]` with tags/categories — **covered:** `e2e/addnames.spec.ts` (cheat-sheet tag `e2e-name-tag`)
-- [ ] Name normalization — spaces/punctuation/case variants → same duplicate behavior (UI search/add flows beyond case duplicate)
+- [ ] Name normalization — spaces/punctuation/case variants → same duplicate behavior — **covered:** `e2e/addnames.spec.ts` (case, spaces, punctuation on submit + search)
 - [ ] Edit own content → `likedByCount` unchanged unless liking
 
 ### Blocklist (bio and API detail)
