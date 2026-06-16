@@ -6,6 +6,11 @@ import {
   submitDescriptionForm,
 } from "./helpers/descriptions";
 import {
+  hashedTagText,
+  SEED_DESCRIPTION_FILTER_TAG,
+  submitDescriptionWithTags,
+} from "./helpers/adddescriptions-ui";
+import {
   SEED_DESCRIPTION_MIDDLE_MARKER,
   SEED_DESCRIPTION_START_PREFIX,
 } from "./fixtures/seed-data";
@@ -16,7 +21,7 @@ test.describe("Add descriptions page", () => {
     await expect(
       page.getByText("Please sign in to submit a description"),
     ).toBeVisible();
-    await expect(page.locator("#nameDescription")).toBeDisabled();
+    await expect(page.locator("#descriptionInput")).toBeDisabled();
   });
 });
 
@@ -85,6 +90,29 @@ test.describe("Add descriptions page (authenticated)", () => {
 
     await expect(
       page.getByText("Success! That content is not in the database"),
+    ).toBeVisible({ timeout: 15_000 });
+  });
+
+  test("submitted description with tag shows tag on detail page", async ({
+    page,
+  }) => {
+    const uniqueContent = `E2E description with tag ${Date.now().toString(36)} and enough length here`;
+
+    await page.goto("/adddescriptions");
+    const { status, id } = await submitDescriptionWithTags(page, uniqueContent);
+    expect(status).toBe(201);
+
+    await expect(page.getByText(/Successfully added description/i)).toBeVisible({
+      timeout: 15_000,
+    });
+
+    const detailResponse = await page.goto(`/description/${id}`);
+    expect(detailResponse?.status()).toBeLessThan(500);
+    await expect(page.getByText(uniqueContent, { exact: false })).toBeVisible({
+      timeout: 15_000,
+    });
+    await expect(
+      page.getByText(hashedTagText(SEED_DESCRIPTION_FILTER_TAG), { exact: true }),
     ).toBeVisible({ timeout: 15_000 });
   });
 });

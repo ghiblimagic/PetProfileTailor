@@ -130,6 +130,7 @@ Playwright maps `MONGODB_URI_TEST` → `MONGODB_URI` when starting the server. `
 - Blocklisted substring in description → rejected
 - “Check if exists” at **start** of seeded description → duplicate shown
 - Same UI — seeded **middle-only** marker → not flagged
+- Description with seeded tag (`e2e-filter-tag` via tags cheat sheet) → `#e2e-filter-tag` on `/description/[id]` (after `pnpm seed:e2e`)
 
 **`e2e/auth-session.spec.ts`**
 
@@ -161,6 +162,7 @@ Playwright maps `MONGODB_URI_TEST` → `MONGODB_URI` when starting the server. `
 - Owner updates seeded name notes (API + UI)
 - Non-owner cannot edit admin-owned name → 403
 - Edit description to duplicate another seeded entry → 409
+- Owner edit (API + UI) preserves like count on name/description detail page (`likedByCount unchanged on owner edit`)
 
 **`e2e/social.spec.ts`**
 
@@ -271,8 +273,9 @@ E2E cannot exercise these (bypassed or skipped).
 ### Content depth (tags, normalization)
 
 - [ ] `/addnames` — name with **tags** → appears on `/name/[name]` with tags/categories — **covered:** `e2e/addnames.spec.ts` (cheat-sheet tag `e2e-name-tag`)
+- [ ] `/adddescriptions` — description with **tags** → appears on `/description/[id]` — **covered:** `e2e/adddescriptions.spec.ts` (cheat-sheet tag `e2e-filter-tag`)
 - [ ] Name normalization — spaces/punctuation/case variants → same duplicate behavior — **covered:** `e2e/addnames.spec.ts` (case, spaces, punctuation on submit + search)
-- [ ] Edit own content → `likedByCount` unchanged unless liking
+- [ ] Edit own content → `likedByCount` unchanged unless liking — **covered:** `e2e/edits.spec.ts` (`likedByCount unchanged on owner edit`)
 
 ### Blocklist (bio and API detail)
 

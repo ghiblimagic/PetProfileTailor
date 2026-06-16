@@ -97,6 +97,12 @@ export function nameDetailLikeButton(page: Page) {
   return page.getByRole("button", { name: /^(Like|Unlike)$/ });
 }
 
+export async function readDetailPageLikeCount(page: Page): Promise<number> {
+  const likeButton = nameDetailLikeButton(page);
+  await expect(likeButton).toBeVisible({ timeout: 15_000 });
+  return Number((await likeButton.locator("span").textContent()) ?? "0");
+}
+
 /**
  * Two clicks back-to-back (within the 500ms debounce window).
  * Playwright `dblclick()` can use the OS double-click interval (~500ms), which fires two debounced commits.
@@ -159,4 +165,19 @@ export async function ensureDescriptionLiked(
   expect(response.ok()).toBeTruthy();
   const json = (await response.json()) as { liked: boolean };
   expect(json.liked).toBe(true);
+}
+
+/** Toggle until the description is not liked by the current session (idempotent). */
+export async function ensureDescriptionUnliked(
+  request: APIRequestContext,
+  contentId: string,
+  contentCreator: ContentCreator,
+): Promise<void> {
+  if (!(await isDescriptionLikedBySession(request, contentId))) return;
+
+  const url = `/api/description/likes/${contentId}/togglelike`;
+  const response = await request.post(url, { data: { contentCreator } });
+  expect(response.ok()).toBeTruthy();
+  const json = (await response.json()) as { liked: boolean };
+  expect(json.liked).toBe(false);
 }

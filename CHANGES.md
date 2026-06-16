@@ -5817,3 +5817,52 @@ Manual backlog: spaces and punctuation variants of `E2ESeedName` must duplicate 
 
 - `pnpm test:e2e e2e/addnames.spec.ts` — 14 passed
 
+---
+
+## 2026-06-08 — Add descriptions with tags + likedByCount on edit E2E
+
+### What was built and why
+
+Manual backlog: submit description with tags and assert hashed tag on detail page; verify owner edits do not change the like count on name/description detail pages.
+
+### Files created
+
+- `e2e/helpers/adddescriptions-ui.ts` — tags cheat-sheet helpers, `submitDescriptionWithTags`
+
+### Files modified
+
+- `e2e/helpers/descriptions.ts` — fix textarea selector `#descriptionInput` (was stale `#nameDescription`)
+- `e2e/helpers/likes.ts` — `readDetailPageLikeCount`, `ensureDescriptionUnliked`
+- `e2e/helpers/seed-lookup.ts` — `tags` on lookup type, `tagIdsFromSeededContent`
+- `e2e/adddescriptions.spec.ts` — tag on detail page test
+- `e2e/edits.spec.ts` — `likedByCount unchanged on owner edit` describe (name/description API + name UI)
+- `TESTING.md`, `CHANGES.md`
+
+### Problems encountered and fixes
+
+- Description PUT with unchanged `content` text triggered false 409 (`shouldCheckDescriptionDuplicate` case mismatch) — notes-only update omits `content`.
+- Description PUT requires `tags` array — pass `tagIdsFromSeededContent(seeded)` so route does not assign `undefined`.
+
+### Verification
+
+- `pnpm test:e2e e2e/adddescriptions.spec.ts e2e/edits.spec.ts` — 13 passed
+
+---
+
+## 2026-06-08 — Fix description PUT false-positive duplicate 409
+
+### What was built and why
+
+`shouldCheckDescriptionDuplicate` compared submitted `content` to `existingContent.toLowerCase()` only on the stored side, so unchanged mixed-case text still ran duplicate lookup and 409'd against the same row. Aligned with name edits: case-insensitive comparison on both sides.
+
+### Files modified
+
+- `utils/api/descriptionDuplicateCheck.ts` — `content.toLowerCase() !== existingContent?.toLowerCase()`
+- `utils/api/descriptionDuplicateCheck.test.ts` — updated expectations for unchanged / casing-only content
+- `e2e/edits.spec.ts` — description likedByCount test now sends unchanged `content` (matches UI edit dialog)
+- `CHANGES.md`
+
+### Verification
+
+- `pnpm vitest run utils/api/descriptionDuplicateCheck.test.ts` — 6 passed
+

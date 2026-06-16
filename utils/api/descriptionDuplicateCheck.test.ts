@@ -8,9 +8,18 @@ describe("shouldCheckDescriptionDuplicate", () => {
     expect(shouldCheckDescriptionDuplicate("Fluffy lover", null)).toBe(true);
   });
 
-  it("skips when content is unchanged (case-insensitive match on existing)", () => {
+  it("skips when content is unchanged (case-insensitive)", () => {
     expect(
       shouldCheckDescriptionDuplicate("hello world", "hello world"),
+    ).toBe(false);
+    expect(shouldCheckDescriptionDuplicate("Hello World", "hello world")).toBe(
+      false,
+    );
+    expect(
+      shouldCheckDescriptionDuplicate(
+        "E2E Seeded Description",
+        "E2E Seeded Description",
+      ),
     ).toBe(false);
   });
 
@@ -18,11 +27,6 @@ describe("shouldCheckDescriptionDuplicate", () => {
     expect(
       shouldCheckDescriptionDuplicate("new text", "old text"),
     ).toBe(true);
-  });
-
-  it("checks when only casing differs from stored content", () => {
-    // Preserves route.js comparison: raw content vs lowercased existing
-    expect(shouldCheckDescriptionDuplicate("Hello", "hello")).toBe(true);
   });
 
   it("skips empty content", () => {

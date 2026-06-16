@@ -5,6 +5,7 @@ type SeededContent = {
   content: string;
   createdBy: { _id: string; name?: string; profileName?: string };
   likedByCount?: number;
+  tags?: Array<{ _id: string } | string>;
 };
 
 type LookupResponse = {
@@ -80,4 +81,12 @@ export async function lookupUserByProfileName(
     profileName: user.profileName,
     followers,
   };
+}
+
+export function tagIdsFromSeededContent(
+  seeded: Pick<SeededContent, "tags">,
+): string[] {
+  return (seeded.tags ?? []).map((tag) =>
+    typeof tag === "object" ? String(tag._id) : String(tag),
+  );
 }

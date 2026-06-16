@@ -1,10 +1,14 @@
 import { type Page } from "@playwright/test";
 
+export function descriptionInput(page: Page) {
+  return page.locator("#descriptionInput");
+}
+
 export async function fillDescriptionContent(
   page: Page,
   content: string,
 ): Promise<void> {
-  await page.locator("#nameDescription").fill(content);
+  await descriptionInput(page).fill(content);
 }
 
 export async function submitDescriptionForm(page: Page): Promise<void> {

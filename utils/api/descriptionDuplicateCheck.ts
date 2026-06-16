@@ -8,7 +8,7 @@ export function shouldCheckDescriptionDuplicate(
 ): boolean {
   return Boolean(
     content?.toLowerCase() &&
-      content !== existingContent?.toLowerCase(),
+      content.toLowerCase() !== existingContent?.toLowerCase(),
   );
 }
 
