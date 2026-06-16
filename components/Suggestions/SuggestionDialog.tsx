@@ -37,10 +37,10 @@ export default function SuggestionDialog({
       className="relative z-50 "
     >
       <div
-        className="fixed inset-0 bg-black/50 overflow-y-auto"
+        className="fixed inset-0 bg-black/50"
         aria-hidden="true"
-        tabIndex={0}
-      >
+      />
+      <div className="fixed inset-0 overflow-y-auto">
         <DialogPanel
           className=" bg-secondary sm:p-12 bg-opacity-40 h-fit"
           onClick={(e) => e.stopPropagation()}
@@ -49,7 +49,7 @@ export default function SuggestionDialog({
             <AddSuggestion
               dataType={dataType}
               contentInfo={target}
-              apisuggestionSubmission="/api/suggestion/"
+              apisuggestionSubmission="/api/suggestion"
               suggestionBy={signedInUsersId}
               onClose={onClose}
             />
@@ -59,7 +59,7 @@ export default function SuggestionDialog({
               dataType={dataType}
               contentInfo={target}
               suggestionBy={signedInUsersId}
-              apisuggestionSubmission="/api/suggestion/"
+              apisuggestionSubmission="/api/suggestion"
               onClose={onClose}
             />
           )}

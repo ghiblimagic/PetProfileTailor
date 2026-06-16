@@ -5516,4 +5516,39 @@ Second testing tier from backlog: notification badge context, cooldown/suggestio
 
 - Pagination/sort cooldown UI E2E on `/fetchnames`
 - `useSwrSimple` unit tests (mock `useSWRInfinite`)
-- Suggestion/report **UI** E2E (dialog submit like thanks-ui)
+- Admin category **UI** E2E
+
+---
+
+## 2026-06-08 — Suggestion/report UI E2E (`moderation-ui.spec.ts`)
+
+### What was built and why
+
+Tier 2 remaining item: Playwright coverage for suggestion and report dialogs via the listing ⋮ menu (mirrors `thanks-ui.spec.ts` and `moderation.spec.ts` API flows).
+
+### Files created
+
+- `e2e/moderation-ui.spec.ts`
+- `e2e/helpers/moderation-ui.ts`
+
+### Files modified
+
+- `components/Suggestions/SuggestionDialog.tsx` — Headless UI a11y fix (backdrop `aria-hidden` separate from `DialogPanel`); API path without trailing slash (`/api/suggestion`)
+- `components/Flagging/FlagDialog.tsx` — same a11y fix; `/api/flag/flagreportsubmission` without trailing slash (avoids 308 redirect on POST)
+- `TESTING.md`, `CHANGES.md`
+
+### Problems encountered and fixes
+
+- **308 on POST:** trailing-slash API URLs in dialogs caused permanent redirects; Playwright captured 308 instead of 201.
+- **Admin menu:** admins see Delete/Edit on all content — report UI test uses regular user on admin-owned name (matches API test).
+- **Idempotent pending:** prior runs leave pending suggestion/report; tests check API first and assert edit form, with reload retry if client context is stale.
+
+### Verification
+
+- `pnpm test:e2e e2e/moderation-ui.spec.ts` — 3 passed
+
+### Next logical step (tier 2 remaining)
+
+- Pagination/sort cooldown UI E2E on `/fetchnames`
+- `useSwrSimple` unit tests (mock `useSWRInfinite`)
+- Admin category **UI** E2E
