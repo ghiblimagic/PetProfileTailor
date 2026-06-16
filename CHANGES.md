@@ -5570,7 +5570,29 @@ Final tier 2 item: Playwright coverage for admin category creation through the U
 
 ### Next logical step
 
-- Tier 3 / manual backlog per `TESTING.md` (tag UI, edit category UI, follow UI in `docs/FUTURE.md`)
+- Tier 3 / manual backlog per `TESTING.md` (description tag UI, edit category/tag UI, follow UI in `docs/FUTURE.md`)
+
+---
+
+## 2026-06-08 — Admin name tag UI E2E (add-on to `admin-category-ui.spec.ts`)
+
+### What was built and why
+
+Minimal admin tag-create coverage: `/addnametag` form → `POST /api/nametag` without exercising react-select category attach.
+
+### Files modified
+
+- `e2e/admin-category-ui.spec.ts` — third test
+- `e2e/helpers/admin-ui.ts` — `submitNameTagForm`, `expectNameTagExists`
+- `TESTING.md`, `CHANGES.md`
+
+### Verification
+
+- `pnpm test:e2e e2e/admin-category-ui.spec.ts` — 3 passed
+
+### Next logical step
+
+- Optional: tag + category attach via react-select; description tag UI
 
 ---
 
@@ -5626,3 +5648,21 @@ Tier 2 remaining item: Playwright coverage for suggestion and report dialogs via
 ### Verification
 
 - `pnpm test:e2e e2e/moderation-ui.spec.ts` — 3 passed
+
+---
+
+## 2026-06-08 — Admin name tag UI E2E (add-on to `admin-category-ui.spec.ts`)
+
+### What was built and why
+
+Minimal admin tag-create coverage: `/addnametag` form → `POST /api/nametag` without react-select category attach.
+
+### Files modified
+
+- `e2e/admin-category-ui.spec.ts` — third test
+- `e2e/helpers/admin-ui.ts` — `submitNameTagForm`, `expectNameTagExists`
+- `TESTING.md`, `CHANGES.md`
+
+### Verification
+
+- `pnpm test:e2e e2e/admin-category-ui.spec.ts` — 3 passed

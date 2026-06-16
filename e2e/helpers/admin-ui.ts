@@ -4,6 +4,10 @@ export function uniqueE2ECategoryName(prefix: string): string {
   return `e2e-${prefix}-${Date.now().toString(36)}`;
 }
 
+export function uniqueE2ENameTag(prefix: string): string {
+  return `e2e-${prefix}-${Date.now().toString(36)}`;
+}
+
 /** Wait until NextAuth session exposes admin role (client gates admin forms). */
 export async function waitForAdminSession(page: Page): Promise<void> {
   await expect
@@ -78,4 +82,31 @@ export async function expectDescriptionCategoryExists(
   expect(
     categories.some((entry) => entry.category === category),
   ).toBeTruthy();
+}
+
+export async function submitNameTagForm(
+  page: Page,
+  tag: string,
+): Promise<number> {
+  await page.locator("#categoryInput").fill(tag);
+
+  const responsePromise = page.waitForResponse(
+    (response) =>
+      response.url().includes("/api/nametag") &&
+      response.request().method() === "POST",
+  );
+
+  await page.getByRole("button", { name: "Submit tag" }).click();
+  const response = await responsePromise;
+  return response.status();
+}
+
+export async function expectNameTagExists(
+  request: APIRequestContext,
+  tag: string,
+): Promise<void> {
+  const response = await request.get("/api/nametag");
+  expect(response.ok()).toBeTruthy();
+  const tags = (await response.json()) as Array<{ tag?: string }>;
+  expect(tags.some((entry) => entry.tag === tag)).toBeTruthy();
 }
