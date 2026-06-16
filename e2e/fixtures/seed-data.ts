@@ -17,6 +17,13 @@ export const SEED_DESCRIPTION_MIDDLE_MARKER =
 export const SEED_DESCRIPTION_ADMIN =
   seedData.description.adminOwned.content;
 
+export const SEED_DESCRIPTION_FILTER_CATEGORY =
+  seedData.listingCooldown.descriptionFilterCategory;
+export const SEED_DESCRIPTION_FILTER_TAG =
+  seedData.listingCooldown.descriptionFilterTag;
+export const MIN_LISTING_DOCS_FOR_PAGINATION_COOLDOWN =
+  seedData.listingCooldown.minDocsForPagination;
+
 export function getPlaywrightProfileName(): string {
   return (
     process.env.PLAYWRIGHT_TEST_PROFILENAME ??

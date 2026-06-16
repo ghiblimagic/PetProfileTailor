@@ -207,7 +207,13 @@ Playwright maps `MONGODB_URI_TEST` → `MONGODB_URI` when starting the server. `
 
 - `/fetchnames` — sort dropdown change → ~3s cooldown (disabled select + wait option text)
 - `/fetchnames` — filter quick apply → ~5s cooldown (`Wait Ns`, disabled apply/quick buttons)
-- `/fetchnames` — pagination next at SWR chunk edge → ~15s cooldown — **skipped** when test DB has &lt; 51 names (seed-only DB)
+- `/fetchnames` — pagination next at SWR chunk edge → ~15s cooldown (requires `pnpm seed:e2e` — 51+ names, second SWR chunk)
+
+**`e2e/fetchdescriptions-cooldown.spec.ts`**
+
+- `/fetchdescriptions` — sort dropdown change → ~3s cooldown (disabled select + wait option text)
+- `/fetchdescriptions` — filter apply via seeded category/tag → ~5s cooldown (`wait N secs` apply button)
+- `/fetchdescriptions` — pagination next at SWR chunk edge → ~15s cooldown (requires `pnpm seed:e2e` — 51+ descriptions, second SWR chunk)
 
 **Note — duplicate notification rows (strict mode):** Serial reruns of `notifications-ui.spec.ts` leave multiple thank/like rows for the same seeded content in the test DB. A locator like `row.getByText('E2E Admin')` can then match two elements and Playwright throws a strict mode violation.
 
@@ -222,6 +228,8 @@ pnpm test:e2e e2e/notifications-ui.spec.ts
 ### Fixture data
 
 Shared seed content lives in **`e2e/fixtures/seed-data.json`** (imported by `scripts/seed-e2e.mjs` and Playwright via `e2e/fixtures/seed-data.ts`). Tests use constants like `SEED_NAME` — not hardcoded strings — so duplicate checks stay in sync with the DB.
+
+**Listing cooldown seed** (`listingCooldown` in `seed-data.json`): bulk names/descriptions (51+ total each), description filter category `e2e filter` + tag `e2e-filter-tag`. Re-run `pnpm seed:e2e` after changing fixture counts.
 
 ### Where tests live
 
@@ -279,8 +287,8 @@ E2E cannot exercise these (bypassed or skipped).
 
 - [ ] DevTools → Network — other APIs (`leanWithStrings`) still return string `_id`; no `__v`
 - [ ] `/name/[name]`, `/description/[id]` — render with related data (tags, creator) — **partial:** `e2e/browse.spec.ts` (name + description detail smoke)
-- [ ] `/fetchnames` or `/fetchdescriptions` — pagination spam **next** → ~15s cooldown — **partial:** sort + filter cooldown UI — `e2e/fetchnames-cooldown.spec.ts`; pagination cooldown skips when DB &lt; 51 names
-- [ ] Same pages — rapid sort/filter → ~3s cooldown — **partial:** `e2e/fetchnames-cooldown.spec.ts`
+- [ ] `/fetchnames` or `/fetchdescriptions` — pagination spam **next** → ~15s cooldown — **covered:** `e2e/fetchnames-cooldown.spec.ts`, `e2e/fetchdescriptions-cooldown.spec.ts` (after `pnpm seed:e2e`)
+- [ ] Same pages — rapid sort/filter → ~3s / ~5s cooldown — **covered:** `e2e/fetchnames-cooldown.spec.ts`, `e2e/fetchdescriptions-cooldown.spec.ts`
 - [ ] `useApiRateLimiter` / like button — rapid clicks throttled — **unit:** `useApiRateLimiter.test.ts`; UI double-click E2E still open
 
 ### Misc utils (no E2E yet)

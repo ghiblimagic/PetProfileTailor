@@ -1,17 +1,18 @@
 import { test, expect } from "@playwright/test";
 import {
-  getNamesTotalDocs,
-  gotoFetchnames,
-  MIN_NAMES_FOR_PAGINATION_COOLDOWN,
+  applySeededDescriptionFilter,
+  getDescriptionsTotalDocs,
+  gotoFetchdescriptions,
+  MIN_DESCRIPTIONS_FOR_PAGINATION_COOLDOWN,
   nextPageButton,
   openFiltersDrawer,
   sortSelect,
   triggerPaginationCooldown,
-} from "./helpers/fetchnames-ui";
+} from "./helpers/fetchdescriptions-ui";
 
-test.describe("Fetchnames cooldown UI", () => {
+test.describe("Fetchdescriptions cooldown UI", () => {
   test("sort change shows ~3s cooldown on dropdown", async ({ page }) => {
-    await gotoFetchnames(page);
+    await gotoFetchdescriptions(page);
 
     await sortSelect(page).selectOption("likedByCount,1");
 
@@ -23,29 +24,25 @@ test.describe("Fetchnames cooldown UI", () => {
   });
 
   test("filter apply shows ~5s cooldown in drawer", async ({ page }) => {
-    await gotoFetchnames(page);
+    await gotoFetchdescriptions(page);
+    await applySeededDescriptionFilter(page);
 
     await openFiltersDrawer(page);
-    await page.getByRole("button", { name: "Human Names" }).click();
-
-    await openFiltersDrawer(page);
-    await expect(page.getByText(/Wait \d+s/)).toBeVisible();
-    await expect(
-      page.getByRole("button", { name: "Human Names" }),
-    ).toBeDisabled();
-    await expect(
-      page.getByRole("button", { name: /wait \d+ secs/i }),
-    ).toBeDisabled();
+    const applyButton = page.getByRole("button", { name: /wait \d+ secs/i });
+    await expect(applyButton).toBeVisible();
+    await expect(applyButton).toBeDisabled();
   });
 
   test("pagination next at chunk edge shows ~15s cooldown", async ({
     page,
     request,
   }) => {
-    const totalDocs = await getNamesTotalDocs(request);
-    expect(totalDocs).toBeGreaterThanOrEqual(MIN_NAMES_FOR_PAGINATION_COOLDOWN);
+    const totalDocs = await getDescriptionsTotalDocs(request);
+    expect(totalDocs).toBeGreaterThanOrEqual(
+      MIN_DESCRIPTIONS_FOR_PAGINATION_COOLDOWN,
+    );
 
-    await gotoFetchnames(page);
+    await gotoFetchdescriptions(page);
 
     await triggerPaginationCooldown(page);
 

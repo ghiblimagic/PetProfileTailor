@@ -1,28 +1,33 @@
 import { expect, type APIRequestContext, type Page } from "@playwright/test";
-import { MIN_LISTING_DOCS_FOR_PAGINATION_COOLDOWN } from "../fixtures/seed-data";
+import {
+  MIN_LISTING_DOCS_FOR_PAGINATION_COOLDOWN,
+  SEED_DESCRIPTION_FILTER_CATEGORY,
+  SEED_DESCRIPTION_FILTER_TAG,
+} from "../fixtures/seed-data";
 
-/** Minimum names in DB to trigger SWR chunk preload + 15s pagination cooldown. */
-export const MIN_NAMES_FOR_PAGINATION_COOLDOWN =
+export const MIN_DESCRIPTIONS_FOR_PAGINATION_COOLDOWN =
   MIN_LISTING_DOCS_FOR_PAGINATION_COOLDOWN;
 
-export async function getNamesTotalDocs(
+export { SEED_DESCRIPTION_FILTER_CATEGORY, SEED_DESCRIPTION_FILTER_TAG };
+
+export async function getDescriptionsTotalDocs(
   request: APIRequestContext,
 ): Promise<number> {
   const response = await request.get(
-    "/api/names/swr?page=1&sortingproperty=likedByCount&sortingvalue=-1",
+    "/api/description/swr?page=1&sortingproperty=likedByCount&sortingvalue=-1",
   );
   if (!response.ok()) return 0;
   const json = (await response.json()) as { totalDocs?: number };
   return json.totalDocs ?? 0;
 }
 
-export async function gotoFetchnames(page: Page): Promise<void> {
+export async function gotoFetchdescriptions(page: Page): Promise<void> {
   const firstChunk = page.waitForResponse(
     (response) =>
-      response.url().includes("/api/names/swr") &&
+      response.url().includes("/api/description/swr") &&
       response.url().includes("page=1"),
   );
-  await page.goto("/fetchnames");
+  await page.goto("/fetchdescriptions");
   await firstChunk;
   await expect(page.getByText(/\d+-\d+ of \d+ Items/)).toBeVisible({
     timeout: 20_000,
@@ -33,10 +38,6 @@ export async function gotoFetchnames(page: Page): Promise<void> {
 export async function triggerPaginationCooldown(page: Page): Promise<void> {
   await page.getByRole("button", { name: "3", exact: true }).click();
   await nextPageButton(page).click();
-}
-
-export function perPageSelect(page: Page) {
-  return page.locator("select").first();
 }
 
 export function sortSelect(page: Page) {
@@ -52,4 +53,13 @@ export async function openFiltersDrawer(page: Page): Promise<void> {
   await expect(page.getByRole("heading", { name: "Filters" })).toBeVisible({
     timeout: 10_000,
   });
+}
+
+export async function applySeededDescriptionFilter(page: Page): Promise<void> {
+  await openFiltersDrawer(page);
+  await page
+    .getByRole("button", { name: SEED_DESCRIPTION_FILTER_CATEGORY, exact: true })
+    .click();
+  await page.getByText(SEED_DESCRIPTION_FILTER_TAG, { exact: true }).click();
+  await page.getByRole("button", { name: "apply", exact: true }).click();
 }

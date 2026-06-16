@@ -19,6 +19,13 @@
       "content": "E2E admin owned description with enough characters for validation here"
     }
   },
+  "listingCooldown": {
+    "minDocsForPagination": 51,
+    "descriptionBulkPrefix": "E2E pagination description bulk item",
+    "nameBulkPrefix": "E2Epaginationbulkname",
+    "descriptionFilterCategory": "e2e filter",
+    "descriptionFilterTag": "e2e-filter-tag"
+  },
   "admin": {
     "defaultEmail": "e2e-admin@example.com",
     "defaultPassword": "e2eadminpass",

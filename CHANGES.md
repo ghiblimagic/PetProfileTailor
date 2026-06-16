@@ -5682,3 +5682,53 @@ Symmetric coverage for `/adddescriptiontag` after name tag test.
 ### Verification
 
 - `pnpm test:e2e e2e/admin-category-ui.spec.ts` — 4 passed
+
+---
+
+## 2026-06-08 — Fetchdescriptions cooldown UI E2E (`fetchdescriptions-cooldown.spec.ts`)
+
+### What was built and why
+
+Mirror of `fetchnames-cooldown.spec.ts` for `/fetchdescriptions` (sort, filter, pagination cooldown UX).
+
+### Files created
+
+- `e2e/fetchdescriptions-cooldown.spec.ts`
+- `e2e/helpers/fetchdescriptions-ui.ts`
+
+### Files modified
+
+- `TESTING.md`, `CHANGES.md`
+
+### Notes
+
+- Descriptions have no quick-filter buttons; filter test expands first category disclosure and checks a tag checkbox.
+- Filter test skips when test DB has no description categories/tags (seed does not create them).
+- Pagination cooldown skips when DB has &lt; 51 descriptions.
+
+### Verification
+
+- `pnpm test:e2e e2e/fetchdescriptions-cooldown.spec.ts` — 1 passed, 2 skipped on seed DB
+
+---
+
+## 2026-06-08 — E2E seed + listing cooldown tests (no skips)
+
+### What was built and why
+
+Extended `pnpm seed:e2e` so filter and pagination cooldown E2E tests run against real DB data instead of skipping. SWR fetches 50 items per chunk; seed targets 51+ docs so a second chunk is required. Pagination test clicks page 3 then **next** (not page 5) to avoid auto-preload on the last loaded page, which fetches chunk 2 without showing the 15s cooldown.
+
+### Files modified
+
+- `e2e/fixtures/seed-data.json` — `listingCooldown` block (bulk prefixes, filter category/tag, min 51 docs)
+- `scripts/seed-e2e.mjs` — bulk names/descriptions, description tag + category
+- `e2e/fixtures/seed-data.ts` — exports for filter + pagination constants
+- `e2e/helpers/fetchdescriptions-ui.ts` — `applySeededDescriptionFilter`, `triggerPaginationCooldown` (page 3 + next)
+- `e2e/helpers/fetchnames-ui.ts` — `triggerPaginationCooldown` (page 3 + next)
+- `e2e/fetchdescriptions-cooldown.spec.ts`, `e2e/fetchnames-cooldown.spec.ts` — assert DB counts, no `test.skip`
+- `TESTING.md`, `CHANGES.md`
+
+### Verification
+
+- `pnpm seed:e2e` then `pnpm test:e2e e2e/fetchdescriptions-cooldown.spec.ts e2e/fetchnames-cooldown.spec.ts` — 6 passed
+

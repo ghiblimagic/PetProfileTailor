@@ -113,6 +113,79 @@ async function upsertDescription(descriptions, { content, createdBy }) {
   }
 }
 
+async function upsertDescriptionTag(descriptionTags, { tag, createdBy }) {
+  const result = await descriptionTags.updateOne(
+    { tag },
+    {
+      $set: { tag, createdBy, updatedAt: new Date() },
+      $setOnInsert: { createdAt: new Date() },
+    },
+    { upsert: true },
+  );
+
+  const doc = await descriptionTags.findOne({ tag });
+  if (result.upsertedCount) {
+    console.log(`Created description tag: ${tag}`);
+  } else {
+    console.log(`Updated description tag: ${tag}`);
+  }
+  return doc._id;
+}
+
+async function upsertDescriptionCategory(descriptionCategories, {
+  category,
+  tags,
+}) {
+  const result = await descriptionCategories.updateOne(
+    { category },
+    { $set: { category, tags } },
+    { upsert: true },
+  );
+
+  if (result.upsertedCount) {
+    console.log(`Created description category: ${category}`);
+  } else {
+    console.log(`Updated description category: ${category}`);
+  }
+}
+
+async function seedBulkDescriptions(
+  descriptions,
+  { prefix, createdBy, targetCount },
+) {
+  const existing = await descriptions.countDocuments({
+    content: { $regex: `^${prefix.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}` },
+  });
+  const toCreate = Math.max(0, targetCount - existing);
+
+  for (let i = 0; i < toCreate; i++) {
+    const index = existing + i + 1;
+    const content = `${prefix} ${String(index).padStart(3, "0")} with enough characters for validation here`;
+    await upsertDescription(descriptions, { content, createdBy });
+  }
+
+  console.log(
+    `Description bulk for pagination: ${existing} existing, ${toCreate} created (target ${targetCount})`,
+  );
+}
+
+async function seedBulkNames(names, { prefix, createdBy, targetCount }) {
+  const existing = await names.countDocuments({
+    content: { $regex: `^${prefix.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}` },
+  });
+  const toCreate = Math.max(0, targetCount - existing);
+
+  for (let i = 0; i < toCreate; i++) {
+    const index = existing + i + 1;
+    const content = `${prefix}${String(index).padStart(3, "0")}`;
+    await upsertName(names, { content, createdBy });
+  }
+
+  console.log(
+    `Name bulk for pagination: ${existing} existing, ${toCreate} created (target ${targetCount})`,
+  );
+}
+
 const uri = process.env.MONGODB_URI_TEST;
 const email = process.env.PLAYWRIGHT_TEST_EMAIL?.trim().toLowerCase();
 const password = process.env.PLAYWRIGHT_TEST_PASSWORD;
@@ -148,6 +221,15 @@ await mongoose.connect(uri);
 const users = mongoose.connection.collection("users");
 const names = mongoose.connection.collection("names");
 const descriptions = mongoose.connection.collection("descriptions");
+const descriptionTags = mongoose.connection.collection("descriptiontags");
+const descriptionCategories =
+  mongoose.connection.collection("descriptioncategories");
+
+const minDocsForPagination = seedData.listingCooldown.minDocsForPagination;
+const descriptionBulkPrefix = seedData.listingCooldown.descriptionBulkPrefix;
+const nameBulkPrefix = seedData.listingCooldown.nameBulkPrefix;
+const filterCategory = seedData.listingCooldown.descriptionFilterCategory;
+const filterTag = seedData.listingCooldown.descriptionFilterTag;
 
 const userId = await upsertPasswordUser(users, {
   email,
@@ -188,6 +270,30 @@ await upsertDescription(descriptions, {
 await upsertDescription(descriptions, {
   content: seedData.description.adminOwned.content,
   createdBy: adminId,
+});
+
+const filterTagId = await upsertDescriptionTag(descriptionTags, {
+  tag: filterTag,
+  createdBy: adminId,
+});
+
+await upsertDescriptionCategory(descriptionCategories, {
+  category: filterCategory,
+  tags: [filterTagId],
+});
+
+// Pagination cooldown tests need 51+ docs and a second SWR chunk (50 per page).
+const fixtureDescriptionCount = 3;
+const fixtureNameCount = 2;
+await seedBulkDescriptions(descriptions, {
+  prefix: descriptionBulkPrefix,
+  createdBy: userId,
+  targetCount: Math.max(0, minDocsForPagination - fixtureDescriptionCount),
+});
+await seedBulkNames(names, {
+  prefix: nameBulkPrefix,
+  createdBy: userId,
+  targetCount: Math.max(0, minDocsForPagination - fixtureNameCount),
 });
 
 console.log(`Database: ${mongoose.connection.name}`);
