@@ -6,12 +6,15 @@ import {
 } from "./helpers/auth";
 import {
   expectDescriptionCategoryExists,
+  expectDescriptionTagExists,
   expectNameCategoryExists,
   expectNameTagExists,
   submitDescriptionCategoryForm,
+  submitDescriptionTagForm,
   submitNameCategoryForm,
   submitNameTagForm,
   uniqueE2ECategoryName,
+  uniqueE2EDescriptionTag,
   uniqueE2ENameTag,
   waitForAdminSession,
 } from "./helpers/admin-ui";
@@ -69,5 +72,18 @@ test.describe("Admin category and tag UI", () => {
     const status = await submitNameTagForm(page, tag);
     expect(status).toBe(201);
     await expectNameTagExists(request, tag);
+  });
+
+  test("admin creates description tag via form", async ({ page, request }) => {
+    const tag = uniqueE2EDescriptionTag("desc-tag");
+
+    await page.goto("/adddescriptiontag");
+    await expect(
+      page.getByRole("button", { name: "Submit tag" }),
+    ).toBeVisible({ timeout: 15_000 });
+
+    const status = await submitDescriptionTagForm(page, tag);
+    expect(status).toBe(201);
+    await expectDescriptionTagExists(request, tag);
   });
 });

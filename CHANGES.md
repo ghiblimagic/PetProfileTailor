@@ -5666,3 +5666,19 @@ Minimal admin tag-create coverage: `/addnametag` form → `POST /api/nametag` wi
 ### Verification
 
 - `pnpm test:e2e e2e/admin-category-ui.spec.ts` — 3 passed
+
+---
+
+## 2026-06-08 — Admin description tag UI E2E (add-on)
+
+### What was built and why
+
+Symmetric coverage for `/adddescriptiontag` after name tag test.
+
+### Files modified
+
+- `e2e/admin-category-ui.spec.ts`, `e2e/helpers/admin-ui.ts`, `TESTING.md`, `CHANGES.md`
+
+### Verification
+
+- `pnpm test:e2e e2e/admin-category-ui.spec.ts` — 4 passed

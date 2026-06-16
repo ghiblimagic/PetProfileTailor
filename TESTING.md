@@ -151,6 +151,7 @@ Playwright maps `MONGODB_URI_TEST` → `MONGODB_URI` when starting the server. `
 - Admin — `POST /api/namecategories` via `/addnamecategory` form → 201; category in `GET /api/namecategories`
 - Admin — `POST /api/descriptioncategory` via `/adddescriptioncategory` form → 201; category in `GET /api/descriptioncategory`
 - Admin — `POST /api/nametag` via `/addnametag` form → 201; tag in `GET /api/nametag` (no category attach)
+- Admin — `POST /api/descriptiontag` via `/adddescriptiontag` form → 201; tag in `GET /api/descriptiontag` (no category attach)
 
 **`e2e/edits.spec.ts`**
 
@@ -253,7 +254,7 @@ E2E cannot exercise these (bypassed or skipped).
 
 ### Admin UI depth
 
-- [ ] Admin — create tag/category via **UI** (not just API smoke) — **partial:** name + description category create, name tag create — `e2e/admin-category-ui.spec.ts`; nav links — `e2e/admin.spec.ts`
+- [ ] Admin — create tag/category via **UI** (not just API smoke) — **covered:** name + description category/tag create — `e2e/admin-category-ui.spec.ts`; nav links — `e2e/admin.spec.ts`
 - [ ] Admin — edit existing category/tag in UI
 
 ### Content depth (tags, normalization)
