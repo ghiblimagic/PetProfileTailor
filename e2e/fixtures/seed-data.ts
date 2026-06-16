@@ -21,6 +21,8 @@ export const SEED_DESCRIPTION_FILTER_CATEGORY =
   seedData.listingCooldown.descriptionFilterCategory;
 export const SEED_DESCRIPTION_FILTER_TAG =
   seedData.listingCooldown.descriptionFilterTag;
+export const SEED_NAME_TAG_ATTACH_CATEGORY =
+  seedData.listingCooldown.nameTagAttachCategory;
 export const MIN_LISTING_DOCS_FOR_PAGINATION_COOLDOWN =
   seedData.listingCooldown.minDocsForPagination;
 

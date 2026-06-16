@@ -5,14 +5,22 @@ import {
   loginWithAdminCredentials,
 } from "./helpers/auth";
 import {
+  SEED_DESCRIPTION_FILTER_CATEGORY,
+  SEED_NAME_TAG_ATTACH_CATEGORY,
+} from "./fixtures/seed-data";
+import {
   expectDescriptionCategoryExists,
+  expectDescriptionTagAttachedToCategory,
   expectDescriptionTagExists,
   expectNameCategoryExists,
+  expectNameTagAttachedToCategory,
   expectNameTagExists,
   submitDescriptionCategoryForm,
   submitDescriptionTagForm,
+  submitDescriptionTagFormWithCategories,
   submitNameCategoryForm,
   submitNameTagForm,
+  submitNameTagFormWithCategories,
   uniqueE2ECategoryName,
   uniqueE2EDescriptionTag,
   uniqueE2ENameTag,
@@ -85,5 +93,60 @@ test.describe("Admin category and tag UI", () => {
     const status = await submitDescriptionTagForm(page, tag);
     expect(status).toBe(201);
     await expectDescriptionTagExists(request, tag);
+  });
+
+  test("admin creates name tag and attaches to category via react-select", async ({
+    page,
+    request,
+  }) => {
+    test.setTimeout(60_000);
+    const tag = uniqueE2ENameTag("name-tag-attach");
+
+    await page.goto("/addnametag");
+    await expect(
+      page.getByRole("button", { name: "Submit tag" }),
+    ).toBeVisible({ timeout: 15_000 });
+
+    const { postStatus, putStatus } = await submitNameTagFormWithCategories(
+      page,
+      tag,
+      [SEED_NAME_TAG_ATTACH_CATEGORY],
+    );
+    expect(postStatus).toBe(201);
+    expect(putStatus).toBe(200);
+
+    await expectNameTagExists(request, tag);
+    await expectNameTagAttachedToCategory(
+      request,
+      SEED_NAME_TAG_ATTACH_CATEGORY,
+      tag,
+    );
+  });
+
+  test("admin creates description tag and attaches to category via react-select", async ({
+    page,
+    request,
+  }) => {
+    test.setTimeout(60_000);
+    const tag = uniqueE2EDescriptionTag("desc-tag-attach");
+
+    await page.goto("/adddescriptiontag");
+    await expect(
+      page.getByRole("button", { name: "Submit tag" }),
+    ).toBeVisible({ timeout: 15_000 });
+
+    const { postStatus, putStatus } =
+      await submitDescriptionTagFormWithCategories(page, tag, [
+        SEED_DESCRIPTION_FILTER_CATEGORY,
+      ]);
+    expect(postStatus).toBe(201);
+    expect(putStatus).toBe(200);
+
+    await expectDescriptionTagExists(request, tag);
+    await expectDescriptionTagAttachedToCategory(
+      request,
+      SEED_DESCRIPTION_FILTER_CATEGORY,
+      tag,
+    );
   });
 });

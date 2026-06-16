@@ -48,7 +48,7 @@ export default function AddNameTag() {
     try {
       void axios.put("/api/namecategories/edittags", {
         newtagid: newNameTagId,
-        categoriesToUpdate: categoriesChosen,
+        categoriesToUpdate: categoriesChosen.map((option) => option._id),
       });
     } catch (err) {
       console.log("tag not added to categories :(", err);

@@ -88,6 +88,155 @@ export async function expectDescriptionCategoryExists(
   ).toBeTruthy();
 }
 
+export async function selectStyledSelectOptions(
+  page: Page,
+  inputId: string,
+  optionLabels: string[],
+): Promise<void> {
+  const input = page.locator(`#${inputId}`);
+  await expect(input).toBeVisible({ timeout: 15_000 });
+
+  for (const label of optionLabels) {
+    await input.click();
+    await input.fill(label);
+    const option = page.getByRole("option", { name: label, exact: true });
+    await expect(option).toBeVisible({ timeout: 15_000 });
+    await option.click();
+  }
+}
+
+export async function createNameCategoryViaApi(
+  page: Page,
+  category: string,
+): Promise<void> {
+  const response = await page.request.post("/api/namecategories", {
+    data: { category },
+  });
+  expect(response.status()).toBe(201);
+}
+
+export async function createDescriptionCategoryViaApi(
+  page: Page,
+  category: string,
+): Promise<void> {
+  const response = await page.request.post("/api/descriptioncategory", {
+    data: { category },
+  });
+  expect(response.status()).toBe(201);
+}
+
+export async function submitNameTagFormWithCategories(
+  page: Page,
+  tag: string,
+  categoryLabels: string[],
+): Promise<{ postStatus: number; putStatus: number | null }> {
+  await page.locator("#categoryInput").fill(tag);
+  if (categoryLabels.length > 0) {
+    await selectStyledSelectOptions(page, "categoryTags", categoryLabels);
+  }
+
+  const postPromise = page.waitForResponse(
+    (response) =>
+      response.url().includes("/api/nametag") &&
+      response.request().method() === "POST",
+  );
+  const putPromise =
+    categoryLabels.length > 0
+      ? page.waitForResponse(
+          (response) =>
+            response.url().includes("/api/namecategories/edittags") &&
+            response.request().method() === "PUT",
+        )
+      : null;
+
+  await page.getByRole("button", { name: "Submit tag" }).click();
+  const postResponse = await postPromise;
+  const putResponse = putPromise ? await putPromise : null;
+  return {
+    postStatus: postResponse.status(),
+    putStatus: putResponse?.status() ?? null,
+  };
+}
+
+export async function submitDescriptionTagFormWithCategories(
+  page: Page,
+  tag: string,
+  categoryLabels: string[],
+): Promise<{ postStatus: number; putStatus: number | null }> {
+  await page.locator("#categoryInput").fill(tag);
+  if (categoryLabels.length > 0) {
+    await selectStyledSelectOptions(page, "descriptionTags", categoryLabels);
+  }
+
+  const postPromise = page.waitForResponse(
+    (response) =>
+      response.url().includes("/api/descriptiontag") &&
+      response.request().method() === "POST",
+  );
+  const putPromise =
+    categoryLabels.length > 0
+      ? page.waitForResponse(
+          (response) =>
+            response.url().includes("/api/descriptioncategory/edittags") &&
+            response.request().method() === "PUT",
+        )
+      : null;
+
+  await page.getByRole("button", { name: "Submit tag" }).click();
+  const postResponse = await postPromise;
+  const putResponse = putPromise ? await putPromise : null;
+  return {
+    postStatus: postResponse.status(),
+    putStatus: putResponse?.status() ?? null,
+  };
+}
+
+export async function expectNameTagAttachedToCategory(
+  request: APIRequestContext,
+  categoryName: string,
+  tagName: string,
+): Promise<void> {
+  const response = await request.get("/api/namecategories");
+  expect(response.ok()).toBeTruthy();
+  const categories = (await response.json()) as Array<{
+    category?: string;
+    tags?: Array<{ tag?: string } | string>;
+  }>;
+  const category = categories.find((entry) => entry.category === categoryName);
+  expect(category).toBeTruthy();
+  const tags = category?.tags ?? [];
+  expect(
+    tags.some((entry) =>
+      typeof entry === "object" && entry !== null
+        ? entry.tag === tagName
+        : false,
+    ),
+  ).toBeTruthy();
+}
+
+export async function expectDescriptionTagAttachedToCategory(
+  request: APIRequestContext,
+  categoryName: string,
+  tagName: string,
+): Promise<void> {
+  const response = await request.get("/api/descriptioncategory");
+  expect(response.ok()).toBeTruthy();
+  const categories = (await response.json()) as Array<{
+    category?: string;
+    tags?: Array<{ tag?: string } | string>;
+  }>;
+  const category = categories.find((entry) => entry.category === categoryName);
+  expect(category).toBeTruthy();
+  const tags = category?.tags ?? [];
+  expect(
+    tags.some((entry) =>
+      typeof entry === "object" && entry !== null
+        ? entry.tag === tagName
+        : false,
+    ),
+  ).toBeTruthy();
+}
+
 export async function submitNameTagForm(
   page: Page,
   tag: string,

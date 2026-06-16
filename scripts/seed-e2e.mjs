@@ -149,6 +149,20 @@ async function upsertDescriptionCategory(descriptionCategories, {
   }
 }
 
+async function upsertNameCategory(nameCategories, { category, tags = [] }) {
+  const result = await nameCategories.updateOne(
+    { category },
+    { $set: { category, tags } },
+    { upsert: true },
+  );
+
+  if (result.upsertedCount) {
+    console.log(`Created name category: ${category}`);
+  } else {
+    console.log(`Updated name category: ${category}`);
+  }
+}
+
 async function seedBulkDescriptions(
   descriptions,
   { prefix, createdBy, targetCount },
@@ -224,12 +238,14 @@ const descriptions = mongoose.connection.collection("descriptions");
 const descriptionTags = mongoose.connection.collection("descriptiontags");
 const descriptionCategories =
   mongoose.connection.collection("descriptioncategories");
+const nameCategories = mongoose.connection.collection("namecategories");
 
 const minDocsForPagination = seedData.listingCooldown.minDocsForPagination;
 const descriptionBulkPrefix = seedData.listingCooldown.descriptionBulkPrefix;
 const nameBulkPrefix = seedData.listingCooldown.nameBulkPrefix;
 const filterCategory = seedData.listingCooldown.descriptionFilterCategory;
 const filterTag = seedData.listingCooldown.descriptionFilterTag;
+const nameTagAttachCategory = seedData.listingCooldown.nameTagAttachCategory;
 
 const userId = await upsertPasswordUser(users, {
   email,
@@ -280,6 +296,11 @@ const filterTagId = await upsertDescriptionTag(descriptionTags, {
 await upsertDescriptionCategory(descriptionCategories, {
   category: filterCategory,
   tags: [filterTagId],
+});
+
+await upsertNameCategory(nameCategories, {
+  category: nameTagAttachCategory,
+  tags: [],
 });
 
 // Pagination cooldown tests need 51+ docs and a second SWR chunk (50 per page).
