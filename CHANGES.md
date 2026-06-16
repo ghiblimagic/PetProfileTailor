@@ -5514,7 +5514,7 @@ Second testing tier from backlog: notification badge context, cooldown/suggestio
 
 ### Next logical step (tier 2 remaining)
 
-- Admin category **UI** E2E
+- _(completed in later 2026-06-08 entries)_
 
 ---
 
@@ -5541,9 +5541,36 @@ Tier 2 item: unit coverage for the notifications infinite-SWR hook (`getKey`, pa
 
 - `pnpm test hooks/useSwrSimple.test.ts` — 7 passed
 
-### Next logical step (tier 2 remaining)
+---
 
-- Admin category **UI** E2E
+## 2026-06-08 — Admin category UI E2E (`admin-category-ui.spec.ts`)
+
+### What was built and why
+
+Final tier 2 item: Playwright coverage for admin category creation through the UI forms (not only API smoke in `admin.spec.ts`).
+
+### Files created
+
+- `e2e/admin-category-ui.spec.ts`
+- `e2e/helpers/admin-ui.ts`
+
+### Files modified
+
+- `TESTING.md`, `CHANGES.md`
+
+### Notes
+
+- `waitForAdminSession()` polls `/api/auth/session` so client `isAdmin` is true before asserting submit buttons.
+- Direct `page.goto` to admin routes is more reliable than Admin dropdown navigation (menu click did not consistently route in Playwright).
+- Tag create/edit UI still manual-only (`/addnametag`, etc.).
+
+### Verification
+
+- `pnpm test:e2e e2e/admin-category-ui.spec.ts` — 2 passed
+
+### Next logical step
+
+- Tier 3 / manual backlog per `TESTING.md` (tag UI, edit category UI, follow UI in `docs/FUTURE.md`)
 
 ---
 
@@ -5570,10 +5597,6 @@ Tier 2 item: Playwright coverage for sort (~3s), filter (~5s), and pagination (~
 ### Verification
 
 - `pnpm test:e2e e2e/fetchnames-cooldown.spec.ts` — 2 passed, 1 skipped (pagination on seed DB)
-
-### Next logical step (tier 2 remaining)
-
-- Admin category **UI** E2E
 
 ---
 
@@ -5603,7 +5626,3 @@ Tier 2 remaining item: Playwright coverage for suggestion and report dialogs via
 ### Verification
 
 - `pnpm test:e2e e2e/moderation-ui.spec.ts` — 3 passed
-
-### Next logical step (tier 2 remaining)
-
-- Admin category **UI** E2E
