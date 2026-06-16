@@ -5514,7 +5514,35 @@ Second testing tier from backlog: notification badge context, cooldown/suggestio
 
 ### Next logical step (tier 2 remaining)
 
-- `useSwrSimple` unit tests (mock `useSWRInfinite`)
+- Admin category **UI** E2E
+
+---
+
+## 2026-06-08 — `useSwrSimple` unit tests
+
+### What was built and why
+
+Tier 2 item: unit coverage for the notifications infinite-SWR hook (`getKey`, page flattening, end-of-list detection) without hitting the network.
+
+### Files created
+
+- `hooks/useSwrSimple.test.ts`
+
+### Files modified
+
+- `TESTING.md`, `CHANGES.md`
+
+### Patterns
+
+- Mock `swr/infinite` via `vi.hoisted` (same pattern as `useLikeState.test.ts`)
+- Capture `getKey` and options from the mock to assert URL building and `fallbackData`
+
+### Verification
+
+- `pnpm test hooks/useSwrSimple.test.ts` — 7 passed
+
+### Next logical step (tier 2 remaining)
+
 - Admin category **UI** E2E
 
 ---
@@ -5545,7 +5573,6 @@ Tier 2 item: Playwright coverage for sort (~3s), filter (~5s), and pagination (~
 
 ### Next logical step (tier 2 remaining)
 
-- `useSwrSimple` unit tests (mock `useSWRInfinite`)
 - Admin category **UI** E2E
 
 ---
@@ -5579,5 +5606,4 @@ Tier 2 remaining item: Playwright coverage for suggestion and report dialogs via
 
 ### Next logical step (tier 2 remaining)
 
-- `useSwrSimple` unit tests (mock `useSWRInfinite`)
 - Admin category **UI** E2E

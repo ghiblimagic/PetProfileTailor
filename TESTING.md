@@ -39,6 +39,7 @@ Vitest + E2E green covers validation logic and the flows listed below. Manual ch
 | Notifications context | `notificationsContext.test.tsx` (fetch counts, logout clear, `resetNotificationType` PATCH) |
 | Client cooldown | `useLocalStorageCooldown.test.ts` (localStorage gate, trigger, countdown) |
 | Moderation dialog hooks | `useSuggest.test.ts`, `useFlagging.test.ts` (open/close state) |
+| Notifications infinite SWR | `useSwrSimple.test.ts` (`getKey` when disabled/at end, flatten pages, `SWRisReachingEnd`, `fallbackData`) |
 | Like toggle hook | `useLikeState.test.ts` (optimistic count, rollback; mocked `useToggleState`); `useToggleState.test.ts` (debounce POST, rollback, rate limit, in-flight guard); `useApiRateLimiter.test.ts` (limit, window reset) |
 | Shared actions | `Shared/actions/GeneralButton.test.tsx` |
 | Alert / validation UI | `Shared/feedback/WarningMessage.test.tsx`, `Shared/feedback/ToggeableAlert.test.tsx` |
