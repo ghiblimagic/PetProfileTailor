@@ -235,7 +235,7 @@ E2E cannot exercise these (bypassed or skipped).
 
 - [ ] Like toggle on name detail UI — rapid double-click → one like, no 500 — **E2E:** `e2e/social.spec.ts` (burst + like/unlike settle); behavior documented in [`togglelike-route.md`](docs/notes/app/api/togglelike-route.md)
 - [ ] `/notifications` **UI** — mark read persists — **partial:** thanks + names tab badges covered in `notifications-ui.spec.ts` (reload after mark-read)
-- [ ] Profile follow / unfollow via **UI** (followers list is commented out on profile)
+- [ ] Profile follow / unfollow via **UI** — **deferred:** followers/following modals commented out on profile; track in [`docs/FUTURE.md`](docs/FUTURE.md) (re-enable UI, then Playwright on `FollowButton`)
 - [ ] Thank, suggestion, report flows — submit without 500; lists load if exposed
 
 ### Data shape & listing UX

@@ -25,4 +25,5 @@ Source: [`app/api/user/updatefollows/route.ts`](../../../app/api/user/updatefoll
 
 - [`getUserFollowers`](../../../utils/api/getUserFollowers.ts) — who follows a user
 - [`getUserFollowing`](../../../utils/api/getUserFollowing.ts) — who a user follows
-- E2E: `e2e/social.spec.ts`
+- E2E (API): `e2e/social.spec.ts`
+- E2E (UI): deferred — see [`docs/FUTURE.md`](../../../../FUTURE.md) (follow modals commented out on profile)

@@ -11,7 +11,7 @@ Heavy design and learning notes for converted TypeScript modules live here so so
 | Strict mode migration fixes | [strict-mode-fixes.md](notes/typescript/strict-mode-fixes.md) | All 21 `strict: true` errors: messages, causes, fixes |
 | Migration note preservation | [preserving-migration-notes.md](notes/typescript/preserving-migration-notes.md) | Move long JS comments into `docs/notes/` on TS conversion |
 | Operational changelog | [`CHANGES.md`](../CHANGES.md) | What changed, when, verification |
-| Post-migration backlog | [`FUTURE.md`](FUTURE.md) | Deferred improvements (e.g. likes SSR hydration) |
+| Post-migration backlog | [`FUTURE.md`](FUTURE.md) | Deferred improvements (e.g. likes SSR hydration, follow UI E2E) |
 | Testing | [`TESTING.md`](../TESTING.md) | Automated + manual verification checklists |
 
 Each source file with notes should have a one-line pointer at the top linking to its markdown file. Notes files should include **code excerpts** (key functions, wiring, edge-case branches) so you can read behavior without opening the source.

@@ -5412,3 +5412,18 @@ Verify server **429** on the real `togglelike` route without breaking serial UI 
 ### Verification
 
 - `pnpm test:e2e e2e/social.spec.ts` — 7 passed
+
+---
+
+## 2026-06-08 — FUTURE.md: follow / unfollow UI E2E backlog
+
+### What changed
+
+Documented deferred Playwright coverage for `FollowButton` when profile follow/following modals are re-enabled. Cross-linked from `TESTING.md`, `updatefollows-route.md`, `docs/README.md`.
+
+### Files modified
+
+- `docs/FUTURE.md`
+- `TESTING.md`
+- `docs/notes/app/api/updatefollows-route.md`
+- `docs/README.md`
