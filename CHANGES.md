@@ -5732,3 +5732,35 @@ Extended `pnpm seed:e2e` so filter and pagination cooldown E2E tests run against
 
 - `pnpm seed:e2e` then `pnpm test:e2e e2e/fetchdescriptions-cooldown.spec.ts e2e/fetchnames-cooldown.spec.ts` — 6 passed
 
+---
+
+## 2026-06-08 — Admin tag + category attach E2E (react-select)
+
+### What was built and why
+
+Tier 3 backlog item: Playwright coverage for attaching a new tag to categories via `StyledSelect` on `/addnametag` and `/adddescriptiontag` (POST tag + PUT `edittags`).
+
+### Files modified
+
+- `app/(admin)/addnametag/page.tsx` — send `categoriesToUpdate` as `_id` strings (match description tag page + API contract)
+- `e2e/fixtures/seed-data.json` — `nameTagAttachCategory`: `e2e name attach`
+- `e2e/fixtures/seed-data.ts` — `SEED_NAME_TAG_ATTACH_CATEGORY` export
+- `scripts/seed-e2e.mjs` — upsert name category for attach tests
+- `e2e/helpers/admin-ui.ts` — `selectStyledSelectOptions`, submit-with-categories helpers, attach assertions
+- `e2e/admin-category-ui.spec.ts` — 2 attach tests (name + description)
+- `TESTING.md`, `CHANGES.md`
+
+### Problems encountered and fixes
+
+- **react-select options:** new categories created mid-test are not in the dropdown — root layout caches categories for 3 hours (`getCategoriesAndTagsWithTTL`). Attach tests use seeded categories present when the E2E server starts.
+- **Name tag attach bug:** `addnametag` sent full category objects to `edittags`; API expects id strings.
+
+### Verification
+
+- `pnpm seed:e2e` (~8s) then `pnpm test:e2e e2e/admin-category-ui.spec.ts` — 6 passed
+
+### Next logical step
+
+- `/addnames` with tags on detail page — `TESTING.md` manual backlog
+- Edit category/tag UI — no edit routes yet
+

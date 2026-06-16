@@ -152,6 +152,7 @@ Playwright maps `MONGODB_URI_TEST` → `MONGODB_URI` when starting the server. `
 - Admin — `POST /api/descriptioncategory` via `/adddescriptioncategory` form → 201; category in `GET /api/descriptioncategory`
 - Admin — `POST /api/nametag` via `/addnametag` form → 201; tag in `GET /api/nametag` (no category attach)
 - Admin — `POST /api/descriptiontag` via `/adddescriptiontag` form → 201; tag in `GET /api/descriptiontag` (no category attach)
+- Admin — tag create + **category attach** via `StyledSelect` (react-select) → `POST` tag + `PUT` `edittags`; uses seeded categories `e2e name attach` / `e2e filter` (must exist before E2E server starts — run `pnpm seed:e2e` then `pnpm test:e2e`, not `test:e2e:local` against a stale server)
 
 **`e2e/edits.spec.ts`**
 
@@ -229,7 +230,7 @@ pnpm test:e2e e2e/notifications-ui.spec.ts
 
 Shared seed content lives in **`e2e/fixtures/seed-data.json`** (imported by `scripts/seed-e2e.mjs` and Playwright via `e2e/fixtures/seed-data.ts`). Tests use constants like `SEED_NAME` — not hardcoded strings — so duplicate checks stay in sync with the DB.
 
-**Listing cooldown seed** (`listingCooldown` in `seed-data.json`): bulk names/descriptions (51+ total each), description filter category `e2e filter` + tag `e2e-filter-tag`. Re-run `pnpm seed:e2e` after changing fixture counts.
+**Listing cooldown seed** (`listingCooldown` in `seed-data.json`): bulk names/descriptions (51+ total each), description filter category `e2e filter` + tag `e2e-filter-tag`, name category `e2e name attach` (react-select attach tests). Re-run `pnpm seed:e2e` after changing fixture counts. Root layout caches categories for 3 hours in-process — attach tests need categories present when the test server starts.
 
 ### Where tests live
 
