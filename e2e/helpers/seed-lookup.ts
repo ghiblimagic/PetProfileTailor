@@ -64,6 +64,7 @@ export async function lookupUserByProfileName(
   _id: string;
   profileName: string;
   profileImage?: string;
+  bio?: string;
   followers: string[];
 }> {
   const response = await request.get(
@@ -75,6 +76,7 @@ export async function lookupUserByProfileName(
     _id: string;
     profileName: string;
     profileImage?: string;
+    bio?: string;
     followers?: Array<string | { _id: string }>;
   };
 
@@ -86,6 +88,7 @@ export async function lookupUserByProfileName(
     _id: typeof user._id === "string" ? user._id : String(user._id),
     profileName: user.profileName,
     profileImage: user.profileImage,
+    bio: user.bio,
     followers,
   };
 }

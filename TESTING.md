@@ -123,6 +123,7 @@ Playwright maps `MONGODB_URI_TEST` → `MONGODB_URI` when starting the server. `
 
 - `PUT /api/user/editbiolocationavatar` with blocklisted bio → 403 + `blockedBy` in JSON
 - Profile edit UI — blocklisted bio → server message in error toast
+- API + UI — valid bio saves and appears on `/profile/[profilename]` (lookup + About text)
 
 **`e2e/login.spec.ts`**
 

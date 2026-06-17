@@ -5997,3 +5997,22 @@ Playwright coverage for landing hero video buttons (`YoutubeEmbed`): correct emb
 
 - `pnpm test:e2e e2e/landing-videos.spec.ts` — 6 passed
 
+---
+
+## 2026-06-08 — Profile bio happy path E2E
+
+### What was built and why
+
+Complement blocklist coverage: valid bio saves via API and profile edit UI, persists on profile lookup and About section.
+
+### Files modified
+
+- `e2e/profile-bio.spec.ts` — `Profile bio happy path` describe (API + UI)
+- `e2e/helpers/profile.ts` — `saveProfileBioEdit({ expectOk })`, export `profileBioModal`
+- `e2e/helpers/seed-lookup.ts` — `bio` on `lookupUserByProfileName`
+- `TESTING.md`, `CHANGES.md`
+
+### Verification
+
+- `pnpm test:e2e e2e/profile-bio.spec.ts` — 4 passed
+

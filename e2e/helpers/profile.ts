@@ -1,6 +1,6 @@
 import { expect, type Page, type Locator } from "@playwright/test";
 
-function profileBioModal(page: Page): Locator {
+export function profileBioModal(page: Page): Locator {
   return page.locator('[aria-labelledby="modal-title"]');
 }
 
@@ -15,7 +15,10 @@ export async function fillProfileBio(page: Page, bio: string): Promise<void> {
   await profileBioModal(page).locator("textarea").fill(bio);
 }
 
-export async function saveProfileBioEdit(page: Page): Promise<void> {
+export async function saveProfileBioEdit(
+  page: Page,
+  options?: { expectOk?: boolean },
+): Promise<void> {
   const modal = profileBioModal(page);
   const responsePromise = page.waitForResponse(
     (response) =>
@@ -23,5 +26,13 @@ export async function saveProfileBioEdit(page: Page): Promise<void> {
       response.request().method() === "PUT",
   );
   await modal.getByRole("button", { name: "save" }).click();
-  await responsePromise;
+  const response = await responsePromise;
+
+  if (options?.expectOk) {
+    const body = await response.text();
+    expect(
+      response.ok(),
+      `PUT ${response.url()} returned ${response.status()}: ${body.slice(0, 200)}`,
+    ).toBeTruthy();
+  }
 }
