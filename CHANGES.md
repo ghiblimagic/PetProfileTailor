@@ -5975,3 +5975,25 @@ Extend suggestion/report UI coverage to description detail pages (symmetric to e
 
 - `pnpm test:e2e e2e/moderation-ui.spec.ts` — 6 passed
 
+---
+
+## 2026-06-08 — Landing page YouTube embed E2E
+
+### What was built and why
+
+Playwright coverage for landing hero video buttons (`YoutubeEmbed`): correct embed URL/title, iframe load reveals close button, toggle and single-open behavior.
+
+### Files created
+
+- `e2e/landing-videos.spec.ts`
+- `e2e/fixtures/landing-videos.ts` — embed ids mirror `app/page.tsx`
+- `e2e/helpers/landing-videos.ts` — stub `youtube-nocookie.com` for reliable `onLoad`
+
+### Files modified
+
+- `TESTING.md`, `CHANGES.md`
+
+### Verification
+
+- `pnpm test:e2e e2e/landing-videos.spec.ts` — 6 passed
+

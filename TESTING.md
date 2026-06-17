@@ -83,6 +83,12 @@ Playwright maps `MONGODB_URI_TEST` → `MONGODB_URI` when starting the server. `
 - `/name/[name]` — seeded name, creator profile, seeded tag `#e2e-name-tag`
 - `/description/[id]` — seeded content, creator profile, seeded tag `#e2e-filter-tag`
 
+**`e2e/landing-videos.spec.ts`**
+
+- `/` — Fun / Impactful / Fitting buttons each open `youtube-nocookie.com` iframe with expected `embedId` and `title`
+- Iframe `onLoad` reveals embed + close button (YouTube stubbed in test)
+- Close X and toggle-click hide embed; only one video open at a time
+
 **`e2e/blocklist-api.spec.ts`**
 
 - `POST /api/names` with exact blocklisted name → 403 + `blockedBy`
