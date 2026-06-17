@@ -5866,3 +5866,31 @@ Manual backlog: submit description with tags and assert hashed tag on detail pag
 
 - `pnpm vitest run utils/api/descriptionDuplicateCheck.test.ts` — 6 passed
 
+---
+
+## 2026-06-08 — Edit tags + description notes E2E
+
+### What was built and why
+
+Next manual backlog items: owner edit dialog tag attach (name + description) and description notes UI (symmetric to name). Admin category/tag **edit** routes still missing; follow UI deferred in `docs/FUTURE.md`.
+
+### Files created
+
+- `e2e/helpers/edit-content-ui.ts` — open edit dialog, cheat-sheet tag select, save PUT
+
+### Files modified
+
+- `e2e/edits.spec.ts` — tag attach + description notes UI tests; reuse edit helpers in likedByCount UI test
+- `e2e/helpers/seed-lookup.ts` — `seededHasTagSlug` for idempotent tag tests
+- `TESTING.md`, `CHANGES.md`
+
+### Problems encountered and fixes
+
+- Parallel workers raced on shared seed content — `Content edits and ownership` runs serial.
+- Notes field locator ambiguous on description edit (content + notes textareas) — target field after `Notes` heading.
+- Description tag cheat sheet matched react-select label too — scope click to disclosure panel.
+
+### Verification
+
+- `pnpm test:e2e e2e/edits.spec.ts` — 10 passed
+

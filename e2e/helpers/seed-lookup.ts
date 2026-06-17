@@ -5,7 +5,7 @@ type SeededContent = {
   content: string;
   createdBy: { _id: string; name?: string; profileName?: string };
   likedByCount?: number;
-  tags?: Array<{ _id: string } | string>;
+  tags?: Array<{ _id: string; tag?: string } | string>;
 };
 
 type LookupResponse = {
@@ -88,5 +88,17 @@ export function tagIdsFromSeededContent(
 ): string[] {
   return (seeded.tags ?? []).map((tag) =>
     typeof tag === "object" ? String(tag._id) : String(tag),
+  );
+}
+
+export function seededHasTagSlug(
+  seeded: Pick<SeededContent, "tags">,
+  tagSlug: string,
+): boolean {
+  return (seeded.tags ?? []).some(
+    (tag) =>
+      typeof tag === "object" &&
+      "tag" in tag &&
+      tag.tag === tagSlug,
   );
 }

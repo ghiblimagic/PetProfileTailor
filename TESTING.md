@@ -160,6 +160,8 @@ Playwright maps `MONGODB_URI_TEST` → `MONGODB_URI` when starting the server. `
 **`e2e/edits.spec.ts`**
 
 - Owner updates seeded name notes (API + UI)
+- Owner updates seeded description notes (UI)
+- Owner attaches tag to seeded name/description via edit dialog (cheat sheet)
 - Non-owner cannot edit admin-owned name → 403
 - Edit description to duplicate another seeded entry → 409
 - Owner edit (API + UI) preserves like count on name/description detail page (`likedByCount unchanged on owner edit`)
