@@ -5894,3 +5894,32 @@ Next manual backlog items: owner edit dialog tag attach (name + description) and
 
 - `pnpm test:e2e e2e/edits.spec.ts` — 10 passed
 
+---
+
+## 2026-06-08 — Profile bio blocklist + default avatar E2E
+
+### What was built and why
+
+Manual backlog: blocklisted profile bio rejection, `blockedBy` on blocklist 403 JSON, and default avatar on registration (`chooseRandomDefaultAvatar`). Register form has no bio field — blocklist applies on `PUT /api/user/editbiolocationavatar`.
+
+### Files created
+
+- `e2e/profile-bio.spec.ts` — API `blockedBy` + profile edit UI toast
+- `e2e/helpers/profile.ts` — bio edit modal helpers
+- `utils/chooseRandomDefaultAvatar.test.ts`
+- `utils/api/checkMultipleBlocklists.test.ts`
+
+### Files modified
+
+- `app/api/user/editbiolocationavatar/route.ts` — blocklist on bio + location
+- `utils/api/checkMultipleBlocklists.ts` — include `blockedBy` in 403 body
+- `utils/chooseRandomDefaultAvatar.ts` — export `DEFAULT_AVATARS`
+- `components/EditingData/EditBioAndProfile.tsx` — surface server blocklist message in toast
+- `e2e/register.spec.ts`, `e2e/helpers/register.ts`, `e2e/helpers/seed-lookup.ts`
+- `TESTING.md`, `CHANGES.md`
+
+### Verification
+
+- `pnpm vitest run utils/chooseRandomDefaultAvatar.test.ts utils/api/checkMultipleBlocklists.test.ts` — 2 passed
+- `pnpm test:e2e e2e/register.spec.ts e2e/profile-bio.spec.ts` — 5 passed
+

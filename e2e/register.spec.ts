@@ -1,8 +1,11 @@
 import { test, expect } from "@playwright/test";
 import { getPlaywrightCredentials } from "./helpers/auth";
+import { DEFAULT_AVATARS } from "../utils/chooseRandomDefaultAvatar";
+import { lookupUserByProfileName } from "./helpers/seed-lookup";
 import {
   fillRegisterForm,
   getPlaywrightProfileName,
+  registerNewUser,
   submitRegisterForm,
 } from "./helpers/register";
 
@@ -51,5 +54,23 @@ test.describe("Register page", () => {
     await expect(page.getByText("Email is already used!")).toBeVisible({
       timeout: 15_000,
     });
+  });
+
+  test("successful registration assigns a default avatar", async ({
+    page,
+  }) => {
+    const profileName = `e2e${Date.now().toString(36)}`;
+    const email = `e2e-${Date.now()}@example.com`;
+
+    await registerNewUser(page, {
+      name: "E2E Avatar Test",
+      profilename: profileName,
+      email,
+      password: "testpass123",
+    });
+
+    const user = await lookupUserByProfileName(page.request, profileName);
+    expect(user.profileImage).toBeTruthy();
+    expect(DEFAULT_AVATARS).toContain(user.profileImage);
   });
 });

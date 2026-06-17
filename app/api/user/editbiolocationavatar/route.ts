@@ -6,6 +6,10 @@ import User from "@models/User";
 import db from "@utils/db";
 import mongoose from "mongoose";
 import { getSessionForApis } from "@/utils/api/getSessionForApis";
+import {
+  checkMultipleFieldsBlocklist,
+  respondIfBlocked,
+} from "@/utils/api/checkMultipleBlocklists";
 
 type BioLocationBody = {
   bioSubmission?: {
@@ -27,6 +31,13 @@ export async function PUT(req: Request) {
   await db.connect();
   const { bio, location } = ((await req.json()) as BioLocationBody)
     .bioSubmission ?? {};
+
+  const blockResult = checkMultipleFieldsBlocklist([
+    { value: bio ?? "", fieldName: "bio" },
+    { value: location ?? "", fieldName: "location" },
+  ]);
+  const errorResponse = respondIfBlocked(blockResult);
+  if (errorResponse) return errorResponse;
 
   const objectId = new mongoose.Types.ObjectId(userId);
 

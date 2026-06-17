@@ -53,9 +53,10 @@ export default function EditBioAndProfile({
         setShowProfileEditPage(false);
         toast.success("Profile successfully updated!");
       })
-      .catch((error) => {
+      .catch((error: { response?: { data?: { message?: string } } }) => {
         console.log("there was an error when sending your edits", error);
-        toast.error("Ruh Roh! Profile not updated");
+        const message = error.response?.data?.message;
+        toast.error(message ?? "Ruh Roh! Profile not updated");
       });
   };
 

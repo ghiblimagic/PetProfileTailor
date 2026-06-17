@@ -45,6 +45,8 @@ Vitest + E2E green covers validation logic and the flows listed below. Manual ch
 | Alert / validation UI | `Shared/feedback/WarningMessage.test.tsx`, `Shared/feedback/ToggeableAlert.test.tsx` |
 | Form / gate UI | `Shared/feedback/MustLoginMessage.test.tsx`, `StyledCheckbox.test.tsx`, `preserveTextAfterSubmission.test.tsx` |
 | Duplicate check UI | `CheckIfContentExists.test.tsx` (mocked `fetch` + `ContentListing`) |
+| Blocklist API shape | `checkMultipleBlocklists.test.ts` (`blockedBy` on 403) |
+| Default avatar util | `chooseRandomDefaultAvatar.test.ts` |
 | Register form | `RegisterForm.test.tsx` (client validation + server field errors; mocked auth/captcha/axios) |
 | Presentational | `Shared/ui/skeleton.test.tsx`, `Shared/media/ShowTime.test.tsx`, `Shared/lists/ListWithPawPrintIcon.test.tsx` |
 
@@ -103,6 +105,12 @@ Playwright maps `MONGODB_URI_TEST` → `MONGODB_URI` when starting the server. `
 
 - Duplicate `PLAYWRIGHT_TEST_PROFILENAME` → rejected (new email, seeded user owns profile name)
 - Duplicate seeded email → rejected (new profile name)
+- Successful registration → `profileImage` is one of `DEFAULT_AVATARS` (`chooseRandomDefaultAvatar`)
+
+**`e2e/profile-bio.spec.ts`**
+
+- `PUT /api/user/editbiolocationavatar` with blocklisted bio → 403 + `blockedBy` in JSON
+- Profile edit UI — blocklisted bio → server message in error toast
 
 **`e2e/login.spec.ts`**
 
@@ -281,8 +289,8 @@ E2E cannot exercise these (bypassed or skipped).
 
 ### Blocklist (bio and API detail)
 
-- [ ] `/register` or profile bio — blocklisted bio → rejected (if field checked)
-- [ ] DevTools — blocklist 403 responses include `blockedBy` (E2E asserts message only)
+- [ ] `/register` or profile bio — blocklisted bio → rejected (if field checked) — **covered:** `e2e/profile-bio.spec.ts` (API + profile edit UI)
+- [ ] DevTools — blocklist 403 responses include `blockedBy` — **covered:** `e2e/profile-bio.spec.ts` (API); `utils/api/checkMultipleBlocklists.test.ts`
 
 ### Social & notifications (beyond E2E API smoke)
 
@@ -301,7 +309,7 @@ E2E cannot exercise these (bypassed or skipped).
 
 ### Misc utils (no E2E yet)
 
-- [ ] `/register` — full signup with real captcha → default avatar assigned (`chooseRandomDefaultAvatar`)
+- [ ] `/register` — full signup with real captcha → default avatar assigned (`chooseRandomDefaultAvatar`) — **partial:** E2E with captcha bypass — `e2e/register.spec.ts`; unit — `utils/chooseRandomDefaultAvatar.test.ts`
 
 ---
 

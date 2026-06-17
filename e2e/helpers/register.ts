@@ -21,3 +21,18 @@ export async function fillRegisterForm(
 export async function submitRegisterForm(page: Page): Promise<void> {
   await page.getByRole("button", { name: "register" }).click();
 }
+
+export async function registerNewUser(
+  page: Page,
+  fields: {
+    name: string;
+    profilename: string;
+    email: string;
+    password: string;
+  },
+): Promise<void> {
+  await page.goto("/register");
+  await fillRegisterForm(page, fields);
+  await submitRegisterForm(page);
+  await page.waitForURL(/\/dashboard/, { timeout: 45_000 });
+}

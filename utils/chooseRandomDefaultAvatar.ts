@@ -8,6 +8,8 @@ const defaultAvatars = [
   "/avatar-whale.png",
 ] as const;
 
+export const DEFAULT_AVATARS: readonly string[] = defaultAvatars;
+
 export default function chooseRandomDefaultAvatar(): string {
   const randomAvatar =
     defaultAvatars[Math.floor(Math.random() * defaultAvatars.length)];

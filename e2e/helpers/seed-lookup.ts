@@ -60,7 +60,12 @@ export async function lookupSeededDescription(
 export async function lookupUserByProfileName(
   request: APIRequestContext,
   profileName: string,
-): Promise<{ _id: string; profileName: string; followers: string[] }> {
+): Promise<{
+  _id: string;
+  profileName: string;
+  profileImage?: string;
+  followers: string[];
+}> {
   const response = await request.get(
     `/api/user/getASpecificUserByProfileName/${encodeURIComponent(profileName)}`,
   );
@@ -69,6 +74,7 @@ export async function lookupUserByProfileName(
   const user = (await response.json()) as {
     _id: string;
     profileName: string;
+    profileImage?: string;
     followers?: Array<string | { _id: string }>;
   };
 
@@ -79,6 +85,7 @@ export async function lookupUserByProfileName(
   return {
     _id: typeof user._id === "string" ? user._id : String(user._id),
     profileName: user.profileName,
+    profileImage: user.profileImage,
     followers,
   };
 }

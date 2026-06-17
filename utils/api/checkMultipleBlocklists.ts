@@ -37,6 +37,7 @@ export function respondIfBlocked(blockResult: BlockResult | null): Response | nu
   return Response.json(
     {
       message: bannedWordsMessage(value, fieldName, blockedBy, blockType),
+      blockedBy,
     },
     { status: 403 },
   );
