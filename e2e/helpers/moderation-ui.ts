@@ -1,7 +1,7 @@
 import { expect, type Page } from "@playwright/test";
-import { gotoNameDetail } from "./thanks-ui";
+import { gotoDescriptionDetail, gotoNameDetail } from "./thanks-ui";
 
-export { gotoNameDetail };
+export { gotoNameDetail, gotoDescriptionDetail };
 
 export function listingMoreOptionsButton(page: Page) {
   return page.getByRole("button", { name: "More options" });
@@ -11,11 +11,7 @@ export function moderationDialog(page: Page) {
   return page.getByRole("dialog");
 }
 
-/** Name detail with user suggestions/reports context fetch settled (best-effort). */
-export async function gotoNameDetailForModeration(
-  page: Page,
-  name: string,
-): Promise<void> {
+async function waitForModerationContextFetches(page: Page): Promise<void> {
   const suggestionsFetch = page.waitForResponse(
     (response) =>
       response.url().includes("/api/user/suggestions") &&
@@ -27,12 +23,37 @@ export async function gotoNameDetailForModeration(
       response.request().method() === "GET",
   );
 
-  await gotoNameDetail(page, name);
-
   await Promise.all([
     suggestionsFetch.catch(() => undefined),
     reportsFetch.catch(() => undefined),
   ]);
+}
+
+/** Name detail with user suggestions/reports context fetch settled (best-effort). */
+export async function gotoNameDetailForModeration(
+  page: Page,
+  name: string,
+): Promise<void> {
+  await gotoNameDetail(page, name);
+  await waitForModerationContextFetches(page);
+}
+
+/** Description detail with user suggestions/reports context fetch settled (best-effort). */
+export async function gotoDescriptionDetailForModeration(
+  page: Page,
+  descriptionId: string,
+  options?: { requireThankButton?: boolean },
+): Promise<void> {
+  if (options?.requireThankButton === false) {
+    await page.goto(`/description/${descriptionId}`);
+    await expect(listingMoreOptionsButton(page)).toBeVisible({
+      timeout: 15_000,
+    });
+  } else {
+    await gotoDescriptionDetail(page, descriptionId);
+  }
+
+  await waitForModerationContextFetches(page);
 }
 
 export async function openListingMenuItem(
@@ -45,7 +66,7 @@ export async function openListingMenuItem(
 
 export async function expectEditSuggestionDialog(
   page: Page,
-  name: string,
+  reloadPage: () => Promise<void>,
 ): Promise<void> {
   const dialog = moderationDialog(page);
   const editHeading = dialog.getByRole("heading", { name: "Edit Suggestion" });
@@ -59,14 +80,14 @@ export async function expectEditSuggestionDialog(
     .getByRole("button", { name: "Cancel" })
     .click()
     .catch(() => undefined);
-  await gotoNameDetailForModeration(page, name);
+  await reloadPage();
   await openListingMenuItem(page, "Suggestion");
   await expect(editHeading).toBeVisible({ timeout: 15_000 });
 }
 
 export async function expectEditReportDialog(
   page: Page,
-  name: string,
+  reloadPage: () => Promise<void>,
 ): Promise<void> {
   const dialog = moderationDialog(page);
   const editHeading = dialog.getByRole("heading", {
@@ -82,7 +103,7 @@ export async function expectEditReportDialog(
     .getByRole("button", { name: "Cancel" })
     .click()
     .catch(() => undefined);
-  await gotoNameDetailForModeration(page, name);
+  await reloadPage();
   await openListingMenuItem(page, "Report");
   await expect(editHeading).toBeVisible({ timeout: 15_000 });
 }

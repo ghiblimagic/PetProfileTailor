@@ -5953,3 +5953,25 @@ Next manual backlog: SWR `_id` shape for descriptions, detail pages with tags + 
 
 - Mid-session ban + refresh — not covered (needs runtime status flip)
 
+---
+
+## 2026-06-08 — Description moderation UI E2E
+
+### What was built and why
+
+Extend suggestion/report UI coverage to description detail pages (symmetric to existing name tests).
+
+### Files modified
+
+- `e2e/moderation-ui.spec.ts` — suggestion + report on admin-owned description; owner menu guard
+- `e2e/helpers/moderation-ui.ts` — `gotoDescriptionDetailForModeration`; reload callback for edit-dialog helpers
+- `TESTING.md`, `CHANGES.md`
+
+### Problems encountered and fixes
+
+- Owner viewing own description has no Thank button — `requireThankButton: false` waits for ⋮ menu instead.
+
+### Verification
+
+- `pnpm test:e2e e2e/moderation-ui.spec.ts` — 6 passed
+

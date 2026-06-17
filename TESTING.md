@@ -224,6 +224,7 @@ Playwright maps `MONGODB_URI_TEST` → `MONGODB_URI` when starting the server. `
 - Name detail — user opens ⋮ menu → Suggestion on admin-owned name → add form submit or edit form if pending (idempotent via API check)
 - Name detail — user opens ⋮ menu → Report on admin-owned name → Spam checkbox submit or edit form if pending
 - Name detail — content owner ⋮ menu shows Delete only (no Suggestion/Report)
+- Description detail — same Suggestion / Report / owner-menu flows on admin-owned and user-owned seeded descriptions
 
 **`e2e/fetchnames-cooldown.spec.ts`**
 
@@ -304,7 +305,7 @@ E2E cannot exercise these (bypassed or skipped).
 - [ ] Like toggle on name detail UI — rapid double-click → one like, no 500 — **E2E:** `e2e/social.spec.ts` (burst + like/unlike settle); behavior documented in [`togglelike-route.md`](docs/notes/app/api/togglelike-route.md)
 - [ ] `/notifications` **UI** — mark read persists — **partial:** thanks + names tab badges covered in `notifications-ui.spec.ts` (reload after mark-read)
 - [ ] Profile follow / unfollow via **UI** — **deferred:** followers/following modals commented out on profile; track in [`docs/FUTURE.md`](docs/FUTURE.md) (re-enable UI, then Playwright on `FollowButton`)
-- [ ] Thank, suggestion, report flows — submit without 500; lists load if exposed — **partial:** thank UI — `e2e/thanks-ui.spec.ts`; suggestion/report API — `e2e/moderation.spec.ts`; suggestion/report UI — `e2e/moderation-ui.spec.ts`
+- [ ] Thank, suggestion, report flows — submit without 500; lists load if exposed — **partial:** thank UI — `e2e/thanks-ui.spec.ts`; suggestion/report API — `e2e/moderation.spec.ts`; suggestion/report UI — `e2e/moderation-ui.spec.ts` (names + descriptions)
 
 ### Data shape & listing UX
 
