@@ -42,7 +42,7 @@ async function upsertPasswordUser(users, fields) {
     email,
     profileName: fields.profileName.toLowerCase(),
     password: passwordHash,
-    status: "active",
+    status: fields.status ?? "active",
     role: fields.role,
     bio: "",
     location: "",
@@ -327,6 +327,33 @@ const nameTagId = await upsertNameTag(nameTags, {
 await upsertNameCategory(nameCategories, {
   category: nameTagAttachCategory,
   tags: [nameTagId],
+});
+
+await names.updateOne(
+  { normalizedContent: normalizeString(seedData.name.content) },
+  { $set: { tags: [nameTagId] } },
+);
+await descriptions.updateOne(
+  { content: seedData.description.startDuplicate.content },
+  { $set: { tags: [filterTagId] } },
+);
+
+const bannedEmail = (
+  process.env.PLAYWRIGHT_TEST_BANNED_EMAIL ?? seedData.bannedUser.defaultEmail
+)
+  .trim()
+  .toLowerCase();
+const bannedPassword =
+  process.env.PLAYWRIGHT_TEST_BANNED_PASSWORD ??
+  seedData.bannedUser.defaultPassword;
+
+await upsertPasswordUser(users, {
+  email: bannedEmail,
+  password: bannedPassword,
+  name: seedData.bannedUser.defaultName,
+  profileName: seedData.bannedUser.defaultProfileName,
+  role: "user",
+  status: "banned",
 });
 
 // Pagination cooldown tests need 51+ docs and a second SWR chunk (50 per page).

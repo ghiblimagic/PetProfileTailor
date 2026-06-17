@@ -37,5 +37,11 @@
     "defaultPassword": "e2eadminpass",
     "defaultName": "E2E Admin",
     "defaultProfileName": "e2eadmin"
+  },
+  "bannedUser": {
+    "defaultEmail": "e2e-banned@example.com",
+    "defaultPassword": "e2ebanned",
+    "defaultName": "E2E Banned",
+    "defaultProfileName": "e2ebanned"
   }
 }

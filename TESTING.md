@@ -79,8 +79,14 @@ Playwright maps `MONGODB_URI_TEST` → `MONGODB_URI` when starting the server. `
 - `/fetchnames` loads (no 500)
 - `/fetchdescriptions` loads (no 500)
 - `POST /api/names/swr` — `_id` values are strings; no `__v`
-- `/name/[name]` — seeded name + creator profile render
-- `/description/[id]` — seeded description content renders
+- `POST /api/description/swr` — same `_id` / `__v` shape
+- `/name/[name]` — seeded name, creator profile, seeded tag `#e2e-name-tag`
+- `/description/[id]` — seeded content, creator profile, seeded tag `#e2e-filter-tag`
+
+**`e2e/blocklist-api.spec.ts`**
+
+- `POST /api/names` with exact blocklisted name → 403 + `blockedBy`
+- `POST /api/description` with blocklisted substring → 403 + `blockedBy`
 
 **`e2e/moderation.spec.ts`**
 
@@ -116,6 +122,7 @@ Playwright maps `MONGODB_URI_TEST` → `MONGODB_URI` when starting the server. `
 
 - Login page UI (magic link section, register link)
 - Wrong password → error, stay on `/login`
+- Banned account credentials → ban error toast, stay on `/login` (seeded `e2e-banned@example.com`)
 - Credentials login → logged-in nav (profile menu)
 
 **`e2e/addnames.spec.ts`**
@@ -273,7 +280,7 @@ E2E cannot exercise these (bypassed or skipped).
 ### Auth & session (beyond E2E)
 
 - [ ] Nav — avatar image detail (pixel/layout)
-- [ ] Optional: banned account → ban error; mid-session ban + refresh → logged out
+- [ ] Optional: banned account → ban error; mid-session ban + refresh → logged out — **partial:** credentials login ban — `e2e/login.spec.ts`; mid-session ban not covered
 
 ### Admin UI depth
 
@@ -301,11 +308,11 @@ E2E cannot exercise these (bypassed or skipped).
 
 ### Data shape & listing UX
 
-- [ ] DevTools → Network — other APIs (`leanWithStrings`) still return string `_id`; no `__v`
-- [ ] `/name/[name]`, `/description/[id]` — render with related data (tags, creator) — **partial:** `e2e/browse.spec.ts` (name + description detail smoke)
+- [ ] DevTools → Network — other APIs (`leanWithStrings`) still return string `_id`; no `__v` — **covered:** `e2e/browse.spec.ts` (names + descriptions SWR)
+- [ ] `/name/[name]`, `/description/[id]` — render with related data (tags, creator) — **covered:** `e2e/browse.spec.ts`
 - [ ] `/fetchnames` or `/fetchdescriptions` — pagination spam **next** → ~15s cooldown — **covered:** `e2e/fetchnames-cooldown.spec.ts`, `e2e/fetchdescriptions-cooldown.spec.ts` (after `pnpm seed:e2e`)
 - [ ] Same pages — rapid sort/filter → ~3s / ~5s cooldown — **covered:** `e2e/fetchnames-cooldown.spec.ts`, `e2e/fetchdescriptions-cooldown.spec.ts`
-- [ ] `useApiRateLimiter` / like button — rapid clicks throttled — **unit:** `useApiRateLimiter.test.ts`; UI double-click E2E still open
+- [ ] `useApiRateLimiter` / like button — rapid clicks throttled — **unit:** `useApiRateLimiter.test.ts`; **E2E:** `e2e/social.spec.ts` (double-click + rate limit)
 
 ### Misc utils (no E2E yet)
 

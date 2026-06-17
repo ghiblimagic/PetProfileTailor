@@ -5923,3 +5923,33 @@ Manual backlog: blocklisted profile bio rejection, `blockedBy` on blocklist 403 
 - `pnpm vitest run utils/chooseRandomDefaultAvatar.test.ts utils/api/checkMultipleBlocklists.test.ts` — 2 passed
 - `pnpm test:e2e e2e/register.spec.ts e2e/profile-bio.spec.ts` — 5 passed
 
+---
+
+## 2026-06-08 — Data shape, blocklist API, banned login E2E
+
+### What was built and why
+
+Next manual backlog: SWR `_id` shape for descriptions, detail pages with tags + creator, `blockedBy` on name/description POST blocklist, banned credentials login.
+
+### Files created
+
+- `e2e/blocklist-api.spec.ts`
+
+### Files modified
+
+- `e2e/browse.spec.ts` — description SWR shape; detail pages assert creator + seeded tags
+- `e2e/login.spec.ts` — banned account credentials rejected
+- `e2e/fixtures/seed-data.json` — `bannedUser`; seed attaches tags to `E2ESeedName` + start description
+- `e2e/fixtures/seed-data.ts` — `getPlaywrightBannedCredentials`
+- `scripts/seed-e2e.mjs` — optional `status` on upsert; banned user; tag ids on seed content
+- `TESTING.md`, `CHANGES.md`
+
+### Verification
+
+- `pnpm seed:e2e`
+- `pnpm test:e2e e2e/browse.spec.ts e2e/blocklist-api.spec.ts e2e/login.spec.ts` (filtered new tests) — 7 passed
+
+### TODOs
+
+- Mid-session ban + refresh — not covered (needs runtime status flip)
+

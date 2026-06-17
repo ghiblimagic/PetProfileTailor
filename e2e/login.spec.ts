@@ -3,6 +3,7 @@ import {
   getPlaywrightCredentials,
   loginWithCredentials,
 } from "./helpers/auth";
+import { getPlaywrightBannedCredentials } from "./fixtures/seed-data";
 
 test.describe("Login page", () => {
   test("shows magic link section and register link", async ({ page }) => {
@@ -39,5 +40,20 @@ test.describe("Login page", () => {
     await expect(page.getByText("Open profile menu")).toBeVisible({
       timeout: 10_000,
     });
+  });
+
+  test("rejects banned account credentials", async ({ page }) => {
+    const creds = getPlaywrightBannedCredentials();
+    test.skip(!creds, "Banned user not configured (run pnpm seed:e2e)");
+
+    await page.goto("/login");
+    await page.locator("#email").fill(creds!.email);
+    await page.locator("#password").fill(creds!.password);
+    await page.getByRole("button", { name: "sign in", exact: true }).click();
+
+    await expect(
+      page.getByText(/this account has been banned/i),
+    ).toBeVisible({ timeout: 15_000 });
+    await expect(page).toHaveURL(/\/login/);
   });
 });

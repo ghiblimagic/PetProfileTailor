@@ -1,9 +1,13 @@
 import { test, expect } from "@playwright/test";
 import {
+  SEED_DESCRIPTION_FILTER_TAG,
   SEED_DESCRIPTION_START,
   SEED_DESCRIPTION_START_PREFIX,
   SEED_NAME,
+  SEED_NAME_TAG_FOR_ADD_NAMES,
 } from "./fixtures/seed-data";
+import { hashedTagText as hashedNameTagText } from "./helpers/addnames-ui";
+import { hashedTagText as hashedDescriptionTagText } from "./helpers/adddescriptions-ui";
 import { lookupSeededDescription, lookupSeededName } from "./helpers/seed-lookup";
 
 test.describe("Browse smoke", () => {
@@ -42,6 +46,28 @@ test.describe("Browse smoke", () => {
     }
   });
 
+  test("descriptions API returns string _id values without __v", async ({
+    request,
+  }) => {
+    const response = await request.post("/api/description/swr", {
+      data: { page: 1 },
+    });
+    expect(response.ok()).toBeTruthy();
+
+    const json = (await response.json()) as {
+      data?: Array<{ _id: unknown; __v?: unknown }>;
+    };
+
+    if (!json.data?.length) {
+      test.skip(true, "No descriptions in test DB to assert _id shape");
+    }
+
+    for (const item of json.data!) {
+      expect(typeof item._id).toBe("string");
+      expect(item.__v).toBeUndefined();
+    }
+  });
+
   test("name detail page renders seeded name and creator", async ({ page }) => {
     const seeded = await lookupSeededName(page.request, SEED_NAME);
 
@@ -54,9 +80,16 @@ test.describe("Browse smoke", () => {
     await expect(
       page.getByText(`@${seeded.createdBy.profileName}`, { exact: false }),
     ).toBeVisible();
+    await expect(
+      page.getByText(hashedNameTagText(SEED_NAME_TAG_FOR_ADD_NAMES), {
+        exact: true,
+      }),
+    ).toBeVisible({ timeout: 15_000 });
   });
 
-  test("description detail page renders seeded content", async ({ page }) => {
+  test("description detail page renders seeded content, creator, and tag", async ({
+    page,
+  }) => {
     const seeded = await lookupSeededDescription(
       page.request,
       SEED_DESCRIPTION_START,
@@ -67,6 +100,14 @@ test.describe("Browse smoke", () => {
 
     await expect(
       page.getByText(SEED_DESCRIPTION_START_PREFIX, { exact: false }),
+    ).toBeVisible({ timeout: 15_000 });
+    await expect(
+      page.getByText(`@${seeded.createdBy.profileName}`, { exact: false }),
+    ).toBeVisible();
+    await expect(
+      page.getByText(hashedDescriptionTagText(SEED_DESCRIPTION_FILTER_TAG), {
+        exact: true,
+      }),
     ).toBeVisible({ timeout: 15_000 });
   });
 });

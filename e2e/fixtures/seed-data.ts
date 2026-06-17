@@ -62,3 +62,16 @@ export function getPlaywrightAdminProfileName(): string {
 export function getPlaywrightAdminDisplayName(): string {
   return process.env.PLAYWRIGHT_TEST_ADMIN_NAME ?? seedData.admin.defaultName;
 }
+
+export function getPlaywrightBannedCredentials():
+  | { email: string; password: string }
+  | null {
+  const email =
+    process.env.PLAYWRIGHT_TEST_BANNED_EMAIL ??
+    seedData.bannedUser.defaultEmail;
+  const password =
+    process.env.PLAYWRIGHT_TEST_BANNED_PASSWORD ??
+    seedData.bannedUser.defaultPassword;
+  if (!email || !password) return null;
+  return { email: email.trim().toLowerCase(), password };
+}
