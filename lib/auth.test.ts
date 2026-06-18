@@ -173,7 +173,42 @@ describe("serverAuthOptions", () => {
       });
     });
 
-    it("refreshes status from DB when token has user id", async () => {
+    it("refreshes non-banned status from DB when token has user id", async () => {
+      mocks.findById.mockReturnValue({
+        select: vi.fn().mockResolvedValue({ status: "limited" }),
+      });
+
+      const jwt = serverAuthOptions.callbacks!.jwt!;
+      const token = await jwt({
+        token: { user: { id: "user-1", status: "active" } },
+        user: undefined,
+        trigger: undefined,
+        session: undefined,
+      });
+
+      expect(mocks.findById).toHaveBeenCalledWith("user-1");
+      expect(token.user?.status).toBe("limited");
+    });
+
+    it("refreshes status using token.sub when token.user.id is missing", async () => {
+      mocks.findById.mockReturnValue({
+        select: vi.fn().mockResolvedValue({ status: "suspended" }),
+      });
+
+      const jwt = serverAuthOptions.callbacks!.jwt!;
+      const token = await jwt({
+        token: { sub: "user-from-sub", user: { name: "Test" } },
+        user: undefined,
+        trigger: undefined,
+        session: undefined,
+      });
+
+      expect(mocks.findById).toHaveBeenCalledWith("user-from-sub");
+      expect(token.user?.status).toBe("suspended");
+      expect(token.user?.id).toBe("user-from-sub");
+    });
+
+    it("nullifies token.user when DB user is banned", async () => {
       mocks.findById.mockReturnValue({
         select: vi.fn().mockResolvedValue({ status: "banned" }),
       });
@@ -187,7 +222,7 @@ describe("serverAuthOptions", () => {
       });
 
       expect(mocks.findById).toHaveBeenCalledWith("user-1");
-      expect(token.user?.status).toBe("banned");
+      expect(token.user).toBeNull();
     });
 
     it("clears token.user when DB user is deleted", async () => {
@@ -245,12 +280,19 @@ describe("serverAuthOptions", () => {
       expect(result?.user).toEqual(tokenUser);
     });
 
-    it("returns null when session has no user", async () => {
+    it("returns null when token.user is cleared even if session still has email/name", async () => {
       const sessionCb = serverAuthOptions.callbacks!.session!;
 
       const result = await sessionCb({
-        session: { expires: "2099-01-01", user: undefined as unknown as Session["user"] },
-        token: {},
+        session: {
+          expires: "2099-01-01",
+          user: {
+            id: "user-1",
+            email: "a@b.com",
+            name: "Stale",
+          } as Session["user"],
+        },
+        token: { user: null },
       });
 
       expect(result).toBeNull();

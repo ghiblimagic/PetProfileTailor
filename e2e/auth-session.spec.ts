@@ -3,6 +3,8 @@ import {
   getPlaywrightCredentials,
   loginWithCredentials,
   openProfileMenu,
+  restorePlaywrightTestUserStatus,
+  setE2eUserStatus,
   signOutViaNav,
 } from "./helpers/auth";
 import { getPlaywrightProfileName } from "./helpers/register";
@@ -64,6 +66,37 @@ test.describe("Auth & session", () => {
       await expect(page.getByText("Open profile menu")).toBeVisible({
         timeout: 10_000,
       });
+    });
+  });
+
+  test.describe("mid-session ban", () => {
+    test.describe.configure({ mode: "serial" });
+
+    test.afterEach(async ({ page }) => {
+      await restorePlaywrightTestUserStatus(page);
+    });
+
+    test("ban while logged in then refresh signs user out", async ({ page }) => {
+      test.skip(!getPlaywrightCredentials(), "PLAYWRIGHT_TEST_EMAIL/PASSWORD not set");
+
+      await loginWithCredentials(page);
+      await page.goto("/dashboard");
+      await expect(page.getByText(/Welcome Back/i)).toBeVisible({
+        timeout: 15_000,
+      });
+
+      await setE2eUserStatus(page, "banned");
+
+      const sessionResponse = await page.request.get("/api/auth/session");
+      const sessionJson = await sessionResponse.json();
+      expect(sessionJson).toBeNull();
+
+      await page.reload();
+
+      await expect(page.getByText("Open profile menu")).not.toBeVisible({
+        timeout: 15_000,
+      });
+      await expect(page).toHaveURL(/\/login/, { timeout: 15_000 });
     });
   });
 });

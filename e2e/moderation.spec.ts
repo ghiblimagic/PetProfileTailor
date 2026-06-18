@@ -77,18 +77,60 @@ test.describe("Moderation API", () => {
   });
 
   test("unauthenticated suggestion POST returns 401", async ({ page }) => {
-    const seeded = await lookupSeededName(page.request, SEED_NAME);
+    const nameSeeded = await lookupSeededName(page.request, SEED_NAME);
+    const descriptionSeeded = await lookupSeededDescription(
+      page.request,
+      SEED_DESCRIPTION_START,
+    );
 
-    const response = await page.request.post("/api/suggestion", {
-      data: {
-        contentType: "names",
-        contentId: seeded.id,
-        contentCreator: seeded.creatorId,
-        comments: "Should fail",
+    for (const { contentType, seeded } of [
+      { contentType: "names" as const, seeded: nameSeeded },
+      { contentType: "descriptions" as const, seeded: descriptionSeeded },
+    ]) {
+      const response = await page.request.post("/api/suggestion", {
+        data: {
+          contentType,
+          contentId: seeded.id,
+          contentCreator: seeded.creatorId,
+          comments: "Should fail",
+        },
+      });
+
+      expect(response.status()).toBe(401);
+    }
+  });
+
+  test("unauthenticated report POST returns 401", async ({ page }) => {
+    const nameSeeded = await lookupSeededName(page.request, SEED_NAME_ADMIN);
+    const descriptionSeeded = await lookupSeededDescription(
+      page.request,
+      SEED_DESCRIPTION_ADMIN,
+    );
+
+    for (const { contentType, seeded, content } of [
+      {
+        contentType: "names" as const,
+        seeded: nameSeeded,
+        content: SEED_NAME_ADMIN,
       },
-    });
+      {
+        contentType: "descriptions" as const,
+        seeded: descriptionSeeded,
+        content: SEED_DESCRIPTION_ADMIN,
+      },
+    ]) {
+      const response = await page.request.post("/api/flag/flagreportsubmission", {
+        data: {
+          contentType,
+          contentId: seeded.id,
+          contentCreatedBy: seeded.creatorId,
+          contentCopy: { content },
+          reportCategories: ["Spam"],
+        },
+      });
 
-    expect(response.status()).toBe(401);
+      expect(response.status()).toBe(401);
+    }
   });
 
   test("admin can submit suggestion on user description", async ({ page }) => {

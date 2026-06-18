@@ -6069,6 +6069,38 @@ Next backlog items: `/login?error=UserNotFound` toast (symmetric to Banned), API
 
 ### Next logical step
 
-- Mid-session ban + refresh E2E (needs test hook to ban logged-in user)
-- Unauthenticated description moderation 401 in `moderation.spec.ts`
+- Admin edit category/tag UI (no edit routes)
+- Contact happy path with real reCAPTCHA
+
+---
+
+## 2026-06-08 — Mid-session ban E2E + moderation 401 + auth session invalidation fix
+
+### What was built and why
+
+Close backlog items: mid-session ban signs user out after refresh, unauthenticated moderation API 401 for descriptions + reports, and fix session callback so null `token.user` actually invalidates the session (stale email/name no longer kept).
+
+### Files created
+
+- `app/api/test/e2e/set-user-status/route.ts` — E2E ban/unban hook
+
+### Files modified
+
+- `lib/auth.ts` — banned users null `token.user`; JWT refresh uses `token.sub` fallback; `updateAge: 0` in E2E; session callback checks `token.user` first
+- `lib/auth.test.ts` — banned/sub/session-null coverage
+- `components/NavBar/NavLayoutwithSettingsMenu.tsx` — sign out when `status === "banned"`
+- `e2e/auth-session.spec.ts` — mid-session ban test
+- `e2e/moderation.spec.ts` — unauthenticated suggestion/report 401 (names + descriptions)
+- `e2e/helpers/auth.ts` — `setE2eUserStatus`, `restorePlaywrightTestUserStatus`
+- `docs/notes/lib/auth.md`, `TESTING.md`, `CHANGES.md`
+
+### Problems encountered
+
+- Session API still returned `{ user: { email, name } }` after `token.user = null` because the session callback only nulled when `session.user` was missing, not when `token.user` was cleared. Fixed by returning `null` when `!token.user`.
+
+### Verification
+
+- `pnpm vitest run lib/auth.test.ts` — 18 passed
+- `CI=1 pnpm test:e2e e2e/auth-session.spec.ts -g "mid-session"` — 1 passed
+- `pnpm test:e2e e2e/moderation.spec.ts -g "unauthenticated"` — 2 passed
 

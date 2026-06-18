@@ -114,27 +114,25 @@ token.user = { ...token.user, ...session.user };
 | `name`, `profileName`, `profileImage`, `role`, `status` | From sign-in user |
 | `bio`, `location` | From sign-in user (optional on `User`; may be undefined until profile update) |
 
-**On refresh** (no `user`, but `token.user?.id` exists) — runs when `updateAge` is reached:
+**On refresh** (no `user`, but `token.user?.id` exists) — runs when `updateAge` is reached (or every request in E2E when `E2E_TEST_MODE` sets `updateAge: 0`):
 
 - Re-fetch `status` from DB via `UserModel.findById(token.user.id).select("status")`
-- If user deleted → `token.user = null`
+- If user deleted or **banned** → `token.user = null`
+- If user active (or other non-banned status) → update `token.user.status`
 - Errors logged, token left as-is on failure
 
 ### session
 
 ```ts
-if (token.user) {
-  session.user = token.user;
+if (!token.user) {
+  return null as unknown as typeof session;
 }
-if (!session.user) {
-  return null as unknown as typeof session; // invalidates session at runtime
-}
+session.user = token.user;
 return session;
 ```
 
-- `session` and `token` are always objects; `token.user` may be missing
-- If `token.user` exists → `session.user = token.user` (only safe fields from `toTokenUser`)
-- If `session.user` still missing → return `null` (invalidates session). NextAuth types omit `null`; see comment in source.
+- Check `token.user` first — when banned/deleted, JWT clears `token.user` but NextAuth may still pass a stale `session.user` (email/name from the token root). Returning `null` invalidates the session.
+- If `token.user` exists → copy onto `session.user` (only safe fields from `toTokenUser`).
 
 ---
 

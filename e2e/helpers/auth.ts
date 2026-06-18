@@ -87,3 +87,21 @@ export async function signOutViaNav(page: Page): Promise<void> {
   await page.getByRole("menuitem", { name: "Logout" }).click();
   await page.waitForURL(/\/login/, { timeout: 15_000 });
 }
+
+/** E2E-only — set status for signed-in user, or pass email for unauthenticated cleanup. */
+export async function setE2eUserStatus(
+  page: Page,
+  status: "active" | "banned",
+  options?: { email?: string },
+): Promise<void> {
+  const response = await page.request.post("/api/test/e2e/set-user-status", {
+    data: { status, ...(options?.email ? { email: options.email } : {}) },
+  });
+  expect(response.ok()).toBeTruthy();
+}
+
+export async function restorePlaywrightTestUserStatus(page: Page): Promise<void> {
+  const creds = getPlaywrightCredentials();
+  if (!creds) return;
+  await setE2eUserStatus(page, "active", { email: creds.email });
+}

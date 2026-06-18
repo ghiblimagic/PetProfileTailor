@@ -11,6 +11,7 @@ import { MongoDBAdapter } from "@next-auth/mongodb-adapter";
 import clientPromise from "@/app/api/auth/lib/mongodb";
 import { sendVerificationRequest } from "@/lib/send-verification-request";
 import { resolveSignInCallback } from "./resolveSignInCallback";
+import { isE2eServerMode } from "@/utils/api/e2eTestMode";
 
 function toCredentialsUser(doc: IUserDocument): User {
   return {
@@ -44,7 +45,7 @@ export const serverAuthOptions: AuthOptions = {
   session: {
     strategy: "jwt",
     maxAge: 60 * 60 * 24,
-    updateAge: 30 * 60,
+    updateAge: isE2eServerMode() ? 0 : 30 * 60,
   },
   callbacks: {
     async signIn({ user, account }) {
@@ -69,19 +70,33 @@ export const serverAuthOptions: AuthOptions = {
 
       if (user) {
         token.user = toTokenUser(user);
-      } else if (token.user?.id) {
-        try {
-          await db.connect();
-          const freshUser = await UserModel.findById(token.user.id).select(
-            "status",
-          );
-          if (freshUser) {
-            token.user.status = freshUser.status;
-          } else {
-            token.user = null;
+      } else {
+        const userId =
+          token.user?.id ??
+          (typeof token.sub === "string" ? token.sub : undefined);
+
+        if (userId) {
+          try {
+            await db.connect();
+            const freshUser = await UserModel.findById(userId).select(
+              "status",
+            );
+            if (freshUser) {
+              if (freshUser.status === "banned") {
+                token.user = null;
+              } else {
+                token.user = {
+                  ...(token.user ?? { id: userId }),
+                  id: userId,
+                  status: freshUser.status,
+                };
+              }
+            } else {
+              token.user = null;
+            }
+          } catch (err) {
+            console.error("JWT refresh error:", err);
           }
-        } catch (err) {
-          console.error("JWT refresh error:", err);
         }
       }
 
@@ -89,15 +104,11 @@ export const serverAuthOptions: AuthOptions = {
     },
 
     async session({ session, token }) {
-      if (token.user) {
-        session.user = token.user;
-      }
-
-      // Runtime: null invalidates session (see docs/notes/lib/auth.md). TS types omit null so we have to do this to satisfy the type system.
-      if (!session.user) {
+      if (!token.user) {
         return null as unknown as typeof session;
       }
 
+      session.user = token.user;
       return session;
     },
   },
