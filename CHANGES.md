@@ -6104,3 +6104,20 @@ Close backlog items: mid-session ban signs user out after refresh, unauthenticat
 - `CI=1 pnpm test:e2e e2e/auth-session.spec.ts -g "mid-session"` — 1 passed
 - `pnpm test:e2e e2e/moderation.spec.ts -g "unauthenticated"` — 2 passed
 
+---
+
+## 2026-06-08 — TESTING.md manual backlog cleanup
+
+### What was built and why
+
+Removed stale manual checkboxes that duplicated E2E coverage; manual section now lists only dev-only work (captcha, email, visual polish) plus blocked/deferred items, with a reference table pointing to Playwright specs.
+
+### Files modified
+
+- `TESTING.md`, `CHANGES.md`
+
+### Next logical step
+
+- Contact/register/magic-link manual checks when Resend + reCAPTCHA keys are configured
+- Admin edit category/tag E2E when edit routes exist
+

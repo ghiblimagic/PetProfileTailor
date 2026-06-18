@@ -283,59 +283,55 @@ Shared seed content lives in **`e2e/fixtures/seed-data.json`** (imported by `scr
 
 ## Manual verification (dev only)
 
-Use **`pnpm dev`** against your normal **`MONGODB_URI`**. Run the sections that match your PR — skip anything already in the E2E table above.
+Use **`pnpm dev`** against your normal **`MONGODB_URI`**. The **E2E section above** is the tier-2 backlog — do **not** re-run those flows manually unless debugging a failure.
 
-**Note:** Checkboxes are personal progress; preserve them when editing.
+Checkboxes below are for **dev-only** work automation cannot do (real captcha, email, blocked features).
 
-### Captcha, email, and real third-party services
-
-E2E cannot exercise these (bypassed or skipped).
+### Real captcha & email (cannot E2E)
 
 - [ ] **Contact happy path** — `/contact`, wait **>3s**, complete **real reCAPTCHA**, submit → success toast or email (Resend configured)
-- [ ] **Register** — `/register` with real reCAPTCHA → new user, default avatar
-- [ ] **Magic link** — `/login` request link → email arrives (skip if Resend not configured)
-- [ ] **Magic link** — click link → logged in; refresh keeps session
+- [ ] **Register** — `/register` with real reCAPTCHA → new user, default avatar (`chooseRandomDefaultAvatar`)
+- [ ] **Magic link — request** — `/login` request link → email arrives (skip if Resend not configured)
+- [ ] **Magic link — sign in** — click link → logged in; refresh keeps session
 
-### Auth & session (beyond E2E)
+### Optional visual check
 
-- [ ] Nav — avatar image detail (pixel/layout)
-- [ ] Optional: banned account → ban error; mid-session ban + refresh → logged out — **covered:** credentials ban + `/login?error=Banned` toast — `e2e/login.spec.ts`; mid-session ban + refresh — `e2e/auth-session.spec.ts` (`POST /api/test/e2e/set-user-status`)
+- [ ] **Nav** — avatar image detail (pixel/layout)
 
-### Admin UI depth
+### Blocked on product (not manual yet)
 
-- [ ] Admin — create tag/category via **UI** (not just API smoke) — **covered:** name + description category/tag create — `e2e/admin-category-ui.spec.ts`; nav links — `e2e/admin.spec.ts`
-- [ ] Admin — edit existing category/tag in UI
+| Item | Why |
+|------|-----|
+| Admin — **edit** existing category/tag in UI | No edit routes; create is E2E’d in `e2e/admin-category-ui.spec.ts` |
+| Profile **follow / unfollow** via UI | Modals commented out — see [`docs/FUTURE.md`](docs/FUTURE.md); API follow in `e2e/social.spec.ts` |
 
-### Content depth (tags, normalization)
+### Optional future E2E (not in manual backlog)
 
-- [ ] `/addnames` — name with **tags** → appears on `/name/[name]` with tags/categories — **covered:** `e2e/addnames.spec.ts` (cheat-sheet tag `e2e-name-tag`)
-- [ ] `/adddescriptions` — description with **tags** → appears on `/description/[id]` — **covered:** `e2e/adddescriptions.spec.ts` (cheat-sheet tag `e2e-filter-tag`)
-- [ ] Name normalization — spaces/punctuation/case variants → same duplicate behavior — **covered:** `e2e/addnames.spec.ts` (case, spaces, punctuation on submit + search)
-- [ ] Edit own content → `likedByCount` unchanged unless liking — **covered:** `e2e/edits.spec.ts` (`likedByCount unchanged on owner edit`)
+- `/login?error=DBUnavailable` toast
+- Magic-link banned user → `/login?error=Banned` (unit: `resolveSignInCallback.test.ts`)
+- Real YouTube playback on `/` (embed load is stubbed in `e2e/landing-videos.spec.ts`)
+- More `leanWithStrings` asserts (notifications APIs, etc.) beyond `e2e/data-shape.spec.ts`
 
-### Blocklist (bio and API detail)
+### Tier-2 backlog — automated (reference only)
 
-- [ ] `/register` or profile bio — blocklisted bio → rejected (if field checked) — **covered:** `e2e/profile-bio.spec.ts` (API + profile edit UI)
-- [ ] DevTools — blocklist 403 responses include `blockedBy` — **covered:** `e2e/profile-bio.spec.ts` (API); `utils/api/checkMultipleBlocklists.test.ts`
+These manual checklist items are **done in Playwright**; see spec files in [What E2E covers](#what-e2e-covers).
 
-### Social & notifications (beyond E2E API smoke)
-
-- [ ] Like toggle on name detail UI — rapid double-click → one like, no 500 — **E2E:** `e2e/social.spec.ts` (burst + like/unlike settle); behavior documented in [`togglelike-route.md`](docs/notes/app/api/togglelike-route.md)
-- [ ] `/notifications` **UI** — mark read persists — **partial:** thanks + names tab badges covered in `notifications-ui.spec.ts` (reload after mark-read)
-- [ ] Profile follow / unfollow via **UI** — **deferred:** followers/following modals commented out on profile; track in [`docs/FUTURE.md`](docs/FUTURE.md) (re-enable UI, then Playwright on `FollowButton`)
-- [ ] Thank, suggestion, report flows — submit without 500; lists load if exposed — **partial:** thank UI — `e2e/thanks-ui.spec.ts`; suggestion/report API — `e2e/moderation.spec.ts`; suggestion/report UI — `e2e/moderation-ui.spec.ts` (names + descriptions)
-
-### Data shape & listing UX
-
-- [ ] DevTools → Network — other APIs (`leanWithStrings`) still return string `_id`; no `__v` — **covered:** `e2e/browse.spec.ts` (names + descriptions SWR); `e2e/data-shape.spec.ts` (check-if-exists, user likes)
-- [ ] `/name/[name]`, `/description/[id]` — render with related data (tags, creator) — **covered:** `e2e/browse.spec.ts`
-- [ ] `/fetchnames` or `/fetchdescriptions` — pagination spam **next** → ~15s cooldown — **covered:** `e2e/fetchnames-cooldown.spec.ts`, `e2e/fetchdescriptions-cooldown.spec.ts` (after `pnpm seed:e2e`)
-- [ ] Same pages — rapid sort/filter → ~3s / ~5s cooldown — **covered:** `e2e/fetchnames-cooldown.spec.ts`, `e2e/fetchdescriptions-cooldown.spec.ts`
-- [ ] `useApiRateLimiter` / like button — rapid clicks throttled — **unit:** `useApiRateLimiter.test.ts`; **E2E:** `e2e/social.spec.ts` (double-click + rate limit)
-
-### Misc utils (no E2E yet)
-
-- [ ] `/register` — full signup with real captcha → default avatar assigned (`chooseRandomDefaultAvatar`) — **partial:** E2E with captcha bypass — `e2e/register.spec.ts`; unit — `utils/chooseRandomDefaultAvatar.test.ts`
+| Area | Primary specs |
+|------|----------------|
+| Auth & bans | `login.spec.ts`, `auth-session.spec.ts` |
+| Admin create UI | `admin.spec.ts`, `admin-category-ui.spec.ts` |
+| Add content + tags + normalization | `addnames.spec.ts`, `adddescriptions.spec.ts` |
+| Edits + `likedByCount` | `edits.spec.ts` |
+| Blocklist + bio | `profile-bio.spec.ts`, `blocklist-api.spec.ts` |
+| Likes + follow API + rate limit | `social.spec.ts` |
+| Notifications API + UI mark-read | `notifications.spec.ts`, `notifications-ui.spec.ts` |
+| Thanks / suggestion / report | `thanks-ui.spec.ts`, `moderation.spec.ts`, `moderation-ui.spec.ts` |
+| Data shape + detail pages | `browse.spec.ts`, `data-shape.spec.ts` |
+| Listing cooldowns | `fetchnames-cooldown.spec.ts`, `fetchdescriptions-cooldown.spec.ts` |
+| Register (captcha bypass) + default avatar | `register.spec.ts` |
+| Landing videos (stubbed YouTube) | `landing-videos.spec.ts` |
+| Edit settings | `editsettings.spec.ts` |
+| Contact validation (no real captcha) | `contact.spec.ts` |
 
 ---
 
