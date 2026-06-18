@@ -101,6 +101,7 @@ Playwright maps `MONGODB_URI_TEST` → `MONGODB_URI` when starting the server. `
 - User `POST /api/flag/flagreportsubmission` on admin-owned name → 201 (or idempotent skip)
 - Self-report on own name → 400
 - Unauthenticated suggestion → 401
+- Same flows for user-owned / admin-owned **descriptions** (`SEED_DESCRIPTION_START` / `SEED_DESCRIPTION_ADMIN`)
 
 **`e2e/contact.spec.ts`**
 
@@ -130,6 +131,7 @@ Playwright maps `MONGODB_URI_TEST` → `MONGODB_URI` when starting the server. `
 - Login page UI (magic link section, register link)
 - Wrong password → error, stay on `/login`
 - Banned account credentials → ban error toast, stay on `/login` (seeded `e2e-banned@example.com`)
+- `/login?error=Banned` → ban toast (signIn redirect path)
 - Credentials login → logged-in nav (profile menu)
 
 **`e2e/addnames.spec.ts`**
@@ -165,6 +167,7 @@ Playwright maps `MONGODB_URI_TEST` → `MONGODB_URI` when starting the server. `
 **`e2e/editsettings.spec.ts`**
 
 - Clear name → client validation error (`Please enter a name`)
+- Update display name → `PUT /api/auth/update` 200, success toast, persists on profile + API lookup
 
 **`e2e/admin.spec.ts`**
 
@@ -288,7 +291,7 @@ E2E cannot exercise these (bypassed or skipped).
 ### Auth & session (beyond E2E)
 
 - [ ] Nav — avatar image detail (pixel/layout)
-- [ ] Optional: banned account → ban error; mid-session ban + refresh → logged out — **partial:** credentials login ban — `e2e/login.spec.ts`; mid-session ban not covered
+- [ ] Optional: banned account → ban error; mid-session ban + refresh → logged out — **partial:** credentials ban + `/login?error=Banned` toast — `e2e/login.spec.ts`; mid-session ban not covered
 
 ### Admin UI depth
 

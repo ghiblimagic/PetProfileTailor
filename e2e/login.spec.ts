@@ -56,4 +56,13 @@ test.describe("Login page", () => {
     ).toBeVisible({ timeout: 15_000 });
     await expect(page).toHaveURL(/\/login/);
   });
+
+  test("shows ban toast when redirected with ?error=Banned", async ({ page }) => {
+    await page.goto("/login?error=Banned");
+
+    await expect(
+      page.getByRole("alert").filter({ hasText: /this account has been banned/i }),
+    ).toBeVisible({ timeout: 15_000 });
+    await expect(page).toHaveURL(/\/login/);
+  });
 });

@@ -12,10 +12,15 @@ import {
   submitSuggestion,
 } from "./helpers/moderation";
 import {
+  SEED_DESCRIPTION_ADMIN,
+  SEED_DESCRIPTION_START,
   SEED_NAME,
   SEED_NAME_ADMIN,
 } from "./fixtures/seed-data";
-import { lookupSeededName } from "./helpers/seed-lookup";
+import {
+  lookupSeededDescription,
+  lookupSeededName,
+} from "./helpers/seed-lookup";
 
 test.describe("Moderation API", () => {
   test.describe.configure({ mode: "serial" });
@@ -84,5 +89,63 @@ test.describe("Moderation API", () => {
     });
 
     expect(response.status()).toBe(401);
+  });
+
+  test("admin can submit suggestion on user description", async ({ page }) => {
+    const seeded = await lookupSeededDescription(
+      page.request,
+      SEED_DESCRIPTION_START,
+    );
+
+    await loginWithAdminCredentials(page);
+    await submitSuggestion(page.request, {
+      contentType: "descriptions",
+      contentId: seeded.id,
+      contentCreator: seeded.creatorId,
+    });
+  });
+
+  test("self-suggestion on own description is rejected", async ({ page }) => {
+    const seeded = await lookupSeededDescription(
+      page.request,
+      SEED_DESCRIPTION_START,
+    );
+
+    await loginWithCredentials(page);
+    await expectSelfSuggestionRejected(page.request, {
+      contentType: "descriptions",
+      contentId: seeded.id,
+      contentCreator: seeded.creatorId,
+    });
+  });
+
+  test("user can submit report on admin-owned description", async ({ page }) => {
+    const seeded = await lookupSeededDescription(
+      page.request,
+      SEED_DESCRIPTION_ADMIN,
+    );
+
+    await loginWithCredentials(page);
+    await submitReport(page.request, {
+      contentType: "descriptions",
+      contentId: seeded.id,
+      contentCreatedBy: seeded.creatorId,
+      contentCopy: { content: SEED_DESCRIPTION_ADMIN },
+    });
+  });
+
+  test("self-report on own admin description is rejected", async ({ page }) => {
+    const seeded = await lookupSeededDescription(
+      page.request,
+      SEED_DESCRIPTION_ADMIN,
+    );
+
+    await loginWithAdminCredentials(page);
+    await expectSelfReportRejected(page.request, {
+      contentType: "descriptions",
+      contentId: seeded.id,
+      contentCreatedBy: seeded.creatorId,
+      contentCopy: { content: SEED_DESCRIPTION_ADMIN },
+    });
   });
 });

@@ -6016,3 +6016,23 @@ Complement blocklist coverage: valid bio saves via API and profile edit UI, pers
 
 - `pnpm test:e2e e2e/profile-bio.spec.ts` — 4 passed
 
+---
+
+## 2026-06-08 — Moderation API descriptions + editsettings + login ban redirect E2E
+
+### What was built and why
+
+Close remaining small backlog items: description suggestion/report API (symmetric to names), editsettings display-name update, and `/login?error=Banned` toast.
+
+### Files modified
+
+- `e2e/moderation.spec.ts` — 4 description API tests
+- `e2e/editsettings.spec.ts` — name update success path
+- `e2e/login.spec.ts` — `?error=Banned` toast
+- `e2e/helpers/seed-lookup.ts` — `name` on profile lookup
+- `TESTING.md`, `CHANGES.md`
+
+### Verification
+
+- `pnpm test:e2e e2e/moderation.spec.ts e2e/editsettings.spec.ts e2e/login.spec.ts` — 16 passed
+
