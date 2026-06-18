@@ -4,6 +4,7 @@
 import { type Model } from "mongoose";
 // Register User model for Mongoose populate (createdBy)
 import "@/models/User";
+import { leanWithStrings, type MongoCleanupResult } from "@/utils/mongoDataCleanup";
 import normalizeString from "./normalizeString";
 
 export interface NormalizedContentFields {
@@ -23,40 +24,46 @@ export function escapeRegex(str: string): string {
 export async function findStartNormalized<T extends NormalizedContentFields>(
   Model: Model<T>,
   content: string,
-): Promise<T | null> {
+): Promise<MongoCleanupResult<T> | null> {
   const normalizedString = normalizeString(content).slice(0, 400);
 
   console.log("this is normalizedString", normalizedString);
 
-  return (await Model.findOne({
-    normalizedContent: {
-      $regex: new RegExp("^" + escapeRegex(normalizedString), "i"),
-    },
-  }).populate(CREATED_BY_POPULATE)) as T | null;
+  return leanWithStrings(
+    Model.findOne({
+      normalizedContent: {
+        $regex: new RegExp("^" + escapeRegex(normalizedString), "i"),
+      },
+    }).populate(CREATED_BY_POPULATE),
+  ) as Promise<MongoCleanupResult<T> | null>;
 }
 
 /** Non-anchored partial match — scans full collection; avoid when possible. */
 export async function findPartialMatch<T extends NormalizedContentFields>(
   Model: Model<T>,
   content: string,
-): Promise<T[]> {
+): Promise<MongoCleanupResult<T>[]> {
   const normalizedString = normalizeString(content).slice(0, 400);
 
-  return (await Model.find({
-    normalizedContent: {
-      $regex: escapeRegex(normalizedString),
-      $options: "i",
-    },
-  }).populate(CREATED_BY_POPULATE)) as T[];
+  return (await leanWithStrings(
+    Model.find({
+      normalizedContent: {
+        $regex: escapeRegex(normalizedString),
+        $options: "i",
+      },
+    }).populate(CREATED_BY_POPULATE),
+  )) as MongoCleanupResult<T>[];
 }
 
 /** Exact normalized duplicate check — preferred for uniqueness validation. */
 export async function findExactNormalized<T extends NormalizedContentFields>(
   Model: Model<T>,
   content: string,
-): Promise<T | null> {
+): Promise<MongoCleanupResult<T> | null> {
   const normalizedString = normalizeString(content);
-  return (await Model.findOne({
-    normalizedContent: normalizedString,
-  }).populate(CREATED_BY_POPULATE)) as T | null;
+  return leanWithStrings(
+    Model.findOne({
+      normalizedContent: normalizedString,
+    }).populate(CREATED_BY_POPULATE),
+  ) as Promise<MongoCleanupResult<T> | null>;
 }

@@ -65,4 +65,15 @@ test.describe("Login page", () => {
     ).toBeVisible({ timeout: 15_000 });
     await expect(page).toHaveURL(/\/login/);
   });
+
+  test("shows user not found toast when redirected with ?error=UserNotFound", async ({
+    page,
+  }) => {
+    await page.goto("/login?error=UserNotFound");
+
+    await expect(
+      page.getByRole("alert").filter({ hasText: /user not found/i }),
+    ).toBeVisible({ timeout: 15_000 });
+    await expect(page).toHaveURL(/\/login/);
+  });
 });

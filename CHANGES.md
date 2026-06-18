@@ -6036,3 +6036,39 @@ Close remaining small backlog items: description suggestion/report API (symmetri
 
 - `pnpm test:e2e e2e/moderation.spec.ts e2e/editsettings.spec.ts e2e/login.spec.ts` — 16 passed
 
+---
+
+## 2026-06-08 — Data-shape E2E + login UserNotFound + leanWithStrings on duplicate checks
+
+### What was built and why
+
+Next backlog items: `/login?error=UserNotFound` toast (symmetric to Banned), API assertions for string `_id` / no `__v` on check-if-exists and user likes, and production fix so duplicate-check routes use `leanWithStrings`.
+
+### Files created
+
+- `e2e/data-shape.spec.ts`
+- `e2e/helpers/data-shape.ts`
+
+### Files modified
+
+- `e2e/login.spec.ts` — UserNotFound redirect toast
+- `app/api/names/check-if-content-exists/[content]/route.ts` — `leanWithStrings`
+- `utils/stringManipulation/findNormalizedMatch.ts` — all find helpers use `leanWithStrings`
+- `utils/stringManipulation/findNormalizedMatch.test.ts` — mock `lean().exec()` chain
+- `TESTING.md`, `CHANGES.md`
+
+### Problems encountered
+
+- Check-if-exists routes returned raw Mongoose docs (`__v` present). Fixed with `leanWithStrings`.
+- Description duplicate check does not populate tags; E2E accepts string tag refs or populated tag objects.
+
+### Verification
+
+- `pnpm vitest run utils/stringManipulation/findNormalizedMatch.test.ts` — 4 passed
+- `pnpm test:e2e e2e/data-shape.spec.ts e2e/login.spec.ts -g "UserNotFound|data shape|leanWithStrings"` — 4 passed
+
+### Next logical step
+
+- Mid-session ban + refresh E2E (needs test hook to ban logged-in user)
+- Unauthenticated description moderation 401 in `moderation.spec.ts`
+

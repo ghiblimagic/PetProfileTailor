@@ -89,6 +89,11 @@ Playwright maps `MONGODB_URI_TEST` → `MONGODB_URI` when starting the server. `
 - Iframe `onLoad` reveals embed + close button (YouTube stubbed in test)
 - Close X and toggle-click hide embed; only one video open at a time
 
+**`e2e/data-shape.spec.ts`**
+
+- `GET` name/description `check-if-content-exists` — string `_id` on document, `createdBy`, tags; no `__v`
+- `GET /api/user/likes` — `id` and `contentId` are strings; no `__v`
+
 **`e2e/blocklist-api.spec.ts`**
 
 - `POST /api/names` with exact blocklisted name → 403 + `blockedBy`
@@ -132,6 +137,7 @@ Playwright maps `MONGODB_URI_TEST` → `MONGODB_URI` when starting the server. `
 - Wrong password → error, stay on `/login`
 - Banned account credentials → ban error toast, stay on `/login` (seeded `e2e-banned@example.com`)
 - `/login?error=Banned` → ban toast (signIn redirect path)
+- `/login?error=UserNotFound` → user not found toast (credentials signIn redirect)
 - Credentials login → logged-in nav (profile menu)
 
 **`e2e/addnames.spec.ts`**
@@ -319,7 +325,7 @@ E2E cannot exercise these (bypassed or skipped).
 
 ### Data shape & listing UX
 
-- [ ] DevTools → Network — other APIs (`leanWithStrings`) still return string `_id`; no `__v` — **covered:** `e2e/browse.spec.ts` (names + descriptions SWR)
+- [ ] DevTools → Network — other APIs (`leanWithStrings`) still return string `_id`; no `__v` — **covered:** `e2e/browse.spec.ts` (names + descriptions SWR); `e2e/data-shape.spec.ts` (check-if-exists, user likes)
 - [ ] `/name/[name]`, `/description/[id]` — render with related data (tags, creator) — **covered:** `e2e/browse.spec.ts`
 - [ ] `/fetchnames` or `/fetchdescriptions` — pagination spam **next** → ~15s cooldown — **covered:** `e2e/fetchnames-cooldown.spec.ts`, `e2e/fetchdescriptions-cooldown.spec.ts` (after `pnpm seed:e2e`)
 - [ ] Same pages — rapid sort/filter → ~3s / ~5s cooldown — **covered:** `e2e/fetchnames-cooldown.spec.ts`, `e2e/fetchdescriptions-cooldown.spec.ts`

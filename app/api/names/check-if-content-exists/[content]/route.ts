@@ -13,6 +13,7 @@ import {
 } from "@/utils/api/checkMultipleBlocklists";
 import normalizeString from "@/utils/stringManipulation/normalizeString";
 import regexInvalidInput from "@/utils/stringManipulation/check-for-valid-content";
+import { leanWithStrings } from "@/utils/mongoDataCleanup";
 
 type RouteContext = {
   params: Promise<{ content: string }>;
@@ -52,11 +53,13 @@ export async function GET(_req: Request, { params }: RouteContext) {
 
     const normalizedString = normalizeString(content);
 
-    const existingNameCheck = await Names.findOne({
-      normalizedContent: { $regex: new RegExp(`^${normalizedString}$`, "i") },
-    })
-      .populate({ path: "createdBy", select: "name profileName profileImage" })
-      .populate({ path: "tags", select: "tag" });
+    const existingNameCheck = await leanWithStrings(
+      Names.findOne({
+        normalizedContent: { $regex: new RegExp(`^${normalizedString}$`, "i") },
+      })
+        .populate({ path: "createdBy", select: "name profileName profileImage" })
+        .populate({ path: "tags", select: "tag" }),
+    );
 
     // find returns an array
     if (existingNameCheck) {

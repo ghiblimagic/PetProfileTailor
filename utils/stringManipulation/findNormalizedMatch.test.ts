@@ -7,11 +7,15 @@ import {
 } from "./findNormalizedMatch";
 
 function mockModel<T>(result: T) {
-  const populate = vi.fn().mockResolvedValue(result);
+  const exec = vi.fn().mockResolvedValue(result);
+  const lean = vi.fn().mockReturnValue({ exec });
+  const populate = vi.fn().mockReturnValue({ lean, populate: vi.fn().mockReturnValue({ lean }) });
   return {
     findOne: vi.fn().mockReturnValue({ populate }),
     find: vi.fn().mockReturnValue({ populate }),
     populate,
+    lean,
+    exec,
   };
 }
 
@@ -36,7 +40,7 @@ describe("findExactNormalized", () => {
       path: "createdBy",
       select: ["name", "profileName", "profileImage"],
     });
-    expect(result).toBe(doc);
+    expect(result).toEqual(doc);
   });
 });
 
@@ -81,6 +85,6 @@ describe("findPartialMatch", () => {
         $options: "i",
       },
     });
-    expect(result).toBe(docs);
+    expect(result).toEqual(docs);
   });
 });
