@@ -6151,3 +6151,67 @@ Completed the “optional future E2E” list from `TESTING.md`: DBUnavailable to
 - `CI=1 pnpm test:e2e e2e/login.spec.ts -g "magic link sign-in for banned"` — 1 passed
 - Prior run: notification data-shape (3), DBUnavailable toast, YouTube network — all passed
 
+---
+
+## 2026-06-08 — Delete content, forgot-password, magic link UI E2E
+
+### What was built and why
+
+Three medium-value tests from the “what’s left” list: owner delete via detail UI, forgot-password non-enumeration UX, magic link form → `/magiclink` confirmation (no email).
+
+### Files created
+
+- `e2e/delete-content.spec.ts`
+- `e2e/forgot-password.spec.ts`
+- `e2e/helpers/delete-content-ui.ts`
+
+### Files modified
+
+- `e2e/login.spec.ts` — magic link UI happy path
+- `TESTING.md`, `CHANGES.md`
+
+### Problems encountered
+
+- Delete confirm dialog is nested (Headless UI + inner `role="dialog"`); confirm button needed `force: true` and text filter, not `getByRole`.
+- Toast text “Content deleted successfully” matched loose `getByText('DELETED')` — use `{ exact: true }` for the content label.
+
+### Verification
+
+- `CI=1 pnpm test:e2e e2e/delete-content.spec.ts` — 1 passed
+- `CI=1 pnpm test:e2e e2e/forgot-password.spec.ts` — 3 passed
+- `CI=1 pnpm test:e2e e2e/login.spec.ts -g "magic link form"` — 1 passed
+
+---
+
+## 2026-06-08 — `/fetchname` search page + session refresh E2E
+
+### What was built and why
+
+Public single-name duplicate check on `/fetchname` and API contract tests for `POST /api/auth/session/refresh` after bio/settings DB updates (UI only calls refresh on avatar today; tests validate the endpoint returns fresh fields).
+
+### Files created
+
+- `e2e/fetchname.spec.ts`
+- `e2e/session-refresh.spec.ts`
+- `e2e/helpers/fetchname-ui.ts`
+
+### Files modified
+
+- `TESTING.md`, `CHANGES.md`
+
+### Patterns followed
+
+- Reused `clickNameExistsSearch` pattern from `e2e/helpers/addnames-ui.ts` (`#checkExists` + Search button with svg)
+- Session refresh tests mirror `profile-bio.spec.ts` / `editsettings.spec.ts` API PUT flows
+
+### TODOs
+
+- Wire `POST /api/auth/session/refresh` + `session.update()` into bio/settings UI (avatar upload already does)
+
+### Problems encountered
+
+- Seeded name appears in duplicate message and listing — strict mode violation on `getByText(SEED_NAME)`; assert listing via `span.font-bold` filter instead.
+
+### Verification
+
+- `CI=1 pnpm test:e2e e2e/fetchname.spec.ts e2e/session-refresh.spec.ts` — 8 passed (after locator fix)

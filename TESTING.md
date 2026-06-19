@@ -143,6 +143,7 @@ Playwright maps `MONGODB_URI_TEST` → `MONGODB_URI` when starting the server. `
 - `/login?error=UserNotFound` → user not found toast (credentials signIn redirect)
 - `/login?error=DBUnavailable` → database unavailable toast
 - Magic link `POST /api/auth/signin/email` for banned email → redirect `?error=Banned`
+- Magic link form (valid seeded email) → `/magiclink?email=…` confirmation page
 - Credentials login → logged-in nav (profile menu)
 
 **`e2e/addnames.spec.ts`**
@@ -248,6 +249,30 @@ Playwright maps `MONGODB_URI_TEST` → `MONGODB_URI` when starting the server. `
 - Name detail — content owner ⋮ menu shows Delete only (no Suggestion/Report)
 - Description detail — same Suggestion / Report / owner-menu flows on admin-owned and user-owned seeded descriptions
 
+**`e2e/delete-content.spec.ts`**
+
+- Owner creates unique name → deletes from `/name/[name]` via ⋮ menu → success toast, content shows `DELETED`, duplicate check no longer matches
+
+**`e2e/forgot-password.spec.ts`**
+
+- `POST /api/forgotpassword` unknown email → 404
+- UI unknown email → same non-enumeration success message (green alert)
+- UI unknown + known email with stubbed 200 API → identical success copy
+
+**`e2e/fetchname.spec.ts`**
+
+- `/fetchname` — public page loads (`#checkExists`, Search button)
+- Search seeded name → duplicate message + seeded content visible
+- Search punctuation variant → duplicate message
+- Search unique name → “not in the database” success message
+- Invalid `@` character → warning + disabled Search
+
+**`e2e/session-refresh.spec.ts`**
+
+- `POST /api/auth/session/refresh` unauthenticated → 401
+- After `PUT /api/user/editbiolocationavatar` → refresh returns updated `bio`
+- After `PUT /api/auth/update` name change → refresh returns updated `name`
+
 **`e2e/fetchnames-cooldown.spec.ts`**
 
 - `/fetchnames` — sort dropdown change → ~3s cooldown (disabled select + wait option text)
@@ -327,11 +352,16 @@ These manual checklist items are **done in Playwright**; see spec files in [What
 | Likes + follow API + rate limit | `social.spec.ts` |
 | Notifications API + UI mark-read | `notifications.spec.ts`, `notifications-ui.spec.ts` |
 | Thanks / suggestion / report | `thanks-ui.spec.ts`, `moderation.spec.ts`, `moderation-ui.spec.ts` |
+| Owner delete content | `delete-content.spec.ts` |
+| Forgot password (non-enumeration UX) | `forgot-password.spec.ts` |
+| Magic link confirmation UI | `login.spec.ts` |
 | Data shape + detail pages | `browse.spec.ts`, `data-shape.spec.ts` |
 | Listing cooldowns | `fetchnames-cooldown.spec.ts`, `fetchdescriptions-cooldown.spec.ts` |
 | Register (captcha bypass) + default avatar | `register.spec.ts` |
 | Landing videos (stubbed YouTube) | `landing-videos.spec.ts` |
 | Edit settings | `editsettings.spec.ts` |
+| Single name search (`/fetchname`) | `fetchname.spec.ts` |
+| Session refresh after profile/settings DB change | `session-refresh.spec.ts` |
 | Contact validation (no real captcha) | `contact.spec.ts` |
 
 ---

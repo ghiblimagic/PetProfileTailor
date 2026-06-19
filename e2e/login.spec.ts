@@ -102,4 +102,27 @@ test.describe("Login page", () => {
     expect(result.status).toBe(200);
     expectSignInRedirectParam(result.url, "Banned");
   });
+
+  test("magic link form navigates to confirmation page for valid email", async ({
+    page,
+  }) => {
+    const creds = getPlaywrightCredentials();
+    test.skip(!creds, "PLAYWRIGHT_TEST_EMAIL/PASSWORD not set");
+
+    await page.goto("/login");
+    await page.evaluate(() => localStorage.removeItem("lastRecheck-MagicLink}"));
+
+    const magicSection = page.locator("section.bg-secondary");
+    await magicSection.locator("#magiclinkemail").fill(creds!.email);
+    await magicSection.getByRole("button", { name: "Sign in" }).click();
+
+    await expect(page).toHaveURL(
+      new RegExp(`/magiclink\\?email=${encodeURIComponent(creds!.email)}`),
+      { timeout: 15_000 },
+    );
+    await expect(
+      page.getByRole("heading", { name: /Magic link request sent!/i }),
+    ).toBeVisible();
+    await expect(page.getByText(`Sent to: ${creds!.email}`)).toBeVisible();
+  });
 });
