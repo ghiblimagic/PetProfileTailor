@@ -54,6 +54,9 @@ export default function Login() {
       } else if (error === "UserNotFound") {
         toast.error("User not found.");
         hasShownError.current = true;
+      } else if (error === "DBUnavailable") {
+        toast.error("Database unavailable. Please try again later.");
+        hasShownError.current = true;
       }
     }
   }, [error]);

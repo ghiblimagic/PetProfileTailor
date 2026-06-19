@@ -56,3 +56,27 @@ test.describe("Landing page videos", () => {
     await expectLandingVideoLoaded(page, fitting.embedId, fitting.title);
   });
 });
+
+test.describe("Landing page videos (embed network)", () => {
+  test("opening a video requests the real YouTube embed URL", async ({ page }) => {
+    const video = LANDING_VIDEOS.fun;
+    const embedRequest = page.waitForRequest(
+      (req) =>
+        req.url().includes("youtube-nocookie.com/embed/") &&
+        req.url().includes(video.embedId),
+      { timeout: 15_000 },
+    );
+
+    await gotoLandingPage(page);
+    await openLandingVideoButton(page, video.buttonLabel);
+
+    const request = await embedRequest;
+    expect(request.url()).toContain(`embed/${video.embedId}`);
+
+    await expect(landingVideoIframe(page, video.embedId)).toHaveCount(1);
+    await expect(landingVideoIframe(page, video.embedId)).toHaveAttribute(
+      "src",
+      `https://www.youtube-nocookie.com/embed/${video.embedId}`,
+    );
+  });
+});

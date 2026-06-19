@@ -6121,3 +6121,33 @@ Removed stale manual checkboxes that duplicated E2E coverage; manual section now
 - Contact/register/magic-link manual checks when Resend + reCAPTCHA keys are configured
 - Admin edit category/tag E2E when edit routes exist
 
+---
+
+## 2026-06-08 — Optional E2E backlog (login errors, magic link ban, notifications shape, YouTube network)
+
+### What was built and why
+
+Completed the “optional future E2E” list from `TESTING.md`: DBUnavailable toast, magic-link banned redirect via NextAuth API, notification API `leanWithStrings` asserts, and real YouTube embed URL request (no stub).
+
+### Files created
+
+- `e2e/helpers/magic-link.ts` — `postEmailSignIn`, `expectSignInRedirectParam` (handles relative redirect URLs)
+
+### Files modified
+
+- `components/login.tsx` — `?error=DBUnavailable` toast
+- `e2e/login.spec.ts` — DBUnavailable toast + magic-link banned API test
+- `e2e/data-shape.spec.ts` — notification names/descriptions/thanks `_id` / no `__v`
+- `e2e/helpers/data-shape.ts` — like/thank notification shape helpers
+- `e2e/landing-videos.spec.ts` — embed network test (separate describe, no YouTube stub)
+- `docs/notes/app/auth-pages.md`, `TESTING.md`, `CHANGES.md`
+
+### Problems encountered
+
+- NextAuth `json: true` sign-in returns a relative redirect URL (`/login?error=Banned`); `new URL(url)` threw — fixed by resolving against `NEXTAUTH_URL` / localhost origin.
+
+### Verification
+
+- `CI=1 pnpm test:e2e e2e/login.spec.ts -g "magic link sign-in for banned"` — 1 passed
+- Prior run: notification data-shape (3), DBUnavailable toast, YouTube network — all passed
+

@@ -33,7 +33,7 @@
 - **Deferred dashboard redirect** — `setRedirect(true)` then `useEffect` waits for `session` from `useSession()` before `router.replace("/dashboard")` (redirect was firing too early).
 - **Magic link** — `signIn("email", { redirect: false })`; always send user to `/magiclink?email=…` when `result` is truthy (no hint whether email exists). Honeypot field `website` blocks bots.
 - **Cooldown** — `useLocalStorageCooldown` rate-limits magic-link requests.
-- **Query errors** — `?error=Banned` / `?error=UserNotFound` from [`lib/auth` signIn callback](../lib/auth.md) shown once via toast.
+- **Query errors** — `?error=Banned` / `?error=UserNotFound` / `?error=DBUnavailable` from [`lib/auth` signIn callback](../lib/auth.md) shown once via toast.
 
 ### `forgotpassword.tsx`
 

@@ -4,6 +4,10 @@ import {
   loginWithCredentials,
 } from "./helpers/auth";
 import { getPlaywrightBannedCredentials } from "./fixtures/seed-data";
+import {
+  expectSignInRedirectParam,
+  postEmailSignIn,
+} from "./helpers/magic-link";
 
 test.describe("Login page", () => {
   test("shows magic link section and register link", async ({ page }) => {
@@ -75,5 +79,27 @@ test.describe("Login page", () => {
       page.getByRole("alert").filter({ hasText: /user not found/i }),
     ).toBeVisible({ timeout: 15_000 });
     await expect(page).toHaveURL(/\/login/);
+  });
+
+  test("shows database unavailable toast when redirected with ?error=DBUnavailable", async ({
+    page,
+  }) => {
+    await page.goto("/login?error=DBUnavailable");
+
+    await expect(
+      page.getByRole("alert").filter({ hasText: /database unavailable/i }),
+    ).toBeVisible({ timeout: 15_000 });
+    await expect(page).toHaveURL(/\/login/);
+  });
+
+  test("magic link sign-in for banned email redirects with ?error=Banned", async ({
+    request,
+  }) => {
+    const creds = getPlaywrightBannedCredentials();
+    test.skip(!creds, "Banned user not configured (run pnpm seed:e2e)");
+
+    const result = await postEmailSignIn(request, creds!.email);
+    expect(result.status).toBe(200);
+    expectSignInRedirectParam(result.url, "Banned");
   });
 });

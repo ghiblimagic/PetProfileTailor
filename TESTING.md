@@ -88,11 +88,13 @@ Playwright maps `MONGODB_URI_TEST` → `MONGODB_URI` when starting the server. `
 - `/` — Fun / Impactful / Fitting buttons each open `youtube-nocookie.com` iframe with expected `embedId` and `title`
 - Iframe `onLoad` reveals embed + close button (YouTube stubbed in test)
 - Close X and toggle-click hide embed; only one video open at a time
+- **Embed network** (no stub) — opening a video requests real `youtube-nocookie.com/embed/{id}` URL
 
 **`e2e/data-shape.spec.ts`**
 
 - `GET` name/description `check-if-content-exists` — string `_id` on document, `createdBy`, tags; no `__v`
 - `GET /api/user/likes` — `id` and `contentId` are strings; no `__v`
+- `GET /api/notifications/names|descriptions|thanks` — populated nested `_id` strings; no `__v` (serial; admin action + user fetch)
 
 **`e2e/blocklist-api.spec.ts`**
 
@@ -139,6 +141,8 @@ Playwright maps `MONGODB_URI_TEST` → `MONGODB_URI` when starting the server. `
 - Banned account credentials → ban error toast, stay on `/login` (seeded `e2e-banned@example.com`)
 - `/login?error=Banned` → ban toast (signIn redirect path)
 - `/login?error=UserNotFound` → user not found toast (credentials signIn redirect)
+- `/login?error=DBUnavailable` → database unavailable toast
+- Magic link `POST /api/auth/signin/email` for banned email → redirect `?error=Banned`
 - Credentials login → logged-in nav (profile menu)
 
 **`e2e/addnames.spec.ts`**
@@ -305,12 +309,9 @@ Checkboxes below are for **dev-only** work automation cannot do (real captcha, e
 | Admin — **edit** existing category/tag in UI | No edit routes; create is E2E’d in `e2e/admin-category-ui.spec.ts` |
 | Profile **follow / unfollow** via UI | Modals commented out — see [`docs/FUTURE.md`](docs/FUTURE.md); API follow in `e2e/social.spec.ts` |
 
-### Optional future E2E (not in manual backlog)
+### Optional future E2E
 
-- `/login?error=DBUnavailable` toast
-- Magic-link banned user → `/login?error=Banned` (unit: `resolveSignInCallback.test.ts`)
-- Real YouTube playback on `/` (embed load is stubbed in `e2e/landing-videos.spec.ts`)
-- More `leanWithStrings` asserts (notifications APIs, etc.) beyond `e2e/data-shape.spec.ts`
+All items from this list are now covered in Playwright (see specs above).
 
 ### Tier-2 backlog — automated (reference only)
 
