@@ -181,6 +181,7 @@ Playwright maps `MONGODB_URI_TEST` → `MONGODB_URI` when starting the server. `
 
 - Clear name → client validation error (`Please enter a name`)
 - Update display name → `PUT /api/auth/update` 200, success toast, persists on profile + API lookup
+- Update password via settings form → success toast, login with new password works, old password rejected
 
 **`e2e/admin.spec.ts`**
 

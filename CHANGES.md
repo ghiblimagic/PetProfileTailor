@@ -6244,3 +6244,24 @@ Owner description delete mirrors name delete; reset-password flow E2E with test 
 ### Verification
 
 - `CI=1 pnpm test:e2e e2e/delete-content.spec.ts e2e/reset-password.spec.ts`
+
+---
+
+## 2026-06-08 — Edit settings password change E2E
+
+### What was built and why
+
+Authenticated password update via `/editsettings` — disposable registered user avoids mutating shared `PLAYWRIGHT_TEST_EMAIL` credentials used by other specs.
+
+### Files modified
+
+- `e2e/editsettings.spec.ts` — password change + re-login + old password rejected
+- `TESTING.md`, `CHANGES.md`
+
+### Patterns followed
+
+- Same disposable-user approach as `e2e/reset-password.spec.ts`
+
+### Verification
+
+- `CI=1 pnpm test:e2e e2e/editsettings.spec.ts -g "password change"` — 1 passed
