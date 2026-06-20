@@ -6215,3 +6215,32 @@ Public single-name duplicate check on `/fetchname` and API contract tests for `P
 ### Verification
 
 - `CI=1 pnpm test:e2e e2e/fetchname.spec.ts e2e/session-refresh.spec.ts` — 8 passed (after locator fix)
+
+---
+
+## 2026-06-08 — Description delete UI + reset password E2E
+
+### What was built and why
+
+Owner description delete mirrors name delete; reset-password flow E2E with test hook (no Resend). **`PUT /api/auth/update` production fix:** unauthenticated reset path when user has valid `passwordResetToken` (reset page was calling update while logged out → 401).
+
+### Files created
+
+- `e2e/reset-password.spec.ts`
+- `e2e/helpers/reset-password.ts`
+- `app/api/test/e2e/set-password-reset-token/route.ts`
+
+### Files modified
+
+- `app/api/auth/update/route.ts` — password reset branch without session
+- `e2e/delete-content.spec.ts` — description delete test
+- `e2e/helpers/delete-content-ui.ts` — `createUniqueDescriptionViaUi`
+- `docs/notes/app/api/auth-update-route.md`, `TESTING.md`, `CHANGES.md`
+
+### Problems encountered
+
+- Reset password UI could never succeed before fix — `auth/update` required session; added token-gated unauthenticated branch.
+
+### Verification
+
+- `CI=1 pnpm test:e2e e2e/delete-content.spec.ts e2e/reset-password.spec.ts`

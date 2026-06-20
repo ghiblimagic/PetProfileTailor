@@ -17,18 +17,43 @@ type AuthUpdateBody = {
 
 export async function PUT(req: Request) {
   const body = (await req.json()) as AuthUpdateBody;
-  const { name, email, password } = body;
+  const { name, email, password, userid } = body;
 
   if (!name || !email || !email.includes("@")) {
     return NextResponse.json({ message: "Validation error" }, { status: 422 });
   }
 
-  const auth = await getSessionForApis({ req });
-  if (!auth.ok) {
-    return NextResponse.json({ message: "Not authenticated" }, { status: 401 });
-  }
-
   await db.connect();
+
+  const auth = await getSessionForApis({ req });
+
+  if (!auth.ok) {
+    if (!password || !userid) {
+      return NextResponse.json({ message: "Not authenticated" }, { status: 401 });
+    }
+
+    const resetUser = await User.findOne({
+      _id: userid,
+      email: email.toLowerCase().trim(),
+      passwordResetToken: { $exists: true, $ne: null },
+      resetTokenExpires: { $gt: Date.now() },
+    });
+
+    if (!resetUser) {
+      return NextResponse.json(
+        { message: "Invalid or expired reset token" },
+        { status: 401 },
+      );
+    }
+
+    resetUser.name = name;
+    resetUser.password = bcryptjs.hashSync(password);
+    resetUser.passwordResetToken = undefined;
+    resetUser.resetTokenExpires = undefined;
+    await resetUser.save();
+
+    return NextResponse.json({ message: "User updated" });
+  }
 
   const userId = auth.session.user.id;
   const toUpdateUser = await User.findById(userId);

@@ -252,6 +252,12 @@ Playwright maps `MONGODB_URI_TEST` → `MONGODB_URI` when starting the server. `
 **`e2e/delete-content.spec.ts`**
 
 - Owner creates unique name → deletes from `/name/[name]` via ⋮ menu → success toast, content shows `DELETED`, duplicate check no longer matches
+- Owner creates unique description → deletes from `/description/[id]` via ⋮ menu → same success + duplicate check no longer matches
+
+**`e2e/reset-password.spec.ts`**
+
+- `/resetpassword/[token]` invalid token → error message, password fields disabled
+- E2E token hook → reset form → auto sign-in → new password works on manual login
 
 **`e2e/forgot-password.spec.ts`**
 
@@ -353,6 +359,7 @@ These manual checklist items are **done in Playwright**; see spec files in [What
 | Notifications API + UI mark-read | `notifications.spec.ts`, `notifications-ui.spec.ts` |
 | Thanks / suggestion / report | `thanks-ui.spec.ts`, `moderation.spec.ts`, `moderation-ui.spec.ts` |
 | Owner delete content | `delete-content.spec.ts` |
+| Reset password (token + new password login) | `reset-password.spec.ts` |
 | Forgot password (non-enumeration UX) | `forgot-password.spec.ts` |
 | Magic link confirmation UI | `login.spec.ts` |
 | Data shape + detail pages | `browse.spec.ts`, `data-shape.spec.ts` |
