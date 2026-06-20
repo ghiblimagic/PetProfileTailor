@@ -53,6 +53,34 @@ test.describe("POST /api/auth/session/refresh", () => {
       expect(body.bio).toBe(bio);
     });
 
+    test("returns updated location after profile location save", async ({
+      page,
+    }) => {
+      const location = `E2E refresh location ${Date.now().toString(36)}`;
+      const bio = `E2E refresh bio keep ${Date.now().toString(36)}`;
+
+      const saveResponse = await page.request.put(
+        "/api/user/editbiolocationavatar",
+        {
+          data: {
+            bioSubmission: {
+              bio,
+              location,
+            },
+          },
+        },
+      );
+      expect(saveResponse.ok()).toBeTruthy();
+
+      const refreshResponse = await page.request.post(
+        "/api/auth/session/refresh",
+      );
+      expect(refreshResponse.ok()).toBeTruthy();
+
+      const body = (await refreshResponse.json()) as SessionRefreshResponse;
+      expect(body.location).toBe(location);
+    });
+
     test("returns updated name after settings save", async ({ page }) => {
       const creds = getPlaywrightCredentials()!;
       const updatedName = `E2E Refresh ${Date.now().toString(36)}`;

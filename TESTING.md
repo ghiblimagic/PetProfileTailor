@@ -133,6 +133,7 @@ Playwright maps `MONGODB_URI_TEST` → `MONGODB_URI` when starting the server. `
 - `PUT /api/user/editbiolocationavatar` with blocklisted bio → 403 + `blockedBy` in JSON
 - Profile edit UI — blocklisted bio → server message in error toast
 - API + UI — valid bio saves and appears on `/profile/[profilename]` (lookup + About text)
+- API + UI — location saves and appears on profile page (lookup + location row)
 
 **`e2e/login.spec.ts`**
 
@@ -176,6 +177,7 @@ Playwright maps `MONGODB_URI_TEST` → `MONGODB_URI` when starting the server. `
 - Profile menu → Profile link visible
 - Sign out → login again → session restored
 - Mid-session ban (`POST /api/test/e2e/set-user-status`) → `/api/auth/session` null → reload → `/login`
+- Mid-session unban after ban → sign-in with credentials works again
 
 **`e2e/editsettings.spec.ts`**
 
@@ -278,6 +280,7 @@ Playwright maps `MONGODB_URI_TEST` → `MONGODB_URI` when starting the server. `
 
 - `POST /api/auth/session/refresh` unauthenticated → 401
 - After `PUT /api/user/editbiolocationavatar` → refresh returns updated `bio`
+- After location save → refresh returns updated `location`
 - After `PUT /api/auth/update` name change → refresh returns updated `name`
 
 **`e2e/fetchnames-cooldown.spec.ts`**

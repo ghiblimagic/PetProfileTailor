@@ -65,6 +65,7 @@ export async function lookupUserByProfileName(
   profileName: string;
   profileImage?: string;
   bio?: string;
+  location?: string;
   name?: string;
   followers: string[];
 }> {
@@ -78,6 +79,7 @@ export async function lookupUserByProfileName(
     profileName: string;
     profileImage?: string;
     bio?: string;
+    location?: string;
     name?: string;
     followers?: Array<string | { _id: string }>;
   };
@@ -91,6 +93,7 @@ export async function lookupUserByProfileName(
     profileName: user.profileName,
     profileImage: user.profileImage,
     bio: user.bio,
+    location: user.location,
     name: user.name,
     followers,
   };

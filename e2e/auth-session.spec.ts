@@ -99,4 +99,43 @@ test.describe("Auth & session", () => {
       await expect(page).toHaveURL(/\/login/, { timeout: 15_000 });
     });
   });
+
+  test.describe("mid-session unban", () => {
+    test.describe.configure({ mode: "serial" });
+
+    test.afterEach(async ({ page }) => {
+      await restorePlaywrightTestUserStatus(page);
+    });
+
+    test("unban after mid-session ban allows sign-in again", async ({ page }) => {
+      test.skip(!getPlaywrightCredentials(), "PLAYWRIGHT_TEST_EMAIL/PASSWORD not set");
+      test.setTimeout(90_000);
+
+      const creds = getPlaywrightCredentials()!;
+
+      await loginWithCredentials(page);
+      await page.goto("/dashboard");
+      await expect(page.getByText(/Welcome Back/i)).toBeVisible({
+        timeout: 15_000,
+      });
+
+      await setE2eUserStatus(page, "banned");
+
+      const sessionResponse = await page.request.get("/api/auth/session");
+      const sessionJson = await sessionResponse.json();
+      expect(sessionJson).toBeNull();
+
+      await page.reload();
+      await expect(page).toHaveURL(/\/login/, { timeout: 15_000 });
+
+      await setE2eUserStatus(page, "active", { email: creds.email });
+      await page.context().clearCookies();
+
+      await loginWithCredentials(page);
+      await page.goto("/dashboard");
+      await expect(page.getByText(/Welcome Back/i)).toBeVisible({
+        timeout: 15_000,
+      });
+    });
+  });
 });

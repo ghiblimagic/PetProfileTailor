@@ -15,6 +15,13 @@ export async function fillProfileBio(page: Page, bio: string): Promise<void> {
   await profileBioModal(page).locator("textarea").fill(bio);
 }
 
+export async function fillProfileLocation(
+  page: Page,
+  location: string,
+): Promise<void> {
+  await profileBioModal(page).locator("#location").fill(location);
+}
+
 export async function saveProfileBioEdit(
   page: Page,
   options?: { expectOk?: boolean },

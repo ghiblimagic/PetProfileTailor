@@ -6265,3 +6265,29 @@ Authenticated password update via `/editsettings` — disposable registered user
 ### Verification
 
 - `CI=1 pnpm test:e2e e2e/editsettings.spec.ts -g "password change"` — 1 passed
+
+---
+
+## 2026-06-08 — Mid-session unban + profile location E2E
+
+### What was built and why
+
+Round out session invalidation (unban → can sign in again) and location field coverage mirroring bio tests (API, UI, session refresh).
+
+### Files modified
+
+- `e2e/auth-session.spec.ts` — mid-session unban test
+- `e2e/profile-bio.spec.ts` — profile location API + UI tests
+- `e2e/session-refresh.spec.ts` — location refresh assert
+- `e2e/helpers/profile.ts` — `fillProfileLocation`
+- `e2e/helpers/seed-lookup.ts` — `location` on user lookup
+- `TESTING.md`, `CHANGES.md`
+
+### Problems encountered
+
+- Unban re-login timed out at 30s — extended timeout; `clearCookies()` after unban clears stale JWT before credentials login.
+
+### Verification
+
+- `CI=1 pnpm test:e2e e2e/auth-session.spec.ts -g "unban after"` — 1 passed
+- `CI=1 pnpm test:e2e e2e/profile-bio.spec.ts -g location e2e/session-refresh.spec.ts -g location` — 3 passed
