@@ -4,9 +4,9 @@
  */
 import User from "@models/User";
 import db from "@utils/db";
-import crypto from "crypto";
 import { Resend } from "resend";
 import { ResetPasswordEmail } from "@components/EmailTemplates/reset-password-template";
+import { createPasswordResetToken } from "@/utils/api/passwordResetToken";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
@@ -29,18 +29,12 @@ export async function POST(req: Request) {
     return Response.json({ message: "Email does not exist" }, { status: 404 });
   }
 
-  const emailResetPasswordToken = crypto.randomBytes(20).toString("hex");
-  const databaseResetPasswordToken = crypto
-    .createHash("sha256")
-    .update(emailResetPasswordToken)
-    .digest("hex");
+  const { plainToken, hashedToken, expiresAt } = createPasswordResetToken();
 
-  const passwordResetExpires = Date.now() + 3600000;
+  existingUser.passwordResetToken = hashedToken;
+  existingUser.resetTokenExpires = expiresAt;
 
-  existingUser.passwordResetToken = databaseResetPasswordToken;
-  existingUser.resetTokenExpires = new Date(passwordResetExpires);
-
-  const resetUrl = `${process.env.NEXTAUTH_URL}/resetpassword/${emailResetPasswordToken}`;
+  const resetUrl = `${process.env.NEXTAUTH_URL}/resetpassword/${plainToken}`;
   const userName = existingUser.profileName;
 
   try {

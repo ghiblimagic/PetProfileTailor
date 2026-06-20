@@ -6291,3 +6291,27 @@ Round out session invalidation (unban → can sign in again) and location field 
 
 - `CI=1 pnpm test:e2e e2e/auth-session.spec.ts -g "unban after"` — 1 passed
 - `CI=1 pnpm test:e2e e2e/profile-bio.spec.ts -g location e2e/session-refresh.spec.ts -g location` — 3 passed
+
+---
+
+## 2026-06-08 — Unit tests: like toggle limit, password reset hash, auth update reset, ObjectId
+
+### What was built and why
+
+Four high-value pure-logic gaps: extracted shared password-reset hashing + auth-update reset filters; added Vitest coverage for like-toggle rate limit wrapper and ObjectId conversion.
+
+### Files created
+
+- `utils/api/passwordResetToken.ts`, `passwordResetToken.test.ts`
+- `utils/api/authPasswordResetUpdate.ts`, `authPasswordResetUpdate.test.ts`
+- `utils/api/likeToggleRateLimit.test.ts`
+- `utils/stringManipulation/convertStringToMongooseId.test.ts`
+
+### Files modified
+
+- `app/api/forgotpassword/route.ts`, `app/api/verifyresetpasstoken/route.ts`, `app/api/auth/update/route.ts`, `app/api/test/e2e/set-password-reset-token/route.ts` — use shared helpers
+- `TESTING.md`, `docs/notes/app/api/auth-update-route.md`, `CHANGES.md`
+
+### Verification
+
+- `pnpm test utils/api/passwordResetToken.test.ts utils/api/authPasswordResetUpdate.test.ts utils/api/likeToggleRateLimit.test.ts utils/stringManipulation/convertStringToMongooseId.test.ts`

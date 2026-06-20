@@ -35,6 +35,9 @@ Vitest + E2E green covers validation logic and the flows listed below. Manual ch
 | Area | Tests |
 |------|-------|
 | API auth guards | `checkOwnership.test.ts`, `checkIfAdmin.test.ts`, `getSessionForApis.test.ts`, `lib/auth.test.ts` (callbacks + credentials `authorize`; `resolveSignInCallback.test.ts` for signIn branching) |
+| Password reset + auth update | `passwordResetToken.test.ts`, `authPasswordResetUpdate.test.ts` |
+| Like toggle rate limit | `likeToggleRateLimit.test.ts` (wraps `rateLimiter`; E2E strict header + 429 response shape) |
+| ObjectId conversion | `convertStringToMongooseId.test.ts` |
 | User likes prefetch | `getUserLikes.test.ts`, `LikesContext.test.tsx` (SSR hydrate, fetch, logout) |
 | Notifications context | `notificationsContext.test.tsx` (fetch counts, logout clear, `resetNotificationType` PATCH) |
 | Client cooldown | `useLocalStorageCooldown.test.ts` (localStorage gate, trigger, countdown) |

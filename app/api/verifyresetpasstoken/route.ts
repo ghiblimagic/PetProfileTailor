@@ -4,8 +4,11 @@
  */
 import User from "@models/User";
 import db from "@utils/db";
-import crypto from "crypto";
 import { NextResponse } from "next/server";
+import {
+  buildVerifyResetTokenFilter,
+} from "@/utils/api/authPasswordResetUpdate";
+import { hashPasswordResetToken } from "@/utils/api/passwordResetToken";
 
 type VerifyResetBody = {
   token?: string;
@@ -23,12 +26,9 @@ export async function POST(req: Request) {
 
   await db.connect();
 
-  const hashedToken = crypto.createHash("sha256").update(token).digest("hex");
+  const hashedToken = hashPasswordResetToken(token);
 
-  const user = await User.findOne({
-    passwordResetToken: hashedToken,
-    resetTokenExpires: { $gt: Date.now() },
-  });
+  const user = await User.findOne(buildVerifyResetTokenFilter(hashedToken));
 
   if (!user) {
     return NextResponse.json(

@@ -6,6 +6,10 @@ import bcryptjs from "bcryptjs";
 import User from "@models/User";
 import db from "@utils/db";
 import { getSessionForApis } from "@/utils/api/getSessionForApis";
+import {
+  buildPasswordResetUserFilter,
+  isUnauthenticatedPasswordResetAttempt,
+} from "@/utils/api/authPasswordResetUpdate";
 import { NextResponse } from "next/server";
 
 type AuthUpdateBody = {
@@ -28,16 +32,13 @@ export async function PUT(req: Request) {
   const auth = await getSessionForApis({ req });
 
   if (!auth.ok) {
-    if (!password || !userid) {
+    if (!isUnauthenticatedPasswordResetAttempt({ password, userid })) {
       return NextResponse.json({ message: "Not authenticated" }, { status: 401 });
     }
 
-    const resetUser = await User.findOne({
-      _id: userid,
-      email: email.toLowerCase().trim(),
-      passwordResetToken: { $exists: true, $ne: null },
-      resetTokenExpires: { $gt: Date.now() },
-    });
+    const resetUser = await User.findOne(
+      buildPasswordResetUserFilter(userid!, email),
+    );
 
     if (!resetUser) {
       return NextResponse.json(
