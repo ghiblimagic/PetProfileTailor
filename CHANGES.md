@@ -6358,3 +6358,39 @@ Simplified to `(prev: T) => T` (matches `useState` updater); removed overloads a
 ## 2026-06-08 — delete helper param rename deletedContentId
 
 Unified `itemId` / `targetId` → `deletedContentId` in `removeDeletedItemFromSwrPages` and `applyOptimisticDeleteToContent`.
+
+---
+
+## 2026-06-08 — Unit tests: remaining hook + auth/update coverage
+
+### What was built and why
+
+Closed the last planned unit/hook gaps from the tier-2 backlog: `setLocalData` delete path, SWR pagination fetcher GET vs POST, and route-level smoke tests for `PUT /api/auth/update` (validation, unauthenticated reset branch).
+
+### Files created
+
+- `app/api/auth/update/route.test.ts`
+
+### Files modified
+
+- `hooks/useSwrPagination.ts` — export `swrPaginationFetcher` for direct testing
+- `hooks/useSwrPagination.test.ts` — fetcher GET/POST cases
+- `hooks/useDeleteConfirmation.test.ts` — optimistic `setLocalData` + rollback on failure
+- `TESTING.md`, `CHANGES.md`
+
+### Verification
+
+- `pnpm test hooks/useDeleteConfirmation.test.ts hooks/useSwrPagination.test.ts app/api/auth/update/route.test.ts` — 26 passed
+
+### Next logical step
+
+Optional E2E backlog only (expired reset token, profile location blocklist, forgot-password known email 200 with Resend).
+
+---
+
+## 2026-06-08 — useSwrPagination.test ContentListingItem fixture
+
+Fixed TypeScript error: `buildSwrPaginationGetKey` expects `SwrPage` rows typed as `ContentListingItem` (`LikeableContent` + `EditableContent`), not bare `{ _id }`. Added `mockListingItem()` helper and typed SWR mock state as `SwrPage[]`.
+
+- `hooks/useSwrPagination.test.ts`
+- `CHANGES.md`

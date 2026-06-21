@@ -1,21 +1,34 @@
 import { renderHook } from "@testing-library/react";
 import { vi } from "vitest";
+import type { ContentListingItem } from "@/components/ShowingListOfContent/ContentListing";
 import {
   buildSwrPaginationGetKey,
   shouldSkipSwrPaginationForLikes,
+  swrPaginationFetcher,
   useSwrPagination,
+  type SwrPage,
 } from "./useSwrPagination";
+
+function mockListingItem(
+  overrides: Partial<ContentListingItem> = {},
+): ContentListingItem {
+  return {
+    _id: "item-1",
+    content: "Test content",
+    tags: [],
+    likedByCount: 0,
+    createdBy: { _id: "user-1" },
+    ...overrides,
+  };
+}
 
 const mocks = vi.hoisted(() => {
   const state = {
     getKey: null as
-      | ((
-          pageIndex: number,
-          previousPageData: { data: { _id: string }[] } | null,
-        ) => unknown)
+      | ((pageIndex: number, previousPageData: SwrPage | null) => unknown)
       | null,
     getLikedIds: vi.fn(() => [] as string[]),
-    data: undefined as { data: { _id: string }[]; totalDocs?: number }[] | undefined,
+    data: undefined as SwrPage[] | undefined,
   };
 
   return {
@@ -84,7 +97,7 @@ describe("buildSwrPaginationGetKey", () => {
     ]);
 
     expect(
-      buildSwrPaginationGetKey(2, { data: [{ _id: "n1" }] }, {
+      buildSwrPaginationGetKey(2, { data: [mockListingItem({ _id: "n1" })] }, {
         dataType: "names",
         ...baseParams,
       }),
@@ -162,6 +175,55 @@ describe("buildSwrPaginationGetKey", () => {
   });
 });
 
+describe("swrPaginationFetcher", () => {
+  const fetchMock = vi.fn();
+
+  beforeEach(() => {
+    fetchMock.mockResolvedValue({
+      ok: true,
+      json: () => Promise.resolve({ data: [], totalDocs: 0 }),
+    });
+    vi.stubGlobal("fetch", fetchMock);
+  });
+
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
+  it("uses GET for a plain URL key", async () => {
+    await swrPaginationFetcher("/api/names/swr?page=1");
+
+    expect(fetchMock).toHaveBeenCalledWith("/api/names/swr?page=1", {
+      method: "GET",
+      headers: { "Content-Type": "application/json" },
+      body: undefined,
+    });
+  });
+
+  it("uses GET when the tuple has an empty options object", async () => {
+    await swrPaginationFetcher(["/api/names/swr?page=1", {}]);
+
+    expect(fetchMock).toHaveBeenCalledWith("/api/names/swr?page=1", {
+      method: "GET",
+      headers: { "Content-Type": "application/json" },
+      body: undefined,
+    });
+  });
+
+  it("uses POST with JSON body when filters are present", async () => {
+    await swrPaginationFetcher([
+      "/api/names/swr?page=1",
+      { body: { tags: ["e2e-tag"], likedIds: ["id-1"] } },
+    ]);
+
+    expect(fetchMock).toHaveBeenCalledWith("/api/names/swr?page=1", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ tags: ["e2e-tag"], likedIds: ["id-1"] }),
+    });
+  });
+});
+
 describe("useSwrPagination", () => {
   beforeEach(() => {
     mocks.state.data = undefined;
@@ -204,8 +266,14 @@ describe("useSwrPagination", () => {
 
   it("flattens SWR pages and computes total pages", () => {
     mocks.state.data = [
-      { data: [{ _id: "a" }, { _id: "b" }], totalDocs: 25 },
-      { data: [{ _id: "c" }] },
+      {
+        data: [
+          mockListingItem({ _id: "a" }),
+          mockListingItem({ _id: "b" }),
+        ],
+        totalDocs: 25,
+      },
+      { data: [mockListingItem({ _id: "c" })] },
     ];
 
     const { result } = renderHook(() =>
@@ -216,7 +284,11 @@ describe("useSwrPagination", () => {
       }),
     );
 
-    expect(result.current.data).toEqual([{ _id: "a" }, { _id: "b" }, { _id: "c" }]);
+    expect(result.current.data).toEqual([
+      mockListingItem({ _id: "a" }),
+      mockListingItem({ _id: "b" }),
+      mockListingItem({ _id: "c" }),
+    ]);
     expect(result.current.totalItems).toBe(25);
     expect(result.current.totalPagesInDatabase).toBe(3);
   });

@@ -1,4 +1,5 @@
 import { act, renderHook } from "@testing-library/react";
+import type { SetStateAction } from "react";
 import { vi } from "vitest";
 import {
   applyOptimisticDeleteToContent,
@@ -161,5 +162,66 @@ describe("useDeleteConfirmation", () => {
 
     expect(customMutate).toHaveBeenCalledTimes(2);
     expect(customMutate.mock.calls[1][0]).toBeUndefined();
+  });
+
+  it("confirmDelete marks standalone local content DELETED optimistically", async () => {
+    type ContentRow = { _id: string; content: string };
+    let localContent: ContentRow = { _id: "item-1", content: "Hello" };
+    const setLocalData = vi.fn((updater: SetStateAction<ContentRow>) => {
+      localContent =
+        typeof updater === "function" ? updater(localContent) : updater;
+    });
+
+    const { result } = renderHook(() => useDeleteConfirmation());
+
+    act(() => {
+      result.current.openDelete({ _id: "item-1", content: "Hello" });
+    });
+
+    await act(async () => {
+      await result.current.confirmDelete(
+        "/api/names/delete/item-1",
+        "user-1",
+        undefined,
+        setLocalData,
+      );
+    });
+
+    expect(setLocalData).toHaveBeenCalled();
+    expect(localContent).toEqual({ _id: "item-1", content: "DELETED" });
+  });
+
+  it("confirmDelete rolls back local content on fetch failure", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue({
+        ok: false,
+        status: 500,
+      }),
+    );
+
+    type ContentRow = { _id: string; content: string };
+    let localContent: ContentRow = { _id: "item-1", content: "Hello" };
+    const setLocalData = vi.fn((updater: SetStateAction<ContentRow>) => {
+      localContent =
+        typeof updater === "function" ? updater(localContent) : updater;
+    });
+
+    const { result } = renderHook(() => useDeleteConfirmation());
+
+    act(() => {
+      result.current.openDelete({ _id: "item-1", content: "Hello" });
+    });
+
+    await act(async () => {
+      await result.current.confirmDelete(
+        "/api/names/delete/item-1",
+        "user-1",
+        undefined,
+        setLocalData,
+      );
+    });
+
+    expect(localContent).toEqual({ _id: "item-1", content: "Hello" });
   });
 });

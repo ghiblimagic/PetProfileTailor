@@ -68,7 +68,7 @@ export function buildSwrPaginationGetKey(
   return [url, Object.keys(body).length ? { body } : {}] as SwrFetcherKey;
 }
 
-const fetcher = (key: SwrFetcherKey) => {
+export function swrPaginationFetcher(key: SwrFetcherKey): Promise<SwrPage> {
   let url: string;
   let options: SwrRequestOptions = {};
   if (Array.isArray(key)) {
@@ -84,7 +84,7 @@ const fetcher = (key: SwrFetcherKey) => {
     headers: { "Content-Type": "application/json" },
     body: hasBody ? JSON.stringify(options.body) : undefined,
   }).then((res) => res.json()) as Promise<SwrPage>;
-};
+}
 
 export type UseSwrPaginationParams = {
   dataType: ContentType | string;
@@ -165,7 +165,7 @@ export function useSwrPagination({
     });
 
   const { data, error, size, isLoading, isValidating, setSize, mutate } =
-    useSWRInfinite<SwrPage>(getKey, fetcher, {
+    useSWRInfinite<SwrPage>(getKey, swrPaginationFetcher, {
       initialSize: 1,
       revalidateAll: false,
       revalidateOnMount: true, // recheck when mounting, aka when the user uses a link to return to this page, it'll refetch the 1st page
