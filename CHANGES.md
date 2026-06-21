@@ -6504,6 +6504,7 @@ Automated merge gate: fast lint/unit/build on every push; full E2E on `main` and
 
 - Local: `pnpm lint`, `pnpm test`, `pnpm build` with CI-style env vars
 - Fixed flaky `app/api/auth/update/route.test.ts` (`Date.now()` 1ms race on reset filter assertion)
+- CI fix: removed duplicate pnpm `version` in workflow (uses `packageManager` from `package.json`)
 - Remote: push workflow and confirm Actions `fast` + `e2e` jobs green
 
 ### Next logical step
