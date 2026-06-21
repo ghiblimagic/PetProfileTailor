@@ -10,7 +10,7 @@ export type DeleteTarget = {
   content?: string;
 };
 
-type SwrPageLike<T extends { _id: string }> = {
+export type SwrPageLike<T extends { _id: string }> = {
   data: T[];
   totalDocs?: number;
 };
@@ -19,6 +19,28 @@ type SwrMutate<T extends { _id: string } = { _id: string }> = (
   updater?: (pages?: SwrPageLike<T>[]) => SwrPageLike<T>[],
   shouldRevalidate?: boolean,
 ) => void;
+
+/** Optimistic SWR infinite updater — remove deleted row and decrement totalDocs. */
+export function removeDeletedItemFromSwrPages<T extends { _id: string }>(
+  pages: SwrPageLike<T>[],
+  deletedContentId: string,
+): SwrPageLike<T>[] {
+  return pages.map((page) => ({
+    ...page,
+    data: page.data.filter((item) => item._id !== deletedContentId),
+    totalDocs: (page.totalDocs ?? page.data.length) - 1,
+  }));
+}
+
+/** Optimistic detail-page update — mark matching content as DELETED. */
+export function applyOptimisticDeleteToContent<
+  T extends { _id: string; content?: string },
+>(prev: T, deletedContentId: string): T {
+  if (prev._id === deletedContentId) {
+    return { ...prev, content: "DELETED" };
+  }
+  return prev;
+}
 
 export function useDeleteConfirmation() {
   const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
@@ -34,7 +56,7 @@ export function useDeleteConfirmation() {
     setShowDeleteConfirmation(false);
   }
 
-  async function confirmDelete<T extends { _id: string }>(
+  async function confirmDelete<T extends { _id: string; content?: string }>(
     apiLink: string,
     signedInUsersId: string,
     customMutate?: SwrMutate<T>,
@@ -44,23 +66,15 @@ export function useDeleteConfirmation() {
 
     try {
       if (setLocalData) {
-        setLocalData((prev) => {
-          if (!prev) return prev;
-          if (prev._id === deleteTarget._id) {
-            return { ...prev, content: "DELETED" };
-          }
-          return prev;
-        });
+        setLocalData((prev) =>
+          applyOptimisticDeleteToContent(prev, deleteTarget._id),
+        );
       }
 
       if (customMutate) {
         customMutate(
           (pages = []) =>
-            pages.map((page) => ({
-              ...page,
-              data: page.data.filter((item) => item._id !== deleteTarget._id),
-              totalDocs: (page.totalDocs ?? page.data.length) - 1,
-            })),
+            removeDeletedItemFromSwrPages(pages, deleteTarget._id),
           false,
         );
       }

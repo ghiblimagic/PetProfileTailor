@@ -76,36 +76,45 @@ if (restrictSwrToLikedNames) {
 }
 
 // if restrict to liked content but there are no likes, return early
-if (
-  (restrictSwrToLikedNames && likedIds === null) ||
-  (restrictSwrToLikedNames && likedIds.length === 0)
-) {
+if (shouldSkipSwrPaginationForLikes(restrictSwrToLikedNames, likedIds)) {
   return emptyResult;
 }
 ```
 
-## `getKey` — SWR page index vs API page
+## `buildSwrPaginationGetKey` — SWR page index vs API page
+
+Extracted from the hook’s inline `getKey` for unit tests. Same behavior and comments.
 
 ```ts
 // hooks/useSwrPagination.ts
-const getKey = (index: number, previousPageData: SwrPage | null) => {
+export function buildSwrPaginationGetKey(
+  index: number,
+  previousPageData: SwrPage | null | undefined,
+  params: SwrPaginationGetKeyParams,
+): SwrFetcherKey | null {
   if (previousPageData && !previousPageData.data?.length) return null; // no more data
   if (index === undefined) return null; // stop fetching
   const page = index + 1; // SWR index starts at 0, but our API pages start at 1
   let url = "";
-  if (dataType === "names") {
-    url = `/api/names/swr?page=${page}&sortingproperty=${sortingProperty}&sortingvalue=${sortingValue}`;
-  } else if (dataType === "descriptions") {
-    url = `/api/description/swr?page=${page}&sortingproperty=${sortingProperty}&sortingvalue=${sortingValue}`;
+  if (params.dataType === "names") {
+    url = `/api/names/swr?page=${page}&sortingproperty=${params.sortingProperty}&sortingvalue=${params.sortingValue}`;
+  } else if (params.dataType === "descriptions") {
+    url = `/api/description/swr?page=${page}&sortingproperty=${params.sortingProperty}&sortingvalue=${params.sortingValue}`;
   }
+  // else if (params.dataType === "individualNames") {
+  //   url = `/api/names/check-if-content-exists/${contentIdentifier}`;
+  // }
+  // POST in case likedIds is big; GET vs POST is decided in the fetcher
   const body: Record<string, unknown> = {};
-  if (tags?.length) body.tags = tags;
-  if (profileUserId) body.profileUserId = profileUserId;
-  if (likedIds?.length || likedIds === null) body.likedIds = likedIds;
+  if (params.tags?.length) body.tags = params.tags;
+  if (params.profileUserId) body.profileUserId = params.profileUserId;
+  if (params.likedIds?.length || params.likedIds === null) body.likedIds = params.likedIds;
 
   return [url, Object.keys(body).length ? { body } : {}] as SwrFetcherKey;
-};
+}
 ```
+
+The hook wraps this as `getKey` and passes `likedIds` from `useLikes()` when `restrictSwrToLikedNames` is set.
 
 ## SWR options
 

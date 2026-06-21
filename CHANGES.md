@@ -6315,3 +6315,46 @@ Four high-value pure-logic gaps: extracted shared password-reset hashing + auth-
 ### Verification
 
 - `pnpm test utils/api/passwordResetToken.test.ts utils/api/authPasswordResetUpdate.test.ts utils/api/likeToggleRateLimit.test.ts utils/stringManipulation/convertStringToMongooseId.test.ts`
+
+---
+
+## 2026-06-08 — Unit tests: useSwrPagination getKey + delete SWR updater
+
+### What was built and why
+
+Extracted pure helpers from listing pagination and delete confirmation hooks; Vitest covers getKey URLs/body, liked-names early exit, optimistic SWR removal, and rollback on failed DELETE.
+
+### Files created
+
+- `hooks/useSwrPagination.test.ts`
+- `hooks/useDeleteConfirmation.test.ts`
+
+### Files modified
+
+- `hooks/useSwrPagination.ts` — `buildSwrPaginationGetKey`, `shouldSkipSwrPaginationForLikes`
+- `hooks/useDeleteConfirmation.ts` — `removeDeletedItemFromSwrPages`, `applyOptimisticDeleteToContent`
+- `TESTING.md`, `CHANGES.md`
+
+### Verification
+
+- `pnpm test hooks/useSwrPagination.test.ts hooks/useDeleteConfirmation.test.ts` — 16 passed
+
+---
+
+## 2026-06-08 — useSwrPagination getKey comments preserved on extract
+
+Restored inline comments from the original `getKey` onto `buildSwrPaginationGetKey` (end-of-list stop, SWR vs API page index, individualNames stub, POST body for large likedIds). Synced `docs/notes/hooks/useSwrPagination.md`.
+
+---
+
+## 2026-06-08 — applyOptimisticDeleteToContent single signature
+
+Simplified to `(prev: T) => T` (matches `useState` updater); removed overloads and null test case.
+
+- `hooks/useDeleteConfirmation.ts`, `hooks/useDeleteConfirmation.test.ts`
+
+---
+
+## 2026-06-08 — delete helper param rename deletedContentId
+
+Unified `itemId` / `targetId` → `deletedContentId` in `removeDeletedItemFromSwrPages` and `applyOptimisticDeleteToContent`.

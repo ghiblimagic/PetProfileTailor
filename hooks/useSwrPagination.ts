@@ -14,9 +14,59 @@ import type { ContentType } from "@/utils/api/checkIfValidContentType";
 
 export type SwrPage = { data: ContentListingItem[]; totalDocs?: number };
 
-type SwrFetcherKey = string | [string, { body?: Record<string, unknown> }];
+export type SwrFetcherKey = string | [string, { body?: Record<string, unknown> }];
 
 type SwrRequestOptions = { body?: Record<string, unknown>; method?: string };
+
+export type SwrPaginationGetKeyParams = {
+  dataType: ContentType | string;
+  sortingProperty?: string;
+  sortingValue?: number;
+  tags?: string[];
+  profileUserId?: string;
+  likedIds?: string[] | null;
+};
+
+/** Returns true when liked-names filter is on but there is nothing to fetch. */
+export function shouldSkipSwrPaginationForLikes(
+  restrictSwrToLikedNames: boolean | undefined,
+  likedIds: string[] | null,
+): boolean {
+  return (
+    Boolean(restrictSwrToLikedNames && likedIds === null) ||
+    Boolean(restrictSwrToLikedNames && likedIds.length === 0)
+  );
+}
+
+/** SWR infinite getKey — page URLs, POST body for tags/profile/likedIds filters. */
+export function buildSwrPaginationGetKey(
+  index: number,
+  previousPageData: SwrPage | null | undefined,
+  params: SwrPaginationGetKeyParams,
+): SwrFetcherKey | null {
+  if (previousPageData && !previousPageData.data?.length) return null; // no more data
+  if (index === undefined) return null; // stop fetching
+
+  const page = index + 1; // SWR index starts at 0, but our API pages start at 1
+  let url = "";
+  if (params.dataType === "names") {
+    url = `/api/names/swr?page=${page}&sortingproperty=${params.sortingProperty}&sortingvalue=${params.sortingValue}`;
+  } else if (params.dataType === "descriptions") {
+    url = `/api/description/swr?page=${page}&sortingproperty=${params.sortingProperty}&sortingvalue=${params.sortingValue}`;
+  }
+  // else if (params.dataType === "individualNames") {
+  //   url = `/api/names/check-if-content-exists/${contentIdentifier}`;
+  // }
+
+  // POST in case likedIds is big; GET vs POST is decided in the fetcher
+  const body: Record<string, unknown> = {};
+  if (params.tags?.length) body.tags = params.tags;
+  if (params.profileUserId) body.profileUserId = params.profileUserId;
+  const { likedIds } = params;
+  if (likedIds?.length || likedIds === null) body.likedIds = likedIds;
+
+  return [url, Object.keys(body).length ? { body } : {}] as SwrFetcherKey;
+}
 
 const fetcher = (key: SwrFetcherKey) => {
   let url: string;
@@ -99,36 +149,20 @@ export function useSwrPagination({
     // console.log("likedIds in swr pagination", likedIds);
   }
 
-  // if restrict to liked content but there are no likes, return early
-  if (
-    (restrictSwrToLikedNames && likedIds === null) ||
-    (restrictSwrToLikedNames && likedIds.length === 0)
-  ) {
+  if (shouldSkipSwrPaginationForLikes(restrictSwrToLikedNames, likedIds)) {
+    // if restrict to liked content but there are no likes, return early
     return emptyResult;
   }
 
-  // SWR key function
-  const getKey = (index: number, previousPageData: SwrPage | null) => {
-    if (previousPageData && !previousPageData.data?.length) return null; // no more data
-    if (index === undefined) return null; // stop fetching
-    const page = index + 1; // SWR index starts at 0, but our API pages start at 1
-    let url = "";
-    if (dataType === "names") {
-      url = `/api/names/swr?page=${page}&sortingproperty=${sortingProperty}&sortingvalue=${sortingValue}`;
-    } else if (dataType === "descriptions") {
-      url = `/api/description/swr?page=${page}&sortingproperty=${sortingProperty}&sortingvalue=${sortingValue}`;
-    }
-    // else if (dataType === "individualNames") {
-    //   url = `/api/names/check-if-content-exists/${contentIdentifier}`;
-    // }
-    // POST in case likedIds is big, the method is decided in the fetchers fetch function
-    const body: Record<string, unknown> = {};
-    if (tags?.length) body.tags = tags;
-    if (profileUserId) body.profileUserId = profileUserId;
-    if (likedIds?.length || likedIds === null) body.likedIds = likedIds;
-
-    return [url, Object.keys(body).length ? { body } : {}] as SwrFetcherKey;
-  };
+  const getKey = (index: number, previousPageData: SwrPage | null) =>
+    buildSwrPaginationGetKey(index, previousPageData, {
+      dataType,
+      sortingProperty,
+      sortingValue,
+      tags,
+      profileUserId,
+      likedIds,
+    });
 
   const { data, error, size, isLoading, isValidating, setSize, mutate } =
     useSWRInfinite<SwrPage>(getKey, fetcher, {
