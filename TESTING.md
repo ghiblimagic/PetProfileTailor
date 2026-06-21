@@ -2,9 +2,55 @@
 
 ## Stack
 
-- **Vitest** — unit tests (pure logic, no browser)
-- **React Testing Library** — component tests
+- **Vitest** — test runner for unit, API, hook, and component tests (`*.test.ts` / `*.test.tsx`)
+- **React Testing Library** — component and hook tests (via Vitest + jsdom)
 - **Playwright** — E2E on test DB (`MONGODB_URI_TEST`)
+
+## Test suite overview
+
+Counts from `pnpm test` and `pnpm exec playwright test --list` (update after large test additions).
+
+| Layer | Tool | Test cases | Files |
+|-------|------|------------|-------|
+| Unit / component / API | **Vitest** | **269** | **53** |
+| End-to-end | **Playwright** | **169** | **28** spec files |
+| **Total automated** | | **438** | **81** |
+
+Vitest is a single runner. Of the 269 cases, roughly **170+** are pure unit/API tests and **90–100** use React Testing Library. Details below. Per-spec E2E inventory: [What E2E covers](#what-e2e-covers).
+
+### Playwright E2E (169 tests, 28 spec files)
+
+Full browser flows against a seeded test DB:
+
+- **Auth** — login, ban, magic link, session refresh
+- **CRUD** — names, descriptions, edits, delete
+- **Social** — likes, thanks, notifications UI + API
+- **Admin** — categories, tags, moderation
+- **Contact form**, register, profile, reset password
+- **Browse**, pagination/cooldown, data-shape/API contracts
+
+Runs in CI with ephemeral MongoDB (replica set for transactions), seed-before-suite, and E2E test hooks. See [Before merge (automated)](#before-merge-automated).
+
+### Pure unit / API tests (about 30 files, 170+ tests)
+
+No browser UI — logic, validation, guards:
+
+- **API validation** — contact, signup, names, blocklists, pagination
+- **Auth** — NextAuth callbacks, password reset, session helpers
+- **Utilities** — rate limiter, debounce, string normalization, ObjectId conversion
+- **API route** — `PUT /api/auth/update` (Node env, mocked DB/session)
+
+### React Testing Library (about 23 files, 90–100 tests)
+
+Uses `@testing-library/react` (and often `userEvent`) for UI and hooks:
+
+- **Components** — e.g. `RegisterForm`, `CheckIfContentExists`, buttons, alerts, skeletons (about 11 component test files)
+- **Hooks** — `useToggleState`, `useSwrPagination`, `useDeleteConfirmation`, etc. (often via `renderHook`)
+- **Context** — `LikesContext`, `notificationsContext`
+
+RTL pattern notes: small harness with `useState` for dismiss flows; `userEvent` for clicks. API guards mock `getSessionForApis` via `vi.hoisted`. See also the [Unit + component](#unit--component-vitest--rtl) area table below.
+
+**Not counted:** manual checks (real captcha, Resend email) in [Manual verification (dev only)](#manual-verification-dev-only); Next.js `build` type-check/lint during CI.
 
 ## Scripts
 
@@ -28,7 +74,7 @@
 | Job | When | Steps |
 |-----|------|--------|
 | `fast` | Every push / PR | `pnpm lint`, `pnpm test`, `pnpm build` |
-| `e2e` | Push to `main` or pull request | Ephemeral `mongo:7` service → `pnpm test:e2e:ci` (seed + Playwright) |
+| `e2e` | Push to `main` or pull request | MongoDB replica set (`docker run … --replSet rs0`) → `pnpm test:e2e:ci` (seed + Playwright) |
 
 CI uses fixed test credentials (`e2e-ci@example.com`) and a fresh MongoDB container each run — no Atlas secret required. Optional: **Settings → Branches → `main`** → require status checks `fast` and `e2e` (pull requests not required if you push directly to `main`).
 

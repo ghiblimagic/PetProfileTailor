@@ -6514,3 +6514,11 @@ Automated merge gate: fast lint/unit/build on every push; full E2E on `main` and
 ### Next logical step
 
 Enable branch protection on `main` requiring `fast` and `e2e` status checks.
+
+---
+
+## 2026-06-21 — TESTING.md test suite overview
+
+Added **Test suite overview** section with Vitest (269 / 53 files), Playwright (169 / 28 specs), expanded E2E / RTL / pure-unit breakdown (no resume one-liner). Corrected CI e2e job description (docker replica set, not GHA service `--replSet`).
+
+- `TESTING.md`, `CHANGES.md`
