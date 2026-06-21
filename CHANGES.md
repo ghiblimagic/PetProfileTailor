@@ -6554,7 +6554,7 @@ Confirm first Actions run uploads `playwright-report` on green E2E and `vitest-c
 
 ## 2026-06-21 — E2E adddescriptions blocklist strict mode fix
 
-`getByText(/wank|…/)` matched both the textarea value and the `WarningMessage` banner — Playwright strict mode violation. Assert the API substring message instead.
+`getByText(/wank|…/)` matched both the textarea value and the `WarningMessage` banner — Playwright strict mode violation. Assert via 403 response + `p.bg-red-900` banner (API message for `wank` is banned-everywhere / blocklist wording, not substring phrase text).
 
 - `e2e/adddescriptions.spec.ts`
 - `CHANGES.md`

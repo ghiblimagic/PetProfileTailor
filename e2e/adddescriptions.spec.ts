@@ -62,13 +62,25 @@ test.describe("Add descriptions page (authenticated)", () => {
       page,
       "This friendly dog wank test phrase is long enough",
     );
-    await submitDescriptionForm(page);
 
-    await expect(
-      page.getByText(/any content containing the phrase wank is not allowed/i),
-    ).toBeVisible({
-      timeout: 15_000,
-    });
+    const blockResponse = page.waitForResponse(
+      (res) =>
+        res.url().includes("/api/description") &&
+        res.request().method() === "POST" &&
+        res.status() === 403,
+    );
+    await submitDescriptionForm(page);
+    const response = await blockResponse;
+    const body = (await response.json()) as {
+      message: string;
+      blockedBy: string;
+    };
+    expect(body.blockedBy).toBe("wank");
+
+    // WarningMessage banner only — textarea still contains "wank"
+    await expect(page.locator("p.bg-red-900").getByText(body.message)).toBeVisible(
+      { timeout: 15_000 },
+    );
   });
 
   test("check-if-exists flags duplicate at start of seeded description", async ({
