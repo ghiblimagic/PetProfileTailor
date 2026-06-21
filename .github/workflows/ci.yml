@@ -53,13 +53,6 @@ jobs:
     name: e2e
     runs-on: ubuntu-latest
     if: github.event_name == 'pull_request' || github.ref == 'refs/heads/main'
-    services:
-      mongodb:
-        image: mongo:7
-        ports:
-          - 27017:27017
-        options: >-
-          --replSet rs0
     steps:
       - uses: actions/checkout@v4
 
@@ -76,21 +69,22 @@ jobs:
       - name: Install Playwright Chromium
         run: pnpm exec playwright install --with-deps chromium
 
-      - name: Init MongoDB replica set
+      - name: Start MongoDB replica set
         run: |
+          docker run -d --name mongodb-ci -p 27017:27017 mongo:7 --replSet rs0
           for i in $(seq 1 30); do
-            if docker run --rm --network host mongo:7 mongosh "mongodb://127.0.0.1:27017" --quiet --eval "db.adminCommand({ ping: 1 })"; then
+            if docker exec mongodb-ci mongosh --quiet --eval "db.adminCommand({ ping: 1 })"; then
               break
             fi
             sleep 2
           done
-          docker run --rm --network host mongo:7 mongosh "mongodb://127.0.0.1:27017" --eval '
+          docker exec mongodb-ci mongosh --eval '
             try { rs.status(); } catch (e) {
               rs.initiate({ _id: "rs0", members: [{ _id: 0, host: "127.0.0.1:27017" }] });
             }
           '
           for i in $(seq 1 30); do
-            if docker run --rm --network host mongo:7 mongosh "mongodb://127.0.0.1:27017/?replicaSet=rs0" --quiet --eval "rs.isMaster().ismaster" | grep -q true; then
+            if docker exec mongodb-ci mongosh "mongodb://127.0.0.1:27017/?replicaSet=rs0" --quiet --eval "rs.isMaster().ismaster" | grep -q true; then
               exit 0
             fi
             sleep 2

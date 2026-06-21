@@ -96,7 +96,7 @@ describe("checkLikeToggleRateLimit", () => {
 
     expect(checkSpy).toHaveBeenCalledWith("like-toggle:user-like-test", {
       windowMs: LIKE_TOGGLE_RATE_LIMIT.windowMs,
-      maxRequests: 50,
+      maxRequests: 200,
     });
   });
 
