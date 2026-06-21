@@ -6507,6 +6507,8 @@ Automated merge gate: fast lint/unit/build on every push; full E2E on `main` and
 - CI fix: removed duplicate pnpm `version` in workflow (uses `packageManager` from `package.json`)
 - CI fix: dummy `RESEND_API_KEY` / `RESEND_EMAIL_FROM` in workflow for build-time `new Resend()` in `lib/auth`
 - CI: Node.js 24 in workflow (GitHub deprecating Node 20 on runners)
+- CI E2E: MongoDB replica set init in workflow (togglelike uses transactions; standalone mongo:7 fails)
+- CI E2E: raised E2E like-toggle cap to 200; `postToggleLike` helper retries after rate-limit reset
 - Remote: push workflow and confirm Actions `fast` + `e2e` jobs green
 
 ### Next logical step

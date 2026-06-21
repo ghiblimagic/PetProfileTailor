@@ -35,6 +35,9 @@ export async function gotoNameDetailForModeration(
   name: string,
 ): Promise<void> {
   await gotoNameDetail(page, name);
+  await expect(listingMoreOptionsButton(page)).toBeVisible({
+    timeout: 30_000,
+  });
   await waitForModerationContextFetches(page);
 }
 
@@ -60,7 +63,9 @@ export async function openListingMenuItem(
   page: Page,
   itemName: "Suggestion" | "Report",
 ): Promise<void> {
-  await listingMoreOptionsButton(page).click();
+  const menuButton = listingMoreOptionsButton(page);
+  await expect(menuButton).toBeVisible({ timeout: 30_000 });
+  await menuButton.click();
   await page.getByRole("button", { name: itemName }).click();
 }
 

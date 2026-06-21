@@ -24,6 +24,24 @@ async function isNameLikedBySession(
   return json.names.some((entry) => entry.contentId === contentId);
 }
 
+async function postToggleLike(
+  request: APIRequestContext,
+  url: string,
+  body: { contentCreator: ContentCreator },
+): Promise<{ liked: boolean }> {
+  let response = await request.post(url, { data: body });
+  if (response.status() === 429) {
+    await resetLikeToggleRateLimitForSession(request);
+    response = await request.post(url, { data: body });
+  }
+  const responseText = await response.text();
+  expect(
+    response.ok(),
+    `togglelike failed (${response.status()}): ${responseText}`,
+  ).toBeTruthy();
+  return JSON.parse(responseText) as { liked: boolean };
+}
+
 /** Toggle until the name is liked (idempotent across test runs). */
 export async function ensureNameLiked(
   request: APIRequestContext,
@@ -33,11 +51,7 @@ export async function ensureNameLiked(
   if (await isNameLikedBySession(request, contentId)) return;
 
   const url = `/api/names/likes/${contentId}/togglelike`;
-  const body = { contentCreator };
-
-  const response = await request.post(url, { data: body });
-  expect(response.ok()).toBeTruthy();
-  const json = (await response.json()) as { liked: boolean };
+  const json = await postToggleLike(request, url, { contentCreator });
   expect(json.liked).toBe(true);
 }
 
@@ -50,11 +64,7 @@ export async function ensureNameUnliked(
   if (!(await isNameLikedBySession(request, contentId))) return;
 
   const url = `/api/names/likes/${contentId}/togglelike`;
-  const body = { contentCreator };
-
-  const response = await request.post(url, { data: body });
-  expect(response.ok()).toBeTruthy();
-  const json = (await response.json()) as { liked: boolean };
+  const json = await postToggleLike(request, url, { contentCreator });
   expect(json.liked).toBe(false);
 }
 
@@ -159,11 +169,7 @@ export async function ensureDescriptionLiked(
   if (await isDescriptionLikedBySession(request, contentId)) return;
 
   const url = `/api/description/likes/${contentId}/togglelike`;
-  const body = { contentCreator };
-
-  const response = await request.post(url, { data: body });
-  expect(response.ok()).toBeTruthy();
-  const json = (await response.json()) as { liked: boolean };
+  const json = await postToggleLike(request, url, { contentCreator });
   expect(json.liked).toBe(true);
 }
 
@@ -176,8 +182,6 @@ export async function ensureDescriptionUnliked(
   if (!(await isDescriptionLikedBySession(request, contentId))) return;
 
   const url = `/api/description/likes/${contentId}/togglelike`;
-  const response = await request.post(url, { data: { contentCreator } });
-  expect(response.ok()).toBeTruthy();
-  const json = (await response.json()) as { liked: boolean };
+  const json = await postToggleLike(request, url, { contentCreator });
   expect(json.liked).toBe(false);
 }

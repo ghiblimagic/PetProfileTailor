@@ -13,7 +13,7 @@ export const E2E_STRICT_LIKE_RATE_LIMIT_HEADER = "x-e2e-strict-like-rate-limit";
 /** Serial E2E runs many togglelike POSTs per user; production cap stays strict. */
 const E2E_LIKE_TOGGLE_RATE_LIMIT = {
   windowMs: LIKE_TOGGLE_RATE_LIMIT.windowMs,
-  maxRequests: 50,
+  maxRequests: 200,
 } as const;
 
 type CheckLikeToggleRateLimitOptions = {

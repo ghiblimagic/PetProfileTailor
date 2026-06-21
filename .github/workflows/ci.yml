@@ -13,8 +13,8 @@ concurrency:
 env:
   NEXTAUTH_URL: http://localhost:3000
   NEXTAUTH_SECRET: ci-nextauth-secret-not-for-production
-  MONGODB_URI: mongodb://127.0.0.1:27017/homeward_tails_ci_build
-  MONGODB_URI_TEST: mongodb://127.0.0.1:27017/homeward_tails_e2e
+  MONGODB_URI: mongodb://127.0.0.1:27017/homeward_tails_ci_build?replicaSet=rs0
+  MONGODB_URI_TEST: mongodb://127.0.0.1:27017/homeward_tails_e2e?replicaSet=rs0
   PLAYWRIGHT_TEST_EMAIL: e2e-ci@example.com
   PLAYWRIGHT_TEST_PASSWORD: e2eci-pass-2026
   PLAYWRIGHT_TEST_PROFILENAME: e2eciuser
@@ -58,6 +58,8 @@ jobs:
         image: mongo:7
         ports:
           - 27017:27017
+        options: >-
+          --replSet rs0
     steps:
       - uses: actions/checkout@v4
 
@@ -73,6 +75,28 @@ jobs:
 
       - name: Install Playwright Chromium
         run: pnpm exec playwright install --with-deps chromium
+
+      - name: Init MongoDB replica set
+        run: |
+          for i in $(seq 1 30); do
+            if docker run --rm --network host mongo:7 mongosh "mongodb://127.0.0.1:27017" --quiet --eval "db.adminCommand({ ping: 1 })"; then
+              break
+            fi
+            sleep 2
+          done
+          docker run --rm --network host mongo:7 mongosh "mongodb://127.0.0.1:27017" --eval '
+            try { rs.status(); } catch (e) {
+              rs.initiate({ _id: "rs0", members: [{ _id: 0, host: "127.0.0.1:27017" }] });
+            }
+          '
+          for i in $(seq 1 30); do
+            if docker run --rm --network host mongo:7 mongosh "mongodb://127.0.0.1:27017/?replicaSet=rs0" --quiet --eval "rs.isMaster().ismaster" | grep -q true; then
+              exit 0
+            fi
+            sleep 2
+          done
+          echo "MongoDB replica set did not become primary in time"
+          exit 1
 
       - name: E2E tests
         run: pnpm test:e2e:ci
