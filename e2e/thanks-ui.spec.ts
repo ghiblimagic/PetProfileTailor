@@ -14,12 +14,11 @@ import {
 import {
   contentThankButton,
   DEFAULT_THANK_MESSAGE,
-  expectThanksSuccessToast,
+  expectThanksDialogSubmitted,
   gotoDescriptionDetail,
   gotoNameDetail,
   openThanksDialog,
   submitThanksDialog,
-  thanksDialog,
 } from "./helpers/thanks-ui";
 import {
   gotoNotificationsPage,
@@ -29,7 +28,9 @@ import {
 } from "./helpers/notifications-ui";
 import {
   lookupSeededDescription,
+  lookupSeededName,
 } from "./helpers/seed-lookup";
+import { resetE2eThanksForContent } from "./helpers/thanks";
 
 const TRUNCATED_DESCRIPTION =
   SEED_DESCRIPTION_START.slice(0, 60) +
@@ -43,6 +44,14 @@ test.describe("Thanks UI", () => {
     "PLAYWRIGHT_TEST and ADMIN credentials required",
   );
 
+  test.beforeAll(async ({ request }) => {
+    const seeded = await lookupSeededName(request, SEED_NAME);
+    await resetE2eThanksForContent(request, {
+      contentType: "names",
+      contentId: seeded.id,
+    });
+  });
+
   test("name detail — admin submits thank via dialog", async ({ page }) => {
     test.setTimeout(60_000);
 
@@ -50,12 +59,8 @@ test.describe("Thanks UI", () => {
     await gotoNameDetail(page, SEED_NAME);
     await openThanksDialog(page);
 
-    const status = await submitThanksDialog(page);
-    expect(status).toBeGreaterThanOrEqual(200);
-    expect(status).toBeLessThan(300);
-
-    await expectThanksSuccessToast(page);
-    await expect(thanksDialog(page)).toHaveCount(0);
+    const result = await submitThanksDialog(page);
+    await expectThanksDialogSubmitted(page, result);
   });
 
   test("notifications — content owner sees UI-submitted name thank", async ({
@@ -92,16 +97,17 @@ test.describe("Thanks UI", () => {
       SEED_DESCRIPTION_START,
     );
 
+    await resetE2eThanksForContent(page.request, {
+      contentType: "descriptions",
+      contentId: seeded.id,
+    });
+
     await loginWithAdminCredentials(page);
     await gotoDescriptionDetail(page, seeded.id);
     await openThanksDialog(page);
 
-    const status = await submitThanksDialog(page, ["Clever!"]);
-    expect(status).toBeGreaterThanOrEqual(200);
-    expect(status).toBeLessThan(300);
-
-    await expectThanksSuccessToast(page);
-    await expect(thanksDialog(page)).toHaveCount(0);
+    const result = await submitThanksDialog(page, ["Clever!"]);
+    await expectThanksDialogSubmitted(page, result);
 
     await signOutViaNav(page);
     await loginWithCredentials(page);

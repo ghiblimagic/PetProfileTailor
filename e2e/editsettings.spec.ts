@@ -57,7 +57,9 @@ test.describe("Edit settings page", () => {
     expect(user.name).toBe(updatedName);
 
     await page.goto(`/profile/${profileName}`);
-    await expect(page.getByText(updatedName)).toBeVisible({ timeout: 15_000 });
+    await expect(
+      page.locator("span.text-xl.font-bold").filter({ hasText: updatedName }),
+    ).toBeVisible({ timeout: 15_000 });
   });
 });
 

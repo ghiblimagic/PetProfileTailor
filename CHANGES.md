@@ -6439,3 +6439,43 @@ NextAuth callback mocks used partial `user`/`account` objects that failed strict
 
 - `pnpm exec tsc --noEmit` — no `lib/auth.test.ts` errors
 - `pnpm test lib/auth.test.ts` — 17 passed
+
+---
+
+## 2026-06-08 — E2E hardening after full-suite failures
+
+### What was built and why
+
+Full E2E run (`156 pass, 3 fail, 2 flaky`) exposed cumulative-state bugs: thanks cap on seeded name, contact timing/rate-limit isolation, edit-settings strict mode, and mark-read tests assuming unread rows after `notifications-ui.spec.ts` runs first.
+
+### Files modified
+
+- `e2e/helpers/thanks.ts` — idempotent `submitThanks` on max-thanks 400; `resetE2eThanksForContent()`
+- `app/api/test/e2e/reset-thanks/route.ts` — E2E hook to delete thanks for content
+- `e2e/helpers/thanks-ui.ts` — `ThanksDialogSubmitResult`, `expectThanksDialogSubmitted()`
+- `e2e/thanks-ui.spec.ts`, `e2e/notifications.spec.ts` — reset thanks / seed unread rows before mark-read tests
+- `e2e/editsettings.spec.ts` — scope display-name assertion to `span.text-xl.font-bold`
+- `utils/api/contactRateLimit.ts`, `app/api/test/e2e/reset-contact-rate-limit/route.ts` — contact rate limit reset hook
+- `e2e/helpers/contact.ts` — `resetE2eContactRateLimit()`, `submitContactFormWithValidTiming()` (3.1s wait)
+- `e2e/contact.spec.ts` — self-contained rate-limit test; scoped error locators
+- `utils/api/rateLimiter.ts` — `resetAll()` + `globalThis` singleton (server action + route share one limiter in prod build)
+- `components/Contact/ContactForm.tsx` — `formStartTime` uses `defaultValue` so Playwright can override for too-fast test
+- `TESTING.md`, `CHANGES.md`
+
+### Problems encountered
+
+- Contact rate limit: hidden-field timing hack flaked under React re-renders → replaced with real 3.1s wait before submit.
+- Rate limiter: separate instances in server action vs API route → fixed with `globalThis` singleton (E2E uses production `next start`).
+- Mark-read API tests: `notifications-ui.spec.ts` runs alphabetically first and marks likes/thanks read → tests now unlike/relike or reset+thank to seed unread rows first.
+- Browse `#e2e-filter-tag` failure after long suite without fresh seed → passes after `pnpm seed:e2e` (tags re-applied by seed script).
+
+### Verification
+
+- `CI=1 pnpm test:e2e e2e/contact.spec.ts` — 8 passed
+- `CI=1 pnpm test:e2e e2e/notifications.spec.ts` — 9 passed
+- `CI=1 pnpm test:e2e e2e/thanks-ui.spec.ts e2e/editsettings.spec.ts` — key tests passed
+- `CI=1 pnpm test:e2e` — 166 passed, 1 failed (browse tag without fresh seed), 2 flaky (edits tag attach, moderation-ui timeout)
+
+### Next logical step
+
+Run `pnpm seed:e2e` then `CI=1 pnpm test:e2e` for a clean full-suite green; optional seed tweak to preserve description tags on upsert if tag `updateOne` ever misses.

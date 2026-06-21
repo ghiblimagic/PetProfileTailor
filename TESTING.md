@@ -75,6 +75,18 @@ pnpm test:e2e
 
 Playwright maps `MONGODB_URI_TEST` → `MONGODB_URI` when starting the server. `NEXTAUTH_SECRET` can match dev.
 
+**E2E-only test hooks** (`E2E_TEST_MODE` — 404 in production):
+
+| Route | Purpose |
+|-------|---------|
+| `POST /api/test/e2e/reset-thanks` | Delete thanks for a content item (`contentType`, `contentId`) — avoids 10-thanks cap on serial reruns |
+| `POST /api/test/e2e/reset-contact-rate-limit` | Clear in-memory contact rate limit (shared singleton across server actions + API routes) |
+| `POST /api/test/e2e/reset-like-toggle-rate-limit` | Clear like-toggle rate limit for current session |
+| `POST /api/test/e2e/set-password-reset-token` | Set reset token on user (`email`, optional `expired: true`) |
+| `POST /api/test/e2e/set-user-status` | Ban/unban user mid-session |
+
+Re-run `pnpm seed:e2e` before a full suite if thanks caps, tags, or listing pagination counts drift after many local runs.
+
 **Slow runs:** `pnpm test:e2e` runs `build && start` (~3–6 min). If port 3000 is busy, use `pnpm build:e2e && pnpm start:e2e` then `pnpm test:e2e:local`.
 
 ### What E2E covers

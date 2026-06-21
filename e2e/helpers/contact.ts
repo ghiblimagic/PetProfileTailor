@@ -22,3 +22,22 @@ export async function fillContactForm(
 export async function submitContactForm(page: Page): Promise<void> {
   await page.getByRole("button", { name: "Submit" }).click();
 }
+
+/** Wait for the 3s minimum before submit (more reliable than patching the hidden field). */
+export async function submitContactFormWithValidTiming(
+  page: Page,
+): Promise<void> {
+  await page.waitForTimeout(3100);
+  await submitContactForm(page);
+}
+
+export async function resetE2eContactRateLimit(
+  request: import("@playwright/test").APIRequestContext,
+): Promise<void> {
+  const response = await request.post("/api/test/e2e/reset-contact-rate-limit");
+  if (!response.ok()) {
+    throw new Error(
+      `reset-contact-rate-limit failed: ${response.status()} ${await response.text()}`,
+    );
+  }
+}

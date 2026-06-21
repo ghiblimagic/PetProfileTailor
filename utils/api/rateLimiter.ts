@@ -63,6 +63,11 @@ export class RateLimiter {
     this.records.delete(identifier);
   }
 
+  /** E2E only — clear all in-memory buckets (contact + like-toggle share this instance). */
+  resetAll(): void {
+    this.records.clear();
+  }
+
   getStatus(identifier: string, options: RateLimitOptions = {}): RateLimitResult {
     const { windowMs = 60_000, maxRequests = 5 } = options;
     const now = Date.now();
@@ -84,7 +89,15 @@ export class RateLimiter {
   }
 }
 
-export const rateLimiter = new RateLimiter();
+const globalForRateLimiter = globalThis as typeof globalThis & {
+  __shelterRateLimiter?: RateLimiter;
+};
+
+/** One in-memory limiter per Node process (server actions + route handlers share it). */
+export const rateLimiter =
+  globalForRateLimiter.__shelterRateLimiter ?? new RateLimiter();
+
+globalForRateLimiter.__shelterRateLimiter = rateLimiter;
 
 /** Shared client + server cap for like toggle POSTs (per user / per hook instance). */
 export const LIKE_TOGGLE_RATE_LIMIT = {

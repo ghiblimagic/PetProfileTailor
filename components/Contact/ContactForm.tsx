@@ -252,7 +252,7 @@ export default function ContactForm() {
           <input
             type="hidden"
             name="formStartTime"
-            value={formStartTime.current}
+            defaultValue={formStartTime.current}
           />
         </form>
       </div>

@@ -2,6 +2,24 @@ import { expect, type APIRequestContext } from "@playwright/test";
 
 export const DEFAULT_THANK_MESSAGE = "Made me smile or laugh";
 
+const MAX_THANKS_MESSAGE = /maximum thank you notes for this content/i;
+
+export async function resetE2eThanksForContent(
+  request: APIRequestContext,
+  {
+    contentType,
+    contentId,
+  }: {
+    contentType: "names" | "descriptions";
+    contentId: string;
+  },
+): Promise<void> {
+  const response = await request.post("/api/test/e2e/reset-thanks", {
+    data: { contentType, contentId },
+  });
+  expect(response.ok()).toBeTruthy();
+}
+
 export async function submitThanks(
   request: APIRequestContext,
   {
@@ -24,6 +42,14 @@ export async function submitThanks(
       messages,
     },
   });
+
+  if (response.status() === 400) {
+    const json = (await response.json()) as { message?: string };
+    if (json.message?.match(MAX_THANKS_MESSAGE)) {
+      return;
+    }
+  }
+
   expect(response.ok()).toBeTruthy();
 }
 

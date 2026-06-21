@@ -36,13 +36,18 @@ export async function openThanksDialog(page: Page): Promise<void> {
   ).toBeVisible({ timeout: 10_000 });
 }
 
+export type ThanksDialogSubmitResult = {
+  status: number;
+  message?: string;
+};
+
 /**
- * Select thank tags and submit the dialog. Returns POST /api/thanks status.
+ * Select thank tags and submit the dialog. Returns POST /api/thanks status + message.
  */
 export async function submitThanksDialog(
   page: Page,
   messages: string[] = [DEFAULT_THANK_MESSAGE],
-): Promise<number> {
+): Promise<ThanksDialogSubmitResult> {
   const dialog = thanksDialog(page);
 
   for (const message of messages) {
@@ -58,7 +63,32 @@ export async function submitThanksDialog(
 
   await dialog.getByRole("button", { name: "Submit" }).click();
   const response = await responsePromise;
-  return response.status();
+  const json = (await response.json().catch(() => ({}))) as {
+    message?: string;
+  };
+
+  return { status: response.status(), message: json.message };
+}
+
+const MAX_THANKS_MESSAGE = /maximum thank you notes for this content/i;
+
+/** Assert dialog submit succeeded or hit the per-content thank cap (idempotent). */
+export async function expectThanksDialogSubmitted(
+  page: Page,
+  result: ThanksDialogSubmitResult,
+): Promise<void> {
+  if (result.status === 201) {
+    await expectThanksSuccessToast(page);
+    await expect(thanksDialog(page)).toHaveCount(0);
+    return;
+  }
+
+  if (result.status === 400 && result.message?.match(MAX_THANKS_MESSAGE)) {
+    return;
+  }
+
+  expect(result.status).toBeGreaterThanOrEqual(200);
+  expect(result.status).toBeLessThan(300);
 }
 
 export async function expectThanksSuccessToast(page: Page): Promise<void> {

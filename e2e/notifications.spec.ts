@@ -11,13 +11,14 @@ import {
   SEED_DESCRIPTION_START,
   SEED_NAME,
 } from "./fixtures/seed-data";
-import { ensureDescriptionLiked, ensureNameLiked } from "./helpers/likes";
+import { ensureDescriptionLiked, ensureNameLiked, ensureNameUnliked, ensureDescriptionUnliked } from "./helpers/likes";
 import {
   lookupSeededDescription,
   lookupSeededName,
 } from "./helpers/seed-lookup";
 import {
   expectSelfThankRejected,
+  resetE2eThanksForContent,
   submitThanks,
 } from "./helpers/thanks";
 
@@ -124,6 +125,11 @@ test.describe("Notifications API", () => {
     }) => {
       const seeded = await lookupSeededName(page.request, SEED_NAME);
 
+      await resetE2eThanksForContent(page.request, {
+        contentType: "names",
+        contentId: seeded.id,
+      });
+
       await loginWithAdminCredentials(page);
       await submitThanks(page.request, {
         contentType: "names",
@@ -156,6 +162,11 @@ test.describe("Notifications API", () => {
         page.request,
         SEED_DESCRIPTION_START,
       );
+
+      await resetE2eThanksForContent(page.request, {
+        contentType: "descriptions",
+        contentId: seeded.id,
+      });
 
       await loginWithAdminCredentials(page);
       await submitThanks(page.request, {
@@ -197,6 +208,21 @@ test.describe("Notifications API", () => {
     test("PATCH thanks mark-read sets read on thank notifications", async ({
       page,
     }) => {
+      const seeded = await lookupSeededName(page.request, SEED_NAME);
+
+      await resetE2eThanksForContent(page.request, {
+        contentType: "names",
+        contentId: seeded.id,
+      });
+
+      await loginWithAdminCredentials(page);
+      await submitThanks(page.request, {
+        contentType: "names",
+        contentId: seeded.id,
+        contentCreator: seeded.creatorId,
+      });
+      await signOutViaNav(page);
+
       await loginWithCredentials(page);
 
       const before = await page.request.get("/api/notifications/thanks");
@@ -227,6 +253,18 @@ test.describe("Notifications API", () => {
     test("PATCH names mark-read sets read on like notifications", async ({
       page,
     }) => {
+      const seeded = await lookupSeededName(page.request, SEED_NAME);
+      const creator = {
+        _id: seeded.creatorId,
+        name: seeded.createdBy.name,
+        profileName: seeded.createdBy.profileName,
+      };
+
+      await loginWithAdminCredentials(page);
+      await ensureNameUnliked(page.request, seeded.id, creator);
+      await ensureNameLiked(page.request, seeded.id, creator);
+      await signOutViaNav(page);
+
       await loginWithCredentials(page);
 
       const before = await page.request.get("/api/notifications/names");
@@ -257,6 +295,21 @@ test.describe("Notifications API", () => {
     test("PATCH descriptions mark-read sets read on like notifications", async ({
       page,
     }) => {
+      const seeded = await lookupSeededDescription(
+        page.request,
+        SEED_DESCRIPTION_START,
+      );
+      const creator = {
+        _id: seeded.creatorId,
+        name: seeded.createdBy.name,
+        profileName: seeded.createdBy.profileName,
+      };
+
+      await loginWithAdminCredentials(page);
+      await ensureDescriptionUnliked(page.request, seeded.id, creator);
+      await ensureDescriptionLiked(page.request, seeded.id, creator);
+      await signOutViaNav(page);
+
       await loginWithCredentials(page);
 
       const before = await page.request.get("/api/notifications/descriptions");
