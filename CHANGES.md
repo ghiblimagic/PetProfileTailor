@@ -6549,3 +6549,12 @@ Upload artifacts on every CI run with `if: always()`; control payload via Playwr
 ### Next logical step
 
 Confirm first Actions run uploads `playwright-report` on green E2E and `vitest-coverage` on green fast job.
+
+---
+
+## 2026-06-21 — E2E adddescriptions blocklist strict mode fix
+
+`getByText(/wank|…/)` matched both the textarea value and the `WarningMessage` banner — Playwright strict mode violation. Assert the API substring message instead.
+
+- `e2e/adddescriptions.spec.ts`
+- `CHANGES.md`

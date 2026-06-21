@@ -64,7 +64,9 @@ test.describe("Add descriptions page (authenticated)", () => {
     );
     await submitDescriptionForm(page);
 
-    await expect(page.getByText(/wank|not allowed|blocklist/i)).toBeVisible({
+    await expect(
+      page.getByText(/any content containing the phrase wank is not allowed/i),
+    ).toBeVisible({
       timeout: 15_000,
     });
   });
