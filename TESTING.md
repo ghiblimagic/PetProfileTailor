@@ -107,6 +107,8 @@ Playwright maps `MONGODB_URI_TEST` → `MONGODB_URI` when starting the server. `
 
 Re-run `pnpm seed:e2e` before a full suite if thanks caps, tags, or listing pagination counts drift after many local runs.
 
+**CI build placeholders** (in [`.github/workflows/ci.yml`](.github/workflows/ci.yml), not GitHub Secrets): `RESEND_API_KEY` / `RESEND_EMAIL_FROM` are dummy values so `new Resend()` at import time in `lib/auth` does not fail during `pnpm build`. E2E mode skips real email sends; production keys stay in Vercel only.
+
 **Slow runs:** `pnpm test:e2e` runs `build && start` (~3–6 min). If port 3000 is busy, use `pnpm build:e2e && pnpm start:e2e` then `pnpm test:e2e:local`.
 
 ### What E2E covers

@@ -19,6 +19,9 @@ env:
   PLAYWRIGHT_TEST_PASSWORD: e2eci-pass-2026
   PLAYWRIGHT_TEST_PROFILENAME: e2eciuser
   PLAYWRIGHT_TEST_NAME: E2E CI User
+  # Resend is constructed at import time in lib/auth → build fails without a key
+  RESEND_API_KEY: re_ci_placeholder_not_used
+  RESEND_EMAIL_FROM: ci@example.com
 
 jobs:
   fast:
