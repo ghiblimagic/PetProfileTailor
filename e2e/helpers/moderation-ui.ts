@@ -1,32 +1,38 @@
 import { expect, type Page } from "@playwright/test";
-import { gotoDescriptionDetail, gotoNameDetail } from "./thanks-ui";
+import { gotoDescriptionDetail } from "./thanks-ui";
 
-export { gotoNameDetail, gotoDescriptionDetail };
+export { gotoNameDetail, gotoDescriptionDetail } from "./thanks-ui";
+
+const MODERATION_FETCH_TIMEOUT = 15_000;
 
 export function listingMoreOptionsButton(page: Page) {
-  return page.getByRole("button", { name: "More options" });
+  return page.getByRole("main").getByRole("button", { name: "More options" });
 }
 
 export function moderationDialog(page: Page) {
   return page.getByRole("dialog");
 }
 
-async function waitForModerationContextFetches(page: Page): Promise<void> {
-  const suggestionsFetch = page.waitForResponse(
-    (response) =>
-      response.url().includes("/api/user/suggestions") &&
-      response.request().method() === "GET",
-  );
-  const reportsFetch = page.waitForResponse(
-    (response) =>
-      response.url().includes("/api/user/reports") &&
-      response.request().method() === "GET",
-  );
-
-  await Promise.all([
-    suggestionsFetch.catch(() => undefined),
-    reportsFetch.catch(() => undefined),
-  ]);
+/** Register before navigation — SuggestionsProvider/ReportsProvider fetch on mount. */
+function startModerationContextFetchWaits(page: Page): Promise<void> {
+  return Promise.all([
+    page
+      .waitForResponse(
+        (response) =>
+          response.url().includes("/api/user/suggestions") &&
+          response.request().method() === "GET",
+        { timeout: MODERATION_FETCH_TIMEOUT },
+      )
+      .catch(() => undefined),
+    page
+      .waitForResponse(
+        (response) =>
+          response.url().includes("/api/user/reports") &&
+          response.request().method() === "GET",
+        { timeout: MODERATION_FETCH_TIMEOUT },
+      )
+      .catch(() => undefined),
+  ]).then(() => undefined);
 }
 
 /** Name detail with user suggestions/reports context fetch settled (best-effort). */
@@ -34,11 +40,15 @@ export async function gotoNameDetailForModeration(
   page: Page,
   name: string,
 ): Promise<void> {
-  await gotoNameDetail(page, name);
-  await expect(listingMoreOptionsButton(page)).toBeVisible({
-    timeout: 30_000,
+  const fetches = startModerationContextFetchWaits(page);
+  await page.goto(`/name/${name}`);
+  await expect(page.getByText(name, { exact: false })).toBeVisible({
+    timeout: 15_000,
   });
-  await waitForModerationContextFetches(page);
+  await expect(listingMoreOptionsButton(page)).toBeVisible({
+    timeout: 15_000,
+  });
+  await fetches;
 }
 
 /** Description detail with user suggestions/reports context fetch settled (best-effort). */
@@ -47,6 +57,8 @@ export async function gotoDescriptionDetailForModeration(
   descriptionId: string,
   options?: { requireThankButton?: boolean },
 ): Promise<void> {
+  const fetches = startModerationContextFetchWaits(page);
+
   if (options?.requireThankButton === false) {
     await page.goto(`/description/${descriptionId}`);
     await expect(listingMoreOptionsButton(page)).toBeVisible({
@@ -56,7 +68,7 @@ export async function gotoDescriptionDetailForModeration(
     await gotoDescriptionDetail(page, descriptionId);
   }
 
-  await waitForModerationContextFetches(page);
+  await fetches;
 }
 
 export async function openListingMenuItem(
@@ -64,7 +76,6 @@ export async function openListingMenuItem(
   itemName: "Suggestion" | "Report",
 ): Promise<void> {
   const menuButton = listingMoreOptionsButton(page);
-  await expect(menuButton).toBeVisible({ timeout: 30_000 });
   await menuButton.click();
   await page.getByRole("button", { name: itemName }).click();
 }

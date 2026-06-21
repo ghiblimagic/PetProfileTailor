@@ -22,6 +22,7 @@ env:
   # Resend is constructed at import time in lib/auth → build fails without a key
   RESEND_API_KEY: re_ci_placeholder_not_used
   RESEND_EMAIL_FROM: ci@example.com
+  NEXT_PUBLIC_BASE_FETCH_URL: http://localhost:3000/
 
 jobs:
   fast:

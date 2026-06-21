@@ -153,7 +153,7 @@ Playwright maps `MONGODB_URI_TEST` → `MONGODB_URI` when starting the server. `
 
 Re-run `pnpm seed:e2e` before a full suite if thanks caps, tags, or listing pagination counts drift after many local runs.
 
-**CI build placeholders** (in [`.github/workflows/ci.yml`](.github/workflows/ci.yml), not GitHub Secrets): `RESEND_API_KEY` / `RESEND_EMAIL_FROM` are dummy values so `new Resend()` at import time in `lib/auth` does not fail during `pnpm build`. E2E mode skips real email sends; production keys stay in Vercel only.
+**CI build placeholders** (in [`.github/workflows/ci.yml`](.github/workflows/ci.yml), not GitHub Secrets): `RESEND_API_KEY` / `RESEND_EMAIL_FROM` are dummy values so `new Resend()` at import time in `lib/auth` does not fail during `pnpm build`. `NEXT_PUBLIC_BASE_FETCH_URL` is set for profile links in E2E builds. E2E mode skips real email sends; production keys stay in Vercel only.
 
 **CI MongoDB:** E2E job uses a single-node replica set (`--replSet rs0`) because `togglelike` routes use Mongoose transactions (Atlas works locally; plain `mongo:7` service does not).
 

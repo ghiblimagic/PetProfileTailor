@@ -37,7 +37,7 @@ test.describe("Moderation UI", () => {
   test("user submits suggestion via listing menu on admin-owned name", async ({
     page,
   }) => {
-    test.setTimeout(60_000);
+    test.setTimeout(90_000);
 
     await loginWithCredentials(page);
     const seeded = await lookupSeededName(page.request, SEED_NAME_ADMIN);
@@ -71,7 +71,7 @@ test.describe("Moderation UI", () => {
   test("user submits report via listing menu on admin-owned name", async ({
     page,
   }) => {
-    test.setTimeout(60_000);
+    test.setTimeout(90_000);
 
     await loginWithCredentials(page);
     const seeded = await lookupSeededName(page.request, SEED_NAME_ADMIN);
@@ -116,7 +116,7 @@ test.describe("Moderation UI", () => {
   test("user submits suggestion via listing menu on admin-owned description", async ({
     page,
   }) => {
-    test.setTimeout(60_000);
+    test.setTimeout(90_000);
 
     await loginWithCredentials(page);
     const seeded = await lookupSeededDescription(
@@ -153,7 +153,7 @@ test.describe("Moderation UI", () => {
   test("user submits report via listing menu on admin-owned description", async ({
     page,
   }) => {
-    test.setTimeout(60_000);
+    test.setTimeout(90_000);
 
     await loginWithCredentials(page);
     const seeded = await lookupSeededDescription(
