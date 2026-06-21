@@ -6421,3 +6421,21 @@ Last medium-value E2E backlog: expired reset token UI, profile location blocklis
 
 - Location UI test initially used `wankville` — `wank` is whole-word-only in blocklist, not substring; aligned with API test phrase `Somewhere wank suburb`.
 - E2E build failed on pre-existing TS errors in `auth/update/route.ts` (`password!`) and `useSwrPagination.ts` (`likedIds !== null` guard).
+
+---
+
+## 2026-06-08 — lib/auth.test.ts TypeScript fixes
+
+### What was built and why
+
+NextAuth callback mocks used partial `user`/`account` objects that failed strict `Parameters<>` typing; `jwtParams` also defaulted `user` to `{}` (truthy), which routed tests through the sign-in branch instead of DB status refresh.
+
+### Files modified
+
+- `lib/auth.test.ts` — `signInParams`, `jwtParams`, `sessionParams` helpers with `NonNullable` callback types
+- `CHANGES.md`
+
+### Verification
+
+- `pnpm exec tsc --noEmit` — no `lib/auth.test.ts` errors
+- `pnpm test lib/auth.test.ts` — 17 passed

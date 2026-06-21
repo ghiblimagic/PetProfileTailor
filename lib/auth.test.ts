@@ -1,4 +1,5 @@
-import type { Session, User } from "next-auth";
+import type { Account, Session, User } from "next-auth";
+import type { JWT } from "next-auth/jwt";
 import type { CredentialsConfig } from "next-auth/providers/credentials";
 import { vi } from "vitest";
 
@@ -43,6 +44,63 @@ vi.mock("./resolveSignInCallback", () => ({
 
 import { serverAuthOptions } from "./auth";
 
+type SignInCallback = NonNullable<
+  NonNullable<(typeof serverAuthOptions)["callbacks"]>["signIn"]
+>;
+type JwtCallback = NonNullable<
+  NonNullable<(typeof serverAuthOptions)["callbacks"]>["jwt"]
+>;
+type SessionCallback = NonNullable<
+  NonNullable<(typeof serverAuthOptions)["callbacks"]>["session"]
+>;
+
+/** Minimal NextAuth callback args — satisfies strict provider/account shapes in tests. */
+function signInParams(
+  overrides: {
+    user?: Partial<User>;
+    account?: Partial<Account>;
+  } = {},
+): Parameters<SignInCallback>[0] {
+  return {
+    user: {
+      id: "user-1",
+      email: "user@example.com",
+      ...overrides.user,
+    } as User,
+    account: {
+      provider: "credentials",
+      type: "credentials",
+      providerAccountId: "credentials",
+      ...overrides.account,
+    } as Account,
+  } as Parameters<SignInCallback>[0];
+}
+
+function jwtParams(
+  overrides: Partial<Parameters<JwtCallback>[0]> &
+    Pick<Parameters<JwtCallback>[0], "token">,
+): Parameters<JwtCallback>[0] {
+  return {
+    account: null,
+    trigger: undefined,
+    session: undefined,
+    ...overrides,
+  } as Parameters<JwtCallback>[0];
+}
+
+function sessionParams(
+  overrides: Partial<Parameters<SessionCallback>[0]>,
+): Parameters<SessionCallback>[0] {
+  return {
+    session: {
+      expires: "2099-01-01",
+      user: {} as Session["user"],
+    },
+    token: {} as JWT,
+    ...overrides,
+  } as Parameters<SessionCallback>[0];
+}
+
 function credentialsAuthorize() {
   const provider = serverAuthOptions.providers?.find(
     (p) => (p as { id?: string }).id === "credentials",
@@ -82,10 +140,12 @@ describe("serverAuthOptions", () => {
       mocks.resolveSignInCallback.mockReturnValue(true);
 
       const signIn = serverAuthOptions.callbacks!.signIn!;
-      const result = await signIn({
-        user: { email: "user@example.com" },
-        account: { provider: "credentials", type: "credentials" },
-      });
+      const result = await signIn(
+        signInParams({
+          user: { email: "user@example.com" },
+          account: { provider: "credentials", type: "credentials" },
+        }),
+      );
 
       expect(mocks.connect).toHaveBeenCalled();
       expect(mocks.findOne).toHaveBeenCalledWith({ email: "user@example.com" });
@@ -101,10 +161,12 @@ describe("serverAuthOptions", () => {
       mocks.resolveSignInCallback.mockReturnValue("/login?error=UserNotFound");
 
       const signIn = serverAuthOptions.callbacks!.signIn!;
-      const result = await signIn({
-        user: { email: "missing@example.com" },
-        account: { provider: "credentials", type: "credentials" },
-      });
+      const result = await signIn(
+        signInParams({
+          user: { email: "missing@example.com" },
+          account: { provider: "credentials", type: "credentials" },
+        }),
+      );
 
       expect(mocks.resolveSignInCallback).toHaveBeenCalledWith({
         userExists: null,
@@ -118,10 +180,12 @@ describe("serverAuthOptions", () => {
       mocks.findOne.mockRejectedValue(new Error("db down"));
 
       const signIn = serverAuthOptions.callbacks!.signIn!;
-      const result = await signIn({
-        user: { email: "user@example.com" },
-        account: { provider: "email", type: "email" },
-      });
+      const result = await signIn(
+        signInParams({
+          user: { email: "user@example.com" },
+          account: { provider: "email", type: "email" },
+        }),
+      );
 
       expect(result).toBe("/login?error=DBUnavailable");
       errorSpy.mockRestore();
@@ -133,12 +197,13 @@ describe("serverAuthOptions", () => {
       const jwt = serverAuthOptions.callbacks!.jwt!;
       const user = signInUser({ bio: "hello", location: "NYC" });
 
-      const token = await jwt({
-        token: {},
-        user,
-        trigger: "signIn",
-        session: undefined,
-      });
+      const token = await jwt(
+        jwtParams({
+          token: {},
+          user,
+          trigger: "signIn",
+        }),
+      );
 
       expect(token.user).toEqual({
         id: user.id,
@@ -158,12 +223,13 @@ describe("serverAuthOptions", () => {
       });
 
       const jwt = serverAuthOptions.callbacks!.jwt!;
-      const token = await jwt({
-        token: { user: { id: "user-1", name: "Old", status: "active" } },
-        user: undefined,
-        trigger: "update",
-        session: { user: { name: "New Name", bio: "updated" } },
-      });
+      const token = await jwt(
+        jwtParams({
+          token: { user: { id: "user-1", name: "Old", status: "active" } },
+          trigger: "update",
+          session: { user: { name: "New Name", bio: "updated" } },
+        }),
+      );
 
       expect(token.user).toMatchObject({
         id: "user-1",
@@ -179,12 +245,11 @@ describe("serverAuthOptions", () => {
       });
 
       const jwt = serverAuthOptions.callbacks!.jwt!;
-      const token = await jwt({
-        token: { user: { id: "user-1", status: "active" } },
-        user: undefined,
-        trigger: undefined,
-        session: undefined,
-      });
+      const token = await jwt(
+        jwtParams({
+          token: { user: { id: "user-1", status: "active" } },
+        }),
+      );
 
       expect(mocks.findById).toHaveBeenCalledWith("user-1");
       expect(token.user?.status).toBe("limited");
@@ -196,12 +261,11 @@ describe("serverAuthOptions", () => {
       });
 
       const jwt = serverAuthOptions.callbacks!.jwt!;
-      const token = await jwt({
-        token: { sub: "user-from-sub", user: { name: "Test" } },
-        user: undefined,
-        trigger: undefined,
-        session: undefined,
-      });
+      const token = await jwt(
+        jwtParams({
+          token: { sub: "user-from-sub", user: { name: "Test" } },
+        }),
+      );
 
       expect(mocks.findById).toHaveBeenCalledWith("user-from-sub");
       expect(token.user?.status).toBe("suspended");
@@ -214,12 +278,11 @@ describe("serverAuthOptions", () => {
       });
 
       const jwt = serverAuthOptions.callbacks!.jwt!;
-      const token = await jwt({
-        token: { user: { id: "user-1", status: "active" } },
-        user: undefined,
-        trigger: undefined,
-        session: undefined,
-      });
+      const token = await jwt(
+        jwtParams({
+          token: { user: { id: "user-1", status: "active" } },
+        }),
+      );
 
       expect(mocks.findById).toHaveBeenCalledWith("user-1");
       expect(token.user).toBeNull();
@@ -231,12 +294,11 @@ describe("serverAuthOptions", () => {
       });
 
       const jwt = serverAuthOptions.callbacks!.jwt!;
-      const token = await jwt({
-        token: { user: { id: "user-1", status: "active" } },
-        user: undefined,
-        trigger: undefined,
-        session: undefined,
-      });
+      const token = await jwt(
+        jwtParams({
+          token: { user: { id: "user-1", status: "active" } },
+        }),
+      );
 
       expect(token.user).toBeNull();
     });
@@ -249,12 +311,7 @@ describe("serverAuthOptions", () => {
 
       const jwt = serverAuthOptions.callbacks!.jwt!;
       const existing = { user: { id: "user-1", status: "active" as const } };
-      const token = await jwt({
-        token: existing,
-        user: undefined,
-        trigger: undefined,
-        session: undefined,
-      });
+      const token = await jwt(jwtParams({ token: existing }));
 
       expect(token).toEqual(existing);
       errorSpy.mockRestore();
@@ -272,10 +329,12 @@ describe("serverAuthOptions", () => {
         status: "active",
       };
 
-      const result = await sessionCb({
-        session: { expires: "2099-01-01", user: {} as Session["user"] },
-        token: { user: tokenUser },
-      });
+      const result = await sessionCb(
+        sessionParams({
+          session: { expires: "2099-01-01", user: {} as Session["user"] },
+          token: { user: tokenUser },
+        }),
+      );
 
       expect(result?.user).toEqual(tokenUser);
     });
@@ -283,17 +342,19 @@ describe("serverAuthOptions", () => {
     it("returns null when token.user is cleared even if session still has email/name", async () => {
       const sessionCb = serverAuthOptions.callbacks!.session!;
 
-      const result = await sessionCb({
-        session: {
-          expires: "2099-01-01",
-          user: {
-            id: "user-1",
-            email: "a@b.com",
-            name: "Stale",
-          } as Session["user"],
-        },
-        token: { user: null },
-      });
+      const result = await sessionCb(
+        sessionParams({
+          session: {
+            expires: "2099-01-01",
+            user: {
+              id: "user-1",
+              email: "a@b.com",
+              name: "Stale",
+            } as Session["user"],
+          },
+          token: { user: null },
+        }),
+      );
 
       expect(result).toBeNull();
     });
