@@ -6522,3 +6522,30 @@ Enable branch protection on `main` requiring `fast` and `e2e` status checks.
 Added **Test suite overview** section with Vitest (269 / 53 files), Playwright (169 / 28 specs), expanded E2E / RTL / pure-unit breakdown (no resume one-liner). Corrected CI e2e job description (docker replica set, not GHA service `--replSet`).
 
 - `TESTING.md`, `CHANGES.md`
+
+---
+
+## 2026-06-21 — E2E moderation-ui CI timeout fix
+
+`waitForModerationContextFetches` registered `waitForResponse` after navigation; suggestions/reports often finished first, so the helper hung until the 60s test timeout. CI snapshot also showed `undefinedprofile/…` (missing `NEXT_PUBLIC_BASE_FETCH_URL` at E2E build).
+
+- `e2e/helpers/moderation-ui.ts` — start fetch waits before `goto`; 15s cap; scope More options to `main`; remove duplicate visibility wait in `openListingMenuItem`
+- `e2e/moderation-ui.spec.ts` — 90s test timeout
+- `.github/workflows/ci.yml` — `NEXT_PUBLIC_BASE_FETCH_URL: http://localhost:3000/`
+- `TESTING.md`, `CHANGES.md`
+
+Commit: `492d6e1`
+
+---
+
+## 2026-06-21 — CI artifact strategy (E2E + coverage)
+
+Upload artifacts on every CI run with `if: always()`; control payload via Playwright config and retention days, not failure-only gates.
+
+- `playwright.config.ts` — CI reporters (list + html + junit); explicit `screenshot`/`video`/`trace` options
+- `.github/workflows/ci.yml` — `fast`: `pnpm test:ci` + coverage artifact (7d); `e2e`: HTML report (7d) + test-results/traces (14d), both `if: always()`
+- `TESTING.md`, `CHANGES.md`
+
+### Next logical step
+
+Confirm first Actions run uploads `playwright-report` on green E2E and `vitest-coverage` on green fast job.

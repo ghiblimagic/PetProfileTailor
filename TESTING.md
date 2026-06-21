@@ -73,8 +73,18 @@ RTL pattern notes: small harness with `useState` for dismiss flows; `userEvent` 
 
 | Job | When | Steps |
 |-----|------|--------|
-| `fast` | Every push / PR | `pnpm lint`, `pnpm test`, `pnpm build` |
+| `fast` | Every push / PR | `pnpm lint`, `pnpm test:ci`, `pnpm build` |
 | `e2e` | Push to `main` or pull request | MongoDB replica set (`docker run … --replSet rs0`) → `pnpm test:e2e:ci` (seed + Playwright) |
+
+**CI artifacts** (uploaded with `if: always()` so green runs leave a baseline; retention controls storage cost):
+
+| Artifact | Job | Retention | Contents |
+|----------|-----|-----------|----------|
+| `vitest-coverage-*` | `fast` | 7 days | Vitest coverage report (`coverage/`) |
+| `playwright-report-*` | `e2e` | 7 days | HTML report (timings, retries) — small, always useful |
+| `playwright-test-results-*` | `e2e` | 14 days | JUnit XML, traces (`on-first-retry`), screenshots/videos (`only-on-failure` / `retain-on-failure`); empty on a clean green run |
+
+Playwright payload size is controlled in [`playwright.config.ts`](playwright.config.ts), not by gating the upload step behind `if: failure()`.
 
 CI uses fixed test credentials (`e2e-ci@example.com`) and a fresh MongoDB container each run — no Atlas secret required. Optional: **Settings → Branches → `main`** → require status checks `fast` and `e2e` (pull requests not required if you push directly to `main`).
 

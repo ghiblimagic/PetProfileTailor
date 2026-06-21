@@ -45,7 +45,17 @@ jobs:
         run: pnpm lint
 
       - name: Unit tests
-        run: pnpm test
+        run: pnpm test:ci
+
+      - name: Upload Vitest coverage
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: vitest-coverage-${{ github.run_id }}
+          path: coverage/
+          retention-days: 7
+          if-no-files-found: ignore
+          compression-level: 9
 
       - name: Production build
         run: pnpm build
@@ -98,10 +108,21 @@ jobs:
         env:
           CI: "true"
 
-      - name: Upload Playwright trace on failure
-        if: failure()
+      - name: Upload Playwright HTML report
+        if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: playwright-traces
-          path: test-results/
+          name: playwright-report-${{ github.run_id }}
+          path: playwright-report/
           retention-days: 7
+          compression-level: 9
+
+      - name: Upload Playwright traces and attachments
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-test-results-${{ github.run_id }}
+          path: test-results/
+          retention-days: 14
+          if-no-files-found: ignore
+          compression-level: 9
