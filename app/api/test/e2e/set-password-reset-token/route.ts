@@ -9,10 +9,16 @@ import { createPasswordResetToken } from "@/utils/api/passwordResetToken";
 
 type SetPasswordResetTokenBody = {
   email?: string;
+  /** When true, token is valid but already past resetTokenExpires (E2E only). */
+  expired?: boolean;
 };
 
-function passwordResetUpdateFields() {
-  const { plainToken, hashedToken, expiresAt } = createPasswordResetToken();
+function passwordResetUpdateFields(expired?: boolean) {
+  const tokenBaseMs = expired
+    ? Date.now() - 3_601_000
+    : Date.now();
+  const { plainToken, hashedToken, expiresAt } =
+    createPasswordResetToken(tokenBaseMs);
   return {
     plainToken,
     update: {
@@ -34,6 +40,8 @@ export async function POST(req: Request) {
     // optional body
   }
 
+  const expired = Boolean(body.expired);
+
   await dbConnect.connect();
 
   const auth = await getSessionForApis({ req });
@@ -44,7 +52,7 @@ export async function POST(req: Request) {
       return Response.json({ error: "Session user id required" }, { status: 400 });
     }
 
-    const { plainToken, update } = passwordResetUpdateFields();
+    const { plainToken, update } = passwordResetUpdateFields(expired);
 
     const updated = await User.findByIdAndUpdate(userId, update, { new: true });
 
@@ -61,7 +69,7 @@ export async function POST(req: Request) {
     return new Response("Unauthorized", { status: 401 });
   }
 
-  const { plainToken, update } = passwordResetUpdateFields();
+  const { plainToken, update } = passwordResetUpdateFields(expired);
 
   const updated = await User.findOneAndUpdate({ email: testEmail }, update, {
     new: true,

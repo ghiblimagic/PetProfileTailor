@@ -34,7 +34,7 @@ export function shouldSkipSwrPaginationForLikes(
 ): boolean {
   return (
     Boolean(restrictSwrToLikedNames && likedIds === null) ||
-    Boolean(restrictSwrToLikedNames && likedIds.length === 0)
+    Boolean(restrictSwrToLikedNames && likedIds !== null && likedIds.length === 0)
   );
 }
 

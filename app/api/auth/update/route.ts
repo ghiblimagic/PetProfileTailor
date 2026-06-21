@@ -48,7 +48,7 @@ export async function PUT(req: Request) {
     }
 
     resetUser.name = name;
-    resetUser.password = bcryptjs.hashSync(password);
+    resetUser.password = bcryptjs.hashSync(password!);
     resetUser.passwordResetToken = undefined;
     resetUser.resetTokenExpires = undefined;
     await resetUser.save();

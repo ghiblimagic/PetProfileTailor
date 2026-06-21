@@ -137,6 +137,8 @@ Playwright maps `MONGODB_URI_TEST` → `MONGODB_URI` when starting the server. `
 
 - `PUT /api/user/editbiolocationavatar` with blocklisted bio → 403 + `blockedBy` in JSON
 - Profile edit UI — blocklisted bio → server message in error toast
+- `PUT /api/user/editbiolocationavatar` with blocklisted location → 403 + `blockedBy` in JSON
+- Profile edit UI — blocklisted location → server message in error toast
 - API + UI — valid bio saves and appears on `/profile/[profilename]` (lookup + About text)
 - API + UI — location saves and appears on profile page (lookup + location row)
 
@@ -265,6 +267,7 @@ Playwright maps `MONGODB_URI_TEST` → `MONGODB_URI` when starting the server. `
 **`e2e/reset-password.spec.ts`**
 
 - `/resetpassword/[token]` invalid token → error message, password fields disabled
+- Expired token (E2E hook) → same error message, password fields disabled
 - E2E token hook → reset form → auto sign-in → new password works on manual login
 
 **`e2e/forgot-password.spec.ts`**
@@ -272,6 +275,8 @@ Playwright maps `MONGODB_URI_TEST` → `MONGODB_URI` when starting the server. `
 - `POST /api/forgotpassword` unknown email → 404
 - UI unknown email → same non-enumeration success message (green alert)
 - UI unknown + known email with stubbed 200 API → identical success copy
+- `POST /api/forgotpassword` known seeded email → 200 (Resend skipped in E2E mode)
+- UI known email via real API → non-enumeration success message
 
 **`e2e/fetchname.spec.ts`**
 
@@ -363,7 +368,7 @@ These manual checklist items are **done in Playwright**; see spec files in [What
 | Admin create UI | `admin.spec.ts`, `admin-category-ui.spec.ts` |
 | Add content + tags + normalization | `addnames.spec.ts`, `adddescriptions.spec.ts` |
 | Edits + `likedByCount` | `edits.spec.ts` |
-| Blocklist + bio | `profile-bio.spec.ts`, `blocklist-api.spec.ts` |
+| Blocklist + bio + location | `profile-bio.spec.ts`, `blocklist-api.spec.ts` |
 | Likes + follow API + rate limit | `social.spec.ts` |
 | Notifications API + UI mark-read | `notifications.spec.ts`, `notifications-ui.spec.ts` |
 | Thanks / suggestion / report | `thanks-ui.spec.ts`, `moderation.spec.ts`, `moderation-ui.spec.ts` |

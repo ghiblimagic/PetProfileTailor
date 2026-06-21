@@ -135,3 +135,45 @@ test.describe("Profile bio blocklist", () => {
     ).toBeVisible({ timeout: 15_000 });
   });
 });
+
+test.describe("Profile location blocklist", () => {
+  test.beforeEach(async ({ page }) => {
+    test.skip(!getPlaywrightCredentials(), "PLAYWRIGHT_TEST_EMAIL/PASSWORD not set");
+    await loginWithCredentials(page);
+  });
+
+  test("API rejects blocklisted location with blockedBy", async ({ page }) => {
+    const profileName = getPlaywrightProfileName();
+    const existing = await lookupUserByProfileName(page.request, profileName);
+
+    const response = await page.request.put("/api/user/editbiolocationavatar", {
+      data: {
+        bioSubmission: {
+          bio: existing.bio ?? "Pet lover",
+          location: "Somewhere wank suburb",
+        },
+      },
+    });
+
+    expect(response.status()).toBe(403);
+    const body = (await response.json()) as {
+      message: string;
+      blockedBy: string;
+    };
+    expect(body.blockedBy).toBe("wank");
+    expect(body.message).toMatch(/location/i);
+  });
+
+  test("UI rejects blocklisted location on profile edit", async ({ page }) => {
+    const profileName = getPlaywrightProfileName();
+    await page.goto(`/profile/${profileName}`);
+
+    await openProfileBioEdit(page);
+    await fillProfileLocation(page, "Somewhere wank suburb");
+    await saveProfileBioEdit(page);
+
+    await expect(
+      page.getByRole("alert").filter({ hasText: /wank|not allowed|blocklist/i }),
+    ).toBeVisible({ timeout: 15_000 });
+  });
+});

@@ -51,4 +51,31 @@ test.describe("Forgot password", () => {
     await page.getByRole("button", { name: "Submit" }).click();
     await expect(forgotPasswordAlert(page)).toBeVisible();
   });
+
+  test("POST with known seeded email returns 200", async ({ request }) => {
+    const creds = getPlaywrightCredentials();
+    test.skip(!creds, "PLAYWRIGHT_TEST_EMAIL/PASSWORD not set");
+
+    const response = await request.post("/api/forgotpassword", {
+      data: { email: creds!.email },
+    });
+
+    expect(response.status()).toBe(200);
+    await expect(response.json()).resolves.toEqual({
+      message: "Password reset email was sent",
+    });
+  });
+
+  test("UI shows success message for known email via real API", async ({
+    page,
+  }) => {
+    const creds = getPlaywrightCredentials();
+    test.skip(!creds, "PLAYWRIGHT_TEST_EMAIL/PASSWORD not set");
+
+    await page.goto("/forgotpassword");
+    await page.locator("#signinemail").fill(creds!.email);
+    await page.getByRole("button", { name: "Submit" }).click();
+
+    await expect(forgotPasswordAlert(page)).toBeVisible({ timeout: 15_000 });
+  });
 });

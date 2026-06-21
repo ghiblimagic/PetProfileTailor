@@ -7,6 +7,7 @@ import db from "@utils/db";
 import { Resend } from "resend";
 import { ResetPasswordEmail } from "@components/EmailTemplates/reset-password-template";
 import { createPasswordResetToken } from "@/utils/api/passwordResetToken";
+import { isE2eServerMode } from "@/utils/api/e2eTestMode";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
@@ -40,15 +41,17 @@ export async function POST(req: Request) {
   try {
     await existingUser.save();
 
-    await resend.emails.send({
-      from: process.env.RESEND_EMAIL_FROM ?? "",
-      to: email,
-      subject: "Reset Password",
-      react: ResetPasswordEmail({
-        userFirstname: userName,
-        resetPasswordLink: resetUrl,
-      }),
-    });
+    if (!isE2eServerMode()) {
+      await resend.emails.send({
+        from: process.env.RESEND_EMAIL_FROM ?? "",
+        to: email,
+        subject: "Reset Password",
+        react: ResetPasswordEmail({
+          userFirstname: userName,
+          resetPasswordLink: resetUrl,
+        }),
+      });
+    }
 
     return Response.json(
       { message: "Password reset email was sent" },

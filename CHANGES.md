@@ -6394,3 +6394,30 @@ Fixed TypeScript error: `buildSwrPaginationGetKey` expects `SwrPage` rows typed 
 
 - `hooks/useSwrPagination.test.ts`
 - `CHANGES.md`
+
+---
+
+## 2026-06-08 — E2E: expired reset token, location blocklist, forgot-password known email
+
+### What was built and why
+
+Last medium-value E2E backlog: expired reset token UI, profile location blocklist (symmetric to bio), and real forgot-password 200 path for seeded user without Resend.
+
+### Files modified
+
+- `app/api/test/e2e/set-password-reset-token/route.ts` — optional `expired: true` sets past `resetTokenExpires`
+- `app/api/forgotpassword/route.ts` — skip Resend send when `E2E_TEST_MODE` (still saves token)
+- `e2e/helpers/reset-password.ts` — `expired` option on token hook
+- `e2e/reset-password.spec.ts` — expired token test
+- `e2e/forgot-password.spec.ts` — known email API + real UI tests
+- `e2e/profile-bio.spec.ts` — location blocklist API + UI
+- `TESTING.md`, `CHANGES.md`
+
+### Verification
+
+- `CI=1 pnpm test:e2e e2e/reset-password.spec.ts e2e/forgot-password.spec.ts e2e/profile-bio.spec.ts -g "blocklist|expired|known"` — 10 passed
+
+### Problems encountered
+
+- Location UI test initially used `wankville` — `wank` is whole-word-only in blocklist, not substring; aligned with API test phrase `Somewhere wank suburb`.
+- E2E build failed on pre-existing TS errors in `auth/update/route.ts` (`password!`) and `useSwrPagination.ts` (`likedIds !== null` guard).
