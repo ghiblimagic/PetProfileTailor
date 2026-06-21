@@ -20,6 +20,7 @@
     "test:watch": "vitest",
     "test:ci": "vitest run --coverage",
     "test:e2e": "playwright test",
+    "test:e2e:ci": "pnpm seed:e2e && playwright test",
     "test:e2e:local": "node scripts/playwright-local.mjs",
     "build:e2e": "node scripts/build-e2e.mjs",
     "start:e2e": "node scripts/start-e2e.mjs",

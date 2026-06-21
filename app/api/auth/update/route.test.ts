@@ -2,7 +2,6 @@
  * @vitest-environment node
  */
 import { vi } from "vitest";
-import { buildPasswordResetUserFilter } from "@/utils/api/authPasswordResetUpdate";
 
 const mocks = vi.hoisted(() => ({
   getSessionForApis: vi.fn(),
@@ -92,7 +91,12 @@ describe("PUT /api/auth/update", () => {
 
     expect(response.status).toBe(401);
     expect(mocks.findOne).toHaveBeenCalledWith(
-      buildPasswordResetUserFilter("user-1", "ada@example.com"),
+      expect.objectContaining({
+        _id: "user-1",
+        email: "ada@example.com",
+        passwordResetToken: { $exists: true, $ne: null },
+        resetTokenExpires: { $gt: expect.any(Number) },
+      }),
     );
     await expect(response.json()).resolves.toEqual({
       message: "Invalid or expired reset token",

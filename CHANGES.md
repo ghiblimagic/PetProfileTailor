@@ -6479,3 +6479,33 @@ Full E2E run (`156 pass, 3 fail, 2 flaky`) exposed cumulative-state bugs: thanks
 ### Next logical step
 
 Run `pnpm seed:e2e` then `CI=1 pnpm test:e2e` for a clean full-suite green; optional seed tweak to preserve description tags on upsert if tag `updateOne` ever misses.
+
+---
+
+## 2026-06-08 — GitHub Actions CI
+
+### What was built and why
+
+Automated merge gate: fast lint/unit/build on every push; full E2E on `main` and PRs using ephemeral MongoDB (no Atlas secret, fresh seed each run).
+
+### Files created or modified
+
+- `.github/workflows/ci.yml` — `fast` and `e2e` jobs
+- `package.json` — `test:e2e:ci` (seed + playwright)
+- `playwright.config.ts` — webServer uses `build:e2e` + `start:e2e`
+- `TESTING.md`, `CHANGES.md`
+
+### CI details
+
+- E2E job: `mongo:7` service, fixed `PLAYWRIGHT_TEST_*` env, `pnpm test:e2e:ci`, Playwright trace artifact on failure
+- Solo-dev friendly: E2E on direct pushes to `main`; PRs optional
+
+### Verification
+
+- Local: `pnpm lint`, `pnpm test`, `pnpm build` with CI-style env vars
+- Fixed flaky `app/api/auth/update/route.test.ts` (`Date.now()` 1ms race on reset filter assertion)
+- Remote: push workflow and confirm Actions `fast` + `e2e` jobs green
+
+### Next logical step
+
+Enable branch protection on `main` requiring `fast` and `e2e` status checks.

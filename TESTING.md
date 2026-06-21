@@ -14,6 +14,7 @@
 | `pnpm test:watch` | Vitest watch |
 | `pnpm test:ci` | Vitest + coverage |
 | `pnpm test:e2e` | Playwright (build + start test server) |
+| `pnpm test:e2e:ci` | Seed test DB then Playwright (CI/local parity) |
 | `pnpm test:e2e:local` | Playwright only (server already on :3000) |
 | `pnpm seed:e2e` | Seed test DB (user, admin, name, descriptions) |
 | `pnpm seed:e2e-user` | Alias for `seed:e2e` |
@@ -22,10 +23,29 @@
 
 ## Before merge (automated)
 
+**GitHub Actions** ([`.github/workflows/ci.yml`](.github/workflows/ci.yml)) runs on every push:
+
+| Job | When | Steps |
+|-----|------|--------|
+| `fast` | Every push / PR | `pnpm lint`, `pnpm test`, `pnpm build` |
+| `e2e` | Push to `main` or pull request | Ephemeral `mongo:7` service → `pnpm test:e2e:ci` (seed + Playwright) |
+
+CI uses fixed test credentials (`e2e-ci@example.com`) and a fresh MongoDB container each run — no Atlas secret required. Optional: **Settings → Branches → `main`** → require status checks `fast` and `e2e` (pull requests not required if you push directly to `main`).
+
+Local parity with the E2E job:
+
+```bash
+pnpm seed:e2e && CI=1 pnpm test:e2e
+# or
+CI=1 pnpm test:e2e:ci
+```
+
+Manual pre-push (without waiting for Actions):
+
 ```bash
 pnpm test
-pnpm test:e2e        # needs: playwright install, seed:e2e, MONGODB_URI_TEST in .env
 pnpm build
+pnpm test:e2e        # needs: playwright install, seed:e2e, MONGODB_URI_TEST in .env
 ```
 
 Vitest + E2E green covers validation logic and the flows listed below. Manual checks on **dev** (`MONGODB_URI`) are only for what automation skips.

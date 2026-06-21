@@ -46,7 +46,7 @@ export default defineConfig({
     : {
         webServer: {
           // Build must include NEXT_PUBLIC_E2E_TEST_MODE for contact validation tests
-          command: "pnpm build && pnpm start",
+          command: "pnpm build:e2e && pnpm start:e2e",
           url: "http://localhost:3000",
           timeout: 360_000,
           reuseExistingServer: !process.env.CI,
