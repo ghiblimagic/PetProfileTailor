@@ -4,13 +4,9 @@
  */
 "use client";
 
-import {
-  useEffect,
-  useState,
-  useRef,
-  type ChangeEvent,
-} from "react";
+import { useEffect, useState, useRef, type ChangeEvent } from "react";
 import { Drawer } from "@mui/material";
+import { ListFilter } from "lucide-react";
 import GeneralButton from "@components/Shared/actions/GeneralButton";
 import FilteringSidebar from "@components/Filtering/FilteringSidebar";
 import PageTitleWithImages from "@components/Shared/typography/PageTitleWithImages";
@@ -131,10 +127,7 @@ export default function CoreListingPageLogic({
       : setFilterTagsIds(filterTagsIds.filter((tag) => tag !== value));
   };
 
-  const handleApplyFilters = (
-    reset = false,
-    quickSearchTags?: string[],
-  ) => {
+  const handleApplyFilters = (reset = false, quickSearchTags?: string[]) => {
     if (reset) {
       setFilterTagsIds([]);
       setTriggerApplyFilters([]);
@@ -206,10 +199,7 @@ export default function CoreListingPageLogic({
 
       {content.length === 0 && !isLoading ? (
         <div className="text-center my-6 text-subtleWhite">
-          <GeneralButton
-            text={`${isOpen ? "Close Filters" : "Open Filters"}`}
-            onClick={() => setIsOpen(!isOpen)}
-          />
+          <GeneralButton text="Filters" onClick={() => setIsOpen(!isOpen)} />
           <p className="mb-4">
             {`We dug deep but there's no ${
               restrictSwrToLikedNames
@@ -275,29 +265,34 @@ export default function CoreListingPageLogic({
         <div className="flex sm:px-2  mx-auto ">
           {/*################# CONTENT DIV ################### */}
 
-          <div className="grow max-w-5xl mx-auto bg-primary rounded-box place-items-center  ">
-            {/* Button that toggles the filter div */}
-            <GeneralButton
-              text={`${isOpen ? "Close Filters" : "Open Filters"}`}
-              onClick={() => setIsOpen(!isOpen)}
-            />
+          <div className="grow max-w-[760px] mx-auto bg-primary rounded-box place-items-center  ">
+            {/* Toolbar: filter toggle + pagination controls read as one row */}
+            <div className="w-full flex flex-wrap items-start gap-3">
+              <GeneralButton
+                className="!bg-blue-600 !border-blue-800 !text-white shrink-0"
+                onClick={() => setIsOpen(!isOpen)}
+              >
+                <ListFilter size={15} className="mr-2" />
+                <span>{isOpen ? "Close Filters" : "Open Filters"}</span>
+              </GeneralButton>
 
-            <Pagination
-              itemsPerPage={itemsPerPage}
-              setItemsPerPageFunction={setItemsPerPageFunction}
-              setSize={setSize}
-              size={size}
-              currentUiPage={currentUiPage}
-              setCurrentUiPage={setCurrentUiPage}
-              setSortingLogicFunction={setSortingLogicFunction}
-              totalPagesInDatabase={totalPagesInDatabase}
-              totalItems={totalItems}
-              amountOfDataLoaded={data?.length}
-              remainingSortCooldown={remainingSortCooldown}
-              sortingValue={sortingValue}
-              sortingProperty={sortingProperty}
-              isValidating={isValidating}
-            />
+              <Pagination
+                itemsPerPage={itemsPerPage}
+                setItemsPerPageFunction={setItemsPerPageFunction}
+                setSize={setSize}
+                size={size}
+                currentUiPage={currentUiPage}
+                setCurrentUiPage={setCurrentUiPage}
+                setSortingLogicFunction={setSortingLogicFunction}
+                totalPagesInDatabase={totalPagesInDatabase}
+                totalItems={totalItems}
+                amountOfDataLoaded={data?.length}
+                remainingSortCooldown={remainingSortCooldown}
+                sortingValue={sortingValue}
+                sortingProperty={sortingProperty}
+                isValidating={isValidating}
+              />
+            </div>
 
             <section className="w-full">
               {isLoading && <LoadingSpinner />}
@@ -309,7 +304,7 @@ export default function CoreListingPageLogic({
                       currentUiPage - 1 === 0
                         ? 0
                         : (currentUiPage - 1) * itemsPerPage,
-                      currentUiPage * itemsPerPage,
+                      currentUiPage * itemsPerPage
                     )
                     .map((singleContent) => (
                       <ContentListing

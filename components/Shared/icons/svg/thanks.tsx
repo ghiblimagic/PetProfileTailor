@@ -1,14 +1,20 @@
 export type ThanksIconProps = {
   fill?: string;
+  width?: string | number;
+  height?: string | number;
 };
 
 /** Thanks / grateful cat SVG (notification tab + thanks button). */
-export default function Thanks({ fill }: ThanksIconProps) {
+export default function Thanks({
+  fill,
+  width = "38pt",
+  height = "38pt",
+}: ThanksIconProps) {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
-      width="38pt"
-      height="38pt"
+      width={width}
+      height={height}
       viewBox="-5.0 -10.0 110.0 135.0"
       x="0px"
       y="0px"

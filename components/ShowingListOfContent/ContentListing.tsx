@@ -14,7 +14,6 @@ import ShareButton from "@components/Shared/content-actions/ShareButton";
 import SharingOptionsBar from "../Shared/content-actions/SharingOptionsBar";
 import ProfileImage from "@components/Shared/media/ProfileImage";
 import ToggeableAlert from "../Shared/feedback/ToggeableAlert";
-import addHashToArrayString from "@utils/stringManipulation/addHashToArrayString";
 import { Ellipsis } from "lucide-react";
 import { useDeleteConfirmation } from "@hooks/useDeleteConfirmation";
 import DeleteDialog from "@components/DeletingData/DeleteDialog";
@@ -45,7 +44,7 @@ export type ContentListingProps = {
   singleContent: ContentListingItem;
   mutate?: (
     updater?: (pages?: SwrPage[]) => SwrPage[],
-    shouldRevalidate?: boolean,
+    shouldRevalidate?: boolean
   ) => void;
   mode?: "swr" | "standalone";
   className?: string;
@@ -84,7 +83,7 @@ export default function ContentListing({
 
   const suggestionStatus = getSuggestionStatus(
     dataType,
-    singleContent._id.toString(),
+    singleContent._id.toString()
   );
   const suggestionPendingOrNone =
     suggestionStatus === "pending" || suggestionStatus === null;
@@ -113,16 +112,12 @@ export default function ContentListing({
     closeSuggestion,
   } = useSuggest();
 
-  const {
-    showEditDialog,
-    openEdit,
-    closeEdit,
-    confirmEdit,
-  } = useEditHandler<ContentListingItem>({
-    apiEndpoint: apiEndPoint,
-    mutate,
-    setLocalData: setLocalContent,
-  });
+  const { showEditDialog, openEdit, closeEdit, confirmEdit } =
+    useEditHandler<ContentListingItem>({
+      apiEndpoint: apiEndPoint,
+      mutate,
+      setLocalData: setLocalContent,
+    });
 
   const { showThanksDialog, openThanks, closeThanks } = useThanksHandler({
     apiEndpoint: "api/thanks",
@@ -147,256 +142,265 @@ export default function ContentListing({
     setShareSectionShowing(!shareSectionShowing);
   }
 
-  const href = `${process.env.NEXT_PUBLIC_BASE_FETCH_URL}profile/${singleContent.createdBy.profileName?.toLowerCase() ?? ""}`;
+  const href = `${process.env.NEXT_PUBLIC_BASE_FETCH_URL}profile/${
+    singleContent.createdBy.profileName?.toLowerCase() ?? ""
+  }`;
 
   const likeDataType = dataType as LikeContentType;
 
   return (
     <div
-      className={`text-base flex border-t border-subtleWhite mb-4 ${className ?? ""}   bg-primary`}
+      className={`flex flex-col gap-4 border border-cardBorder rounded-2xl p-5 mb-4 ${
+        className ?? ""
+      }`}
     >
-      <ProfileImage
-        divStyling="min-h-10 max-w-12 mr-4 mt-3 min-w-10 max-h-12"
-        profileImage={contentProfileImage}
-        layout="responsive"
-        className="rounded-2xl"
-        width={80}
-        height={80}
-        href={href}
-      />
-      <div className="flex-grow ">
-        <div className="grid  grid-cols-1 space-between flex-none text-subtleWhite sm:p-2 justify-items-center ">
-          <section className="w-full pt-2 text-left">
-            <div className="">
-              <div className="w-full p-2 flex items-start">
-                <a
-                  href={`${process.env.NEXT_PUBLIC_BASE_FETCH_URL}profile/${singleContent.createdBy.profileName?.toLowerCase() ?? ""}`}
-                  className="flex-1 min-w-0 flex flex-col"
-                >
-                  <span className="font-bold text-lg break-words">
-                    {singleContent.createdBy.name}
-                  </span>
-                  <span className="font-thin text-base text-gray-300 break-words">
-                    @{singleContent.createdBy.profileName}
-                  </span>
-                </a>
-
-                <Menu
-                  as="div"
-                  className="relative inline-block text-left ml-2"
-                >
-                  {({ open }) => (
-                    <>
-                      <div>
-                        <MenuButton
-                          className={`px-2 py-1 rounded ${
-                            open
-                              ? " bg-subtleWhite text-secondary rounded-2xl"
-                              : "hover:bg-blue-500 rounded-2xl"
-                          }`}
-                        >
-                          <Ellipsis
-                            aria-hidden="true"
-                            focusable="false"
-                          />
-                          <span className="sr-only">More options</span>
-                        </MenuButton>
-                      </div>
-
-                      {(signedInUsersId &&
-                        singleContent.createdBy._id == signedInUsersId) ||
-                      (role === "admin" && status === "active") ? (
-                        <MenuItems className="absolute right-0 mt-2 w-48 py-3 origin-top-right bg-secondary border text-subtleWhite border-subtleWhite rounded-md shadow-lg focus:outline-none z-50 space-y-2">
-                          <MenuItem as="div">
-                            {({ focus }) => (
-                              <DeleteButton
-                                content={singleContent}
-                                onDeleteClick={(item, e) => {
-                                  e.stopPropagation();
-                                  openDelete(item);
-                                }}
-                                className={`ml-2 mr-6 rounded-sm w-[90%] group flex items-center ${
-                                  focus ? "bg-blue-500 text-white" : ""
-                                }`}
-                              />
-                            )}
-                          </MenuItem>
-                          <MenuItem as="div">
-                            {({ focus }) => (
-                              <EditButton
-                                content={singleContent}
-                                onupdateEditState={(item, e) => {
-                                  e.stopPropagation();
-                                  if (item) openEdit(singleContent);
-                                }}
-                                className={`ml-2 mr-6 w-[90%] rounded-sm group flex items-center ${
-                                  focus ? "bg-blue-500 text-white" : ""
-                                }`}
-                              />
-                            )}
-                          </MenuItem>
-                        </MenuItems>
-                      ) : (
-                        <MenuItems className="absolute right-0 mt-2 w-48 py-3 origin-top-right bg-secondary border text-subtleWhite border-subtleWhite rounded-md shadow-lg focus:outline-none z-50">
-                          <MenuItem>
-                            {() => (
-                              <FlagButton
-                                content={singleContent}
-                                dataType={dataType}
-                                onClick={openFlag}
-                                userIsTheCreator={
-                                  singleContent.createdBy._id ===
-                                  signedInUsersId
-                                }
-                              />
-                            )}
-                          </MenuItem>
-
-                          <MenuItem as="div">
-                            {() => (
-                              <SuggestButton
-                                content={singleContent}
-                                dataType={dataType}
-                                onClick={openSuggestion}
-                              />
-                            )}
-                          </MenuItem>
-                        </MenuItems>
-                      )}
-                    </>
-                  )}
-                </Menu>
-              </div>
-            </div>
-
-            {showDeleteConfirmation && deleteTarget && (
-              <DeleteDialog
-                open={showDeleteConfirmation}
-                target={deleteTarget}
-                onClose={closeDelete}
-                signedInUsersId={signedInUsersId}
-                onConfirm={() =>
-                  confirmDelete(
-                    apiEndPoint,
-                    signedInUsersId ?? "",
-                    mode === "swr" ? mutate : undefined,
-                    mode === "standalone" ? setLocalContent : undefined,
-                  )
-                }
-              />
-            )}
-
-            {!userIsTheCreator && reportPendingOrNone && showFlagDialog && (
-              <FlagDialog
-                dataType={dataType}
-                open={showFlagDialog}
-                target={flagTarget}
-                onClose={closeFlag}
-                signedInUsersId={signedInUsersId}
-                contentId={singleContent._id}
-              />
-            )}
-
-            {!userIsTheCreator &&
-              suggestionPendingOrNone &&
-              showSuggestionDialog && (
-                <SuggestionDialog
-                  dataType={dataType}
-                  open={showSuggestionDialog}
-                  target={suggestionTarget}
-                  onClose={closeSuggestion}
-                  signedInUsersId={signedInUsersId}
-                  contentId={singleContent._id}
-                />
-              )}
-
-            {!userIsTheCreator && showThanksDialog && (
-              <ThanksDialog
-                dataType={dataType}
-                open={showThanksDialog}
-                contentInfo={content}
-                onClose={closeThanks}
-                signedInUsersId={signedInUsersId}
-              />
-            )}
-
-            {showEditDialog && (
-              <EditContent
-                dataType={dataType}
-                open={showEditDialog}
-                onClose={closeEdit}
-                content={localContent}
-                onSave={confirmEdit}
-              />
-            )}
-          </section>
-
-          <span
-            className={`font-bold  text-center block w-full mb-2 ${
-              dataType === "names" ? "text-xl" : "text-base"
-            }`}
-          >
-            {content.content}{" "}
+      <div className="flex items-center gap-3 text-subtleWhite">
+        <ProfileImage
+          divStyling="min-h-10 max-w-12 min-w-10 max-h-12 shrink-0"
+          profileImage={contentProfileImage}
+          layout="responsive"
+          className="rounded-full"
+          width={80}
+          height={80}
+          href={href}
+        />
+        <a
+          href={`${process.env.NEXT_PUBLIC_BASE_FETCH_URL}profile/${
+            singleContent.createdBy.profileName?.toLowerCase() ?? ""
+          }`}
+          className="flex-1 min-w-0 flex flex-col leading-tight"
+        >
+          <span className="font-bold text-base text-white break-words">
+            {singleContent.createdBy.name}
           </span>
+          <span className="text-sm text-slate-400 break-words">
+            @{singleContent.createdBy.profileName}
+          </span>
+        </a>
 
-          <p className="whitespace-pre-line">{content.notes}</p>
+        <Menu as="div" className="relative inline-block text-left ml-2">
+          {({ open }) => (
+            <>
+              <div>
+                <MenuButton
+                  className={`px-2 py-1 rounded ${
+                    open
+                      ? " bg-subtleWhite text-secondary rounded-2xl"
+                      : "hover:bg-blue-500 rounded-2xl"
+                  }`}
+                >
+                  <Ellipsis
+                    className="text-slate-400"
+                    aria-hidden="true"
+                    focusable="false"
+                  />
+                  <span className="sr-only">More options</span>
+                </MenuButton>
+              </div>
 
-          <span className="my-4"> {addHashToArrayString(singleContent)} </span>
+              {(signedInUsersId &&
+                singleContent.createdBy._id == signedInUsersId) ||
+              (role === "admin" && status === "active") ? (
+                <MenuItems className="absolute right-0 mt-2 w-48 py-3 origin-top-right bg-secondary border text-subtleWhite border-subtleWhite rounded-md shadow-lg focus:outline-none z-50 space-y-2">
+                  <MenuItem as="div">
+                    {({ focus }) => (
+                      <DeleteButton
+                        content={singleContent}
+                        onDeleteClick={(item, e) => {
+                          e.stopPropagation();
+                          openDelete(item);
+                        }}
+                        className={`ml-2 mr-6 rounded-sm w-[90%] group flex items-center ${
+                          focus ? "bg-blue-500 text-white" : ""
+                        }`}
+                      />
+                    )}
+                  </MenuItem>
+                  <MenuItem as="div">
+                    {({ focus }) => (
+                      <EditButton
+                        content={singleContent}
+                        onupdateEditState={(item, e) => {
+                          e.stopPropagation();
+                          if (item) openEdit(singleContent);
+                        }}
+                        className={`ml-2 mr-6 w-[90%] rounded-sm group flex items-center ${
+                          focus ? "bg-blue-500 text-white" : ""
+                        }`}
+                      />
+                    )}
+                  </MenuItem>
+                </MenuItems>
+              ) : (
+                <MenuItems className="absolute right-0 mt-2 w-48 py-3 origin-top-right bg-secondary border text-subtleWhite border-subtleWhite rounded-md shadow-lg focus:outline-none z-50">
+                  <MenuItem>
+                    {() => (
+                      <FlagButton
+                        content={singleContent}
+                        dataType={dataType}
+                        onClick={openFlag}
+                        userIsTheCreator={
+                          singleContent.createdBy._id === signedInUsersId
+                        }
+                      />
+                    )}
+                  </MenuItem>
 
-          <div className="w-full flex justify-evenly m-2 ">
-            <LikesButtonAndLikesLogic
-              dataType={likeDataType}
-              data={singleContent}
-              setShowLikesSignInMessage={(message) =>
-                setShowLikesSignInMessage(message)
-              }
-              HeartIconStyling="text-xl ml-2 my-auto mx-auto"
-              HeartIconTextStyling="mx-2"
-              signedInUsersId={signedInUsersId ?? ""}
-              apiBaseLink={apiBaseLink}
-            />
+                  <MenuItem as="div">
+                    {() => (
+                      <SuggestButton
+                        content={singleContent}
+                        dataType={dataType}
+                        onClick={openSuggestion}
+                      />
+                    )}
+                  </MenuItem>
+                </MenuItems>
+              )}
+            </>
+          )}
+        </Menu>
+      </div>
 
-            <ShareButton onClickShowShares={onClickShowShares} />
+      {showDeleteConfirmation && deleteTarget && (
+        <DeleteDialog
+          open={showDeleteConfirmation}
+          target={deleteTarget}
+          onClose={closeDelete}
+          signedInUsersId={signedInUsersId}
+          onConfirm={() =>
+            confirmDelete(
+              apiEndPoint,
+              signedInUsersId ?? "",
+              mode === "swr" ? mutate : undefined,
+              mode === "standalone" ? setLocalContent : undefined
+            )
+          }
+        />
+      )}
 
-            {singleContent.createdBy._id !== signedInUsersId && (
-              <ThanksButton onClick={() => openThanks(singleContent._id)} />
-            )}
-          </div>
-        </div>
+      {!userIsTheCreator && reportPendingOrNone && showFlagDialog && (
+        <FlagDialog
+          dataType={dataType}
+          open={showFlagDialog}
+          target={flagTarget}
+          onClose={closeFlag}
+          signedInUsersId={signedInUsersId}
+          contentId={singleContent._id}
+        />
+      )}
 
-        {shareSectionShowing && (
-          <section className="bg-primary py-2">
-            <SharingOptionsBar
-              linkToShare={linkToShare}
-              localLink={localLink}
-            />
-          </section>
-        )}
+      {!userIsTheCreator && suggestionPendingOrNone && showSuggestionDialog && (
+        <SuggestionDialog
+          dataType={dataType}
+          open={showSuggestionDialog}
+          target={suggestionTarget}
+          onClose={closeSuggestion}
+          signedInUsersId={signedInUsersId}
+          contentId={singleContent._id}
+        />
+      )}
 
-        {showLikesSignInMessage && (
-          <ToggeableAlert<string | boolean>
-            text="You must be signed in to like content"
-            setToggleState={setShowLikesSignInMessage}
-            toggleState={showLikesSignInMessage}
-          />
-        )}
+      {!userIsTheCreator && showThanksDialog && (
+        <ThanksDialog
+          dataType={dataType}
+          open={showThanksDialog}
+          contentInfo={content}
+          onClose={closeThanks}
+          signedInUsersId={signedInUsersId}
+        />
+      )}
 
-        {ideaFormToggled && userIsTheCreator && (
-          <ToggeableAlert<boolean>
-            text="You cannot flag your own content 😜"
-            setToggleState={setIdeaFormToggled}
-            toggleState={ideaFormToggled}
-          />
-        )}
+      {showEditDialog && (
+        <EditContent
+          dataType={dataType}
+          open={showEditDialog}
+          onClose={closeEdit}
+          content={localContent}
+          onSave={confirmEdit}
+        />
+      )}
 
-        {ideaFormToggled && userAlreadySentIdea && (
-          <ToggeableAlert<boolean>
-            text="We are in the process of reviewing your idea. Please wait for the prior report to be reviewed before submitting"
-            setToggleState={setIdeaFormToggled}
-            toggleState={ideaFormToggled}
-          />
+      <div className="flex flex-col gap-3 text-left text-subtleWhite">
+        <p
+          className={`font-bold break-words ${
+            dataType === "names" ? "text-xl" : "text-[15.5px]"
+          }`}
+        >
+          {content.content}
+        </p>
+
+        {content.notes && (
+          <p className="whitespace-pre-line text-[15.5px] leading-relaxed text-slate-400 italic">
+            {content.notes}
+          </p>
         )}
       </div>
+
+      {singleContent.tags.length > 0 && (
+        <div className="flex flex-wrap gap-2">
+          {singleContent.tags.map((tag) => (
+            <span
+              key={tag._id}
+              className="bg-white/10 text-subtleWhite text-xs px-3 py-1 rounded-full"
+            >
+              #{tag.tag}
+            </span>
+          ))}
+        </div>
+      )}
+
+      <div className="w-full flex items-center gap-6 pt-3 border-t border-cardBorder">
+        <LikesButtonAndLikesLogic
+          dataType={likeDataType}
+          data={singleContent}
+          setShowLikesSignInMessage={(message) =>
+            setShowLikesSignInMessage(message)
+          }
+          HeartIconStyling="ml-2"
+          HeartIconTextStyling="mx-2"
+          signedInUsersId={signedInUsersId ?? ""}
+          apiBaseLink={apiBaseLink}
+        />
+
+        <ShareButton onClickShowShares={onClickShowShares} />
+
+        {singleContent.createdBy._id !== signedInUsersId && (
+          <div className="ml-auto">
+            <ThanksButton onClick={() => openThanks(singleContent._id)} />
+          </div>
+        )}
+      </div>
+
+      {shareSectionShowing && (
+        <section className="bg-primary py-2 rounded-xl">
+          <SharingOptionsBar linkToShare={linkToShare} localLink={localLink} />
+        </section>
+      )}
+
+      {showLikesSignInMessage && (
+        <ToggeableAlert<string | boolean>
+          text="You must be signed in to like content"
+          setToggleState={setShowLikesSignInMessage}
+          toggleState={showLikesSignInMessage}
+        />
+      )}
+
+      {ideaFormToggled && userIsTheCreator && (
+        <ToggeableAlert<boolean>
+          text="You cannot flag your own content 😜"
+          setToggleState={setIdeaFormToggled}
+          toggleState={ideaFormToggled}
+        />
+      )}
+
+      {ideaFormToggled && userAlreadySentIdea && (
+        <ToggeableAlert<boolean>
+          text="We are in the process of reviewing your idea. Please wait for the prior report to be reviewed before submitting"
+          setToggleState={setIdeaFormToggled}
+          toggleState={ideaFormToggled}
+        />
+      )}
     </div>
   );
 }

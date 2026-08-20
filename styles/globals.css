@@ -9,6 +9,13 @@
   font-size: 18px;
 }
 
+::selection {
+  /* violet-700 — #886BEE (violet-500) only hits ~3.9:1 against white text,
+     below the 4.5:1 AA minimum; this shade holds ~7:1. */
+  background: #6d28d9;
+  color: #fff;
+}
+
 body,
 html {
   margin: 0;

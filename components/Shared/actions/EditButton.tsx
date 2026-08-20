@@ -1,8 +1,6 @@
 import { forwardRef } from "react";
 import type { MouseEvent } from "react";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faPencil } from "@fortawesome/free-solid-svg-icons";
-import "@fortawesome/fontawesome-svg-core/styles.css";
+import { Pencil } from "lucide-react";
 
 type ListingContent = { _id: string };
 
@@ -24,10 +22,7 @@ const EditButton = forwardRef<HTMLButtonElement, EditButtonProps>(
       className={className}
       onClick={(e) => onupdateEditState?.(content, e)}
     >
-      <FontAwesomeIcon
-        icon={faPencil}
-        className="text-xl w-4 h-4 mr-2"
-      />
+      <Pencil size={16} className="mr-2" />
       <span>Edit</span>
     </button>
   ),

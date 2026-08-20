@@ -1,7 +1,6 @@
 import { forwardRef } from "react";
 import type { MouseEvent } from "react";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faTrashCan } from "@fortawesome/free-solid-svg-icons";
+import { Trash2 } from "lucide-react";
 
 type ListingContent = { _id: string };
 
@@ -22,10 +21,7 @@ const DeleteButton = forwardRef<HTMLButtonElement, DeleteButtonProps>(
       className={className}
       onClick={(e) => onDeleteClick?.(content, e)}
     >
-      <FontAwesomeIcon
-        icon={faTrashCan}
-        className="text-xl w-4 h-4 mr-2"
-      />
+      <Trash2 size={16} className="mr-2" />
       <span> Delete</span>
     </button>
   ),
