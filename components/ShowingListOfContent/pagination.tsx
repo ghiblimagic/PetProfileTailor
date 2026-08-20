@@ -6,8 +6,7 @@
 
 import { useEffect, useState, useRef, useMemo } from "react";
 import GeneralButton from "@components/Shared/actions/GeneralButton";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faChevronCircleRight } from "@fortawesome/free-solid-svg-icons";
+import { ChevronDown, ChevronLeft, ChevronRight } from "lucide-react";
 import startCooldown from "@utils/startCooldown";
 
 type PreLoadOverrides = {
@@ -50,7 +49,7 @@ export default function Pagination({
   isValidating,
 }: PaginationProps) {
   const paginationCooldownRef = useRef<ReturnType<typeof setInterval> | null>(
-    null,
+    null
   );
   const [remainingPaginationCooldown, setRemainingPaginationCooldown] =
     useState(0);
@@ -61,11 +60,11 @@ export default function Pagination({
   const windowSize = 5; // max number of visible pages
 
   const startingItemCountForPage = Math.max(
-    (currentUiPage - 1) * itemsPerPage + 1,
+    (currentUiPage - 1) * itemsPerPage + 1
   );
   const endingItemCountForPage = Math.min(
     currentUiPage * itemsPerPage,
-    totalItems,
+    totalItems
   );
 
   const preLoadNextPage = (overrides: PreLoadOverrides = {}) => {
@@ -92,7 +91,7 @@ export default function Pagination({
         startCooldown(
           paginationCooldownRef,
           setRemainingPaginationCooldown,
-          15,
+          15
         );
       }
     }
@@ -100,7 +99,7 @@ export default function Pagination({
 
   useEffect(() => {
     const calculatedTotalLoadedPages = Math.ceil(
-      amountOfDataLoaded / itemsPerPage,
+      amountOfDataLoaded / itemsPerPage
     );
 
     setTotalLoadedPages(calculatedTotalLoadedPages);
@@ -194,17 +193,24 @@ export default function Pagination({
     updateWindow(page);
   };
 
+  const nextEnabled =
+    (currentUiPage < totalLoadedPages && remainingPaginationCooldown === 0) ||
+    (totalLoadedPages < totalPagesInDatabase &&
+      !isValidating &&
+      remainingPaginationCooldown === 0);
+  const prevEnabled = currentUiPage !== 1;
+
   return (
-    <section className="pagination-navigation grid grid-rows-1 min-w-0 my-2  border-t border-violet-300 text-violet-900 font-bold pt-2 ">
+    <section className="pagination-navigation flex-1 flex flex-col gap-3 min-w-0 my-2 border-t border-cardBorder pt-4">
       {/* sorting logic*/}
-      <div className="inline  my-auto pt-3 ">
+      <div className="flex flex-wrap items-center justify-end gap-3">
         {/* wrapping the selects in sections & inline-block keeps the per page and sort by labels from wrapping weirdly at smaller sizes */}
 
         {/* Per page */}
-        <section className="inline-block">
+        <section className="inline-flex items-center gap-2 bg-[oklch(0.20_0.015_260)] border border-[oklch(0.30_0.015_260)] rounded-[10px] px-[14px] py-[9px]">
           <select
             id="per-page"
-            className="bg-secondary text-subtleWhite ml-2 rounded-2xl border-subtleWhite"
+            className="appearance-none bg-none bg-transparent text-subtleWhite text-[14px] border-none p-0 focus:ring-0 cursor-pointer"
             value={itemsPerPage}
             onChange={(e) => resetItemsPerPage(e.target.value)}
           >
@@ -216,18 +222,20 @@ export default function Pagination({
             <option value="50">50</option>
             {/* don't give an option 60 since it leads to an edge case since 60 is the amount of items we grab from the database each time (the chunk size)        */}
           </select>
-          <label
-            className="text-white ml-2"
-            htmlFor="per-page"
-          >
-            Per Page
+          <label className="text-slate-400 text-xs cursor-pointer" htmlFor="per-page">
+            per page
           </label>
+          <ChevronDown
+            size={11}
+            strokeWidth={2.5}
+            className="text-slate-400 pointer-events-none"
+          />
         </section>
         {/* sort by */}
-        <section className="inline-block">
+        <section className="inline-flex items-center gap-2 bg-[oklch(0.20_0.015_260)] border border-[oklch(0.30_0.015_260)] rounded-[10px] px-[14px] py-[9px]">
           {remainingSortCooldown > 0 ? (
             <select
-              className="bg-secondary text-subtleWhite ml-2 p-2 opacity-50 cursor-not-allowed border rounded w-56"
+              className="appearance-none bg-none bg-transparent text-subtleWhite text-[14px] border-none p-0 opacity-50 cursor-not-allowed w-56"
               disabled
             >
               <option>
@@ -236,33 +244,38 @@ export default function Pagination({
               </option>
             </select>
           ) : (
-            <select
-              id="per-page"
-              className="bg-secondary border-subtleWhite text-subtleWhite ml-2 p-2 border  w-40 rounded-2xl"
-              onChange={(e) => setSortingLogicFunction(e.target.value)}
-              value={`${sortingProperty},${sortingValue}`}
-              // so we remember what the user selected after the timeout
-            >
-              <option value="likedByCount,-1">Most Liked</option>
-              <option value="likedByCount,1">Least Liked</option>
-              <option value="_id,-1">Newest</option>
-              <option value="_id,1">Oldest</option>
-            </select>
+            <>
+              <select
+                className="appearance-none bg-none bg-transparent text-subtleWhite text-[14px] border-none p-0 focus:ring-0 cursor-pointer"
+                onChange={(e) => setSortingLogicFunction(e.target.value)}
+                value={`${sortingProperty},${sortingValue}`}
+                // so we remember what the user selected after the timeout
+              >
+                <option value="likedByCount,-1">Most Liked</option>
+                <option value="likedByCount,1">Least Liked</option>
+                <option value="_id,-1">Newest</option>
+                <option value="_id,1">Oldest</option>
+              </select>
+              <ChevronDown
+                size={11}
+                strokeWidth={2.5}
+                className="text-slate-400 pointer-events-none"
+              />
+            </>
           )}
         </section>
       </div>
 
       {/* PAGINATION ARROWS */}
       {remainingPaginationCooldown !== 0 && (
-        <p className="text-subtleWhite mx-auto">
-          {" "}
+        <p className="text-subtleWhite/60 text-sm mx-auto">
           {`Please wait ${remainingPaginationCooldown} secs`}
         </p>
       )}
 
       <div className="flex flex-wrap gap-2 justify-center my-auto items-center ">
         <button
-          className="prevpage"
+          className="prevpage w-8 h-8 rounded-full border border-cardBorder flex items-center justify-center disabled:cursor-not-allowed"
           aria-label="prevpage"
           disabled={currentUiPage == 1}
           type="submit"
@@ -273,10 +286,9 @@ export default function Pagination({
             }
           }}
         >
-          <FontAwesomeIcon
-            icon={faChevronCircleRight}
-            className="text-[38px] fa-rotate-180 leading-none "
-            color={`${currentUiPage === 1 ? "grey" : "rgb(221 214 254)"}`}
+          <ChevronLeft
+            size={18}
+            color={prevEnabled ? "rgb(221 214 254)" : "grey"}
           />
         </button>
 
@@ -287,7 +299,11 @@ export default function Pagination({
               key={number}
               subtle={true}
               active={number === currentUiPage}
-              className={` px-4`}
+              className={`!w-8 !h-8 !p-0 !my-0 !rounded-full !border !flex !items-center !justify-center !text-sm ${
+                number === currentUiPage
+                  ? "!bg-blue-600 !border-blue-700 !text-white"
+                  : "!bg-transparent !border-cardBorder !text-subtleWhite"
+              }`}
               onClick={() => handleClickPage(number)}
             />
           );
@@ -295,27 +311,18 @@ export default function Pagination({
 
         <button
           aria-label="nextpage"
-          className="nextpage aligncenter"
+          className="nextpage w-8 h-8 rounded-full border border-cardBorder flex items-center justify-center disabled:cursor-not-allowed"
           type="submit"
           onClick={() => lastPageHandler()}
         >
-          <FontAwesomeIcon
-            icon={faChevronCircleRight}
-            className="text-[38px]   "
-            color={`${
-              (currentUiPage < totalLoadedPages &&
-                remainingPaginationCooldown === 0) ||
-              (totalLoadedPages < totalPagesInDatabase &&
-                !isValidating &&
-                remainingPaginationCooldown === 0)
-                ? "rgb(221 214 254)"
-                : "grey"
-            }`}
+          <ChevronRight
+            size={18}
+            color={nextEnabled ? "rgb(221 214 254)" : "grey"}
           />
         </button>
       </div>
-      <span className="text-white mx-auto mb-2">
-        {`${startingItemCountForPage}-${endingItemCountForPage} of ${totalItems} Items`}
+      <span className="text-slate-400 text-xs mx-auto mb-2">
+        {`${startingItemCountForPage}-${endingItemCountForPage} of ${totalItems}`}
       </span>
     </section>
   );

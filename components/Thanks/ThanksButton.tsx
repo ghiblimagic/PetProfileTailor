@@ -14,15 +14,16 @@ export type ThanksButtonProps = {
 
 export default function ThanksButton({ onClick }: ThanksButtonProps) {
   return (
-    <ContainerForLikeShareFlag>
+    <ContainerForLikeShareFlag hoverColor="thanks">
       <button
-        className="w-full flex justify-center"
+        className="w-full flex items-center justify-center gap-2"
         // onClick={toggleLike}
         style={{ background: "transparent", border: "none", cursor: "pointer" }}
         onClick={onClick}
         aria-label="Thank"
       >
-        <Thanks fill="rgb(221 214 254)" />
+        <Thanks fill="rgb(221 214 254)" width={33} height={33} />
+        <span className="text-sm text-subtleWhite">Send thanks</span>
       </button>
     </ContainerForLikeShareFlag>
   );

@@ -1,8 +1,7 @@
 "use client";
 
 import { forwardRef } from "react";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faFlag } from "@fortawesome/free-solid-svg-icons";
+import { Flag } from "lucide-react";
 import { useReports } from "@context/ReportsContext";
 import type { ContentType } from "@/utils/api/checkIfValidContentType";
 
@@ -22,7 +21,9 @@ const FlagButton = forwardRef<HTMLButtonElement, FlagButtonProps>(
       dataType,
       content._id.toString(),
     );
-    const flaggedColor = userHasAlreadyReported ? "red" : "white";
+    const flaggedColor = userHasAlreadyReported
+      ? "rgb(248 113 113)"
+      : "rgb(221 214 254)";
 
     return (
       <button
@@ -31,11 +32,7 @@ const FlagButton = forwardRef<HTMLButtonElement, FlagButtonProps>(
         className="ml-2 mr-6 rounded-sm w-[90%] group flex items-center hover:bg-blue-500"
         onClick={() => onClick(content)}
       >
-        <FontAwesomeIcon
-          icon={faFlag}
-          className="text-xl ml-3 mr-2"
-          color={flaggedColor}
-        />
+        <Flag size={18} className="ml-3 mr-2" color={flaggedColor} />
         <span>Report</span>
       </button>
     );
