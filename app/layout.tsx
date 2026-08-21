@@ -3,6 +3,7 @@
  * Notes: docs/notes/app/root-layout.md
  */
 import "../styles/globals.css";
+import { Fredoka } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
 import "@etchteam/next-pagination/dist/index.css";
 import { getServerSession } from "next-auth";
@@ -46,6 +47,14 @@ export const metadata: Metadata = {
     icon: "/icon.png",
   },
 };
+
+const fredoka = Fredoka({
+  subsets: ["latin"],
+  weight: "variable", // Fredoka is a variable font (wght 300-700); loads one file,
+  // any weight utility 300-700 renders natively.
+  display: "swap",
+  variable: "--font-fredoka",
+});
 
 type CachedCategories = {
   names: CategoryWithTags[];
@@ -108,7 +117,7 @@ export default async function RootLayout({ children }: RootLayoutProps) {
   return (
     <html
       lang="en"
-      className="h-full bg-primary w-full"
+      className={`h-full bg-primary w-full ${fredoka.variable}`}
     >
       <body className="h-full flex flex-col w-full">
         <SessionProviderWrapper session={safeSession}>

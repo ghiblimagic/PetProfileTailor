@@ -133,6 +133,14 @@ input::file-selector-button:hover {
     @apply bg-primary text-foreground;
     @apply font-sans;
   }
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    @apply font-heading;
+  }
 }
 
 .blur-with-color {

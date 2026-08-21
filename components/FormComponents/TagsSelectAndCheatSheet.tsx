@@ -34,7 +34,7 @@ export default function TagsSelectAndCheatSheet({
   const [isOpen, setIsOpen] = useState(false);
 
   const selectedOptions = tagsToSubmit.map(
-    (tag) => tagList.find((option) => option.value === tag.value) || tag,
+    (tag) => tagList.find((option) => option.value === tag.value) || tag
   );
 
   const customSelectStyles: StylesConfig<TagOption, true> = {
@@ -184,7 +184,7 @@ export default function TagsSelectAndCheatSheet({
         />
       </div>
       {isOpen && (
-        <div className="flex flex-wrap justify-center">
+        <div className=" justify-center">
           {categoriesWithTags.map((category) => (
             <Disclosure
               key={category._id}
@@ -211,7 +211,7 @@ export default function TagsSelectAndCheatSheet({
                     <div className={`space-y-6 mb-4y `}>
                       {category.tags.map((tag) => {
                         const checked = tagsToSubmit.some(
-                          (t) => t.value === tag._id,
+                          (t) => t.value === tag._id
                         );
                         return (
                           <label
