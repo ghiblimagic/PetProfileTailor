@@ -17,7 +17,8 @@ module.exports = {
       colors: {
         secondary2: "#140223",
         subtleBackground: "#3154bd", //"rgb(99,64,153)",
-        subtleWhite: "rgb(221 214 254 / var(--tw-bg-opacity, 1))",
+        subtleWhite: "oklch(0.88 0.005 260 / <alpha-value>)",
+        cardBorder: "oklch(26% 0.015 260)", // faint card/divider border from the design reference
         accent: {
           DEFAULT: "hsl(var(--accent))",
           foreground: "hsl(var(--accent-foreground))",
@@ -71,6 +72,12 @@ module.exports = {
       },
       fontFamily: {
         sans: ['"Comfortaa"', "sans-serif"],
+        heading: [
+          "var(--font-fredoka)",
+          "ui-rounded",
+          '"Comic Sans MS"',
+          "sans-serif",
+        ],
       },
       width: {
         "30rem": "40rem",

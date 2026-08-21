@@ -9,6 +9,13 @@
   font-size: 18px;
 }
 
+::selection {
+  /* violet-700 — #886BEE (violet-500) only hits ~3.9:1 against white text,
+     below the 4.5:1 AA minimum; this shade holds ~7:1. */
+  background: #6d28d9;
+  color: #fff;
+}
+
 body,
 html {
   margin: 0;
@@ -125,6 +132,14 @@ input::file-selector-button:hover {
   body {
     @apply bg-primary text-foreground;
     @apply font-sans;
+  }
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    @apply font-heading;
   }
 }
 

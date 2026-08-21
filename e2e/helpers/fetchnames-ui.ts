@@ -6,10 +6,10 @@ export const MIN_NAMES_FOR_PAGINATION_COOLDOWN =
   MIN_LISTING_DOCS_FOR_PAGINATION_COOLDOWN;
 
 export async function getNamesTotalDocs(
-  request: APIRequestContext,
+  request: APIRequestContext
 ): Promise<number> {
   const response = await request.get(
-    "/api/names/swr?page=1&sortingproperty=likedByCount&sortingvalue=-1",
+    "/api/names/swr?page=1&sortingproperty=likedByCount&sortingvalue=-1"
   );
   if (!response.ok()) return 0;
   const json = (await response.json()) as { totalDocs?: number };
@@ -20,7 +20,7 @@ export async function gotoFetchnames(page: Page): Promise<void> {
   const firstChunk = page.waitForResponse(
     (response) =>
       response.url().includes("/api/names/swr") &&
-      response.url().includes("page=1"),
+      response.url().includes("page=1")
   );
   await page.goto("/fetchnames");
   await firstChunk;
@@ -48,7 +48,7 @@ export function nextPageButton(page: Page) {
 }
 
 export async function openFiltersDrawer(page: Page): Promise<void> {
-  await page.getByRole("button", { name: "Open Filters" }).click();
+  await page.getByRole("button", { name: "Filters" }).click();
   await expect(page.getByRole("heading", { name: "Filters" })).toBeVisible({
     timeout: 10_000,
   });

@@ -4,9 +4,7 @@
  */
 "use client";
 
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faHeart } from "@fortawesome/free-solid-svg-icons";
-import "@fortawesome/fontawesome-svg-core/styles.css";
+import { Heart } from "lucide-react";
 import "react-toastify/dist/ReactToastify.css";
 import {
   useLikeState,
@@ -56,22 +54,30 @@ export default function LikesButtonAndLikesLogic({
     toggleLike();
   };
 
+  const heartColor = liked ? "rgb(248 113 113)" : "rgb(221 214 254)";
+
   return (
-    <ContainerForLikeShareFlag>
+    <ContainerForLikeShareFlag hoverColor="like">
       <button
-        className="w-full"
+        className="w-full flex items-center justify-center gap-2"
         disabled={isProcessing || isRateLimited}
         onClick={() => toggleLikeIfSignedIn()}
         style={{ background: "transparent", border: "none", cursor: "pointer" }}
         aria-label={liked ? "Unlike" : "Like"}
       >
-        <FontAwesomeIcon
-          icon={faHeart}
+        <Heart
+          size={18}
           className={`${HeartIconStyling}`}
-          color={liked ? "red" : "white"}
+          color={heartColor}
+          fill={liked ? heartColor : "none"}
         />
 
-        <span className={`${HeartIconTextStyling}`}>{likeCount}</span>
+        <span
+          className={`${HeartIconTextStyling}`}
+          style={{ color: heartColor }}
+        >
+          {likeCount}
+        </span>
       </button>
       {remainingSeconds > 0 && (
         <p className="text-subtleWhite text-xs text-center leading-tight mt-0.5">

@@ -1,5 +1,40 @@
 # CHANGES
 
+## 2026-08-21 — Fix pagination "Items" label regression
+
+### What was changed
+
+Restored the literal word "Items" in the pagination range label in
+[components/ShowingListOfContent/pagination.tsx](components/ShowingListOfContent/pagination.tsx)
+(`"{start}-{end} of {totalItems} Items"`).
+
+### Problem encountered
+
+The `f171b55` "refactor: improve layout and structure of pagination and
+content listing components" commit dropped the trailing " Items" from the
+label text. This broke 6 e2e specs that assert on
+`getByText(/\d+-\d+ of \d+ Items/)`:
+`fetchdescriptions-cooldown.spec.ts` (3 tests) and
+`fetchnames-cooldown.spec.ts` (3 tests) — all timed out waiting for that
+text on page load, since `gotoFetchdescriptions`/`gotoFetchnames` use it as
+their initial-load ready signal.
+
+### Why this fix
+
+Restoring the word is a one-line, behavior-preserving fix that matches what
+the e2e suite (and presumably the intended UI copy) expects, rather than
+rewriting the tests to match the unintentional wording change.
+
+### Also fixed: stale selector in fetchname.spec.ts
+
+`e2e/fetchname.spec.ts:16` ("finds duplicate for seeded name") looked for
+`span.font-bold.text-center` containing the seeded name. The `text-center`
+class was intentionally removed from that element (it's a
+`<p className="font-bold ...">`, not a `span`, per current
+[ContentListing.tsx](components/ShowingListOfContent/ContentListing.tsx)
+markup), so the test — not the component — was out of date. Updated the
+locator to `p.font-bold`.
+
 ## 2026-06-02 — TypeScript migration wave 1
 
 ### What was built and why
@@ -6558,3 +6593,36 @@ Confirm first Actions run uploads `playwright-report` on green E2E and `vitest-c
 
 - `e2e/adddescriptions.spec.ts`
 - `CHANGES.md`
+
+---
+
+## 2026-08-20 — Fredoka heading font
+
+### What was built and why
+
+Headers had no font of their own — `<h1>`-`<h6>` just inherited the body font (Comfortaa, `@import`'d in `globals.css` and mapped to Tailwind's `font-sans`). Added **Fredoka**, a rounded/playful Google Font, as a dedicated heading font via `next/font/google` (self-hosted, no runtime request to Google Fonts), applied globally to all headings via one CSS rule rather than editing each of the ~9 components that render bare heading tags.
+
+### Files modified
+
+- `app/layout.tsx` — `Fredoka({ subsets: ["latin"], weight: "variable", display: "swap", variable: "--font-fredoka" })`; variable's className added to `<html>`
+- `tailwind.config.js` — new `fontFamily.heading` key: `["var(--font-fredoka)", "ui-rounded", '"Comic Sans MS"', "sans-serif"]`, alongside the existing `sans: Comfortaa` key
+- `styles/globals.css` — `h1, h2, h3, h4, h5, h6 { @apply font-heading; }` added to the `@layer base` block that already sets `body { @apply font-sans; }`
+- `components/LandingPage/HeroTop.tsx` — removed a stray `font-serif` class on the hero wrapper div (the only `font-serif` usage in the codebase) that was overriding the inherited font for that hero's `<h1>`, so it now picks up Fredoka like every other heading
+
+### Options considered
+
+- **Loading method:** `next/font/google` vs. a plain CSS `@import` matching how Comfortaa is currently loaded. Went with `next/font/google` — it's the idiomatic Next 15 App Router approach (build-time self-hosting, `font-display: swap`, no external request/render-block), even though it's a new pattern for this repo (Comfortaa's `@import` was left as-is, out of scope).
+- **Application scope:** one global `h1..h6` CSS rule vs. a `font-heading` utility class added by hand to every existing heading across ~9 components. Went with the global rule — matches the existing `body { font-sans }` pattern, covers all current and future headings with no per-component edits, and needs no upkeep as new headings are added.
+
+### Problems encountered
+
+- First `pnpm/npm run build` failed at "Collecting page data" with `PageNotFoundError: Cannot find module for page: /_not-found`. Root cause: a stale `.next` build cache, not the font change — confirmed by (a) `git stash` + rebuild on the pre-change code succeeding cleanly, and (b) `rm -rf .next` + rebuild on the changed code also succeeding cleanly, with self-hosted Fredoka `.woff2` files present in `.next/static/media/`.
+
+### Verification
+
+- `npm run build` (after clearing `.next`) — compiled successfully; self-hosted `.woff2` font files present in build output.
+- Manual: dev server, hero `<h1>` and body `<p>` inspected in DevTools — heading resolves to the Fredoka variable, body text still resolves to Comfortaa.
+
+### Note
+
+Headings styled `font-extrabold`/`font-black` (e.g. the HeroTop hero title) will render at Fredoka's max native weight (700) rather than a true 800/900 — expected graceful degradation, not a defect.

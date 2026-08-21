@@ -21,7 +21,7 @@ test.describe("/fetchname single name search", () => {
       timeout: 15_000,
     });
     await expect(
-      page.locator("span.font-bold.text-center").filter({ hasText: SEED_NAME }),
+      page.locator("p.font-bold").filter({ hasText: SEED_NAME }),
     ).toBeVisible({ timeout: 15_000 });
   });
 

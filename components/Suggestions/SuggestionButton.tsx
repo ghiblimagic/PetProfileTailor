@@ -1,8 +1,7 @@
 "use client";
 
 import { forwardRef } from "react";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faLightbulb } from "@fortawesome/free-solid-svg-icons";
+import { Lightbulb } from "lucide-react";
 import { useSuggestions } from "@context/SuggestionsContext";
 import type { ContentType } from "@/utils/api/checkIfValidContentType";
 import type { SuggestionContentInfo } from "@/components/Suggestions/AddSuggestion";
@@ -20,7 +19,9 @@ const SuggestionButton = forwardRef<HTMLButtonElement, SuggestionButtonProps>(
       dataType,
       content._id.toString(),
     );
-    const suggestedColor = userHasAlreadySuggested ? "yellow" : "white";
+    const suggestedColor = userHasAlreadySuggested
+      ? "rgb(250 204 21)"
+      : "rgb(221 214 254)";
 
     return (
       <button
@@ -29,11 +30,7 @@ const SuggestionButton = forwardRef<HTMLButtonElement, SuggestionButtonProps>(
         className="ml-2 mr-6 rounded-sm w-[90%]  group flex items-center hover:bg-blue-500"
         onClick={() => onClick(content)}
       >
-        <FontAwesomeIcon
-          icon={faLightbulb}
-          className="text-xl ml-3 mr-2"
-          color={suggestedColor}
-        />
+        <Lightbulb size={18} className="ml-3 mr-2" color={suggestedColor} />
         <span>Suggestion</span>
       </button>
     );

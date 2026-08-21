@@ -4,9 +4,7 @@
 "use client";
 
 import type { MouseEventHandler } from "react";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faShareFromSquare } from "@fortawesome/free-solid-svg-icons";
-import "@fortawesome/fontawesome-svg-core/styles.css";
+import { Share2 } from "lucide-react";
 import ContainerForLikeShareFlag from "./ContainerForLikeShareFlag";
 
 export type ShareButtonProps = {
@@ -21,18 +19,20 @@ export default function ShareButton({
   shareIconStyling,
 }: ShareButtonProps) {
   return (
-    <ContainerForLikeShareFlag>
+    <ContainerForLikeShareFlag hoverColor="share">
       <button
-        className="w-full"
+        className="w-full flex items-center justify-center gap-2"
         type="button"
         onClick={onClickShowShares}
         tabIndex={0}
         aria-label="toggle sharing options"
       >
-        <FontAwesomeIcon
-          icon={faShareFromSquare}
-          className={`text-xl inline ${shareIconStyling ?? ""}`}
+        <Share2
+          size={17}
+          color="rgb(221 214 254)"
+          className={`${shareIconStyling ?? ""}`}
         />
+        <span className="text-sm text-subtleWhite">Share</span>
       </button>
     </ContainerForLikeShareFlag>
   );

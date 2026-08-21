@@ -34,7 +34,7 @@ export default function HeroTop({
 
   return (
     <div
-      className="hero min-h-fit font-serif 
+      className="hero min-h-fit
   mx-auto overflow-hidden"
       onMouseEnter={() => setHover(true)}
       onMouseLeave={() => setHover(false)}
