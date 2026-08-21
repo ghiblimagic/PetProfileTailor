@@ -4,7 +4,7 @@
  */
 "use client";
 
-import { useEffect, useState, useRef, useMemo } from "react";
+import { useEffect, useState, useRef, useMemo, type ReactNode } from "react";
 import GeneralButton from "@components/Shared/actions/GeneralButton";
 import { ChevronDown, ChevronLeft, ChevronRight } from "lucide-react";
 import startCooldown from "@utils/startCooldown";
@@ -30,6 +30,10 @@ export type PaginationProps = {
   sortingValue: number;
   sortingProperty: string;
   isValidating: boolean;
+  /** Rendered at the start of the top row (e.g. the Filters toggle), so the
+   * whole toolbar — including the page-number row below — shares one width
+   * instead of the pagination controls being squeezed into leftover space. */
+  filtersSlot?: ReactNode;
 };
 
 export default function Pagination({
@@ -47,6 +51,7 @@ export default function Pagination({
   sortingValue,
   sortingProperty,
   isValidating,
+  filtersSlot,
 }: PaginationProps) {
   const paginationCooldownRef = useRef<ReturnType<typeof setInterval> | null>(
     null
@@ -201,9 +206,11 @@ export default function Pagination({
   const prevEnabled = currentUiPage !== 1;
 
   return (
-    <section className="pagination-navigation flex-1 flex flex-col gap-3 min-w-0 my-2 border-t border-cardBorder pt-4">
+    <section className="pagination-navigation w-full flex flex-col gap-3 min-w-0 my-2 border-t border-cardBorder pt-4">
       {/* sorting logic*/}
-      <div className="flex flex-wrap items-center justify-end gap-3">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        {filtersSlot}
+        <div className="flex flex-wrap items-center justify-end gap-3">
         {/* wrapping the selects in sections & inline-block keeps the per page and sort by labels from wrapping weirdly at smaller sizes */}
 
         {/* Per page */}
@@ -264,6 +271,7 @@ export default function Pagination({
             </>
           )}
         </section>
+        </div>
       </div>
 
       {/* PAGINATION ARROWS */}

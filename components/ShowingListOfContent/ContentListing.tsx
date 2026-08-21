@@ -331,7 +331,7 @@ export default function ContentListing({
         </p>
 
         {content.notes && (
-          <p className="whitespace-pre-line text-[15.5px] leading-relaxed text-slate-400 italic">
+          <p className="whitespace-pre-line break-words text-[15.5px] leading-relaxed text-slate-400 italic">
             {content.notes}
           </p>
         )}
@@ -342,7 +342,7 @@ export default function ContentListing({
           {singleContent.tags.map((tag) => (
             <span
               key={tag._id}
-              className="bg-white/10 text-subtleWhite text-xs px-3 py-1 rounded-full"
+              className="bg-white/10 text-subtleWhite text-xs px-3 py-1 rounded-full min-w-0 max-w-full break-words"
             >
               #{tag.tag}
             </span>
@@ -350,7 +350,7 @@ export default function ContentListing({
         </div>
       )}
 
-      <div className="w-full flex items-center gap-6 pt-3 border-t border-cardBorder">
+      <div className="w-full flex flex-wrap items-center gap-x-4 gap-y-2 pt-3 border-t border-cardBorder">
         <LikesButtonAndLikesLogic
           dataType={likeDataType}
           data={singleContent}

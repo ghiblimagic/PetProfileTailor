@@ -265,34 +265,33 @@ export default function CoreListingPageLogic({
         <div className="flex sm:px-2  mx-auto ">
           {/*################# CONTENT DIV ################### */}
 
-          <div className="grow max-w-[760px] mx-auto bg-primary rounded-box place-items-center  ">
-            {/* Toolbar: filter toggle + pagination controls read as one row */}
-            <div className="w-full flex flex-wrap items-start gap-3">
-              <GeneralButton
-                className="!bg-blue-600 !border-blue-800 !text-white shrink-0"
-                onClick={() => setIsOpen(!isOpen)}
-              >
-                <ListFilter size={15} className="mr-2" />
-                <span>{isOpen ? "Close Filters" : "Open Filters"}</span>
-              </GeneralButton>
-
-              <Pagination
-                itemsPerPage={itemsPerPage}
-                setItemsPerPageFunction={setItemsPerPageFunction}
-                setSize={setSize}
-                size={size}
-                currentUiPage={currentUiPage}
-                setCurrentUiPage={setCurrentUiPage}
-                setSortingLogicFunction={setSortingLogicFunction}
-                totalPagesInDatabase={totalPagesInDatabase}
-                totalItems={totalItems}
-                amountOfDataLoaded={data?.length}
-                remainingSortCooldown={remainingSortCooldown}
-                sortingValue={sortingValue}
-                sortingProperty={sortingProperty}
-                isValidating={isValidating}
-              />
-            </div>
+          <div className="grow min-w-0 max-w-[760px] mx-auto bg-primary rounded-box place-items-center  ">
+            {/* Toolbar: filter toggle + pagination controls read as one width-matched block */}
+            <Pagination
+              itemsPerPage={itemsPerPage}
+              setItemsPerPageFunction={setItemsPerPageFunction}
+              setSize={setSize}
+              size={size}
+              currentUiPage={currentUiPage}
+              setCurrentUiPage={setCurrentUiPage}
+              setSortingLogicFunction={setSortingLogicFunction}
+              totalPagesInDatabase={totalPagesInDatabase}
+              totalItems={totalItems}
+              amountOfDataLoaded={data?.length}
+              remainingSortCooldown={remainingSortCooldown}
+              sortingValue={sortingValue}
+              sortingProperty={sortingProperty}
+              isValidating={isValidating}
+              filtersSlot={
+                <GeneralButton
+                  className="!bg-blue-600 !border-blue-800 !text-white shrink-0"
+                  onClick={() => setIsOpen(!isOpen)}
+                >
+                  <ListFilter size={15} className="mr-2" />
+                  <span>{isOpen ? "Close Filters" : "Open Filters"}</span>
+                </GeneralButton>
+              }
+            />
 
             <section className="w-full">
               {isLoading && <LoadingSpinner />}
