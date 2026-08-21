@@ -11,10 +11,10 @@ export const MIN_DESCRIPTIONS_FOR_PAGINATION_COOLDOWN =
 export { SEED_DESCRIPTION_FILTER_CATEGORY, SEED_DESCRIPTION_FILTER_TAG };
 
 export async function getDescriptionsTotalDocs(
-  request: APIRequestContext,
+  request: APIRequestContext
 ): Promise<number> {
   const response = await request.get(
-    "/api/description/swr?page=1&sortingproperty=likedByCount&sortingvalue=-1",
+    "/api/description/swr?page=1&sortingproperty=likedByCount&sortingvalue=-1"
   );
   if (!response.ok()) return 0;
   const json = (await response.json()) as { totalDocs?: number };
@@ -25,7 +25,7 @@ export async function gotoFetchdescriptions(page: Page): Promise<void> {
   const firstChunk = page.waitForResponse(
     (response) =>
       response.url().includes("/api/description/swr") &&
-      response.url().includes("page=1"),
+      response.url().includes("page=1")
   );
   await page.goto("/fetchdescriptions");
   await firstChunk;
@@ -49,7 +49,7 @@ export function nextPageButton(page: Page) {
 }
 
 export async function openFiltersDrawer(page: Page): Promise<void> {
-  await page.getByRole("button", { name: "Open Filters" }).click();
+  await page.getByRole("button", { name: "Filters" }).click();
   await expect(page.getByRole("heading", { name: "Filters" })).toBeVisible({
     timeout: 10_000,
   });
@@ -58,7 +58,10 @@ export async function openFiltersDrawer(page: Page): Promise<void> {
 export async function applySeededDescriptionFilter(page: Page): Promise<void> {
   await openFiltersDrawer(page);
   await page
-    .getByRole("button", { name: SEED_DESCRIPTION_FILTER_CATEGORY, exact: true })
+    .getByRole("button", {
+      name: SEED_DESCRIPTION_FILTER_CATEGORY,
+      exact: true,
+    })
     .click();
   await page.getByText(SEED_DESCRIPTION_FILTER_TAG, { exact: true }).click();
   await page.getByRole("button", { name: "apply", exact: true }).click();
