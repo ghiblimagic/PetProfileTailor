@@ -72,6 +72,12 @@ module.exports = {
       },
       fontFamily: {
         sans: ['"Comfortaa"', "sans-serif"],
+        heading: [
+          "var(--font-fredoka)",
+          "ui-rounded",
+          '"Comic Sans MS"',
+          "sans-serif",
+        ],
       },
       width: {
         "30rem": "40rem",
