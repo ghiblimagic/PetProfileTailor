@@ -54,7 +54,7 @@ export default function Pagination({
   filtersSlot,
 }: PaginationProps) {
   const paginationCooldownRef = useRef<ReturnType<typeof setInterval> | null>(
-    null
+    null,
   );
   const [remainingPaginationCooldown, setRemainingPaginationCooldown] =
     useState(0);
@@ -65,11 +65,11 @@ export default function Pagination({
   const windowSize = 5; // max number of visible pages
 
   const startingItemCountForPage = Math.max(
-    (currentUiPage - 1) * itemsPerPage + 1
+    (currentUiPage - 1) * itemsPerPage + 1,
   );
   const endingItemCountForPage = Math.min(
     currentUiPage * itemsPerPage,
-    totalItems
+    totalItems,
   );
 
   const preLoadNextPage = (overrides: PreLoadOverrides = {}) => {
@@ -96,7 +96,7 @@ export default function Pagination({
         startCooldown(
           paginationCooldownRef,
           setRemainingPaginationCooldown,
-          15
+          15,
         );
       }
     }
@@ -104,7 +104,7 @@ export default function Pagination({
 
   useEffect(() => {
     const calculatedTotalLoadedPages = Math.ceil(
-      amountOfDataLoaded / itemsPerPage
+      amountOfDataLoaded / itemsPerPage,
     );
 
     setTotalLoadedPages(calculatedTotalLoadedPages);
