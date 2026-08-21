@@ -1,5 +1,40 @@
 # CHANGES
 
+## 2026-08-21 — Fix pagination "Items" label regression
+
+### What was changed
+
+Restored the literal word "Items" in the pagination range label in
+[components/ShowingListOfContent/pagination.tsx](components/ShowingListOfContent/pagination.tsx)
+(`"{start}-{end} of {totalItems} Items"`).
+
+### Problem encountered
+
+The `f171b55` "refactor: improve layout and structure of pagination and
+content listing components" commit dropped the trailing " Items" from the
+label text. This broke 6 e2e specs that assert on
+`getByText(/\d+-\d+ of \d+ Items/)`:
+`fetchdescriptions-cooldown.spec.ts` (3 tests) and
+`fetchnames-cooldown.spec.ts` (3 tests) — all timed out waiting for that
+text on page load, since `gotoFetchdescriptions`/`gotoFetchnames` use it as
+their initial-load ready signal.
+
+### Why this fix
+
+Restoring the word is a one-line, behavior-preserving fix that matches what
+the e2e suite (and presumably the intended UI copy) expects, rather than
+rewriting the tests to match the unintentional wording change.
+
+### Also fixed: stale selector in fetchname.spec.ts
+
+`e2e/fetchname.spec.ts:16` ("finds duplicate for seeded name") looked for
+`span.font-bold.text-center` containing the seeded name. The `text-center`
+class was intentionally removed from that element (it's a
+`<p className="font-bold ...">`, not a `span`, per current
+[ContentListing.tsx](components/ShowingListOfContent/ContentListing.tsx)
+markup), so the test — not the component — was out of date. Updated the
+locator to `p.font-bold`.
+
 ## 2026-06-02 — TypeScript migration wave 1
 
 ### What was built and why

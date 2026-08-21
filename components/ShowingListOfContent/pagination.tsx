@@ -330,7 +330,7 @@ export default function Pagination({
         </button>
       </div>
       <span className="text-slate-400 text-xs mx-auto mb-2">
-        {`${startingItemCountForPage}-${endingItemCountForPage} of ${totalItems}`}
+        {`${startingItemCountForPage}-${endingItemCountForPage} of ${totalItems} Items`}
       </span>
     </section>
   );
