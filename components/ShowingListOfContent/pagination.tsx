@@ -6,8 +6,15 @@
 
 import { useEffect, useState, useRef, useMemo, type ReactNode } from "react";
 import GeneralButton from "@components/Shared/actions/GeneralButton";
-import { ChevronDown, ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import startCooldown from "@utils/startCooldown";
+
+// Decorative chevron for the per-page/sort-by selects, drawn as a CSS
+// background-image (lucide's chevron-down path) instead of a DOM icon node.
+// A background-image can never intercept a click, so the whole native
+// <select> box stays clickable end-to-end with no pointer-events bookkeeping.
+const CHEVRON_DOWN_BG =
+  "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='11' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'%3E%3C/path%3E%3C/svg%3E\")";
 
 type PreLoadOverrides = {
   currentPage?: number;
@@ -214,63 +221,57 @@ export default function Pagination({
         {/* wrapping the selects in sections & inline-block keeps the per page and sort by labels from wrapping weirdly at smaller sizes */}
 
         {/* Per page */}
-        <section className="inline-flex items-center gap-2 bg-[oklch(0.20_0.015_260)] border border-[oklch(0.30_0.015_260)] rounded-[10px] px-[14px] py-[9px]">
-          <select
-            id="per-page"
-            className="appearance-none bg-none bg-transparent text-subtleWhite text-[14px] border-none p-0 focus:ring-0 cursor-pointer"
-            value={itemsPerPage}
-            onChange={(e) => resetItemsPerPage(e.target.value)}
-          >
-            <option value="5">5</option>
-            <option value="10">10</option>
-            <option value="20">25</option>
-            <option value="30">30</option>
-            <option value="40">40</option>
-            <option value="50">50</option>
-            {/* don't give an option 60 since it leads to an edge case since 60 is the amount of items we grab from the database each time (the chunk size)        */}
-          </select>
-          <label className="text-slate-400 text-xs cursor-pointer" htmlFor="per-page">
-            per page
-          </label>
-          <ChevronDown
-            size={11}
-            strokeWidth={2.5}
-            className="text-slate-400 pointer-events-none"
-          />
-        </section>
+        {/* The <select> itself is the entire visible pill (background,
+            border, radius, padding all live on it) — no wrapper, no
+            invisible overlay, no decoy text. The browser renders the real
+            selected <option> text, so there's a single source of truth
+            instead of a hand-maintained label mapping. The chevron is a
+            CSS background-image (CHEVRON_DOWN_BG), which can't intercept
+            clicks, so the whole pill stays clickable end-to-end. */}
+        <select
+          id="per-page"
+          className="appearance-none bg-[oklch(0.20_0.015_260)] border border-[oklch(0.30_0.015_260)] rounded-[10px] pl-[14px] pr-7 py-[9px] text-subtleWhite text-[14px] cursor-pointer bg-no-repeat bg-[right_10px_center]"
+          style={{ backgroundImage: CHEVRON_DOWN_BG }}
+          value={itemsPerPage}
+          onChange={(e) => resetItemsPerPage(e.target.value)}
+        >
+          <option value="5">5 per page</option>
+          <option value="10">10 per page</option>
+          <option value="20">25 per page</option>
+          <option value="30">30 per page</option>
+          <option value="40">40 per page</option>
+          <option value="50">50 per page</option>
+          {/* don't give an option 60 since it leads to an edge case since 60 is the amount of items we grab from the database each time (the chunk size)        */}
+        </select>
         {/* sort by */}
-        <section className="inline-flex items-center gap-2 bg-[oklch(0.20_0.015_260)] border border-[oklch(0.30_0.015_260)] rounded-[10px] px-[14px] py-[9px]">
-          {remainingSortCooldown > 0 ? (
-            <select
-              className="appearance-none bg-none bg-transparent text-subtleWhite text-[14px] border-none p-0 opacity-50 cursor-not-allowed w-56"
-              disabled
-            >
-              <option>
-                Please wait {remainingSortCooldown} second
-                {remainingSortCooldown > 1 ? "s" : ""}
-              </option>
-            </select>
-          ) : (
-            <>
-              <select
-                className="appearance-none bg-none bg-transparent text-subtleWhite text-[14px] border-none p-0 focus:ring-0 cursor-pointer"
-                onChange={(e) => setSortingLogicFunction(e.target.value)}
-                value={`${sortingProperty},${sortingValue}`}
-                // so we remember what the user selected after the timeout
-              >
-                <option value="likedByCount,-1">Most Liked</option>
-                <option value="likedByCount,1">Least Liked</option>
-                <option value="_id,-1">Newest</option>
-                <option value="_id,1">Oldest</option>
-              </select>
-              <ChevronDown
-                size={11}
-                strokeWidth={2.5}
-                className="text-slate-400 pointer-events-none"
-              />
-            </>
-          )}
-        </section>
+        {/* Same real-select-is-the-pill treatment as per-page above. Option
+            labels ("Most Liked" etc.) are already self-describing, so no
+            extra caption text is needed. */}
+        {remainingSortCooldown > 0 ? (
+          <select
+            className="appearance-none bg-[oklch(0.20_0.015_260)] border border-[oklch(0.30_0.015_260)] rounded-[10px] px-[14px] py-[9px] text-subtleWhite text-[14px] opacity-50 cursor-not-allowed w-56"
+            disabled
+          >
+            <option>
+              Please wait {remainingSortCooldown} second
+              {remainingSortCooldown > 1 ? "s" : ""}
+            </option>
+          </select>
+        ) : (
+          <select
+            id="sort-by"
+            className="appearance-none bg-[oklch(0.20_0.015_260)] border border-[oklch(0.30_0.015_260)] rounded-[10px] pl-[14px] pr-7 py-[9px] text-subtleWhite text-[14px] cursor-pointer bg-no-repeat bg-[right_10px_center]"
+            style={{ backgroundImage: CHEVRON_DOWN_BG }}
+            onChange={(e) => setSortingLogicFunction(e.target.value)}
+            value={`${sortingProperty},${sortingValue}`}
+            // so we remember what the user selected after the timeout
+          >
+            <option value="likedByCount,-1">Most Liked</option>
+            <option value="likedByCount,1">Least Liked</option>
+            <option value="_id,-1">Newest</option>
+            <option value="_id,1">Oldest</option>
+          </select>
+        )}
         </div>
       </div>
 

@@ -1,5 +1,97 @@
 # CHANGES
 
+## 2026-08-21 — Refactor pagination selects to remove invisible-overlay/duplicated-state hack
+
+### What was changed
+
+Follow-up to the "Fix unresponsive ... dropdown pills" entry below. That
+fix (invisible `absolute inset-0 opacity-0` `<select>` + a separate
+`pointer-events-none` span/icon layer showing the "real" text) worked,
+but introduced a maintenance smell: the visible label text for the sort
+control was a hand-written ternary chain
+(`sortingProperty === "likedByCount" && sortingValue === -1 ? "Most
+Liked" : ...`) that had to be kept in sync by hand with the `<option>`
+list a few lines above — two sources of truth for the same information,
+with no compiler check tying them together.
+
+Replaced both selects in
+[components/ShowingListOfContent/pagination.tsx](components/ShowingListOfContent/pagination.tsx)
+with the standard custom-select pattern: the `<select>` itself **is**
+the entire visible pill (background/border/radius/padding moved directly
+onto it), so the browser renders the real selected `<option>`'s text —
+no decoy span, no invisible layer, single source of truth. The decorative
+chevron is now a CSS `background-image` (`CHEVRON_DOWN_BG`, an inline
+SVG data URI reproducing lucide's chevron-down glyph) instead of a
+`<ChevronDown>` React node — a background-image structurally can't
+intercept clicks, so no `pointer-events-none` bookkeeping is needed at
+all. The `ChevronDown` import was removed as a result (still used
+elsewhere in the file for the prev/next arrow buttons via
+`ChevronLeft`/`ChevronRight`, which are unaffected).
+
+For the per-page control, the "per page" caption (previously separate
+decorative text) was folded directly into each `<option>`'s label (e.g.
+`"10 per page"`) since a real `<select>` can only render its own option
+text — there's no way to show extra static text alongside it without
+reintroducing an overlay.
+
+### Why this fix
+
+This is the standard, well-tested pattern for a custom-styled native
+`<select>` (used by e.g. Tailwind's `forms` plugin) — the real control's
+box **is** the whole visible area, so there's inherently nothing to
+desync and no overlay trick required. Simpler DOM, less code, and
+removes the drift risk from the previous fix's hand-maintained ternary.
+
+## 2026-08-21 — Fix unresponsive "per page" / "sort by" dropdown pills
+
+### What was changed
+
+In [components/ShowingListOfContent/pagination.tsx](components/ShowingListOfContent/pagination.tsx),
+the "per page" and "sort by" controls are each styled as one pill
+(background, border, rounded corners) containing a `<select>`, a text
+label, and a `ChevronDown` icon. The pill's visible bounds only wrapped
+the `<select>` itself for hit-testing — clicking the chevron icon, the
+"per page"/label text, or the surrounding padding did nothing, since
+those were separate sibling elements outside the actual `<select>`'s
+hit area. Only clicking directly on the current value text (e.g. the
+number "10") opened the native picker.
+
+Fixed by making the `<select>` itself the full clickable surface: it's
+now `absolute inset-0` (invisible, `opacity-0`) inside a `relative` pill
+container, sized to cover the entire pill including the chevron and
+padding. The pill's visible content (current value text, "per page"
+label, chevron) is rendered as a separate `pointer-events-none` layer on
+top of it purely for display, so every click anywhere in the pill lands
+on the select underneath and opens the native picker.
+
+### Problem encountered
+
+Two false starts before landing on this:
+1. Initially assumed a Firefox-specific `appearance-none`/sizing CSS bug
+   (the user first said "the dropdown doesn't respond" while testing in
+   Firefox). Static code reading couldn't confirm this, and the user
+   then pinpointed the real cause via devtools: the chevron/label text
+   were never wired to the select's hit-box, in any browser.
+2. Tried wrapping the whole pill in a `<label htmlFor="...">` instead of
+   a plain `<section>`, assuming clicking a label associated with a
+   `<select>` would open its picker like it does for radio/checkbox/text
+   inputs. It doesn't — in Chrome/Firefox a label click on a `<select>`
+   only focuses it, it does not open the dropdown. The user reported
+   clicking still did nothing, which ruled this out.
+
+### Why this fix
+
+Stretching the actual `<select>` over the whole pill (rather than
+relying on `<label>` association) is the standard "invisible native
+control on top, styled decoration underneath" pattern for making an
+entire custom-styled area trigger a native form control's real
+interaction — it doesn't depend on browser-specific label-forwarding
+behavior. Kept the visible current-value text as its own span (driven
+from the same `itemsPerPage`/`sortingProperty`/`sortingValue` state) so
+the display doesn't rely on the now-invisible select's own rendered
+text. `page.locator("select")` e2e selectors are unaffected since the
+selects remain in the same DOM order.
+
 ## 2026-08-21 — Fix pagination "Items" label regression
 
 ### What was changed
