@@ -59,4 +59,12 @@ describe("GeneralButton", () => {
       "bg-red-800",
     );
   });
+
+  it("applies heroStyle variant classes", () => {
+    render(<GeneralButton text="Fun" heroStyle />);
+
+    const button = screen.getByRole("button", { name: "Fun" });
+    expect(button).toHaveClass("bg-secondary");
+    expect(button).toHaveClass("rounded-full");
+  });
 });

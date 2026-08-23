@@ -2,20 +2,69 @@
 
 Source folder: [`components/Shared/actions/`](../../../components/Shared/actions/) (and [`shared/content-actions/`](../../../components/Shared/content-actions/) for like/follow/share). See also [`components/README.md`](../../../components/README.md).
 
+## Shared styling: `buttonStyles.ts`
+
+[`buttonStyles.ts`](../../../components/Shared/actions/buttonStyles.ts) is
+the single source of truth for both `GeneralButton` and `LinkButton` —
+base classes, the `BUTTON_VARIANT_CLASSES` color/class map, and a
+`resolve*Variant()` helper per component that reproduces each component's
+own flag-precedence order (flags are checked in sequence; a later true flag
+overrides an earlier one). Add or recolor a variant here once and both
+components pick it up.
+
+Colors are drawn from the design-system tokens in `tailwind.config.js`
+(`primary`, `secondary`, `subtleBackground`, `cardBorder`, `subtleWhite`)
+plus a small accent/outline/disabled set added alongside them
+(`buttonAccent`, `accentFill`, `accentFillBorder`, `outlineBorder`,
+`warningHover`, `disabledBg`, `disabledText`) — no more ad-hoc Tailwind
+yellow/blue/gray. Named `buttonAccent` rather than `accent` — tailwind.config.js
+already has an unrelated, otherwise-unused shadcn `accent: { DEFAULT:
+"hsl(var(--accent))", ... }` token (a near-white gray), and a same-named key
+added later in the same object silently wins, which is exactly what
+happened the first time this was added — hover/active states rendered as
+grey/white instead of blue until the rename.
+All text/background pairs meet WCAG AA (4.5:1); outline-only borders
+(`secondary`, `tertiary`, `disabled`) meet 3:1. Previously most `GeneralButton`
+variants set a border *color* without a border *width* utility, so the
+border was invisible in practice — every variant now sets an explicit width.
+
+Both components compose `className`s with `cn()` ([`lib/utils.ts`](../../../lib/utils.ts),
+clsx + tailwind-merge) instead of raw string concatenation, so a variant's
+classes and any caller-supplied `className` resolve conflicts predictably
+(last one wins) rather than depending on Tailwind's generated-CSS source
+order.
+
 ## `GeneralButton`
 
-[`GeneralButton.tsx`](../../../components/Shared/actions/GeneralButton.tsx) — primary `<button>` with mutually combinable style flags (`subtle`, `warning`, `secondary`, `tertiary`, `plain`, `active`, `disabled`). Default: yellow CTA.
+[`GeneralButton.tsx`](../../../components/Shared/actions/GeneralButton.tsx) — primary `<button>` with mutually combinable style flags (`subtle`, `warning`, `secondary`, `tertiary`, `plain`, `active`, `disabled`). Default: `subtleBackground` CTA.
 
 ```tsx
 <GeneralButton text="Submit" type="submit" onClick={handleSubmit} />
 <GeneralButton plain text="X" type="button" onClick={onClose} />
 ```
 
+`heroStyle` is a separate, standalone flag (dark navy pill button used over
+the landing-page hero image, e.g. [`HeroTop.tsx`](../../../components/LandingPage/HeroTop.tsx)) — it's a full visual reset, not designed to combine with the other flags above.
+
 `children` render beside `text` (e.g. icon-only [`GoToTopButton`](#gototopbutton)).
 
 ## `LinkButton`
 
-[`LinkButton.tsx`](../../../components/Shared/actions/LinkButton.tsx) — `next/link` with same visual variants (`defaultStyle`, `basic`, `subtle`, `warning`, `active`, `disabled`). Optional `icon` before `text`.
+[`LinkButton.tsx`](../../../components/Shared/actions/LinkButton.tsx) — `next/link` styled via the same shared [`buttonStyles.ts`](../../../components/Shared/actions/buttonStyles.ts) map as `GeneralButton`. Variant flags: `defaultStyle` (→ the same CTA look as `GeneralButton`'s default), `basic` (underline nav-link look, no fill), `secondary`, `subtle`, `warning`, `active`, `disabled`. Optional `icon` before `text`.
+
+Flag names don't fully match `GeneralButton`'s (no `tertiary`/`plain`
+equivalents; `basic`/`defaultStyle` have no `GeneralButton` counterpart) — call
+sites keep their existing prop names, only the underlying colors are shared.
+`secondary` was added on top of the original set (see
+[media-object.md](media-object.md)) once a call site needed it — add further
+flags the same way: a case in `resolveLinkButtonVariant()`
+([buttonStyles.ts](../../../components/Shared/actions/buttonStyles.ts)) mapped
+onto an existing `BUTTON_VARIANT_CLASSES` entry, no new colors needed.
+**No flag set → no variant classes at all** (unlike `GeneralButton`, which
+always applies its default look) — several call sites
+(`NavLayoutwithSettingsMenu.tsx`'s logo link, `SharingOptionsBar.tsx`,
+`ReturnToPreviousPage.tsx`) rely on rendering fully unstyled and driven only
+by their own `className`.
 
 ## `DisabledButton`
 

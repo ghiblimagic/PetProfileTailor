@@ -1,5 +1,381 @@
 # CHANGES
 
+## 2026-08-22 — MediaObjectLeft/Right: center the button under the text block
+
+### What was changed
+
+The button wrapper in both `MediaObjectLeft.tsx` and `MediaObjectRight.tsx`
+used `flex items-center` — `items-center` only affects cross-axis (vertical)
+alignment in a flex row, so it did nothing to horizontally position the
+button; `MediaObjectLeft` additionally had a leftover `ml-4`/`max-w-2xl`
+indent. Changed both wrappers to `flex justify-center` (dropping the
+indent), which centers the button within the same parent container the
+bullet-list text block above it sits in.
+
+### Files modified
+
+- `components/Shared/layout/MediaObjectLeft.tsx`
+- `components/Shared/layout/MediaObjectRight.tsx`
+
+### Verification
+
+- `pnpm exec tsc --noEmit` — clean.
+
+## 2026-08-22 — LinkButton: add `secondary` flag; MediaObject buttonStyle mapping
+
+### What was broken and why
+
+User set `buttonStyle="secondary"` on two `MediaObjectRight`/`MediaObjectLeft`
+call sites in `app/page.tsx`, expecting the `secondary` `LinkButton` look —
+but nothing changed. Two compounding gaps:
+
+1. `LinkButton` never had a `secondary` flag at all — its flag set was
+   `defaultStyle`/`basic`/`subtle`/`warning`/`active`/`disabled` (`secondary`
+   is a `GeneralButton`-only flag; see the "Unify GeneralButton + LinkButton
+   styling" entry below for why they weren't fully unified).
+2. `MediaObjectLeft.tsx`/`MediaObjectRight.tsx` only ever checked
+   `buttonStyle === "subtle"`, hardcoded as a binary ternary — any other
+   string (`"secondary"`, a typo, anything) silently fell through to the
+   `else` branch and rendered `defaultStyle` instead. `buttonStyle="default"`
+   happened to render correctly, but only by accident (it also isn't
+   `"subtle"`, so it also fell into the same `else` branch) — the prop was
+   never actually read for anything but a `"subtle"` check.
+
+### Fix
+
+- Added `secondary` to `LinkButtonProps` / `LinkButtonVariantFlags` /
+  `resolveLinkButtonVariant()` in
+  [buttonStyles.ts](components/Shared/actions/buttonStyles.ts) — maps onto
+  the `"secondary"` entry `BUTTON_VARIANT_CLASSES` already had from
+  `GeneralButton`, so no new colors were needed.
+- New [`components/Shared/layout/mediaObjectButtonStyle.ts`](components/Shared/layout/mediaObjectButtonStyle.ts) —
+  `MediaObjectButtonStyle` (`"default" | "subtle" | "secondary"`) and
+  `mediaObjectLinkButtonFlags()`, a single mapping both `MediaObjectLeft`
+  and `MediaObjectRight` call instead of each hand-rolling its own
+  (previously binary, now 3-way) ternary — same "centralize it so the two
+  copies can't drift apart" reasoning as `buttonStyles.ts` itself.
+  `buttonStyle` is now typed as that union instead of a bare `string`, so a
+  typo or unrecognized value is a type error going forward, not a silent
+  fallback.
+- Collapsed each `{buttonText && buttonStyle === "subtle" ? <A/> : <B/>}` to
+  a single `<LinkButton {...mediaObjectLinkButtonFlags(buttonStyle)} />` —
+  behavior-preserving: `buttonText` is a required (non-optional) prop on
+  both components, so the `buttonText &&` guard could never actually
+  prevent the button from rendering; it always fell into whichever variant
+  the ternary's `else` produced.
+
+### Files modified
+
+- `components/Shared/actions/buttonStyles.ts` — `secondary` on `LinkButtonVariantFlags`/`resolveLinkButtonVariant()`.
+- `components/Shared/actions/LinkButton.tsx` — `secondary` prop.
+- `components/Shared/layout/mediaObjectButtonStyle.ts` — new.
+- `components/Shared/layout/MediaObjectLeft.tsx`, `MediaObjectRight.tsx` — typed `buttonStyle`, use the shared mapping.
+- `docs/notes/components/media-object.md`, `docs/notes/components/reusable-buttons.md` — documented.
+
+### Verification
+
+- `pnpm exec tsc --noEmit` — clean.
+- `pnpm lint` — clean (same pre-existing unrelated warnings as before).
+- `pnpm vitest run components/Shared/actions/GeneralButton.test.tsx` — 6 tests passed.
+
+### Follow-up: cover every LinkButton flag, not just the ones asked for
+
+The first pass above only added `"default" | "subtle" | "secondary"` to
+`MediaObjectButtonStyle` — just enough to fix the reported bug. Asked why it
+wasn't the full set: no good reason, so widened it to all seven `LinkButton`
+flags (`"default" | "basic" | "secondary" | "subtle" | "warning" | "active"
+| "disabled"`) via a `Record<MediaObjectButtonStyle, keyof
+LinkButtonVariantFlags>` lookup table in `mediaObjectButtonStyle.ts`, so a
+future MediaObject usage can reach any LinkButton look without this file
+needing another matching addition. `mediaObjectLinkButtonFlags()` now
+defaults an omitted `buttonStyle` to `"default"` via `?? "default"` rather
+than an unconditional final `return`. Re-verified: `tsc`/`lint`/tests all
+still clean.
+
+### Follow-up 2: derive `MediaObjectButtonStyle` instead of retyping it
+
+The widened union (above) was still hand-typed as its own literal list —
+duplicating `LinkButtonVariantFlags`'s keys in a second place, exactly the
+kind of drift this file exists to prevent. Asked why: no good reason there
+either. Changed it to `Exclude<keyof LinkButtonVariantFlags,
+"defaultStyle"> | "default"` — derived from `LinkButtonVariantFlags` itself
+with only the one deliberate rename (`defaultStyle` → the friendlier
+`default`) spelled out. `MEDIA_OBJECT_BUTTON_STYLE_FLAG`'s
+`Record<MediaObjectButtonStyle, LinkButtonFlagName>` type still requires
+every key to be mapped, so a future LinkButton flag now surfaces here as a
+type error to resolve rather than silently missing. `pnpm exec tsc --noEmit` — clean.
+
+### Follow-up 3: drop the `"default"` rename, use `defaultStyle` as-is
+
+Asked whether the `default` → `defaultStyle` rename (and the lookup table it
+required) was actually necessary — it wasn't. Simplified
+`MediaObjectButtonStyle` to `keyof LinkButtonVariantFlags` directly (no
+`Exclude`, no rename) and `mediaObjectLinkButtonFlags()` to a one-line
+`{ [buttonStyle]: true }` passthrough with `buttonStyle = "defaultStyle"` as
+the default parameter — the lookup table is gone entirely, since an
+identity mapping doesn't need one. Updated the one live call site
+(`app/page.tsx`) from `buttonStyle="default"` to `buttonStyle="defaultStyle"`
+to match. `pnpm exec tsc --noEmit` / `pnpm lint` — clean.
+
+## 2026-08-22 — Bugfix: `subtle` button hover rendering grey/white, not blue
+
+### What was broken and why
+
+User-reported (screenshot of the "Find Names" link on the landing page,
+`buttonStyle="subtle"` in `MediaObjectLeft`): the `subtle` variant's hover
+state rendered as a grey fill with a near-white border instead of blue.
+
+Root cause: [tailwind.config.js](tailwind.config.js)'s `theme.extend.colors`
+already had an (otherwise-unused, shadcn-scaffold) `accent` token —
+`accent: { DEFAULT: "hsl(var(--accent))", foreground: "hsl(var(--accent-foreground))" }`
+— and the `accent: "oklch(62% 0.16 264 / <alpha-value>)"` token added
+earlier today for the button palette used the **same key name**, placed
+*earlier* in the same object literal. JS object literals silently let a
+later duplicate key win, so the pre-existing shadcn `accent` object
+overwrote mine — every `bg-accent`/`border-accent`/`hover:border-accent`
+class actually compiled to `hsl(var(--accent))`, and
+[`styles/globals.css`](styles/globals.css) defines `--accent: 0 0% 96.1%`
+(a near-white gray) — exactly what showed up in the screenshot. No lint,
+type, or test error catches a duplicate key in a plain JS object, so this
+went unnoticed despite `GeneralButton.test.tsx`, `pnpm lint`, and
+`pnpm exec tsc --noEmit` all passing clean at the time.
+
+### Fix
+
+Renamed the button-system token from `accent` to `buttonAccent`
+(tailwind.config.js) and updated its 5 usages in
+[`buttonStyles.ts`](components/Shared/actions/buttonStyles.ts)
+(`secondary`, `tertiary`, `subtle` ×2, `active`). Left the pre-existing
+shadcn `accent`/`accent-foreground` token alone — confirmed via grep it's
+not used anywhere else in the codebase, so untouched rather than risking a
+change to unrelated (if currently dead) scaffold code. Added a comment at
+both the token definition and the variant map warning against renaming it
+back to `accent` without removing the colliding shadcn token first.
+
+### Verification
+
+- Rebuilt (`pnpm build`) and inspected the compiled CSS directly: `hover:bg-buttonAccent/40` now compiles to `background-color:oklch(62% .16 264/.4)` and `hover:border-buttonAccent` to `border-color:oklch(62% .16 264/var(--tw-border-opacity,1))` — both genuinely blue, confirming the fix (previously these compiled to `hsl(var(--accent) / ...)`).
+- `pnpm vitest run components/Shared/actions/GeneralButton.test.tsx` — 6 tests passed.
+- The build's "Collecting page data" step hit the same pre-existing, unrelated `PageNotFoundError: Cannot find module for page: /_document` documented in an earlier entry (stale/interrupted build artifact) — CSS/type/lint stages all completed successfully before that; `rm -rf .next` was run again after to clear it.
+
+### Files modified
+
+- `tailwind.config.js` — `accent` → `buttonAccent`.
+- `components/Shared/actions/buttonStyles.ts` — updated the 5 `accent`-class usages; comments explaining the collision.
+- `docs/notes/components/reusable-buttons.md` — token list + collision note.
+
+## 2026-08-22 — Unify GeneralButton + LinkButton styling into buttonStyles.ts
+
+### What was changed
+
+`LinkButton.tsx` styled itself independently of `GeneralButton.tsx` and had
+drifted onto the old ad-hoc Tailwind colors (`yellow-200`/`yellow-600`,
+`blue-500`/`blue-700`, `red-900`, `indigo-600`, `slate-300`, `gray-400`/
+`gray-500`) that `GeneralButton` moved away from earlier today. Rather than
+just recoloring `LinkButton` a second time, extracted the shared logic into
+a new [`components/Shared/actions/buttonStyles.ts`](components/Shared/actions/buttonStyles.ts):
+`BUTTON_BASE_CLASSES`/`HERO_BUTTON_BASE_CLASSES`, a `BUTTON_VARIANT_CLASSES`
+color/class map, and a `resolve*Variant()` helper per component that
+reproduces each component's own flag-precedence order (flags are checked in
+a fixed sequence; a later true flag overrides an earlier one — preserved
+exactly from the original if-chains so combined-flag behavior doesn't
+silently change). Both components now just resolve a variant and look its
+classes up in the shared map, so a future color/variant change only has to
+happen in one place.
+
+`LinkButton`'s variants now map onto the same tokens as `GeneralButton`:
+`defaultStyle` → the same CTA look as `GeneralButton`'s default (was
+ad-hoc yellow), `subtle`/`warning`/`active`/`disabled` → the matching
+shared variant (`warning`/`active`/`disabled` were unused in production, so
+zero visual-regression risk), `basic` → a new `basicLink` entry in the
+shared map (its underline nav-link look was already token-only, so this
+just centralizes it — no visual change). Deliberately **not** changed:
+`LinkButton` still renders with zero variant classes when no flag is set
+(`GeneralButton` always applies a default look) — real call sites
+(`NavLayoutwithSettingsMenu.tsx`'s logo link, `SharingOptionsBar.tsx`,
+`ReturnToPreviousPage.tsx`) depend on that to stay fully custom-styled via
+their own `className`. Prop names also weren't unified across the two
+components — the flag sets don't actually overlap enough to unify cleanly
+(no `secondary`/`tertiary`/`plain` equivalent on `LinkButton`; no
+`basic`/`defaultStyle` equivalent on `GeneralButton`).
+
+Also adopted `cn()` (clsx + tailwind-merge, already in
+[lib/utils.ts](lib/utils.ts) but previously used by only one component,
+`skeleton.tsx`) in both components to compose `baseClasses`/variant
+classes/`className`, replacing raw template-literal concatenation. This
+fixes the exact fragility called out in the `heroStyle` entry below
+("conflicting Tailwind utilities' precedence depends on generated-CSS
+source order, not template order") for real this time, instead of just
+working around it — e.g. `LinkButton`'s `basic` variant sets `rounded-none`
+to override the shared base's `rounded-2xl`; `twMerge` resolves that
+correctly regardless of source order, where string concatenation only
+worked by accident.
+
+Also dropped `classForDiv` from `LinkButtonProps` — declared but never
+read anywhere in the codebase.
+
+### Files modified
+
+- `components/Shared/actions/buttonStyles.ts` — new; shared base classes, `BUTTON_VARIANT_CLASSES` map, `resolveGeneralButtonVariant()`, `resolveLinkButtonVariant()`.
+- `components/Shared/actions/GeneralButton.tsx` — uses the shared resolver/map + `cn()`; no rendered-output change.
+- `components/Shared/actions/LinkButton.tsx` — uses the shared resolver/map + `cn()`; recolored `defaultStyle`/`warning`/`active`/`disabled`/`basic` onto shared tokens; dropped `classForDiv`.
+- `docs/notes/components/reusable-buttons.md` — new "Shared styling: buttonStyles.ts" section; updated `LinkButton` section (variant mapping, the no-flag/unstyled asymmetry, prop-name mismatch).
+
+### Verification
+
+- `pnpm vitest run components/Shared/actions/GeneralButton.test.tsx` — 6 tests passed, unmodified (still asserts literal `bg-red-800`/`bg-secondary`/`rounded-full`, confirming `cn()` didn't strip anything unexpected).
+- `pnpm lint` — clean (only the same pre-existing unrelated warnings as before this change).
+- `pnpm exec tsc --noEmit` — clean.
+
+### Next logical step
+
+`GeneralOpenCloseButton.tsx` / `iconOpenCloseButton.tsx` are a separately
+copy-pasted tab-toggle pair still on old ad-hoc colors — a candidate for the
+same treatment later, not part of this change.
+
+## 2026-08-22 — GeneralButton: new design-system-aligned color palette
+
+### What was changed
+
+Replaced `GeneralButton`'s ad-hoc Tailwind color classes
+(`yellow-300`/`yellow-700`, `blue-500`/`blue-700`, `indigo-600`,
+`gray-400`/`gray-500`, `slate-300`) with a palette built from the existing
+design-system tokens (`primary`, `secondary`, `subtleBackground`,
+`cardBorder`, `subtleWhite`) plus a small accent/outline/disabled set added
+alongside them in [tailwind.config.js](tailwind.config.js): `accent`,
+`accentFill`, `accentFillBorder`, `outlineBorder`, `warningHover`,
+`disabledBg`, `disabledText`. Explored as a set of visual directions in a
+design canvas first (current-state audit + 3 alternate color directions),
+then iterated on the chosen "design-system aligned" direction based on
+feedback: warning uses a conventional obvious red (`red-800` /
+`warningHover`, not a muted brand-derived brown), `plain`'s hover fills the
+background instead of only recoloring the text, `tertiary`'s hover keeps
+white text (only the underline recolors), and `disabled` text was lightened
+for legibility.
+
+Every variant now also sets an explicit border **width** (`border-[1.5px]`,
+`border-2` for `active`, `border-4` for `hero`, unchanged) — previously
+most variants set a border *color* class without a width utility, so the
+border was invisible in practice (Tailwind's border-width defaults to 0).
+Only `secondary` (`border-t border-x`) and `heroStyle` (`border-4`)
+actually rendered a border before this change.
+
+### Why these values (not eyeballed)
+
+Every text/background pair was checked against WCAG AA (4.5:1 for button
+text, 3:1 for a border that's a button's only affordance — `secondary`,
+`tertiary`, `disabled`) using a small local script computing relative
+luminance from oklch/hex values, not by eye. Several combinations tried
+during exploration failed and were swapped for a passing one before landing
+in the component — see [docs/notes/components/reusable-buttons.md](docs/notes/components/reusable-buttons.md#generalbutton)
+for the final ratios per variant.
+
+### Files modified
+
+- `tailwind.config.js` — added `accent`, `accentFill`, `accentFillBorder`, `outlineBorder`, `warningHover`, `disabledBg`, `disabledText` color tokens.
+- `components/Shared/actions/GeneralButton.tsx` — new `bgClass` per variant (default/secondary/tertiary/plain/subtle/warning/active/disabled/heroStyle), each with an explicit border width.
+- `docs/notes/components/reusable-buttons.md` — documented the new palette, the border-width fix, and the WCAG pass.
+
+### Verification
+
+- `pnpm vitest run components/Shared/actions/GeneralButton.test.tsx` — 6 tests passed (no test changes needed; existing assertions on `bg-red-800`/`bg-secondary`/`rounded-full` still hold).
+
+### Next logical step
+
+Consider applying the same token set to `LinkButton.tsx`, which currently
+has its own separate `defaultStyle`/`basic`/`subtle`/`warning`/`active`/
+`disabled` variants using the old ad-hoc colors.
+
+## 2026-08-22 — YoutubeEmbed: poster/facade pattern to fix blurry video thumbnails
+
+### What was changed
+
+The landing-page video panels ([components/ShowingListOfContent/YoutubeEmbed.tsx](components/ShowingListOfContent/YoutubeEmbed.tsx),
+used by the "Impactful"/"Fun"/"Fitting" videos wired through
+[components/LandingPage/HeroTop.tsx](components/LandingPage/HeroTop.tsx) →
+[app/page.tsx](app/page.tsx)) showed an extremely blurry pre-play thumbnail. `YoutubeEmbed`
+previously mounted the real `youtube-nocookie.com` `<iframe>` as soon as the panel opened, just
+visually hidden behind a spinner until the iframe's own `onLoad` fired — so the thumbnail shown
+before playback was always whatever low-resolution image YouTube itself generated for that
+video, which we have no control over (no embed URL parameter exists to request a sharper one).
+
+Switched to the standard "facade"/"lite-youtube" pattern: `YoutubeEmbed` now renders a static
+poster image (new `posterSrc`/`posterAlt` props) with a play-button overlay (`Play` icon from
+`lucide-react`, already a dependency) first, and only mounts the real iframe — with
+`?autoplay=1` — once the user clicks it. If the local poster file hasn't been supplied yet (all
+three are placeholders pending real screenshots), an `onError` handler on the `next/image`
+falls back to YouTube's own `hqdefault.jpg` thumbnail so nothing breaks in the meantime. This
+is also a perf win: the iframe (and its network request) no longer loads until the user
+actually presses play, not just when the panel opens.
+
+### Files modified
+
+- `components/ShowingListOfContent/YoutubeEmbed.tsx` — `posterSrc`/`posterAlt` props, `started`/`posterFailed` state, poster/play-button facade before the iframe, `autoplay=1` + `allow="autoplay; web-share"` once started, close button no longer gated on `loaded`.
+- `app/page.tsx` — added `posterSrc`/`posterAlt` to all three `YoutubeEmbed` call sites (`/impactful-poster.jpg`, `/fun-poster.jpg`, `/fitting-poster.jpg` — files to be supplied separately).
+- `docs/notes/components/showing-list-of-content/youtube-and-social-lists.md` — updated prop table and behavior notes for the facade pattern.
+
+### Problems encountered
+
+None with this change directly. Unrelated: mid-session the file briefly ended up with a
+malformed JSX-in-template-literal heading and a stale `.next` build cache
+(`PageNotFoundError: Cannot find module for page: /_document`) from an earlier interrupted
+build — both were pre-existing/environmental, not caused by this change; the heading was fixed
+separately and `rm -rf .next` resolved the stale cache.
+
+### Verification
+
+- `pnpm lint` — clean (only pre-existing unrelated warnings in other files).
+- `pnpm build` — succeeded after clearing `.next`.
+
+### TODO
+
+- Supply the actual poster screenshots at `public/impactful-poster.jpg`, `public/fun-poster.jpg`,
+  `public/fitting-poster.jpg` (an existing unused `public/impactfulThumbnail.png` is already a
+  sharp Fishtopher/"Impactful" screenshot, though fresh images are planned for all three).
+
+## 2026-08-22 — Add `heroStyle` variant to GeneralButton; migrate HeroTop buttons
+
+### What was changed
+
+Added a `heroStyle` boolean flag to
+[components/Shared/actions/GeneralButton.tsx](components/Shared/actions/GeneralButton.tsx)
+and migrated the three landing-page hero buttons ("Fun", "Impactful",
+"Fitting") in
+[components/LandingPage/HeroTop.tsx](components/LandingPage/HeroTop.tsx)
+from raw hand-written `<button>` elements to `<GeneralButton heroStyle />`,
+so future style edits to this button style sync from one place. This also
+fixed an existing inconsistency: "Fun" and "Fitting" used
+`border-b-4 border-subtleWhite` while "Impactful" used
+`border-4 border-cardBorder` — all three are now standardized on the
+"Impactful" look. "Fitting" also had an extra `px-0` utility the other two
+lacked; dropped it as part of standardizing all three on one identical
+style.
+
+### Problems encountered / options considered
+
+`GeneralButton`'s `baseClasses` (`font-bold my-3 py-1 px-4 rounded-2xl
+text-base`) is unconditionally applied and conflicts with the new variant's
+required shape (`rounded-full`, `h-10`, `text-sm`, `w-full`, `mt-2` vs.
+`rounded-2xl`, `py-1`, `text-base`). Plain string concatenation makes
+conflicting Tailwind utilities' precedence depend on generated-CSS source
+order, not the order classes appear in the template literal — too fragile
+for a variant needing a different base shape rather than just a color swap.
+
+Two options considered: (a) adopt the existing `cn()`/`twMerge` helper
+([lib/utils.ts](lib/utils.ts), already a dependency but unused by
+`GeneralButton`) throughout the component for principled last-wins conflict
+resolution, or (b) give `heroStyle` its own fully self-contained
+`baseClasses`/`bgClass` override that bypasses the default `baseClasses`
+entirely. Chose (b): `GeneralButton` is imported by ~24 other files, and
+(a) would have changed class-conflict resolution behavior for all of them
+to fix a problem only the new variant has. `let baseClasses` (was `const`)
+was needed to support the override.
+
+### Also updated
+
+- [components/Shared/actions/GeneralButton.test.tsx](components/Shared/actions/GeneralButton.test.tsx) — added a `heroStyle` variant test, matching the existing per-variant pattern.
+- [docs/notes/components/reusable-buttons.md](docs/notes/components/reusable-buttons.md) — documented `heroStyle` as a standalone flag not designed to combine with the others.
+
 ## 2026-08-21 — Refactor pagination selects to remove invisible-overlay/duplicated-state hack
 
 ### What was changed

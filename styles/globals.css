@@ -140,6 +140,7 @@ input::file-selector-button:hover {
   h5,
   h6 {
     @apply font-heading;
+    letter-spacing: 0.05em;
   }
 }
 

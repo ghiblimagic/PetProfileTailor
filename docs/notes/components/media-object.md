@@ -11,7 +11,17 @@ Reusable marketing sections on the landing page: image on one side, paw-print bu
 
 ## Props
 
-Both export `*Props` with shared fields: `image`, `listOfText`, `buttonText`, `buttonTextLink`, `alttext`, `imgwidth`, `imgheight`, optional `buttonStyle` (`"subtle"` uses subtle `LinkButton` styling).
+Both export `*Props` with shared fields: `image`, `listOfText`, `buttonText`, `buttonTextLink`, `alttext`, `imgwidth`, `imgheight`, optional `buttonStyle` (defaults to `"defaultStyle"`) — typed as `MediaObjectButtonStyle = keyof LinkButtonVariantFlags`, i.e. exactly `LinkButton`'s own flag names (`defaultStyle`, `basic`, `secondary`, `subtle`, `warning`, `active`, `disabled`), no renaming.
+
+`buttonStyle` is passed straight through to the matching `LinkButton` flag by
+[`mediaObjectLinkButtonFlags()`](../../../components/Shared/layout/mediaObjectButtonStyle.ts),
+shared by both components so they can't recognize different `buttonStyle`
+values from each other. Omitting `buttonStyle` falls back to `"defaultStyle"`
+— there's no way to render with no button styling at all (unlike
+`LinkButton` itself, which renders unstyled with no flags set). The type is
+a strict union derived from `LinkButtonVariantFlags`, not a bare `string`,
+so an unrecognized value is a build-time type error rather than a silent
+fallback, and a flag `LinkButton` gains later is usable here immediately.
 
 `MediaObjectRight` adds optional `credit` / `creditLink`.
 

@@ -19,6 +19,20 @@ module.exports = {
         subtleBackground: "#3154bd", //"rgb(99,64,153)",
         subtleWhite: "oklch(0.88 0.005 260 / <alpha-value>)",
         cardBorder: "oklch(26% 0.015 260)", // faint card/divider border from the design reference
+        // GeneralButton palette — see docs/notes/components/reusable-buttons.md
+        // Named "buttonAccent" (not "accent") to avoid colliding with the
+        // pre-existing shadcn `accent: { DEFAULT: "hsl(var(--accent))", ... }`
+        // token below — a same-name key later in this object silently wins,
+        // and that shadcn `--accent` CSS var resolves to a near-white gray
+        // (styles/globals.css), which is why an earlier "accent" here was
+        // rendering hover states as grey/white instead of blue.
+        buttonAccent: "oklch(62% 0.16 264 / <alpha-value>)", // hover/active text & outline accent, derived from subtleBackground
+        accentFill: "oklch(38% 0.16 264 / <alpha-value>)", // solid hover fill behind light text
+        accentFillBorder: "oklch(24% 0.14 264 / <alpha-value>)", // border paired with accentFill
+        outlineBorder: "oklch(50% 0.02 260 / <alpha-value>)", // visible neutral border for outline-only buttons
+        warningHover: "#6b1717", // darker step for the warning/destructive hover state
+        disabledBg: "oklch(20% 0.01 260 / <alpha-value>)",
+        disabledText: "oklch(82% 0.01 260 / <alpha-value>)",
         accent: {
           DEFAULT: "hsl(var(--accent))",
           foreground: "hsl(var(--accent-foreground))",

@@ -6,6 +6,10 @@ import LinkButton from "@components/Shared/actions/LinkButton";
 import ListWithPawPrintIcon from "@components/Shared/lists/ListWithPawPrintIcon";
 import Image from "next/image";
 import type { ComponentProps } from "react";
+import {
+  mediaObjectLinkButtonFlags,
+  type MediaObjectButtonStyle,
+} from "./mediaObjectButtonStyle";
 
 export type MediaObjectRightProps = {
   image: string;
@@ -17,7 +21,7 @@ export type MediaObjectRightProps = {
   imgheight: string | number;
   credit?: string;
   creditLink?: string;
-  buttonStyle?: string;
+  buttonStyle?: MediaObjectButtonStyle;
 };
 
 export default function MediaObjectRight({
@@ -44,20 +48,12 @@ export default function MediaObjectRight({
           ))}
         </ul>
 
-        <div className="flex items-center mb-4">
-          {buttonText && buttonStyle === "subtle" ? (
-            <LinkButton
-              href={buttonTextLink}
-              text={buttonText}
-              subtle
-            />
-          ) : (
-            <LinkButton
-              href={buttonTextLink}
-              text={buttonText}
-              defaultStyle
-            />
-          )}
+        <div className="flex justify-center mb-4">
+          <LinkButton
+            href={buttonTextLink}
+            text={buttonText}
+            {...mediaObjectLinkButtonFlags(buttonStyle)}
+          />
         </div>
       </div>
       <div className="self-center w-80 ">

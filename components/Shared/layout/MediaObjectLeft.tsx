@@ -6,16 +6,20 @@ import ListWithPawPrintIcon from "@components/Shared/lists/ListWithPawPrintIcon"
 import LinkButton from "@components/Shared/actions/LinkButton";
 import Image from "next/image";
 import type { ComponentProps } from "react";
+import {
+  mediaObjectLinkButtonFlags,
+  type MediaObjectButtonStyle,
+} from "./mediaObjectButtonStyle";
 
 export type MediaObjectLeftProps = {
   image: string;
   listOfText: string[];
-  buttonText: string;
-  buttonTextLink: ComponentProps<typeof LinkButton>["href"];
+  buttonText?: string;
+  buttonTextLink?: ComponentProps<typeof LinkButton>["href"];
   alttext: string;
   imgwidth: string | number;
   imgheight: string | number;
-  buttonStyle?: string;
+  buttonStyle?: MediaObjectButtonStyle;
 };
 
 export default function MediaObjectLeft({
@@ -47,28 +51,19 @@ export default function MediaObjectLeft({
       <div className="max-w-1/2  mr-8 self-center ">
         <ul className="text-base md:text-lg text-white pb-8 pl-4">
           {listOfText.map((sentence) => (
-            <ListWithPawPrintIcon
-              text={sentence}
-              key={sentence}
-            />
+            <ListWithPawPrintIcon text={sentence} key={sentence} />
           ))}
         </ul>
 
-        <div className="flex items-center max-w-2xl ml-4">
-          {buttonText && buttonStyle === "subtle" ? (
+        {buttonTextLink && (
+          <div className="flex justify-center">
             <LinkButton
               href={buttonTextLink}
               text={buttonText}
-              subtle
+              {...mediaObjectLinkButtonFlags(buttonStyle)}
             />
-          ) : (
-            <LinkButton
-              href={buttonTextLink}
-              text={buttonText}
-              defaultStyle
-            />
-          )}
-        </div>
+          </div>
+        )}
       </div>
     </div>
   );
