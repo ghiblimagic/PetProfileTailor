@@ -13,6 +13,7 @@ import EditContent from "../EditingData/EditContent";
 import ShareButton from "@components/Shared/content-actions/ShareButton";
 import SharingOptionsBar from "../Shared/content-actions/SharingOptionsBar";
 import ProfileImage from "@components/Shared/media/ProfileImage";
+import TagPill from "@components/Shared/typography/TagPill";
 import ToggeableAlert from "../Shared/feedback/ToggeableAlert";
 import { Ellipsis } from "lucide-react";
 import { useDeleteConfirmation } from "@hooks/useDeleteConfirmation";
@@ -340,12 +341,7 @@ export default function ContentListing({
       {singleContent.tags.length > 0 && (
         <div className="flex flex-wrap gap-2">
           {singleContent.tags.map((tag) => (
-            <span
-              key={tag._id}
-              className="bg-white/10 text-subtleWhite text-xs px-3 py-1 rounded-full min-w-0 max-w-full break-words"
-            >
-              #{tag.tag}
-            </span>
+            <TagPill key={tag._id}>{tag.tag}</TagPill>
           ))}
         </div>
       )}

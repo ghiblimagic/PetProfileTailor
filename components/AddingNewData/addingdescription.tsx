@@ -10,6 +10,7 @@ import Image from "next/image";
 import WarningMessage from "../Shared/feedback/WarningMessage";
 import { toast } from "react-toastify";
 import TagsSelectAndCheatSheet from "../FormComponents/TagsSelectAndCheatSheet";
+import TagPill from "@components/Shared/typography/TagPill";
 import { useTags } from "@/hooks/useTags";
 import { useSession } from "next-auth/react";
 import CheckIfContentExists from "./CheckIfContentExists";
@@ -69,7 +70,7 @@ export default function NewDescriptionWithTagsData() {
   }
 
   return (
-    <div className="mx-auto ">
+    <div className="mx-auto max-w-3xl">
       <section className="my-6 text-subtleWhite text-center">
         <h3 className="mt-4  font-normal text-lg mb-2">
           {" "}
@@ -98,12 +99,7 @@ export default function NewDescriptionWithTagsData() {
         <p className="md:ml-6 text-center text-secondaryText py-2">Tags:</p>
         <div className="flex flex-wrap justify-center gap-2 md:ml-6 mb-2">
           {["senior", "funny", "quiet", "well-behaved"].map((tag) => (
-            <span
-              key={tag}
-              className="bg-white/10 text-subtleWhite text-xs px-3 py-1 rounded-full min-w-0 max-w-full break-words"
-            >
-              #{tag}
-            </span>
+            <TagPill key={tag}>{tag}</TagPill>
           ))}
         </div>
 
@@ -167,14 +163,13 @@ export default function NewDescriptionWithTagsData() {
           </label>
           <p className="block mb-2 text-secondaryText">
             {" "}
-            Enter any notes to add. For example, explaining if it has any
-            references to shows/popular culture, ect.
+            Example: explaining if it has any references to shows/popular
+            culture, ect.
           </p>
 
-          <p className="block mb-2 text-secondaryText">
-            If you found it on a shelter/rescue&apos;s listing please mention
-            the organization&apos;s name so people can send some love their way
-            😉.
+          <p className="block mb-4 text-secondaryText">
+            If you found it on a shelter/rescue please mention the
+            organization&apos;s name so people can send some love their way 😉.
           </p>
           <textarea
             id="notesinput"

@@ -134,7 +134,6 @@ export default function HomePage() {
           <MediaObjectLeft
             image="/thanks.png"
             listOfText={[
-              "We appreciate our community members donating their time and want them to see the impact they've made.",
               "Find out if your submissions helped: get a pet adopted, name a personal pet, or more!",
               "Recieve in-app notifications about likes and thank you notes!",
             ]}
@@ -152,7 +151,7 @@ export default function HomePage() {
               "Like your favorite names and descriptions for easy access & sorting.",
               "Add new names and descriptions.",
               "Make someones day by sending them thank you notes about their submissions!",
-              "Edit or delete your own content",
+              "Edit or delete your own content.",
             ]}
             buttonText="Sign Up"
             buttonTextLink="/register"

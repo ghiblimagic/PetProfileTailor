@@ -22,8 +22,11 @@ module.exports = {
         // subtleWhite at a fixed 70% baked in as its own token, rather than
         // ad hoc `text-subtleWhite/70` at each call site, so the ~7.5:1
         // contrast ratio (checked against `primary` #050816) can't drift if
-        // someone changes the opacity on one usage but not another.
-        secondaryText: "oklch(0.88 0.005 260 / 0.7)",
+        // someone changes the opacity on one usage but not another. Reads
+        // `--secondary-text` from globals.css (rather than repeating the
+        // oklch literal here) so a future theme can override the color by
+        // redefining that one CSS var, with no Tailwind config change.
+        secondaryText: "var(--secondary-text)",
         subtleBorder: "oklch(0.4071 0.0962 264 / <alpha-value>)",
         // faint card/divider border from the design reference
         fieldBackground: "oklch(0.2118 0.0592 270.28)",

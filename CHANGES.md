@@ -1,5 +1,183 @@
 # CHANGES
 
+## 2026-08-23 — Bugfix: `TagPillMultiValue` crashed with "innerProps is undefined"
+
+Regression from the previous entry below — reported by the user as a
+runtime crash the moment a tag was already selected or got selected
+("innerProps is undefined"). `tsc --noEmit` and the full test suite were
+both clean because nothing exercised the crashing render path (no test
+selected a tag; `MultiValueProps['innerProps']` is typed as required, so
+`tsc` had no reason to flag reading it).
+
+Root cause: react-select's own `Select.js` (`renderPlaceholderOrValue`)
+renders the top-level `MultiValue` element with only `data`/`removeProps`/
+`isDisabled`/`isFocused`/`components`/`selectProps` — it does **not** pass
+`innerProps` there. `innerProps` only exists for the `Container`/`Label`/
+`Remove` **sub-components**, computed internally by react-select's own
+default `MultiValue` implementation (in `index-*.cjs.dev.js`) — which
+`TagPillMultiValue` replaces entirely. So `props.innerProps` is genuinely
+`undefined` at this level despite the `.d.ts` typing it as required;
+destructuring it (`const { ref, ...spanProps } = innerProps`) threw.
+
+Fix: dropped `innerProps` from `TagPillMultiValue` entirely — it was only
+being used to grab a stray `className`/`ref` that don't need preserving
+here. Also hid the remove ("×") button when the whole select is
+`isDisabled`, matching how a disabled field shouldn't offer removal.
+
+Added `TagsSelectAndCheatSheet.test.tsx` (mocks `useCategoriesForDataType`
+to avoid needing `CategoriesAndTagsContext`) asserting a pre-selected tag
+renders as a pill with a working remove button — confirmed it reproduces
+this exact crash against the broken code (`Cannot destructure property
+'ref' of 'innerProps' as it is undefined`) before verifying it passes
+against the fix. `tsc --noEmit` clean; `StyledCheckbox.test.tsx` +
+`TagsSelectAndCheatSheet.test.tsx` both green.
+
+## 2026-08-23 — Selected tags in `TagsSelectAndCheatSheet`'s select field now match `ContentListing`'s tag pills
+
+Extracted the `"#tag"` pill markup — previously duplicated verbatim in
+`ContentListing.tsx` and `addingdescription.tsx`'s tag preview
+(`bg-white/10 text-subtleWhite text-xs px-3 py-1 rounded-full min-w-0
+max-w-full break-words`, `#`-prefixed) — into a new
+`components/Shared/typography/TagPill.tsx`. Both call sites now render
+`<TagPill>{tag}</TagPill>`.
+
+For `TagsSelectAndCheatSheet.tsx`'s react-select field, the selected-tag
+chips were react-select's own boxy default (`var(--select-bg-secondary)`
+pill via the `multiValue`/`multiValueLabel`/`multiValueRemove` entries in
+`customSelectStyles`) — visually unrelated to the `TagPill` style used
+everywhere else tags are shown. Since react-select applies its per-part
+`styles` via its own emotion CSS-in-JS (not classes), matching the
+Tailwind look exactly meant fully replacing rendering, not just tweaking
+style objects — a `TagPillMultiValue` component overrides `components.
+MultiValue` on the `<Select>`, rendering the exact same `tagPillClassName`
+(now exported from `TagPill.tsx` for this reason) with a small "×" remove
+button wired to react-select's own `removeProps` handlers. Removed the
+now-dead `multiValue`/`multiValueLabel`/`multiValueRemove` style functions
+since a fully custom `MultiValue` bypasses react-select's internal
+Container/Label/Remove sub-components entirely — they'd never run.
+
+Problem encountered: react-select types `removeProps`/`innerProps` as
+plain `<div>` props (its own default `MultiValueRemove`/`MultiValueContainer`
+render divs), which don't structurally match a `<button>`'s HTML attribute
+types (mismatched event-handler element generics, e.g. `onCopy:
+ClipboardEventHandler<HTMLDivElement>`). Checked react-select's actual
+source (`Select-*.cjs.dev.js`) and confirmed `removeProps` is just `{
+onClick, onTouchEnd }` at runtime — the div typing is an artifact of its
+own default implementation, not a real constraint — so cast it to
+`ComponentPropsWithoutRef<"button">` for the spread rather than fighting
+the types or switching to a `<div role="button">`.
+
+Verified with `tsc --noEmit` (clean) and the full `vitest` suite (268/270
+passing — the 2 failures are in `CheckIfContentExists.test.tsx`, a file
+untouched by this change, and pre-date it).
+
+## 2026-08-23 — `StyledCheckbox` box shrunk slightly without shrinking the icon
+
+Shrunk the box from `w-8 h-8`/`p-[7px]` to `w-7 h-7`/`p-[5px]`. The
+`FontAwesomeIcon` itself wasn't touched — it renders at `1em`, sized off
+inherited font-size, not off the box's padding/dimensions — so trimming
+the box's padding shrinks the box without shrinking the icon; there's just
+less empty space around it. (The two knobs are independent: box size —
+`w-*`/`h-*`/`p-[*]` on the `<span>` — vs. icon size — a `className`/`size`
+prop on `<FontAwesomeIcon>` itself. Only the first was touched here.)
+Verified with `tsc --noEmit` and `StyledCheckbox.test.tsx` (4/4, no
+behavior change).
+
+## 2026-08-23 — `StyledCheckbox` box no longer resizes when the icon appears
+
+The icon box `<span>` had no fixed size — just `p-[7px]` padding — so it
+sized to its content. With the paw icon now only rendering once `checked`
+(previous entry below), the box visibly grew/shrank on every toggle:
+empty content collapsed it down to roughly the padding alone, while the
+icon's `<svg>` pushed it back out, shifting the label text next to it.
+
+Fixed by giving the box a fixed `w-8 h-8 shrink-0` (2rem square,
+`shrink-0` so the flex row can't compress it either) so its size no longer
+depends on whether the icon is present. Fixed in `StyledCheckbox.tsx`
+itself rather than per-consumer, since the same box/icon markup is shared
+by every consumer (filter sidebar, add/edit forms, cheat-sheet tags).
+Verified with `tsc --noEmit` and `StyledCheckbox.test.tsx` (still 4/4 —
+purely a visual/layout change, no behavior change).
+
+## 2026-08-23 — `TagsSelectAndCheatSheet` cheat-sheet checkboxes now reuse `StyledCheckbox`
+
+`TagsSelectAndCheatSheet.tsx`'s per-tag checkboxes were a hand-rolled copy
+of `StyledCheckbox.tsx`'s markup (same hidden-native-input technique, same
+paw-icon box) that had already drifted — it had the "icon only shows when
+checked" behavior before that was added to `StyledCheckbox` itself in the
+previous entry below.
+
+Compared the two implementations before merging. Differences found:
+hover treatment (`group`/`group-hover:bg-blue-700` on the box, `hover:` on
+the label — `StyledCheckbox` had none), disabled box background
+(`bg-errorBackgroundColor`, vs. just `cursor-not-allowed`), and label
+weight (plain vs. `StyledCheckbox`'s hardcoded `font-bold`). Everything
+else already matched: the `onChange` callback here was already a plain
+`ChangeEventHandler<HTMLInputElement>`, and `tag._id` already served the
+same role as `StyledCheckbox`'s `value`.
+
+Added two additive, opt-in props to `StyledCheckbox` rather than baking
+the cheat sheet's look in for every consumer:
+- `boxClassName` — extra classes on the icon box (`<span>`), since
+  `className` only reaches the outer `<label>`.
+- `labelClassName` — replaces the label text span's classes (default
+  `"font-bold"`, unchanged for existing consumers); cheat sheet passes
+  `"text-left"`.
+
+Then replaced the inline `<label>`/`<input>`/icon-box markup in
+`TagsSelectAndCheatSheet.tsx` with `<StyledCheckbox>`, dropped its now-
+unused `FontAwesomeIcon`/`faPaw` imports, and updated
+`docs/notes/components/form-components.md` and
+`docs/notes/components/tags-select-and-cheat-sheet.md` to describe the new
+props and the consumer. Verified with `tsc --noEmit` and the existing
+`StyledCheckbox.test.tsx` suite (4 tests, all passing) — no test file
+existed yet for `TagsSelectAndCheatSheet.tsx` itself.
+
+## 2026-08-23 — `StyledCheckbox` paw icon only shows when checked
+
+`components/FormComponents/StyledCheckbox.tsx` previously always rendered
+the `faPaw` icon and only recolored it via `peer-checked:text-secondary`
+against the box's `bg-secondary`/`peer-checked:bg-yellow-300` background —
+so the paw was always visible, just low-contrast against the unchecked
+box. Changed to `{checked && <FontAwesomeIcon icon={faPaw} />}` so the icon
+only renders once the checkbox is actually checked, using the `checked`
+prop the component already receives rather than adding CSS.
+
+Considered a CSS-only route (`peer-checked:[&>svg]:opacity-100` on the
+span, since the icon's `<svg>` isn't a direct sibling of the `peer` input
+and plain `peer-checked:` can't reach it) but picked the prop-driven
+conditional instead — it's simpler, avoids a non-obvious arbitrary-variant
+selector, and the box's border still shows the empty-checkbox shape when
+unchecked.
+
+## 2026-08-23 — `secondaryText` promoted to a CSS variable; applied to all `<p>` by default
+
+Moved the `secondaryText` color off a literal `oklch(0.88 0.005 260 / 0.7)`
+value duplicated in `tailwind.config.js` and onto a single `--secondary-text`
+CSS variable defined in `styles/globals.css` (`@layer base` `:root`, next to
+the existing `--subtle-border`/`--field-background` vars). Tailwind's
+`secondaryText` token now reads `var(--secondary-text)` instead of repeating
+the value, and `styles/globals.css` adds a base-layer `p { @apply
+text-secondaryText; }` so paragraphs get the de-emphasized color by default
+without needing `text-secondaryText` on every call site.
+
+Reasoning: the user wants multiple visual themes later. With the color only
+living in `tailwind.config.js`, a future theme would need Tailwind config
+changes (and a rebuild) to swap it. Sourcing it from a CSS variable means a
+future theme can override `--secondary-text` (and sibling tokens) per
+selector/data-attribute at runtime — Tailwind's `text-secondaryText`
+utility and the new base `p` rule keep working unchanged since both just
+resolve `var(--secondary-text)`.
+
+No visual regression expected: existing components that already set
+`text-secondaryText` explicitly on `<p>` tags (`AddSuggestion.tsx`,
+`addingdescription.tsx`, `preserveTextAfterSubmission.tsx`,
+`TagsSelectAndCheatSheet.tsx`) keep doing so redundantly but harmlessly;
+`<p>` tags elsewhere pick up the new default instead of falling through to
+`body`'s `text-foreground`. Verified by compiling `styles/globals.css`
+through the Tailwind CLI and confirming both the `--secondary-text` var and
+the `p { color: var(--secondary-text) }` rule land in the output.
+
 ## 2026-08-23 — Styling: `/adddescriptions` text colors/weight — first pass
 
 Explored alternative page shells for `/adddescriptions` as a design-comparison

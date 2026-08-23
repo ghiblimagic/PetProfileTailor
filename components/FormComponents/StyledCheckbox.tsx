@@ -13,6 +13,14 @@ export type StyledCheckboxProps = {
   onChange?: ChangeEventHandler<HTMLInputElement>;
   value: string;
   className?: string;
+  // Extra classes for the icon box itself (e.g. group-hover / disabled-bg
+  // treatment) — kept separate from `className` because that one lands on
+  // the outer <label>, not the box.
+  boxClassName?: string;
+  // Overrides the label text span's classes entirely (default matches the
+  // bold help/filter-label look most consumers want; pass e.g. "text-left"
+  // to opt out of the bold weight, as TagsSelectAndCheatSheet does).
+  labelClassName?: string;
   disabled?: boolean;
 };
 
@@ -23,6 +31,8 @@ export default function StyledCheckbox({
   onChange,
   value,
   className = "",
+  boxClassName = "",
+  labelClassName = "font-bold",
   disabled = false,
 }: StyledCheckboxProps) {
   // id={`filter-mobile-${index}`} wasn't working, htmlFor={id} and <input id={id} kept breaking
@@ -57,20 +67,25 @@ export default function StyledCheckbox({
 
       <span
         className={`
-          border-2 border-violet-300 rounded flex items-center justify-center p-[7px]
+          w-7 h-7 shrink-0
+          border-2 border-violet-300 rounded flex items-center justify-center p-[5px]
           transition-colors duration-200
           bg-secondary text-subtleWhite
           peer-checked:bg-yellow-300 peer-checked:text-secondary
           peer-focus:ring-2 peer-focus:ring-yellow-400 peer-focus:outline-none ${
             disabled && "cursor-not-allowed"
-          }
+          } ${boxClassName}
         `}
       >
-        <FontAwesomeIcon icon={faPaw} />
+        {checked && <FontAwesomeIcon icon={faPaw} />}
       </span>
 
       <div className="flex flex-col text-left min-w-0 break-words">
-        {label && <span className="text-subtleWhite font-bold">{label}</span>}
+        {label && (
+          <span className={`text-subtleWhite ${labelClassName}`}>
+            {label}
+          </span>
+        )}
         {description && (
           <span className="text-subtleWhite text-sm">{description}</span>
         )}

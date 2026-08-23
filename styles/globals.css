@@ -170,6 +170,12 @@ select {
     --field-background: oklch(
       0.2118 0.0592 270.28
     ); /* mirrors tailwind.config.js `fieldBackground` */
+    --secondary-text: oklch(
+      76.585% 0.03401 258.412
+    ); /* de-emphasized body copy (help text, captions); tailwind.config.js
+    `secondaryText` reads this var directly (rather than duplicating the
+    value) so a future theme can override it here without touching the
+    Tailwind config */
     --select-text: rgb(221 214 254);
     --select-hover: rgb(59 130 246);
     /* old information */
@@ -242,6 +248,9 @@ select {
   h6 {
     @apply font-heading;
     letter-spacing: 0.05em;
+  }
+  p {
+    @apply text-secondaryText;
   }
 }
 

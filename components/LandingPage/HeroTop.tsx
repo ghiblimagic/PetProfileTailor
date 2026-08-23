@@ -51,7 +51,7 @@ export default function HeroTop({
           alt=""
         />
       </div>
-      <div className="hero-content text-center text-neutral-content mb-10 z-20  ">
+      <div className="hero-content text-center  mb-10 z-20  ">
         {/* hero-content is from daisy ui */}
         <div className="max-w-xl text-subtleWhite">
           <h1 className="mb-5 text-3xl tracking-widest md:text-4xl text-yellow-300  font-black">

@@ -11,7 +11,7 @@
     ]
   },
   "scripts": {
-    "dev": "next dev",
+    "dev": "next dev  | grep -v 'Network:'",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",

@@ -47,7 +47,42 @@ Do **not** use `id={`filter-mobile-${index}`}`:
 > but `peer absolute left-[-9999px] ...` was leading to double vertical scrollbars  
 > **Solution:** `fixed` + `1px` size + `clip` / `clipPath: inset(50%)` — same idea as sr-only but avoids `position: absolute; left: 0` misbehaving on some mobile browsers
 
-**Consumers:** [`FilteringSidebar.tsx`](../../../components/Filtering/FilteringSidebar.tsx), flag/suggestion/thanks forms, [`preserveTextAfterSubmission.tsx`](../../../components/AddingNewData/preserveTextAfterSubmission.tsx).
+### Special behavior: icon visibility
+
+The paw icon only renders once `checked` is true (`{checked &&
+<FontAwesomeIcon .../>}`) — it used to always render and just get
+recolored via `peer-checked:`, leaving a faint paw visible on unchecked
+boxes.
+
+### Styling escape hatches: `boxClassName` / `labelClassName`
+
+- `boxClassName` — extra classes appended to the icon box `<span>` (e.g.
+  `group-hover:` treatment or a disabled background override). Needed
+  because `className` lands on the outer `<label>`, not the box.
+- `labelClassName` — **replaces** (not appends to) the label text
+  `<span>`'s classes; defaults to `"font-bold"`. Pass e.g. `"text-left"` to
+  opt out of the bold weight.
+
+**Consumers:** [`FilteringSidebar.tsx`](../../../components/Filtering/FilteringSidebar.tsx), flag/suggestion/thanks forms, [`preserveTextAfterSubmission.tsx`](../../../components/AddingNewData/preserveTextAfterSubmission.tsx), [`TagsSelectAndCheatSheet.tsx`](../../../components/FormComponents/TagsSelectAndCheatSheet.tsx) (cheat-sheet tag checkboxes — uses `boxClassName`/`labelClassName` to keep its row-hover look).
+
+---
+
+## `TagPill`
+
+Source: [`components/Shared/typography/TagPill.tsx`](../../../components/Shared/typography/TagPill.tsx)
+
+Shared `"#tag"` pill (`bg-white/10 text-subtleWhite text-xs px-3 py-1
+rounded-full`). Also exports `tagPillClassName` as a plain string, for call
+sites that can't render `<TagPill>` directly but still need the identical
+classes — e.g. [`TagsSelectAndCheatSheet.tsx`](../../../components/FormComponents/TagsSelectAndCheatSheet.tsx)'s
+`TagPillMultiValue`, which has to apply them to react-select's own DOM
+structure to wire up its remove-button props.
+
+```tsx
+<TagPill>{tag.tag}</TagPill> // renders "#{tag.tag}"
+```
+
+**Consumers:** [`ContentListing.tsx`](../../../components/ShowingListOfContent/ContentListing.tsx), [`addingdescription.tsx`](../../../components/AddingNewData/addingdescription.tsx) (tag preview), [`TagsSelectAndCheatSheet.tsx`](../../../components/FormComponents/TagsSelectAndCheatSheet.tsx) (via `tagPillClassName`).
 
 ---
 
