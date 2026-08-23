@@ -85,7 +85,7 @@ export default function CheckIfContentExists({
       if (!response.ok) {
         setCheckIsProcessing?.(false);
         setCheckContentMessage(
-          data.message || "Unexpected response from server",
+          data.message || "Unexpected response from server"
         );
         setExistingContent(data.data ?? "");
         return;
@@ -94,7 +94,7 @@ export default function CheckIfContentExists({
       switch (data.type) {
         case "duplicate":
           setCheckContentMessage(
-            `Ruh Roh! This content already exists: ${contentCheck} `,
+            `Ruh Roh! This content already exists: ${contentCheck} `
           );
           setExistingContent(data.data ?? "");
           break;
@@ -120,34 +120,24 @@ export default function CheckIfContentExists({
 
   return (
     <section className="text-center  pb-4 m-6">
-      <h4 className="font-bold block pt-4 m-4 text-xl ">
+      <h4 className="font-normal block pt-4 m-4 text-xl ">
         {" "}
-        {`Check if a ${
+        {`Check if the ${
           contentType === "names" ? "name" : "description"
         } exists:`}
       </h4>
 
-      <button
-        className="inline-block bg-subtleBackground  mt-4 md:mt-0 p-2 border-2  hover:text-subtleWhite hover:border-blue-700 hover:bg-blue-500 border-subtleWhite  disabled:bg-errorBackgroundColor disabled:text-errorTextColor rounded-2xl disabled:border-errorBorderColor disabled:cursor-not-allowed"
+      <GeneralButton
+        className="mt-4 md:mt-0"
         onClick={() => void contentExistsCheck()}
         type="button"
         disabled={
           contentCheck.length < 2 || checkIsProcessing || !!invalidInput
         }
       >
-        <FontAwesomeIcon
-          icon={faSearch}
-          className="text-xl"
-          color={"rgb(221 214 254)"}
-        />
-
-        <span
-          className="mx-2
-                                       text-purple"
-        >
-          Search
-        </span>
-      </button>
+        <FontAwesomeIcon icon={faSearch} className="text-xl" />
+        <span className="mx-2">Search</span>
+      </GeneralButton>
 
       {checkIsProcessing && <LoadingSpinner />}
 

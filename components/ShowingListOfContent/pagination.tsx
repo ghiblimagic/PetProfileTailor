@@ -61,7 +61,7 @@ export default function Pagination({
   filtersSlot,
 }: PaginationProps) {
   const paginationCooldownRef = useRef<ReturnType<typeof setInterval> | null>(
-    null,
+    null
   );
   const [remainingPaginationCooldown, setRemainingPaginationCooldown] =
     useState(0);
@@ -72,11 +72,11 @@ export default function Pagination({
   const windowSize = 5; // max number of visible pages
 
   const startingItemCountForPage = Math.max(
-    (currentUiPage - 1) * itemsPerPage + 1,
+    (currentUiPage - 1) * itemsPerPage + 1
   );
   const endingItemCountForPage = Math.min(
     currentUiPage * itemsPerPage,
-    totalItems,
+    totalItems
   );
 
   const preLoadNextPage = (overrides: PreLoadOverrides = {}) => {
@@ -103,7 +103,7 @@ export default function Pagination({
         startCooldown(
           paginationCooldownRef,
           setRemainingPaginationCooldown,
-          15,
+          15
         );
       }
     }
@@ -111,7 +111,7 @@ export default function Pagination({
 
   useEffect(() => {
     const calculatedTotalLoadedPages = Math.ceil(
-      amountOfDataLoaded / itemsPerPage,
+      amountOfDataLoaded / itemsPerPage
     );
 
     setTotalLoadedPages(calculatedTotalLoadedPages);
@@ -213,65 +213,65 @@ export default function Pagination({
   const prevEnabled = currentUiPage !== 1;
 
   return (
-    <section className="pagination-navigation w-full flex flex-col gap-3 min-w-0 my-2 border-t border-cardBorder pt-4">
+    <section className="pagination-navigation w-full flex flex-col gap-3 min-w-0 my-2 border-t border-subtleBorder pt-4">
       {/* sorting logic*/}
       <div className="flex flex-wrap items-center justify-between gap-3">
         {filtersSlot}
         <div className="flex flex-wrap items-center justify-end gap-3">
-        {/* wrapping the selects in sections & inline-block keeps the per page and sort by labels from wrapping weirdly at smaller sizes */}
+          {/* wrapping the selects in sections & inline-block keeps the per page and sort by labels from wrapping weirdly at smaller sizes */}
 
-        {/* Per page */}
-        {/* The <select> itself is the entire visible pill (background,
+          {/* Per page */}
+          {/* The <select> itself is the entire visible pill (background,
             border, radius, padding all live on it) — no wrapper, no
             invisible overlay, no decoy text. The browser renders the real
             selected <option> text, so there's a single source of truth
             instead of a hand-maintained label mapping. The chevron is a
             CSS background-image (CHEVRON_DOWN_BG), which can't intercept
             clicks, so the whole pill stays clickable end-to-end. */}
-        <select
-          id="per-page"
-          className="appearance-none bg-[oklch(0.20_0.015_260)] border border-[oklch(0.30_0.015_260)] rounded-[10px] pl-[14px] pr-7 py-[9px] text-subtleWhite text-[14px] cursor-pointer bg-no-repeat bg-[right_10px_center]"
-          style={{ backgroundImage: CHEVRON_DOWN_BG }}
-          value={itemsPerPage}
-          onChange={(e) => resetItemsPerPage(e.target.value)}
-        >
-          <option value="5">5 per page</option>
-          <option value="10">10 per page</option>
-          <option value="20">25 per page</option>
-          <option value="30">30 per page</option>
-          <option value="40">40 per page</option>
-          <option value="50">50 per page</option>
-          {/* don't give an option 60 since it leads to an edge case since 60 is the amount of items we grab from the database each time (the chunk size)        */}
-        </select>
-        {/* sort by */}
-        {/* Same real-select-is-the-pill treatment as per-page above. Option
-            labels ("Most Liked" etc.) are already self-describing, so no
-            extra caption text is needed. */}
-        {remainingSortCooldown > 0 ? (
           <select
-            className="appearance-none bg-[oklch(0.20_0.015_260)] border border-[oklch(0.30_0.015_260)] rounded-[10px] px-[14px] py-[9px] text-subtleWhite text-[14px] opacity-50 cursor-not-allowed w-56"
-            disabled
-          >
-            <option>
-              Please wait {remainingSortCooldown} second
-              {remainingSortCooldown > 1 ? "s" : ""}
-            </option>
-          </select>
-        ) : (
-          <select
-            id="sort-by"
+            id="per-page"
             className="appearance-none bg-[oklch(0.20_0.015_260)] border border-[oklch(0.30_0.015_260)] rounded-[10px] pl-[14px] pr-7 py-[9px] text-subtleWhite text-[14px] cursor-pointer bg-no-repeat bg-[right_10px_center]"
             style={{ backgroundImage: CHEVRON_DOWN_BG }}
-            onChange={(e) => setSortingLogicFunction(e.target.value)}
-            value={`${sortingProperty},${sortingValue}`}
-            // so we remember what the user selected after the timeout
+            value={itemsPerPage}
+            onChange={(e) => resetItemsPerPage(e.target.value)}
           >
-            <option value="likedByCount,-1">Most Liked</option>
-            <option value="likedByCount,1">Least Liked</option>
-            <option value="_id,-1">Newest</option>
-            <option value="_id,1">Oldest</option>
+            <option value="5">5 per page</option>
+            <option value="10">10 per page</option>
+            <option value="20">25 per page</option>
+            <option value="30">30 per page</option>
+            <option value="40">40 per page</option>
+            <option value="50">50 per page</option>
+            {/* don't give an option 60 since it leads to an edge case since 60 is the amount of items we grab from the database each time (the chunk size)        */}
           </select>
-        )}
+          {/* sort by */}
+          {/* Same real-select-is-the-pill treatment as per-page above. Option
+            labels ("Most Liked" etc.) are already self-describing, so no
+            extra caption text is needed. */}
+          {remainingSortCooldown > 0 ? (
+            <select
+              className="appearance-none bg-[oklch(0.20_0.015_260)] border border-[oklch(0.30_0.015_260)] rounded-[10px] px-[14px] py-[9px] text-subtleWhite text-[14px] opacity-50 cursor-not-allowed w-56"
+              disabled
+            >
+              <option>
+                Please wait {remainingSortCooldown} second
+                {remainingSortCooldown > 1 ? "s" : ""}
+              </option>
+            </select>
+          ) : (
+            <select
+              id="sort-by"
+              className="appearance-none bg-[oklch(0.20_0.015_260)] border border-[oklch(0.30_0.015_260)] rounded-[10px] pl-[14px] pr-7 py-[9px] text-subtleWhite text-[14px] cursor-pointer bg-no-repeat bg-[right_10px_center]"
+              style={{ backgroundImage: CHEVRON_DOWN_BG }}
+              onChange={(e) => setSortingLogicFunction(e.target.value)}
+              value={`${sortingProperty},${sortingValue}`}
+              // so we remember what the user selected after the timeout
+            >
+              <option value="likedByCount,-1">Most Liked</option>
+              <option value="likedByCount,1">Least Liked</option>
+              <option value="_id,-1">Newest</option>
+              <option value="_id,1">Oldest</option>
+            </select>
+          )}
         </div>
       </div>
 
@@ -284,7 +284,7 @@ export default function Pagination({
 
       <div className="flex flex-wrap gap-2 justify-center my-auto items-center ">
         <button
-          className="prevpage w-8 h-8 rounded-full border border-cardBorder flex items-center justify-center disabled:cursor-not-allowed"
+          className="prevpage w-8 h-8 rounded-full border border-subtleBorder flex items-center justify-center disabled:cursor-not-allowed"
           aria-label="prevpage"
           disabled={currentUiPage == 1}
           type="submit"
@@ -311,7 +311,7 @@ export default function Pagination({
               className={`!w-8 !h-8 !p-0 !my-0 !rounded-full !border !flex !items-center !justify-center !text-sm ${
                 number === currentUiPage
                   ? "!bg-blue-600 !border-blue-700 !text-white"
-                  : "!bg-transparent !border-cardBorder !text-subtleWhite"
+                  : "!bg-transparent !border-subtleBorder !text-subtleWhite"
               }`}
               onClick={() => handleClickPage(number)}
             />
@@ -320,7 +320,7 @@ export default function Pagination({
 
         <button
           aria-label="nextpage"
-          className="nextpage w-8 h-8 rounded-full border border-cardBorder flex items-center justify-center disabled:cursor-not-allowed"
+          className="nextpage w-8 h-8 rounded-full border border-subtleBorder flex items-center justify-center disabled:cursor-not-allowed"
           type="submit"
           onClick={() => lastPageHandler()}
         >

@@ -34,7 +34,7 @@ export default function YoutubeEmbed({
   const [posterFailed, setPosterFailed] = useState(false);
 
   return (
-    <div className="relative mt-4 mx-auto max-w-[850px] px-4 sm:px-8 pt-8 pb-12 text-center border-2 rounded-2xl bg-secondary border-cardBorder motion-safe:animate-in motion-safe:fade-in motion-safe:slide-in-from-top-4 motion-safe:duration-300">
+    <div className="relative mt-4 mx-auto max-w-[850px] px-4 sm:px-8 pt-8 pb-12 text-center border-2 rounded-2xl bg-secondary border-subtleBorder motion-safe:animate-in motion-safe:fade-in motion-safe:slide-in-from-top-4 motion-safe:duration-300">
       <h2 className="text-white font-heading text-lg sm:text-xl font-semibold mb-4 px-8">
         {`Video of a ${text} pet bio in action!`}
       </h2>
@@ -51,7 +51,7 @@ export default function YoutubeEmbed({
       {/* Fixed-size stage: aspect-video + w-full reserve the same box for the poster,
           loading spinner, and iframe, so the panel never collapses/grows between states. */}
       <div
-        className={`relative mx-auto aspect-video w-full rounded-lg border border-cardBorder overflow-hidden ${styling}`}
+        className={`relative mx-auto aspect-video w-full rounded-lg border border-subtleBorder overflow-hidden ${styling}`}
       >
         {!started && (
           <button

@@ -66,7 +66,7 @@ export default function AddSuggestion({
   const toggleIncorrectTag = (tagId: string, checked: boolean) => {
     if (checked) {
       setIncorrectTags((prev) =>
-        prev.includes(tagId) ? prev : [...prev, tagId],
+        prev.includes(tagId) ? prev : [...prev, tagId]
       );
     } else {
       setIncorrectTags((prev) => prev.filter((id) => id !== tagId));
@@ -87,7 +87,7 @@ export default function AddSuggestion({
 
     if (contentCreatedByUserId === suggestionBy) {
       toast.warn(
-        `Ruh Roh! Nice try but you can't suggestion your own content silly goose :)`,
+        `Ruh Roh! Nice try but you can't suggestion your own content silly goose :)`
       );
       setLoading(false);
       return;
@@ -107,12 +107,12 @@ export default function AddSuggestion({
     try {
       const response = await axios.post<SuggestionPostResponse>(
         apisuggestionSubmission,
-        suggestionSubmission,
+        suggestionSubmission
       );
       setLoading(false);
 
       toast.success(
-        `Thank you for your suggestion! Suggestion successfully sent`,
+        `Thank you for your suggestion! Suggestion successfully sent`
       );
 
       addSuggestion(dataType, contentInfo._id, response.data.suggestion._id);
@@ -129,8 +129,8 @@ export default function AddSuggestion({
 
       toast.error(
         `Ruh Roh! ${err.message ?? "Request failed"} ${JSON.stringify(
-          err.response?.data?.message,
-        )}`,
+          err.response?.data?.message
+        )}`
       );
     }
   };
@@ -156,24 +156,24 @@ export default function AddSuggestion({
           <section className="my-6 p-1">
             <h2 className="text-center  text-2xl ">Suggestions</h2>
             {!signedInUser && <MustLoginMessage text="submit suggestions" />}
-            <p className="text-center mt-3 mb-2">
-              Thank you for taking the time to help improve our community
-              powered database! 🙏🙇
+            <p className="text-center mt-3 mb-2 text-secondaryText">
+              Thank you for taking the time to help improve our community lists!
+              🙏🙇
             </p>
 
-            <p className="text-center mb-3">
+            <p className="text-center mb-3 text-secondaryText">
               ❗ Note: <strong> one or more checkboxes must be selected</strong>{" "}
               to submit this form
             </p>
 
-            <p className="text-center mb-3">
+            <p className="text-center mb-3 text-secondaryText">
               Suggestions can be edited{" "}
-              <strong>until they are being reviewed</strong>
+              <strong>until a mod starts the review process.</strong>
             </p>
 
-            <p className="text-center">
+            <p className="text-center text-secondaryText">
               {" "}
-              To prevent harrassment, the submissions will be sent to an admin
+              To prevent harrassment, these submissions will be sent to an admin
               not the original poster
             </p>
           </section>
@@ -184,7 +184,7 @@ export default function AddSuggestion({
             </div>
 
             <div className="flex flex-col gap-4 mt-4">
-              <p className="mx-auto">
+              <p className="mx-auto text-secondaryText">
                 Select the incorrect tags and then please comment why the tags
                 are incorrect in the textbox at the bottom. Thank you!
               </p>
@@ -229,14 +229,17 @@ export default function AddSuggestion({
           </div>
 
           <Field className="mt-6 mx-4">
-            <p className="text-center my-4">
+            <p className="text-secondaryText text-center">
+              {" "}
+              Below if a copy of the existing notes, if any exist:
+            </p>
+            <p className="text-center text-secondaryText my-4">
               {" "}
               {`"${contentInfo.notes === "" ? "no notes" : contentInfo.notes}"`}
             </p>
             <StyledTextarea
               onChange={(e) => setDescriptionSuggestions(e.target.value)}
               maxLength={500}
-              placeholder=""
               ariaLabel="type-comments"
               name="body"
               disabled={!signedInUser}
@@ -246,10 +249,10 @@ export default function AddSuggestion({
           <section>
             <div className=" bg-secondary  rounded-sm mx-5 mb-10 flex mt-6">
               <h3 className=" my-2 text-xl mx-auto py-3 ">
-                Additional Comments
+                Additional Comments (Optional)
               </h3>
             </div>
-            <p className="text-center">
+            <p className="text-center text-secondaryText">
               Please give us more information in the comments textbox below
             </p>
 
@@ -257,7 +260,6 @@ export default function AddSuggestion({
               <StyledTextarea
                 onChange={(e) => setAdditionalCommentsState(e.target.value)}
                 maxLength={500}
-                placeholder="Optional"
                 ariaLabel="type-comments"
                 name="body"
                 disabled={!signedInUser}

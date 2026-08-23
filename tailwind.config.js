@@ -18,7 +18,15 @@ module.exports = {
         secondary2: "#140223",
         subtleBackground: "#3154bd", //"rgb(99,64,153)",
         subtleWhite: "oklch(0.88 0.005 260 / <alpha-value>)",
-        cardBorder: "oklch(26% 0.015 260)", // faint card/divider border from the design reference
+        // De-emphasized body copy (help text, captions, character counts) —
+        // subtleWhite at a fixed 70% baked in as its own token, rather than
+        // ad hoc `text-subtleWhite/70` at each call site, so the ~7.5:1
+        // contrast ratio (checked against `primary` #050816) can't drift if
+        // someone changes the opacity on one usage but not another.
+        secondaryText: "oklch(0.88 0.005 260 / 0.7)",
+        subtleBorder: "oklch(0.4071 0.0962 264 / <alpha-value>)",
+        // faint card/divider border from the design reference
+        fieldBackground: "oklch(0.2118 0.0592 270.28)",
         // GeneralButton palette — see docs/notes/components/reusable-buttons.md
         // Named "buttonAccent" (not "accent") to avoid colliding with the
         // pre-existing shadcn `accent: { DEFAULT: "hsl(var(--accent))", ... }`
@@ -52,7 +60,7 @@ module.exports = {
           foreground: "hsl(var(--popover-foreground))",
         },
         primary: {
-          DEFAULT: "#050816", //darkest purple //"#0c0516"
+          DEFAULT: "#050816", //darkest blue //"#0c0516"
           foreground: "hsl(var(--primary-foreground))",
         },
         secondary: {

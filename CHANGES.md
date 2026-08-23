@@ -1,5 +1,48 @@
 # CHANGES
 
+## 2026-08-23 — Styling: `/adddescriptions` text colors/weight — first pass
+
+Explored alternative page shells for `/adddescriptions` as a design-comparison
+Artifact first (three options: numbered steps, reference rail, quiet
+minimal), settled on the quiet-minimal direction, then checked its text
+contrast ratios against WCAG AA before touching real code. Full layout
+restructure (left-alignment, section dividers, submit-button variant swap)
+is deferred to a later pass — this first pass only touches text color and
+font-weight in `components/AddingNewData/addingdescription.tsx`:
+
+- Secondary/help copy (image caption, notes helper paragraphs, tags helper
+  text, both character-count spans) now uses `text-subtleWhite/70` instead
+  of full-opacity `subtleWhite`, to visually de-emphasize it relative to
+  primary content. Checked at ~7.5:1 contrast against the page background —
+  well clear of the 4.5:1 AA floor for that text size, not a bare pass.
+- "Ruh Roh! This description already exists!" changed from `text-red-500`
+  to `text-red-400` — `red-500` on the page's near-black background
+  measured ~5.3:1 (passing, but thin); `red-400` measures ~7.2:1.
+- "Tags *required" label changed from `font-bold` to `font-black`, matching
+  "Description *required" — both are required fields and should carry the
+  same visual weight; "Notes" (optional) stays `font-bold`.
+
+No layout, spacing, or component-structure changes in this pass, and the
+submit button's existing ad-hoc `yellow-300`/`violet-800`/`blue-500`
+classes were left alone on purpose (flagged for the follow-up pass, not
+this one).
+
+Follow-up small edit: the example tags (`senior, funny, quiet,
+well-behaved`) were plain text in that same caption. Reused the exact tag
+pill styling from `ContentListing.tsx`
+(`bg-white/10 text-subtleWhite text-xs px-3 py-1 rounded-full`, `#`-prefixed)
+so the example tags read as actual tags instead of a comma-separated list.
+
+Follow-up: promoted the ad hoc `text-subtleWhite/70` de-emphasis color used
+throughout this pass into its own `secondaryText` token in
+`tailwind.config.js` (`oklch(0.88 0.005 260 / 0.7)` — the same subtleWhite
+hue baked to a fixed 70%), since it's meant to be reused sitewide for
+help/caption text and shouldn't risk drifting to a different opacity at
+each call site. Swapped `addingdescription.tsx`'s existing
+`text-subtleWhite/70` usages over to `text-secondaryText`; no other
+component in the codebase used that pattern yet, so there was nothing else
+to migrate.
+
 ## 2026-08-22 — Bugfix: dashboard content rows — name/@handle centered, not next to image
 
 ### What was broken and why
@@ -23,7 +66,7 @@ chain resets it — `text-align` inherits straight through. The name/handle
 header row is `<a className="flex-1 min-w-0 flex flex-col leading-tight">`
 — a flex-column container, so its `<span>` children stretch to the row's
 full available width by default (`align-items: stretch`). The inherited
-`text-center` then centers the *text* inside those stretched spans,
+`text-center` then centers the _text_ inside those stretched spans,
 visually separating it from the image even though the `<a>` is still the
 very next flex item, tight against it. The content/notes block just below
 in the same component already had its own `text-left` override for
@@ -182,7 +225,7 @@ already had an (otherwise-unused, shadcn-scaffold) `accent` token —
 `accent: { DEFAULT: "hsl(var(--accent))", foreground: "hsl(var(--accent-foreground))" }`
 — and the `accent: "oklch(62% 0.16 264 / <alpha-value>)"` token added
 earlier today for the button palette used the **same key name**, placed
-*earlier* in the same object literal. JS object literals silently let a
+_earlier_ in the same object literal. JS object literals silently let a
 later duplicate key win, so the pre-existing shadcn `accent` object
 overwrote mine — every `bg-accent`/`border-accent`/`hover:border-accent`
 class actually compiled to `hsl(var(--accent))`, and
@@ -293,7 +336,7 @@ Replaced `GeneralButton`'s ad-hoc Tailwind color classes
 (`yellow-300`/`yellow-700`, `blue-500`/`blue-700`, `indigo-600`,
 `gray-400`/`gray-500`, `slate-300`) with a palette built from the existing
 design-system tokens (`primary`, `secondary`, `subtleBackground`,
-`cardBorder`, `subtleWhite`) plus a small accent/outline/disabled set added
+`subtleBorder`, `subtleWhite`) plus a small accent/outline/disabled set added
 alongside them in [tailwind.config.js](tailwind.config.js): `accent`,
 `accentFill`, `accentFillBorder`, `outlineBorder`, `warningHover`,
 `disabledBg`, `disabledText`. Explored as a set of visual directions in a
@@ -307,7 +350,7 @@ for legibility.
 
 Every variant now also sets an explicit border **width** (`border-[1.5px]`,
 `border-2` for `active`, `border-4` for `hero`, unchanged) — previously
-most variants set a border *color* class without a width utility, so the
+most variants set a border _color_ class without a width utility, so the
 border was invisible in practice (Tailwind's border-width defaults to 0).
 Only `secondary` (`border-t border-x`) and `heroStyle` (`border-4`)
 actually rendered a border before this change.
@@ -398,7 +441,7 @@ from raw hand-written `<button>` elements to `<GeneralButton heroStyle />`,
 so future style edits to this button style sync from one place. This also
 fixed an existing inconsistency: "Fun" and "Fitting" used
 `border-b-4 border-subtleWhite` while "Impactful" used
-`border-4 border-cardBorder` — all three are now standardized on the
+`border-4 border-subtleBorder` — all three are now standardized on the
 "Impactful" look. "Fitting" also had an extra `px-0` utility the other two
 lacked; dropped it as part of standardizing all three on one identical
 style.
@@ -495,6 +538,7 @@ on the select underneath and opens the native picker.
 ### Problem encountered
 
 Two false starts before landing on this:
+
 1. Initially assumed a Firefox-specific `appearance-none`/sizing CSS bug
    (the user first said "the dropdown doesn't respond" while testing in
    Firefox). Static code reading couldn't confirm this, and the user
@@ -582,21 +626,21 @@ This project is ~95% JavaScript, so tsconfig is tuned for **incremental migratio
 
 **Left unchanged on purpose**
 
-| Option | Value | Why |
-|--------|-------|-----|
-| `allowJs` | `true` | Most files are still `.js`/`.jsx`. Without this, TypeScript would ignore the majority of the codebase and break the gradual rename-and-type workflow. |
-| `strict` | `false` | Enabling full strict mode now would surface hundreds of errors across untouched JS files and force a big-bang fix. We flip this to `true` later, once ~70%+ of files are converted. |
-| `strictNullChecks` | `true` | Already on before wave 1. Null/undefined bugs are high-value to catch early, and the existing TS files (email templates, hooks) were written with this in mind. Keeping it avoids regressing code that already passes null checks. |
-| `include` (`**/*.js`, `**/*.jsx`) | kept | Same reason as `allowJs` — JS and TS coexist in one project until migration is done. |
-| `moduleResolution` | `"node"` | Works with the current Next.js 15 setup. `"bundler"` is a later option when we enable full strict and tighten the toolchain. |
-| `checkJs` | not enabled | Would type-check every JS file immediately and create a huge error surface before those files have types. Optional `// @ts-check` per file is the safer path for hard modules later. |
+| Option                            | Value       | Why                                                                                                                                                                                                                                |
+| --------------------------------- | ----------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `allowJs`                         | `true`      | Most files are still `.js`/`.jsx`. Without this, TypeScript would ignore the majority of the codebase and break the gradual rename-and-type workflow.                                                                              |
+| `strict`                          | `false`     | Enabling full strict mode now would surface hundreds of errors across untouched JS files and force a big-bang fix. We flip this to `true` later, once ~70%+ of files are converted.                                                |
+| `strictNullChecks`                | `true`      | Already on before wave 1. Null/undefined bugs are high-value to catch early, and the existing TS files (email templates, hooks) were written with this in mind. Keeping it avoids regressing code that already passes null checks. |
+| `include` (`**/*.js`, `**/*.jsx`) | kept        | Same reason as `allowJs` — JS and TS coexist in one project until migration is done.                                                                                                                                               |
+| `moduleResolution`                | `"node"`    | Works with the current Next.js 15 setup. `"bundler"` is a later option when we enable full strict and tighten the toolchain.                                                                                                       |
+| `checkJs`                         | not enabled | Would type-check every JS file immediately and create a huge error surface before those files have types. Optional `// @ts-check` per file is the safer path for hard modules later.                                               |
 
 **Added in wave 1**
 
-| Option | Why |
-|--------|-----|
-| `noFallthroughCasesInSwitch` | Catches accidental `switch` fall-through — a real logic bug — without requiring types on any file. Safe to turn on during migration. |
-| `noImplicitReturns` | Ensures functions with a return type (or inferred return paths) actually return on all code paths. Again, catches bugs without forcing `noImplicitAny` on legacy JS. |
+| Option                       | Why                                                                                                                                                                  |
+| ---------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `noFallthroughCasesInSwitch` | Catches accidental `switch` fall-through — a real logic bug — without requiring types on any file. Safe to turn on during migration.                                 |
+| `noImplicitReturns`          | Ensures functions with a return type (or inferred return paths) actually return on all code paths. Again, catches bugs without forcing `noImplicitAny` on legacy JS. |
 
 **Deliberately deferred**
 
@@ -3223,8 +3267,6 @@ Converted three small listing/UI helpers to TypeScript. `ToggeableAlert` typed `
 
 Convert `components/ShowingListOfContent/ContentListing.jsx`.
 
-
-
 ---
 
 ## 2026-06-07 — Cleanup: remove dead `target` from `ThanksDialog`
@@ -3283,8 +3325,6 @@ Completed thanks-flow migration: data options, submission form, API routes, and 
 
 Convert `components/ShowingListOfContent/ContentListing.jsx`.
 
-
-
 ---
 
 ## 2026-06-07 — Fix: canonical `descriptions` contentType
@@ -3311,8 +3351,6 @@ Aligned server branches with UI convention (`"descriptions"` not `"description"`
 ### Next logical step
 
 Convert `components/ShowingListOfContent/ContentListing.jsx`.
-
-
 
 ---
 
@@ -3347,8 +3385,6 @@ Converted listing row delete/edit menu buttons and edit dialog to `.tsx`. Export
 ### Next logical step
 
 Convert `components/ShowingListOfContent/ContentListing.jsx`.
-
-
 
 ---
 
@@ -5187,7 +5223,10 @@ import { checkOwnership } from "./checkOwnership";
 
 mocks.getSessionForApis.mockResolvedValue({
   ok: true,
-  session: { user: { id: "creator-42", role: "user", status: "active" }, expires: "…" },
+  session: {
+    user: { id: "creator-42", role: "user", status: "active" },
+    expires: "…",
+  },
 });
 ```
 
@@ -5305,7 +5344,12 @@ Failed approach:
 ```ts
 const onChange = vi.fn();
 render(
-  <StyledCheckbox label="Keep text" value="keep-text" checked={false} onChange={onChange} />,
+  <StyledCheckbox
+    label="Keep text"
+    value="keep-text"
+    checked={false}
+    onChange={onChange}
+  />
 );
 await user.click(screen.getByRole("checkbox", { name: /keep text/i }));
 expect(onChange.mock.calls[0][0].target.checked).toBe(true); // got false
@@ -5481,16 +5525,16 @@ Replaced size-based `ReusableSmallComponents/` and `ReusableMediumComponents/` w
 
 ### Mapping
 
-| Old | New |
-|-----|-----|
-| `ReusableSmallComponents/buttons/*` (generic) | `shared/actions/` |
-| `WarningMessage`, `ToggeableAlert`, `ui/MustLoginMessage` | `shared/feedback/` |
-| icons, `IconWithCount` | `shared/icons/` |
-| headings | `shared/typography/` |
-| `ProfileImage`, `GifHover`, `ShowTime` | `shared/media/` |
-| `ListWithPawPrintIcon` | `shared/lists/` |
-| `MediaObject*` | `shared/layout/` |
-| like/follow/share | `shared/content-actions/` |
+| Old                                                       | New                       |
+| --------------------------------------------------------- | ------------------------- |
+| `ReusableSmallComponents/buttons/*` (generic)             | `shared/actions/`         |
+| `WarningMessage`, `ToggeableAlert`, `ui/MustLoginMessage` | `shared/feedback/`        |
+| icons, `IconWithCount`                                    | `shared/icons/`           |
+| headings                                                  | `shared/typography/`      |
+| `ProfileImage`, `GifHover`, `ShowTime`                    | `shared/media/`           |
+| `ListWithPawPrintIcon`                                    | `shared/lists/`           |
+| `MediaObject*`                                            | `shared/layout/`          |
+| like/follow/share                                         | `shared/content-actions/` |
 
 ### Problems encountered
 
@@ -5934,7 +5978,6 @@ Serial `social.spec.ts` tests share the in-memory server rate limiter (3 POSTs /
 ### Verification
 
 - `pnpm test:e2e e2e/social.spec.ts`
-
 
 ### What changed
 

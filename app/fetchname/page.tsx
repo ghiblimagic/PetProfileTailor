@@ -37,9 +37,8 @@ export default function FetchNamePage() {
         <div>
           <input
             type="text"
-            className={`bg-secondary border-subtleWhite rounded-2xl mr-2 ${
-              checkIsProcessing &&
-              "disabled:bg-errorBackgroundColor   disabled:text-errorTextColor disabled:border-errorBorderColor disabled:cursor-not-allowed"
+            className={`mr-2 ${
+              checkIsProcessing && "disabled:border-errorBorderColor"
             }`}
             value={nameCheck}
             id="checkExists"

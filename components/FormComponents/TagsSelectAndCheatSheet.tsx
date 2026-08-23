@@ -6,7 +6,7 @@
 
 import { Disclosure } from "@headlessui/react";
 import { ChevronUpIcon } from "@heroicons/react/20/solid";
-import { useState } from "react";
+import { Fragment, useState } from "react";
 import Select, { type StylesConfig } from "react-select";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPaw } from "@fortawesome/free-solid-svg-icons";
@@ -38,13 +38,13 @@ export default function TagsSelectAndCheatSheet({
   );
 
   const customSelectStyles: StylesConfig<TagOption, true> = {
-    control: (provided) => ({
+    control: (provided, state) => ({
       ...provided,
       backgroundColor: isDisabled
         ? "var(--select-bg-disabled)"
-        : "var(--select-bg-primary)",
+        : "var(--field-background)",
       pointerEvents: isDisabled ? "auto" : "auto",
-      borderColor: "var(--select-border)",
+      borderColor: state.isFocused ? "#2563EB" : "var(--subtle-border)",
       color: "var(--select-text)",
       width: "96%",
       borderRadius: "10px",
@@ -54,9 +54,9 @@ export default function TagsSelectAndCheatSheet({
       paddingLeft: "0.5rem",
       margin: "1rem auto",
       minHeight: "2.5rem",
-      boxShadow: "none",
+      boxShadow: state.isFocused ? "0 0 0 1px #2563EB" : "none",
       "&:hover": {
-        borderColor: "rgb(221 214 254)",
+        borderColor: state.isFocused ? "#2563EB" : "rgb(221 214 254)",
       },
     }),
     dropdownIndicator: (provided) => ({
@@ -110,7 +110,8 @@ export default function TagsSelectAndCheatSheet({
       ...provided,
       backgroundColor: "var(--select-bg-primary)",
       color: "var(--select-text)",
-      borderRadius: "0.5rem",
+      border: "1px solid var(--subtle-border)",
+      borderRadius: "0.7rem",
     }),
     menuList: (provided) => ({
       ...provided,
@@ -157,7 +158,7 @@ export default function TagsSelectAndCheatSheet({
   };
 
   return (
-    <div className="h-fit w-full bg-secondary border-b-2 border-subtleWhite rounded-box py-2 mx-auto">
+    <div className="h-fit w-full rounded-box py-2 mx-auto">
       <Select<TagOption, true>
         instanceId={`tags-select-${dataType}`}
         styles={customSelectStyles}
@@ -172,7 +173,7 @@ export default function TagsSelectAndCheatSheet({
         onChange={(selected) => handleSelectChange([...selected])}
       />
 
-      <p className="my-4 text-subtleWhite text-center">
+      <p className="my-4 text-secondaryText text-center">
         Or use the tags cheat sheet
       </p>
       <div className="flex justify-center mb-4">
@@ -184,62 +185,62 @@ export default function TagsSelectAndCheatSheet({
         />
       </div>
       {isOpen && (
-        <div className=" justify-center">
-          {categoriesWithTags.map((category) => (
-            <Disclosure
-              key={category._id}
-              as="div"
-              className="inline-block align-top mb-6 text-center "
-            >
-              {({ open }) => (
-                <>
-                  <Disclosure.Button className="flex justify-between w-[306px]  bg-primary px-2 py-2 text-base font-medium text-subtleWhite hover:bg-blue-700 focus:outline-none focus-visible:ring focus-visible:ring-blue-500 focus-visible:ring-opacity-75">
-                    <span className="mx-auto">{category.category}</span>
-                    <ChevronUpIcon
-                      className={`${
-                        open ? "rotate-180 transform" : ""
-                      } h-5 w-5 bg-blue-00`}
-                    />
-                  </Disclosure.Button>
+        <div className="justify-center rounded-box border border-buttonAccent   overflow-hidden">
+          {categoriesWithTags.map((category, index) => (
+            <Fragment key={category._id}>
+              {index > 0 && (
+                <hr className="mx-6 border-t border-subtleBorder" />
+              )}
+              <Disclosure as="div" className="block w-full text-center ">
+                {({ open }) => (
+                  <>
+                    <Disclosure.Button className="flex justify-between w-full  bg-primary px-6 py-3 text-base font-medium text-subtleWhite hover:bg-blue-700 focus:outline-none focus-visible:ring focus-visible:ring-blue-500 focus-visible:ring-opacity-75">
+                      <span className="mx-auto">{category.category}</span>
+                      <ChevronUpIcon
+                        className={`${
+                          open ? "rotate-180 transform" : ""
+                        } h-5 w-5 bg-blue-00`}
+                      />
+                    </Disclosure.Button>
 
-                  <Disclosure.Panel
-                    className={`px-4 pt-4 pb-2 text-sm text-subtleWhite  bg-primary  w-[306px] ${
-                      isDisabled &&
-                      "bg-errorBackgroundColor [&_*]:cursor-not-allowed"
-                    }`}
-                  >
-                    <div className={`space-y-6 mb-4y `}>
-                      {category.tags.map((tag) => {
-                        const checked = tagsToSubmit.some(
-                          (t) => t.value === tag._id
-                        );
-                        return (
-                          <label
-                            key={tag._id}
-                            htmlFor={tag._id}
-                            className={`flex items-center space-x-2 cursor-pointer group hover:bg-blue-700 px-1 py-1 rounded  `}
-                          >
-                            <input
-                              id={tag._id}
-                              type="checkbox"
-                              className="peer fixed top-0 left-0  m-0 h-[1px] w-[1px] overflow-hidden whitespace-nowrap border-0 p-0"
-                              style={{
-                                clip: "rect(0 0 0 0)",
-                                clipPath: "inset(50%)",
-                              }}
-                              disabled={isDisabled}
-                              checked={checked}
-                              onChange={(e) =>
-                                handleCheckboxChange({
-                                  id: tag._id,
-                                  label: tag.tag,
-                                  checked: e.target.checked,
-                                })
-                              }
-                            />
+                    <Disclosure.Panel
+                      className={`px-4 pt-6 pb-6 text-sm text-subtleWhite  bg-primary  w-full ${
+                        isDisabled &&
+                        "bg-errorBackgroundColor [&_*]:cursor-not-allowed"
+                      }`}
+                    >
+                      <div className={`flex flex-wrap gap-4 mb-4y `}>
+                        {category.tags.map((tag) => {
+                          const checked = tagsToSubmit.some(
+                            (t) => t.value === tag._id
+                          );
+                          return (
+                            <label
+                              key={tag._id}
+                              htmlFor={tag._id}
+                              className={`flex items-center space-x-2 cursor-pointer group hover:bg-blue-700 px-1 py-1 rounded  `}
+                            >
+                              <input
+                                id={tag._id}
+                                type="checkbox"
+                                className="peer fixed top-0 left-0  m-0 h-[1px] w-[1px] overflow-hidden whitespace-nowrap border-0 p-0"
+                                style={{
+                                  clip: "rect(0 0 0 0)",
+                                  clipPath: "inset(50%)",
+                                }}
+                                disabled={isDisabled}
+                                checked={checked}
+                                onChange={(e) =>
+                                  handleCheckboxChange({
+                                    id: tag._id,
+                                    label: tag.tag,
+                                    checked: e.target.checked,
+                                  })
+                                }
+                              />
 
-                            <span
-                              className={`
+                              <span
+                                className={`
       border-2 border-violet-300 rounded flex items-center justify-center p-[7px]
       transition-colors duration-200
       bg-secondary text-subtleWhite group
@@ -248,21 +249,22 @@ export default function TagsSelectAndCheatSheet({
         isDisabled && "bg-errorBackgroundColor cursor-not-allowed"
       }
     `}
-                            >
-                              <FontAwesomeIcon icon={faPaw} />
-                            </span>
+                              >
+                                <FontAwesomeIcon icon={faPaw} />
+                              </span>
 
-                            <span className={`text-subtleWhite text-left`}>
-                              {tag.tag}
-                            </span>
-                          </label>
-                        );
-                      })}
-                    </div>
-                  </Disclosure.Panel>
-                </>
-              )}
-            </Disclosure>
+                              <span className={`text-subtleWhite text-left`}>
+                                {tag.tag}
+                              </span>
+                            </label>
+                          );
+                        })}
+                      </div>
+                    </Disclosure.Panel>
+                  </>
+                )}
+              </Disclosure>
+            </Fragment>
           ))}
         </div>
       )}

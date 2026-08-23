@@ -184,7 +184,7 @@ export default function ResetPassword({ token }: ResetPasswordProps) {
                   type="password"
                   disabled={error}
                   // if token expired / invalid, don't allow entering a password
-                  className="w-full border border-gray-300 text-black rounded px-3 py-2 mb-4 focus:outline-none focus:border-blue-400 focus:text-black disabled:bg-errorBackgroundColor disabled:placeholder-errorTextColor"
+                  className="w-full px-3 py-2 mb-4 focus:outline-none disabled:placeholder-errorTextColor"
                   placeholder="password"
                   required
                   id="password"
@@ -204,7 +204,7 @@ export default function ResetPassword({ token }: ResetPasswordProps) {
                     Confirm New Password
                   </label>
                   <input
-                    className="w-full text-secondary"
+                    className="w-full"
                     type="password"
                     id="confirmPassword"
                     {...register("confirmPassword", {

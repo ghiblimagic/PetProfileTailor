@@ -41,7 +41,7 @@ export default function ContactForm() {
 
   const [state, formAction, isPending] = useActionState(
     sendContactEmail,
-    initialContactState,
+    initialContactState
   );
 
   // Set recaptcha as loaded when it's ready, with timeout fallback
@@ -151,19 +151,12 @@ export default function ContactForm() {
             aria-hidden="true"
           />
 
-          <StyledInput
-            name="name"
-            placeholder="Name"
-            required
-            className="bg-secondary mt-3"
-            label="Name"
-          />
+          <StyledInput name="name" required className=" mt-3" label="Name" />
 
           <StyledInput
             name="email"
             type="email"
-            placeholder="Email"
-            className="bg-secondary mt-3"
+            className=" mt-3"
             required
             label="Email"
           />
@@ -175,7 +168,7 @@ export default function ContactForm() {
             required
             maxLength={10000}
             aria-label="Type your message in English or Spanish"
-            className="bg-secondary mt-3"
+            className=" mt-3"
           />
 
           <input

@@ -13,7 +13,7 @@ overrides an earlier one). Add or recolor a variant here once and both
 components pick it up.
 
 Colors are drawn from the design-system tokens in `tailwind.config.js`
-(`primary`, `secondary`, `subtleBackground`, `cardBorder`, `subtleWhite`)
+(`primary`, `secondary`, `subtleBackground`, `subtleBorder`, `subtleWhite`)
 plus a small accent/outline/disabled set added alongside them
 (`buttonAccent`, `accentFill`, `accentFillBorder`, `outlineBorder`,
 `warningHover`, `disabledBg`, `disabledText`) — no more ad-hoc Tailwind
@@ -25,7 +25,7 @@ happened the first time this was added — hover/active states rendered as
 grey/white instead of blue until the rename.
 All text/background pairs meet WCAG AA (4.5:1); outline-only borders
 (`secondary`, `tertiary`, `disabled`) meet 3:1. Previously most `GeneralButton`
-variants set a border *color* without a border *width* utility, so the
+variants set a border _color_ without a border _width_ utility, so the
 border was invisible in practice — every variant now sets an explicit width.
 
 Both components compose `className`s with `cn()` ([`lib/utils.ts`](../../../lib/utils.ts),
@@ -114,13 +114,13 @@ Sibling: [`iconOpenCloseButton.tsx`](../../../components/Shared/actions/iconOpen
 
 ## Already TypeScript
 
-| File | Role |
-|------|------|
-| `EditButton.tsx` | Listing row edit |
-| `ShareButton.tsx` | Share popover trigger |
-| `LikesButtonAndLikesLogic.tsx` | Like toggle + count |
-| `ContainerForLikeShareFlag.tsx` | Action bar wrapper |
-| `iconOpenCloseButton.tsx` | Notification tab buttons |
+| File                            | Role                     |
+| ------------------------------- | ------------------------ |
+| `EditButton.tsx`                | Listing row edit         |
+| `ShareButton.tsx`               | Share popover trigger    |
+| `LikesButtonAndLikesLogic.tsx`  | Like toggle + count      |
+| `ContainerForLikeShareFlag.tsx` | Action bar wrapper       |
+| `iconOpenCloseButton.tsx`       | Notification tab buttons |
 
 ## `ReturnToPreviousPage`
 

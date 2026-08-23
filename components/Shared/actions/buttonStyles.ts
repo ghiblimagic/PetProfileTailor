@@ -31,7 +31,7 @@ export type ButtonVariant =
 
 /**
  * Colors drawn from the design-system tokens (`primary`, `secondary`,
- * `subtleBackground`, `cardBorder`, `subtleWhite`) plus the accent/outline
+ * `subtleBackground`, `subtleBorder`, `subtleWhite`) plus the accent/outline
  * set added alongside them in tailwind.config.js (`buttonAccent`,
  * `accentFill`, `accentFillBorder`, `outlineBorder`, `warningHover`,
  * `disabledBg`, `disabledText`). All text/background pairs meet WCAG AA
@@ -46,7 +46,7 @@ export type ButtonVariant =
  */
 export const BUTTON_VARIANT_CLASSES: Record<ButtonVariant, string> = {
   default:
-    "bg-subtleBackground border-[1.5px] border-cardBorder text-subtleWhite hover:bg-accentFill hover:border-accentFillBorder hover:text-subtleWhite",
+    "bg-subtleBackground border-[1.5px] border-subtleBorder text-subtleWhite hover:bg-accentFill hover:border-accentFillBorder hover:text-subtleWhite",
   secondary:
     "bg-secondary text-white hover:text-white border-[1.5px] border-outlineBorder hover:border-accentFillBorder hover:bg-accentFill font-black  focus:ring-white py-2",
 

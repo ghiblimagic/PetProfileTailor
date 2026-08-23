@@ -150,7 +150,7 @@ export default function ContentListing({
 
   return (
     <div
-      className={`flex flex-col gap-4 border border-cardBorder rounded-2xl p-5 mb-4 text-left ${
+      className={`flex flex-col gap-4 border border-subtleBorder rounded-2xl p-5 mb-4 text-left ${
         className ?? ""
       }`}
     >
@@ -350,7 +350,7 @@ export default function ContentListing({
         </div>
       )}
 
-      <div className="w-full flex flex-wrap items-center gap-x-4 gap-y-2 pt-3 border-t border-cardBorder">
+      <div className="w-full flex flex-wrap items-center gap-x-4 gap-y-2 pt-3 border-t border-subtleBorder">
         <LikesButtonAndLikesLogic
           dataType={likeDataType}
           data={singleContent}
