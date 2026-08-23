@@ -1,5 +1,57 @@
 # CHANGES
 
+## 2026-08-22 — Bugfix: dashboard content rows — name/@handle centered, not next to image
+
+### What was broken and why
+
+User-reported (screenshot: `/dashboard`, all four tabs — Fav Names, Fav
+Descriptions, Added Names, Added Descriptions): the profile image sat in
+the right place, but the name + `@profileName` text was pulled away from
+it — clearly not tucked next to the image the way it renders correctly on
+`/fetchnames`/`/fetchdescriptions`, even though all three routes render the
+exact same `ContentListing.tsx`.
+
+First hypothesis (wrong, ruled out by screenshotting both states —
+including the user's own visual check — before landing on this) was a
+missing `w-full` on a flex-wrap ancestor in `dashboard.tsx` squeezing the
+whole card's width. That didn't reproduce.
+
+Actual root cause: `components/dashboard.tsx`'s outer `<section
+className="... text-center">` sets `text-align: center`, and nothing in
+the `ToggleOneContentPage` → `CoreListingPageLogic` → `ContentListing`
+chain resets it — `text-align` inherits straight through. The name/handle
+header row is `<a className="flex-1 min-w-0 flex flex-col leading-tight">`
+— a flex-column container, so its `<span>` children stretch to the row's
+full available width by default (`align-items: stretch`). The inherited
+`text-center` then centers the *text* inside those stretched spans,
+visually separating it from the image even though the `<a>` is still the
+very next flex item, tight against it. The content/notes block just below
+in the same component already had its own `text-left` override for
+exactly this reason (`<div className="flex flex-col gap-3 text-left
+text-subtleWhite">`) — which is why the title and description render
+correctly in the same screenshot — the header row above it never got the
+same treatment. `/fetchnames`/`/fetchdescriptions` never sit under a
+`text-center` ancestor, so this was never exposed there.
+
+### Fix
+
+Added `text-left` to `ContentListing`'s outermost root div instead of
+patching `dashboard.tsx`'s `text-center` — this component gets embedded
+under very different ancestor trees, so making the card immune to
+whatever alignment an embedding page happens to set is more robust than
+fixing the one ancestor found this time, and matches the pattern the
+content/notes block already used.
+
+### Files modified
+
+- `components/ShowingListOfContent/ContentListing.tsx` — `text-left` on the root div.
+- `docs/notes/components/content-listing.md` — documented why.
+
+### Verification
+
+- `pnpm exec tsc --noEmit` — clean.
+- Not yet visually re-confirmed by the user (no browser testing was run for this fix, per their request after the first, wrong hypothesis below) — pending their check.
+
 ## 2026-08-22 — MediaObjectLeft/Right: center the button under the text block
 
 ### What was changed

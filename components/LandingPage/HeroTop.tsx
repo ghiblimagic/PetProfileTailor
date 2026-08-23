@@ -62,9 +62,9 @@ export default function HeroTop({
             ruff! We&apos;ve been there! And we&apos;re here to help.
           </p>
           <p className="mb-8 text-base md:text-xl">
-            Homeward Tails is a community created database of names and
-            descriptions that helps you write creative &quot;tales&quot; to get
-            pets home! It&apos;s easier than ever to create pet bios that are:
+            Homeward Tails is a community created list of names and descriptions
+            that helps you write creative &quot;tales&quot; to get pets home!
+            It&apos;s easier than ever to create pet bios that are:
           </p>
 
           <section className="flex justify-center gap-3 flex-wrap">

@@ -150,7 +150,7 @@ export default function ContentListing({
 
   return (
     <div
-      className={`flex flex-col gap-4 border border-cardBorder rounded-2xl p-5 mb-4 ${
+      className={`flex flex-col gap-4 border border-cardBorder rounded-2xl p-5 mb-4 text-left ${
         className ?? ""
       }`}
     >
