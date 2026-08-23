@@ -252,6 +252,14 @@ select {
   p {
     @apply text-secondaryText;
   }
+  hr {
+    /* `* { @apply border-border }` above already gives every element a
+    border-color, but `hr` (0,0,1) is more specific than `*` (0,0,0), so
+    this wins regardless of source order — no bare `!important` needed.
+    Margins/width are left to each call site (e.g. `mx-6`) since spacing
+    is layout-specific, not a sitewide default like the color/border. */
+    @apply border-subtleBorder;
+  }
 }
 
 .blur-with-color {

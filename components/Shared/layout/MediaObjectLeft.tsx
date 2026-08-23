@@ -33,8 +33,8 @@ export default function MediaObjectLeft({
   imgheight,
 }: MediaObjectLeftProps) {
   return (
-    <div className="flex justify-center my-6 flex-col md:flex-row sm:ml-2">
-      <div className="self-center ">
+    <div className="flex justify-center py-10 flex-col md:flex-row sm:ml-2">
+      <div className="self-center mr-8">
         <Image
           className=""
           src={image}
@@ -49,7 +49,7 @@ export default function MediaObjectLeft({
         />
       </div>
       <div className="max-w-1/2  mr-8 self-center ">
-        <ul className="text-base md:text-lg text-white pb-8 pl-4">
+        <ul className="text-base md:text-lg text-white pb-8 pl-4 max-w-md">
           {listOfText.map((sentence) => (
             <ListWithPawPrintIcon text={sentence} key={sentence} />
           ))}

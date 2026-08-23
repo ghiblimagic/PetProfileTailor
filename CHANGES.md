@@ -1,5 +1,104 @@
 # CHANGES
 
+## 2026-08-23 — `ContentListing`'s action row (likes/share/thanks) now centers instead of right-pinning thanks
+
+On narrow screens the likes/share/thanks row (`flex flex-wrap`) couldn't
+fit all three, so `ThanksButton` wrapped to its own line — but it was
+wrapped in an `ml-auto` div meant to pin it to the far right of the *wide*
+layout, so on its wrapped line it stayed jammed against the right edge
+while the row above sat left-aligned. Looked unintentional/lopsided.
+
+Removed the `ml-auto` wrapper (redundant now — the div existed only to
+hold that class) and added `justify-center` to the row. Flexbox centers
+each wrapped line independently, so on a narrow screen where thanks wraps
+alone, it now centers on its own line instead of sticking to one side;
+the two-item line above centers too, which reads as one coherent
+(intentionally centered) row rather than a stray leftover button.
+
+Not run: per session preference, no test/typecheck run for this pure
+Tailwind class change — worth a look at a narrow viewport in the browser.
+
+## 2026-08-23 — Test coverage for the submit-button disabled-reason logic
+
+Added `components/AddingNewData/addingdescription.test.tsx` covering the
+`submitDisabledReason` logic from the previous two entries: signed-out,
+signed-in-but-too-short, signed-in-with-no-tag, and the fully-enabled case
+(typed a description, opened the cheat sheet, expanded its one category,
+and actually clicked its one tag checkbox — a real interaction, not a
+prop/state shortcut, since there's no prop to inject `tagsToSubmit`
+directly).
+
+Mocked `next-auth/react`'s `useSession` (`vi.hoisted` + `mockReturnValue`,
+same pattern as `LikesContext.test.tsx`) to flip signed-in/signed-out per
+test, `next/image` (same stub as `RegisterForm.test.tsx`), and
+`@/hooks/useCategoriesForDataType` (same approach as
+`TagsSelectAndCheatSheet.test.tsx`) with one category/tag so the select
+field's `tagList` and the cheat sheet's checkbox refer to the same tag —
+needed for the "select a tag through the UI" case to actually work.
+
+Verified the tag-requirement test is a real regression guard, not a
+false-positive pass: temporarily reverted the `tagsToSubmit.length === 0`
+check to `false` and confirmed that specific test failed (button was not
+disabled), then restored the real check and reran — 4/4 passing. `tsc
+--noEmit` clean.
+
+## 2026-08-23 — Bugfix: submit button's "(disabled)" label didn't cover all disabled reasons
+
+`addingdescription.tsx`'s submit button had `disabled={!session ||
+newDescription.length < 10}` but its label only appended `"(disabled)"`
+for the `!session` case: `` `Add description ${!session ? "(disabled)" : ""}` ``.
+So a signed-in user who'd typed fewer than 10 characters saw a
+button that looked active but did nothing when clicked, with no visible
+reason why.
+
+First fix: hoisted the condition into a single `submitDisabled` const and
+drove both the button's `disabled` prop and its label off it. Follow-up,
+after discussing whether a bare "(disabled)" suffix was worth keeping at
+all: replaced it with a reason-specific `submitDisabledReason` string
+(`" (sign in to submit)"` / `" (min. 10 characters)"`) instead of a
+generic "(disabled)" tag — `GeneralButton`'s own disabled styling and the
+native `disabled` attribute already convey *that* the button is inert
+(both to sighted users and screen readers), so a bare "(disabled)" wasn't
+adding much; naming the actual blocker in the label tells the user what to
+fix without having to go hunting for the sign-in banner or the guidelines
+text above the form.
+
+Second follow-up: the button wasn't disabled for having zero tags
+selected at all — `handleDescriptionSubmission` posts `tags: tagIds`
+either way, so a description with no tags could be submitted. Added a
+third `tagsToSubmit.length === 0` → `" (select at least 1 tag)"` branch.
+Had to move the `useTags()` call (which owns `tagsToSubmit`) above the new
+`submitDisabledReason` const — it was declared using a value not in scope
+yet ("used before its declaration").
+
+Not run: user asked not to run tests this session — worth a manual check
+in the browser (type <10 characters while signed in → "Add description
+(min. 10 characters)"; signed out → "Add description (sign in to
+submit)"; 10+ characters with zero tags picked → "Add description (select
+at least 1 tag)").
+
+## 2026-08-23 — `<hr>` border color is now a sitewide default
+
+`TagsSelectAndCheatSheet.tsx`'s category-divider `<hr className="mx-6
+border-t border-subtleBorder" />` was the only `<hr>` in the codebase with
+explicit border styling — the other (`addingName.tsx`) had none, so it
+fell through to the app's generic `* { @apply border-border }` rule (a
+near-white/gray shadcn token), not `subtleBorder`.
+
+Added `hr { @apply border-subtleBorder; }` to `styles/globals.css`'s base
+layer (next to the `p`/`h1`–`h6` defaults) so every `<hr>` gets the same
+border color by default. `hr` (specificity 0,0,1) naturally wins over the
+`* { @apply border-border }` rule (0,0,0) regardless of source order, so
+no `!important` needed. Left margins/width to each call site — spacing is
+layout-specific, not a sitewide token — so `TagsSelectAndCheatSheet.tsx`'s
+`<hr>` simplified to just `className="mx-6"` (dropped the now-redundant
+`border-t border-subtleBorder`).
+
+Side effect: `addingName.tsx`'s bare `<hr className="mt-4" />` and
+`addingdescription.tsx`'s bare `<hr />` now pick up `subtleBorder` instead
+of the generic gray — a visual change, but one that makes them consistent
+with the rest of the site rather than an oversight worth preserving.
+
 ## 2026-08-23 — Bugfix: `TagPillMultiValue` crashed with "innerProps is undefined"
 
 Regression from the previous entry below — reported by the user as a

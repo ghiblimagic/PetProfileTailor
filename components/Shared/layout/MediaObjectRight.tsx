@@ -37,14 +37,11 @@ export default function MediaObjectRight({
   buttonStyle,
 }: MediaObjectRightProps) {
   return (
-    <div className="flex justify-center my-6 flex-col md:flex-row sm:ml-2">
-      <div className="max-w-md ml-4 mr-8 self-center ">
-        <ul className="text-base md:text-lg text-white pb-8 ">
+    <div className="flex justify-center py-10 flex-col md:flex-row sm:ml-2">
+      <div className="max-w-md ml-4 mr-8 self-center">
+        <ul className="text-base md:text-lg text-white pb-8">
           {listOfText.map((sentence) => (
-            <ListWithPawPrintIcon
-              text={sentence}
-              key={sentence}
-            />
+            <ListWithPawPrintIcon text={sentence} key={sentence} />
           ))}
         </ul>
 
@@ -56,7 +53,7 @@ export default function MediaObjectRight({
           />
         </div>
       </div>
-      <div className="self-center w-80 ">
+      <div className="self-center w-80 ml-8">
         <Image
           className=""
           width={Number(imgwidth)}

@@ -324,7 +324,7 @@ export default function ContentListing({
 
       <div className="flex flex-col gap-3 text-left text-subtleWhite">
         <p
-          className={`font-bold break-words ${
+          className={`font-bold break-words text-subtleWhite py-2 ${
             dataType === "names" ? "text-xl" : "text-[15.5px]"
           }`}
         >
@@ -339,14 +339,14 @@ export default function ContentListing({
       </div>
 
       {singleContent.tags.length > 0 && (
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-wrap gap-2 py-2">
           {singleContent.tags.map((tag) => (
             <TagPill key={tag._id}>{tag.tag}</TagPill>
           ))}
         </div>
       )}
 
-      <div className="w-full flex flex-wrap items-center gap-x-4 gap-y-2 pt-3 border-t border-subtleBorder">
+      <div className="w-full flex flex-wrap justify-center items-center gap-x-4 gap-y-2 pt-3 border-t border-subtleBorder">
         <LikesButtonAndLikesLogic
           dataType={likeDataType}
           data={singleContent}
@@ -362,9 +362,7 @@ export default function ContentListing({
         <ShareButton onClickShowShares={onClickShowShares} />
 
         {singleContent.createdBy._id !== signedInUsersId && (
-          <div className="ml-auto">
-            <ThanksButton onClick={() => openThanks(singleContent._id)} />
-          </div>
+          <ThanksButton onClick={() => openThanks(singleContent._id)} />
         )}
       </div>
 

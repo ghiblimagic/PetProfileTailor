@@ -213,9 +213,9 @@ export default function Pagination({
   const prevEnabled = currentUiPage !== 1;
 
   return (
-    <section className="pagination-navigation w-full flex flex-col gap-3 min-w-0 my-2 border-t border-subtleBorder pt-4">
+    <section className="pagination-navigation w-full flex flex-col gap-3 min-w-0 my-2  pt-4">
       {/* sorting logic*/}
-      <div className="flex flex-wrap items-center justify-between gap-3">
+      <div className="flex flex-wrap items-center justify-between gap-3 mb-3">
         {filtersSlot}
         <div className="flex flex-wrap items-center justify-end gap-3">
           {/* wrapping the selects in sections & inline-block keeps the per page and sort by labels from wrapping weirdly at smaller sizes */}
@@ -230,7 +230,7 @@ export default function Pagination({
             clicks, so the whole pill stays clickable end-to-end. */}
           <select
             id="per-page"
-            className="appearance-none bg-[oklch(0.20_0.015_260)] border border-[oklch(0.30_0.015_260)] rounded-[10px] pl-[14px] pr-7 py-[9px] text-subtleWhite text-[14px] cursor-pointer bg-no-repeat bg-[right_10px_center]"
+            className="appearance-none bg-[oklch(0.20_0.015_260)] border border-subtleBorder rounded-[10px] pl-[14px] pr-7 py-[9px] text-subtleWhite text-[14px] cursor-pointer bg-no-repeat bg-[right_10px_center]"
             style={{ backgroundImage: CHEVRON_DOWN_BG }}
             value={itemsPerPage}
             onChange={(e) => resetItemsPerPage(e.target.value)}
@@ -249,7 +249,7 @@ export default function Pagination({
             extra caption text is needed. */}
           {remainingSortCooldown > 0 ? (
             <select
-              className="appearance-none bg-[oklch(0.20_0.015_260)] border border-[oklch(0.30_0.015_260)] rounded-[10px] px-[14px] py-[9px] text-subtleWhite text-[14px] opacity-50 cursor-not-allowed w-56"
+              className="appearance-none bg-[oklch(0.60_0.015_260)] border border-subtleBorder  rounded-[10px] px-[14px] py-[9px] text-subtleWhite text-[14px] cursor-not-allowed w-56"
               disabled
             >
               <option>
@@ -260,7 +260,7 @@ export default function Pagination({
           ) : (
             <select
               id="sort-by"
-              className="appearance-none bg-[oklch(0.20_0.015_260)] border border-[oklch(0.30_0.015_260)] rounded-[10px] pl-[14px] pr-7 py-[9px] text-subtleWhite text-[14px] cursor-pointer bg-no-repeat bg-[right_10px_center]"
+              className="appearance-none bg-[oklch(0.20_0.015_260)] border border-subtleBorder  rounded-[10px] pl-[14px] pr-7 py-[9px] text-subtleWhite text-[14px] cursor-pointer bg-no-repeat bg-[right_10px_center]"
               style={{ backgroundImage: CHEVRON_DOWN_BG }}
               onChange={(e) => setSortingLogicFunction(e.target.value)}
               value={`${sortingProperty},${sortingValue}`}
@@ -282,7 +282,7 @@ export default function Pagination({
         </p>
       )}
 
-      <div className="flex flex-wrap gap-2 justify-center my-auto items-center ">
+      <div className="flex flex-wrap gap-2 justify-center my-auto items-center mb-3">
         <button
           className="prevpage w-8 h-8 rounded-full border border-subtleBorder flex items-center justify-center disabled:cursor-not-allowed"
           aria-label="prevpage"

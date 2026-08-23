@@ -213,7 +213,7 @@ export default function TagsSelectAndCheatSheet({
           {categoriesWithTags.map((category, index) => (
             <Fragment key={category._id}>
               {index > 0 && (
-                <hr className="mx-6 border-t border-subtleBorder" />
+                <hr className="mx-6" />
               )}
               <Disclosure as="div" className="block w-full text-center ">
                 {({ open }) => (

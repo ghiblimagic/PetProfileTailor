@@ -15,6 +15,7 @@ import { useTags } from "@/hooks/useTags";
 import { useSession } from "next-auth/react";
 import CheckIfContentExists from "./CheckIfContentExists";
 import PreserveTextAfterSubmission from "./preserveTextAfterSubmission";
+import GeneralButton from "../Shared/actions/GeneralButton";
 
 export default function NewDescriptionWithTagsData() {
   const [newDescription, setNewDescription] = useState("");
@@ -31,6 +32,19 @@ export default function NewDescriptionWithTagsData() {
 
   const { tagsToSubmit, tagIds, handleSelectChange, handleCheckboxChange } =
     useTags();
+
+  // Reason-specific, not just "(disabled)" — the button's own disabled
+  // styling/native semantics already convey *that* it's inert; this tells
+  // the user what to actually fix, right where they're looking, instead of
+  // making them go hunting for the sign-in banner or the guidelines text.
+  const submitDisabledReason = !session
+    ? " (sign in to submit)"
+    : newDescription.length < 10
+      ? " (min. 10 characters)"
+      : tagsToSubmit.length === 0
+        ? " (select at least 1 tag)"
+        : "";
+  const submitDisabled = submitDisabledReason !== "";
 
   function handleDescriptionSubmission(e: SubmitEvent) {
     e.preventDefault();
@@ -155,6 +169,8 @@ export default function NewDescriptionWithTagsData() {
             setCheckIsProcessing={setCheckIsProcessing}
           />
 
+          <hr />
+
           <label
             className="font-bold block mt-4 mb-2 text-lg "
             htmlFor="notesinput"
@@ -186,10 +202,12 @@ export default function NewDescriptionWithTagsData() {
             disabled={disabled}
           />
 
-          <span className="mt-2 inline-block text-secondaryText">
+          <span className="mt-2 mb-6 inline-block text-secondaryText">
             {" "}
             {`${800 - notes.length}/800 characters left`}
           </span>
+
+          <hr />
 
           <label
             className="font-black block mt-6 mb-2 text-lg"
@@ -209,22 +227,19 @@ export default function NewDescriptionWithTagsData() {
             isDisabled={disabled}
           />
 
+          <hr />
           <PreserveTextAfterSubmission
             doNotClear={doNotClear}
             setDoNotClear={setDoNotClear}
           />
 
           {!isPending && (
-            <button
-              className={`font-bold py-2 px-4 border-b-4 rounded     
-                disabled:bg-errorBackgroundColor disabled:text-errorTextColor           
-                   mt-4 bg-yellow-300 text-violet-800 border-yellow-100   hover:bg-blue-500                       hover:text-subtleWhite                     hover:border-blue-700
-               `}
-              disabled={!session || newDescription.length < 10}
+            <GeneralButton
+              className="mt-8"
+              disabled={submitDisabled}
               type="submit"
-            >
-              Add description {!session && "(disabled)"}
-            </button>
+              text={`Add description${submitDisabledReason}`}
+            />
           )}
 
           {isPending && (
