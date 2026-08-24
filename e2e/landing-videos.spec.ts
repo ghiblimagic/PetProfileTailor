@@ -6,6 +6,7 @@ import {
   gotoLandingPage,
   landingVideoIframe,
   openLandingVideoButton,
+  playLandingVideoButton,
   stubYoutubeEmbeds,
 } from "./helpers/landing-videos";
 
@@ -18,6 +19,7 @@ test.describe("Landing page videos", () => {
   for (const video of Object.values(LANDING_VIDEOS)) {
     test(`${video.buttonLabel} button opens YouTube embed`, async ({ page }) => {
       await openLandingVideoButton(page, video.buttonLabel);
+      await playLandingVideoButton(page, video.title);
       await expectLandingVideoLoaded(page, video.embedId, video.title);
     });
   }
@@ -26,6 +28,7 @@ test.describe("Landing page videos", () => {
     const video = LANDING_VIDEOS.fun;
 
     await openLandingVideoButton(page, video.buttonLabel);
+    await playLandingVideoButton(page, video.title);
     await expectLandingVideoLoaded(page, video.embedId, video.title);
 
     await closeLandingVideo(page);
@@ -38,6 +41,7 @@ test.describe("Landing page videos", () => {
     const video = LANDING_VIDEOS.impactful;
 
     await openLandingVideoButton(page, video.buttonLabel);
+    await playLandingVideoButton(page, video.title);
     await expectLandingVideoLoaded(page, video.embedId, video.title);
 
     await openLandingVideoButton(page, video.buttonLabel);
@@ -49,10 +53,12 @@ test.describe("Landing page videos", () => {
     const fitting = LANDING_VIDEOS.fitting;
 
     await openLandingVideoButton(page, fun.buttonLabel);
+    await playLandingVideoButton(page, fun.title);
     await expectLandingVideoLoaded(page, fun.embedId, fun.title);
 
     await openLandingVideoButton(page, fitting.buttonLabel);
     await expect(landingVideoIframe(page, fun.embedId)).toHaveCount(0);
+    await playLandingVideoButton(page, fitting.title);
     await expectLandingVideoLoaded(page, fitting.embedId, fitting.title);
   });
 });
@@ -69,6 +75,7 @@ test.describe("Landing page videos (embed network)", () => {
 
     await gotoLandingPage(page);
     await openLandingVideoButton(page, video.buttonLabel);
+    await playLandingVideoButton(page, video.title);
 
     const request = await embedRequest;
     expect(request.url()).toContain(`embed/${video.embedId}`);

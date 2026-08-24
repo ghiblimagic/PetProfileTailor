@@ -1,5 +1,29 @@
 # CHANGES
 
+## 2026-08-23 — Landing video tests also needed the poster's Play click, not just the open button
+
+Follow-up to the entry below: fixing the `close X` → `Close video` name and
+the `?autoplay=1` locator got the assertions matching the right elements,
+but all 7 `landing-videos.spec.ts` tests still failed with the iframe never
+appearing (and the network test's `waitForRequest` timing out). Root cause
+the user correctly diagnosed: `YoutubeEmbed`'s poster/iframe split
+(`started` state) means clicking the landing page's "Fun"/"Impactful"/
+"Fitting" button only mounts the poster — the iframe (and the YouTube
+embed request) doesn't render until the poster's own
+`aria-label="Play video: {title}"` button is clicked. The button-labeled
+tests were never doing that second click.
+
+Added `playLandingVideoButton(page, title)` to
+`e2e/helpers/landing-videos.ts` and inserted it between every
+`openLandingVideoButton` call and the following
+`expectLandingVideoLoaded`/`waitForRequest` across the spec (the "toggle
+closed" test's second `openLandingVideoButton` call is unaffected — that
+one only needs to close an already-open panel).
+
+Verified with `tsc --noEmit` (clean) — still haven't run the Playwright
+suite itself locally (needs live credentials/app), so worth confirming on
+the next CI run.
+
 ## 2026-08-23 — Fixed stale e2e tests broken by tag-required submit and YouTube embed changes
 
 CI had 7 failing Playwright tests across two unrelated causes — both were
