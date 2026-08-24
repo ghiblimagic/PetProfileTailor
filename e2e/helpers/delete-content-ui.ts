@@ -4,6 +4,12 @@ import {
   fillDescriptionContent,
   submitDescriptionForm,
 } from "./descriptions";
+import {
+  openDescriptionTagsCheatSheet,
+  selectDescriptionTagInCheatSheet,
+  SEED_DESCRIPTION_FILTER_CATEGORY,
+  SEED_DESCRIPTION_FILTER_TAG,
+} from "./adddescriptions-ui";
 
 export async function createUniqueNameViaUi(
   page: Page,
@@ -25,6 +31,12 @@ export async function createUniqueDescriptionViaUi(
   await page.goto("/adddescriptions");
   await expect(page.locator("#descriptionInput")).toBeEnabled({ timeout: 10_000 });
   await fillDescriptionContent(page, content);
+  await openDescriptionTagsCheatSheet(page);
+  await selectDescriptionTagInCheatSheet(
+    page,
+    SEED_DESCRIPTION_FILTER_CATEGORY,
+    SEED_DESCRIPTION_FILTER_TAG,
+  );
 
   const createResponse = page.waitForResponse(
     (res) =>

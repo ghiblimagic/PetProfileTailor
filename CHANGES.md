@@ -1,5 +1,44 @@
 # CHANGES
 
+## 2026-08-23 — Fixed stale e2e tests broken by tag-required submit and YouTube embed changes
+
+CI had 7 failing Playwright tests across two unrelated causes — both were
+the app's product code changing out from under tests that were never
+updated to match, not app regressions:
+
+**Tag now required to submit a description.** The submit-button-disabled
+logic added in the "enhance submit button logic and styling" commit now
+requires at least one tag to be selected (matches the "Tags *required"
+label that was already on the form, and is covered by
+`addingdescription.test.tsx`). But `e2e/adddescriptions.spec.ts`'s "submits
+a unique description" and "rejects blocklisted substring" tests, and
+`e2e/helpers/delete-content-ui.ts`'s `createUniqueDescriptionViaUi`, filled
+the description and clicked submit without ever picking a tag — so the
+button stayed disabled forever and `waitForResponse`/`.click()` timed out.
+Fixed by having all three call the existing
+`openDescriptionTagsCheatSheet` / `selectDescriptionTagInCheatSheet`
+helpers (already used by `submitDescriptionWithTags`) before submitting.
+
+**Landing page video embed markup changed.** The "Refactor components for
+improved styling and consistency" commit added `?autoplay=1` to the
+YouTube iframe `src` and changed the close button from
+`text="close X"` to `ariaLabel="Close video"` (`text="✕"` is what's
+visually rendered now; the aria-label is what accessibility-tree queries
+match). `e2e/helpers/landing-videos.ts`'s `landingVideoIframe` locator did
+an exact `src` match (so it never found the iframe once the query param
+was added) and both it and `expectLandingVideoLoaded`/`closeLandingVideo`
+looked for a button named "close X" (no longer the accessible name).
+Fixed the iframe locator to use a `[src^="..."]` starts-with match (so it
+keeps working if the query string changes again), updated the button
+lookups to "Close video", and updated the one test that asserted the
+literal `src` value to include `?autoplay=1`.
+
+Verified with `tsc --noEmit`, `pnpm lint`, and
+`vitest run components/AddingNewData/addingdescription.test.tsx` (all
+clean/passing) — didn't run the Playwright suite itself locally (needs
+`PLAYWRIGHT_TEST_EMAIL`/`PASSWORD` and a running app), so worth confirming
+green on the next CI run.
+
 ## 2026-08-23 — `ContentListing`'s action row (likes/share/thanks) now centers instead of right-pinning thanks
 
 On narrow screens the likes/share/thanks row (`flex flex-wrap`) couldn't

@@ -76,7 +76,7 @@ test.describe("Landing page videos (embed network)", () => {
     await expect(landingVideoIframe(page, video.embedId)).toHaveCount(1);
     await expect(landingVideoIframe(page, video.embedId)).toHaveAttribute(
       "src",
-      `https://www.youtube-nocookie.com/embed/${video.embedId}`,
+      `https://www.youtube-nocookie.com/embed/${video.embedId}?autoplay=1`,
     );
   });
 });

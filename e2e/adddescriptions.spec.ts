@@ -7,6 +7,9 @@ import {
 } from "./helpers/descriptions";
 import {
   hashedTagText,
+  openDescriptionTagsCheatSheet,
+  selectDescriptionTagInCheatSheet,
+  SEED_DESCRIPTION_FILTER_CATEGORY,
   SEED_DESCRIPTION_FILTER_TAG,
   submitDescriptionWithTags,
 } from "./helpers/adddescriptions-ui";
@@ -36,6 +39,12 @@ test.describe("Add descriptions page (authenticated)", () => {
 
     await page.goto("/adddescriptions");
     await fillDescriptionContent(page, uniqueContent);
+    await openDescriptionTagsCheatSheet(page);
+    await selectDescriptionTagInCheatSheet(
+      page,
+      SEED_DESCRIPTION_FILTER_CATEGORY,
+      SEED_DESCRIPTION_FILTER_TAG,
+    );
 
     const createResponse = page.waitForResponse(
       (res) =>
@@ -61,6 +70,12 @@ test.describe("Add descriptions page (authenticated)", () => {
     await fillDescriptionContent(
       page,
       "This friendly dog wank test phrase is long enough",
+    );
+    await openDescriptionTagsCheatSheet(page);
+    await selectDescriptionTagInCheatSheet(
+      page,
+      SEED_DESCRIPTION_FILTER_CATEGORY,
+      SEED_DESCRIPTION_FILTER_TAG,
     );
 
     const blockResponse = page.waitForResponse(
