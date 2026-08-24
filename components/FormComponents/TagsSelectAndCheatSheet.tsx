@@ -233,7 +233,7 @@ export default function TagsSelectAndCheatSheet({
                         "bg-errorBackgroundColor [&_*]:cursor-not-allowed"
                       }`}
                     >
-                      <div className={`flex flex-wrap gap-4 mb-4y `}>
+                      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-4">
                         {category.tags.map((tag) => {
                           const checked = tagsToSubmit.some(
                             (t) => t.value === tag._id

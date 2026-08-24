@@ -1,5 +1,17 @@
 # CHANGES
 
+## 2026-08-23 — Tags cheat sheet checkboxes: grid layout instead of flex-wrap
+
+`TagsSelectAndCheatSheet.tsx`'s per-category checkbox list
+(`components/FormComponents/TagsSelectAndCheatSheet.tsx`) used
+`flex flex-wrap`, which packs checkboxes left-to-right with no column
+alignment — looked messy, especially with a mix of short and long tag
+labels. Switched the container to `grid grid-cols-1 lg:grid-cols-2 gap-4`:
+one column on small screens, two on large screens, each row's height
+following its own tallest (wrapped) label rather than the whole list's
+flow being thrown off. Also dropped a dead `mb-4y` class (invalid
+Tailwind utility, had no effect) in favor of `mb-4`.
+
 ## 2026-08-23 — Landing video tests also needed the poster's Play click, not just the open button
 
 Follow-up to the entry below: fixing the `close X` → `Close video` name and
