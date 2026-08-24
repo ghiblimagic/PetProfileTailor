@@ -14,17 +14,18 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import "@fortawesome/fontawesome-svg-core/styles.css";
 import { usePrefersReducedMotion } from "@/hooks/usePrefersReducedMotions";
+import GeneralButton from "@/components/Shared/actions/GeneralButton";
 
 export type HeroTopProps = {
   updateImpactfulState: () => void;
   updateFunState: () => void;
-  updateTailorState: () => void;
+  updateFittingState: () => void;
 };
 
 export default function HeroTop({
   updateImpactfulState,
   updateFunState,
-  updateTailorState,
+  updateFittingState,
 }: HeroTopProps) {
   const [hover, setHover] = useState(false);
   const prefersReducedMotion = usePrefersReducedMotion();
@@ -50,10 +51,10 @@ export default function HeroTop({
           alt=""
         />
       </div>
-      <div className="hero-content text-center text-neutral-content mb-10 z-20  ">
+      <div className="hero-content text-center  mb-10 z-20  ">
         {/* hero-content is from daisy ui */}
         <div className="max-w-xl text-subtleWhite">
-          <h1 className="mb-5 text-3xl md:text-4xl text-yellow-300 font-black">
+          <h1 className="mb-5 text-3xl tracking-widest md:text-4xl text-yellow-300  font-black">
             Welcome to <br /> Homeward Tails!
           </h1>
           <p className="mb-5 text-base md:text-xl">
@@ -61,26 +62,25 @@ export default function HeroTop({
             ruff! We&apos;ve been there! And we&apos;re here to help.
           </p>
           <p className="mb-8 text-base md:text-xl">
-            Homeward Tails is a community created database of names and
-            descriptions that helps you write creative &quot;tales&quot; to get
-            pets home! It&apos;s easier than ever to create pet bios that are:
+            Homeward Tails is a community created list of names and descriptions
+            that helps you write creative &quot;tales&quot; to get pets home!
+            It&apos;s easier than ever to create pet bios that are:
           </p>
 
           <section className="flex justify-center gap-3 flex-wrap">
             <div className="flex-1">
               <FontAwesomeIcon
                 icon={faFaceGrinWink}
-                className="text-2xl fa-bounce"
+                className="text-2xl"
                 color="white"
               />
 
-              <button
+              <GeneralButton
                 type="button"
-                className="btn  w-full mt-2 bg-secondary text-white hover:text-white border-b-4 border-subtleWhite hover:border-blue-700 hover:bg-blue-500 font-black text-sm h-10 rounded-full tracking-widest"
+                heroStyle
+                text="Fun"
                 onClick={updateFunState}
-              >
-                Fun
-              </button>
+              />
             </div>
             <div className="flex-1">
               <FontAwesomeIcon
@@ -89,13 +89,12 @@ export default function HeroTop({
                 color="white"
               />
 
-              <button
+              <GeneralButton
                 type="button"
-                className="btn w-full mt-2 bg-secondary text-white hover:text-white border-b-4 border-subtleWhite hover:border-blue-700 hover:bg-blue-500 font-black text-sm  h-10 rounded-full tracking-widest focus:ring-white"
+                heroStyle
+                text="Impactful"
                 onClick={updateImpactfulState}
-              >
-                Impactful
-              </button>
+              />
             </div>
 
             <div className="flex-1">
@@ -104,14 +103,18 @@ export default function HeroTop({
                 className="text-2xl"
                 color="white"
               />
-              <button
+              <GeneralButton
                 type="button"
-                className="btn  w-full mt-2 bg-secondary text-white hover:text-white border-b-4 border-subtleWhite hover:border-blue-700 hover:bg-blue-500 font-black text-sm  h-10 rounded-full tracking-widest px-0"
-                onClick={updateTailorState}
-              >
-                Fitting
-              </button>
+                heroStyle
+                text="Fitting"
+                onClick={updateFittingState}
+              />
             </div>
+            <p className="pt-2">
+              {" "}
+              See a video example of each pet bio type by clicking the buttons
+              above!{" "}
+            </p>
           </section>
         </div>
       </div>

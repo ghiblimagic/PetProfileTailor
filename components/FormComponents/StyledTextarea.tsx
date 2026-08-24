@@ -32,7 +32,9 @@ export default function StyledTextarea({
   return (
     <textarea
       id={id}
-      className={`bg-primary border-subtleWhite  disabled:bg-errorBackgroundColor disabled:text-errorTextColor disabled:cursor-not-allowed text-subtleWhite block rounded-2xl h-32 min-w-[200px] w-[95%] sm:min-w-[400px] mx-auto ${className ?? ""}`}
+      className={`block h-32 min-w-[200px] w-[95%] sm:min-w-[400px] mx-auto ${
+        className ?? ""
+      }`}
       aria-label={ariaLabel}
       onChange={onChange}
       required={required}

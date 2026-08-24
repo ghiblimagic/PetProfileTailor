@@ -5,12 +5,8 @@ import { gotoFetchNamePage, searchFetchName } from "./helpers/fetchname-ui";
 test.describe("/fetchname single name search", () => {
   test("loads public page with search input", async ({ page }) => {
     await gotoFetchNamePage(page);
-    await expect(
-      page.getByText(/Check if a name exists:/i),
-    ).toBeVisible();
-    await expect(
-      page.getByRole("button", { name: "Search" }),
-    ).toBeVisible();
+    await expect(page.getByText(/Check if the name exists:/i)).toBeVisible();
+    await expect(page.getByRole("button", { name: "Search" })).toBeVisible();
   });
 
   test("finds duplicate for seeded name", async ({ page }) => {
@@ -21,7 +17,7 @@ test.describe("/fetchname single name search", () => {
       timeout: 15_000,
     });
     await expect(
-      page.locator("p.font-bold").filter({ hasText: SEED_NAME }),
+      page.locator("p.font-bold").filter({ hasText: SEED_NAME })
     ).toBeVisible({ timeout: 15_000 });
   });
 
@@ -43,7 +39,7 @@ test.describe("/fetchname single name search", () => {
     await searchFetchName(page, uniqueName);
 
     await expect(
-      page.getByText(/Success! That content is not in the database/i),
+      page.getByText(/Success! That content is not in the database/i)
     ).toBeVisible({ timeout: 15_000 });
   });
 
@@ -53,11 +49,7 @@ test.describe("/fetchname single name search", () => {
     await gotoFetchNamePage(page);
     await page.locator("#checkExists").fill("bad@name");
 
-    await expect(
-      page.getByText(/@ is not a valid character/i),
-    ).toBeVisible();
-    await expect(
-      page.getByRole("button", { name: "Search" }),
-    ).toBeDisabled();
+    await expect(page.getByText(/@ is not a valid character/i)).toBeVisible();
+    await expect(page.getByRole("button", { name: "Search" })).toBeDisabled();
   });
 });

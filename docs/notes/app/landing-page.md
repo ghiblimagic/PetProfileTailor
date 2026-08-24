@@ -11,7 +11,7 @@ Public home route `/`. Client component that composes the hero, optional YouTube
 
 ## Video toggles
 
-`LandingVideoKey` union (`"impactful" | "fun" | "tailor"`) drives which `YoutubeEmbed` is open. `HeroTop` passes three callbacks; the page toggles one key at a time (click again to close).
+`LandingVideoKey` union (`"impactful" | "fun" | "fitting"`) drives which `YoutubeEmbed` is open. `HeroTop` passes three callbacks; the page toggles one key at a time (click again to close).
 
 ```ts
 const [openVideo, setOpenVideo] = useState<LandingVideoKey | null>(null);

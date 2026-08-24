@@ -55,7 +55,9 @@ export default function NewNameWithTagsData() {
       .then(() => {
         setIsPending(false);
         toast.success(
-          `Successfully added name: ${newName}. Heres a treat point as thanks for your contribution ${session?.user?.name ?? ""}!`,
+          `Successfully added name: ${newName}. Heres a treat point as thanks for your contribution ${
+            session?.user?.name ?? ""
+          }!`
         );
         if (!doNotClear) {
           setNewName("");
@@ -148,7 +150,6 @@ export default function NewNameWithTagsData() {
           <input
             type="text"
             id="nameInput"
-            className="bg-secondary border-subtleWhite rounded-2xl disabled:bg-errorBackgroundColor disabled:text-errorTextColor disabled:cursor-not-allowed"
             value={newName}
             onChange={(e: ChangeEvent<HTMLInputElement>) => {
               setNewName(e.target.value.trimStart());
@@ -182,10 +183,7 @@ export default function NewNameWithTagsData() {
             invalidInput={newNameInvalidInput}
           />
 
-          <label
-            className="font-bold block mb-4 text-xl "
-            htmlFor="nameNote"
-          >
+          <label className="font-bold block mb-4 text-xl " htmlFor="nameNote">
             Note (optional)
           </label>
 
@@ -193,7 +191,7 @@ export default function NewNameWithTagsData() {
             id="nameNote"
             maxLength={1000}
             value={note}
-            className="bg-secondary border-subtleWhite  block "
+            className="   block "
             onChange={(e) => {
               setNote(e.target.value.trimStart());
               if (nameSubmissionMessage !== "") {

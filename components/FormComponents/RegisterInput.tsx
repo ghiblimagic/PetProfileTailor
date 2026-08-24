@@ -67,7 +67,7 @@ export default function RegisterInput<T extends FieldValues = FieldValues>({
         maxLength={maxLength}
         autoFocus={autoFocus}
         disabled={disabled}
-        className={`border rounded-2xl bg-secondary text-subtleWhite border-violet-200 p-2 mb-2 outline-none placeholder-secondary min-w-[250px] w-[95vw] sm:min-w-[400px] sm:w-full ${inputStyling} ${className}`}
+        className={`p-2 mb-2 outline-none placeholder-secondary min-w-[250px] w-[95vw] sm:min-w-[400px] sm:w-full ${inputStyling} ${className}`}
         {...register(id as Path<T>, validation)}
       />
       {/* helper text if provided */}

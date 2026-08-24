@@ -26,9 +26,25 @@ export async function openLandingVideoButton(
   await page.getByRole("button", { name: buttonLabel, exact: true }).click();
 }
 
+/**
+ * Opening a video panel only mounts the poster (`YoutubeEmbed`'s `started`
+ * state starts false) — the iframe isn't rendered, and no embed request
+ * fires, until the poster's own "Play video: {title}" button is clicked.
+ */
+export async function playLandingVideoButton(
+  page: Page,
+  title: string,
+): Promise<void> {
+  await page
+    .getByRole("button", { name: `Play video: ${title}`, exact: true })
+    .click();
+}
+
 export function landingVideoIframe(page: Page, embedId: string) {
+  // `^=` (starts-with) so the match survives query params on the embed src
+  // (e.g. `?autoplay=1`) without hardcoding them here.
   return page.locator(
-    `iframe[src="https://www.youtube-nocookie.com/embed/${embedId}"]`,
+    `iframe[src^="https://www.youtube-nocookie.com/embed/${embedId}"]`,
   );
 }
 
@@ -40,9 +56,9 @@ export async function expectLandingVideoLoaded(
   const iframe = landingVideoIframe(page, embedId);
   await expect(iframe).toBeVisible({ timeout: 15_000 });
   await expect(iframe).toHaveAttribute("title", title);
-  await expect(page.getByRole("button", { name: "close X" })).toBeVisible();
+  await expect(page.getByRole("button", { name: "Close video" })).toBeVisible();
 }
 
 export async function closeLandingVideo(page: Page): Promise<void> {
-  await page.getByRole("button", { name: "close X" }).click();
+  await page.getByRole("button", { name: "Close video" }).click();
 }

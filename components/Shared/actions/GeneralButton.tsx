@@ -5,6 +5,13 @@
 "use client";
 
 import type { ButtonHTMLAttributes, ReactNode } from "react";
+import { cn } from "@/lib/utils";
+import {
+  BUTTON_BASE_CLASSES,
+  BUTTON_VARIANT_CLASSES,
+  HERO_BUTTON_BASE_CLASSES,
+  resolveGeneralButtonVariant,
+} from "./buttonStyles";
 
 export type GeneralButtonProps = {
   text?: string;
@@ -15,6 +22,7 @@ export type GeneralButtonProps = {
   secondary?: boolean;
   tertiary?: boolean;
   plain?: boolean;
+  heroStyle?: boolean;
   type?: ButtonHTMLAttributes<HTMLButtonElement>["type"];
   active?: boolean;
   disabled?: boolean;
@@ -32,6 +40,7 @@ export default function GeneralButton({
   secondary,
   tertiary,
   plain,
+  heroStyle,
   type,
   active = false,
   disabled,
@@ -39,33 +48,27 @@ export default function GeneralButton({
   dataModalToggle,
   ariaLabel,
 }: GeneralButtonProps) {
+  // Colors/classes live in buttonStyles.ts, shared with LinkButton — see
+  // docs/notes/components/reusable-buttons.md for the rationale.
+  const variant = resolveGeneralButtonVariant({
+    secondary,
+    tertiary,
+    plain,
+    subtle,
+    warning,
+    active,
+    disabled,
+    heroStyle,
+  });
+  // heroStyle is a full visual reset (its own base classes) for buttons over
+  // the landing-page hero image — not designed to combine with the other
+  // flags above.
   const baseClasses =
-    "font-bold my-3 py-1 px-4 border-b-4 rounded-2xl text-base";
-
-  // Compute background & border
-  let bgClass =
-    "bg-yellow-300 border-yellow-700 text-secondary  hover:bg-blue-500 hover:text-subtleWhite hover:border-blue-700";
-  if (secondary) bgClass = "border-t border-x text-subtleWhite";
-  if (tertiary) bgClass = "border-b-0 shadow-none text-subtleWhite";
-  if (plain)
-    bgClass =
-      "bg-transparent border-none text-subtleWhite border-subtleWhite hover:text-subtleWhite hover:border-blue-700 hover:bg-blue-500";
-  if (subtle)
-    bgClass =
-      "bg-subtleBackground text-subtleWhite border-subtleWhite hover:text-subtleWhite hover:border-blue-700 hover:bg-blue-500";
-  if (warning)
-    bgClass =
-      "bg-red-800 text-subtleWhite border-subtleWhite hover:text-subtleWhite hover:border-blue-700 hover:bg-blue-500";
-  if (active && !disabled)
-    bgClass =
-      "bg-subtleWhite border-indigo-600 text-secondary hover:bg-blue-500 hover:text-subtleWhite hover:border-blue-700";
-  if (disabled)
-    bgClass =
-      "bg-slate-300 border-gray-400 text-gray-500 cursor-not-allowed hover:bg-slate-300 hover:text-gray-500 hover:border-gray-400";
+    variant === "hero" ? HERO_BUTTON_BASE_CLASSES : BUTTON_BASE_CLASSES;
 
   return (
     <button
-      className={`${baseClasses} ${bgClass} ${className} `}
+      className={cn(baseClasses, BUTTON_VARIANT_CLASSES[variant], className)}
       onClick={onClick}
       type={type}
       disabled={disabled}

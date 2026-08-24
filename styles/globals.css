@@ -9,13 +9,6 @@
   font-size: 18px;
 }
 
-::selection {
-  /* violet-700 — #886BEE (violet-500) only hits ~3.9:1 against white text,
-     below the 4.5:1 AA minimum; this shade holds ~7:1. */
-  background: #6d28d9;
-  color: #fff;
-}
-
 body,
 html {
   margin: 0;
@@ -58,6 +51,109 @@ input::file-selector-button:hover {
   font-style: inherit;
 }
 
+/*
+ * Consistent look for every text-like field sitewide (inputs, textareas,
+ * selects) — background, text color, border color/radius, disabled state,
+ * and hover/focus border color all live here instead of being repeated on
+ * each field's className. The selector list mirrors @tailwindcss/forms' own
+ * "text-like field" base list (see node_modules/@tailwindcss/forms/src/index.js)
+ * so checkboxes, radios, range/color/file/submit/button inputs — which get
+ * their own distinct treatment from that plugin — are left alone.
+ *
+ * These rules are deliberately plain (unlayered) CSS placed after
+ * `@tailwind utilities` above, so they win over both the forms plugin's own
+ * base/`:focus` styles and any leftover `bg-*`/`border-*`/`text-*` utility
+ * classes on individual fields, without needing `!important` — but ONLY
+ * because each selector's specificity is kept at parity with the forms
+ * plugin's own base rule ((0,0,1): a bare tag name). `:where()` wraps just
+ * the attribute-selector part of each `input` entry (exactly like the forms
+ * plugin does), not the whole list — wrapping the *whole* list in `:where()`
+ * (an earlier version of this rule did) zeroes its specificity entirely,
+ * which loses to the forms plugin's own (0,0,1) background/border/radius
+ * rule regardless of source order. `:is()` is used instead of `:where()`
+ * for the pseudo-class-suffixed variants below, since `:is()` preserves
+ * specificity rather than zeroing it, keeping them at parity too.
+ * `:hover:not(:focus)` keeps a hovered *and* focused field on the focus
+ * color instead of the two rules fighting over border-color.
+ */
+input:where([type="text"]),
+input:where(:not([type])),
+input:where([type="email"]),
+input:where([type="url"]),
+input:where([type="password"]),
+input:where([type="number"]),
+input:where([type="date"]),
+input:where([type="datetime-local"]),
+input:where([type="month"]),
+input:where([type="search"]),
+input:where([type="tel"]),
+input:where([type="time"]),
+input:where([type="week"]),
+textarea,
+select {
+  @apply bg-fieldBackground border-subtleBorder text-subtleWhite rounded-2xl;
+}
+
+:is(
+    input:where([type="text"]),
+    input:where(:not([type])),
+    input:where([type="email"]),
+    input:where([type="url"]),
+    input:where([type="password"]),
+    input:where([type="number"]),
+    input:where([type="date"]),
+    input:where([type="datetime-local"]),
+    input:where([type="month"]),
+    input:where([type="search"]),
+    input:where([type="tel"]),
+    input:where([type="time"]),
+    input:where([type="week"]),
+    textarea,
+    select
+  ):disabled {
+  @apply bg-errorBackgroundColor text-errorTextColor cursor-not-allowed;
+}
+
+:is(
+    input:where([type="text"]),
+    input:where(:not([type])),
+    input:where([type="email"]),
+    input:where([type="url"]),
+    input:where([type="password"]),
+    input:where([type="number"]),
+    input:where([type="date"]),
+    input:where([type="datetime-local"]),
+    input:where([type="month"]),
+    input:where([type="search"]),
+    input:where([type="tel"]),
+    input:where([type="time"]),
+    input:where([type="week"]),
+    textarea,
+    select
+  ):hover:not(:focus):not(:disabled) {
+  border-color: rgb(221 214 254);
+}
+
+:is(
+    input:where([type="text"]),
+    input:where(:not([type])),
+    input:where([type="email"]),
+    input:where([type="url"]),
+    input:where([type="password"]),
+    input:where([type="number"]),
+    input:where([type="date"]),
+    input:where([type="datetime-local"]),
+    input:where([type="month"]),
+    input:where([type="search"]),
+    input:where([type="tel"]),
+    input:where([type="time"]),
+    input:where([type="week"]),
+    textarea,
+    select
+  ):focus {
+  border-color: #2563eb;
+}
+
 @layer base {
   :root {
     /* --background: 259, 69%, 35%; */
@@ -68,9 +164,20 @@ input::file-selector-button:hover {
     --select-bg-secondary: #07083b; /*slightly lighter color*/
     --select-bg-disabled: rgb(30 41 59);
     --select-border: rgb(221 214 254);
+    --subtle-border: oklch(
+      0.4071 0.0962 264
+    ); /* mirrors tailwind.config.js `subtleBorder` */
+    --field-background: oklch(
+      0.2118 0.0592 270.28
+    ); /* mirrors tailwind.config.js `fieldBackground` */
+    --secondary-text: oklch(
+      76.585% 0.03401 258.412
+    ); /* de-emphasized body copy (help text, captions); tailwind.config.js
+    `secondaryText` reads this var directly (rather than duplicating the
+    value) so a future theme can override it here without touching the
+    Tailwind config */
     --select-text: rgb(221 214 254);
     --select-hover: rgb(59 130 246);
-
     /* old information */
     --foreground: 0 0% 3.9%;
     --card: 0 0% 100%;
@@ -140,6 +247,18 @@ input::file-selector-button:hover {
   h5,
   h6 {
     @apply font-heading;
+    letter-spacing: 0.05em;
+  }
+  p {
+    @apply text-secondaryText;
+  }
+  hr {
+    /* `* { @apply border-border }` above already gives every element a
+    border-color, but `hr` (0,0,1) is more specific than `*` (0,0,0), so
+    this wins regardless of source order — no bare `!important` needed.
+    Margins/width are left to each call site (e.g. `mx-6`) since spacing
+    is layout-specific, not a sitewide default like the color/border. */
+    @apply border-subtleBorder;
   }
 }
 

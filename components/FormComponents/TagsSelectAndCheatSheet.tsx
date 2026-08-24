@@ -6,14 +6,59 @@
 
 import { Disclosure } from "@headlessui/react";
 import { ChevronUpIcon } from "@heroicons/react/20/solid";
-import { useState } from "react";
-import Select, { type StylesConfig } from "react-select";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faPaw } from "@fortawesome/free-solid-svg-icons";
+import { Fragment, useState, type ComponentPropsWithoutRef } from "react";
+import Select, { type StylesConfig, type MultiValueProps } from "react-select";
 import { useCategoriesForDataType } from "@/hooks/useCategoriesForDataType";
 import GeneralButton from "../Shared/actions/GeneralButton";
+import StyledCheckbox from "./StyledCheckbox";
+import { tagPillClassName } from "@components/Shared/typography/TagPill";
 import type { TagOption, TagCheckboxChange } from "@/hooks/useTags";
 import type { ContentType } from "@/utils/api/checkIfValidContentType";
+
+// Renders a selected tag exactly like TagPill (ContentListing.tsx,
+// addingdescription.tsx's tag preview) — "#tag" pills sitewide — rather
+// than react-select's own boxy default chip. Replaces the whole MultiValue
+// (not just Container/Label) so react-select's own CSS-in-JS styling for
+// those sub-parts (previously set via `multiValue`/`multiValueLabel`/
+// `multiValueRemove` in `customSelectStyles` below) never gets a chance to
+// compete with these Tailwind classes.
+//
+// Note: unlike Container/Label/Remove, the top-level MultiValue element
+// react-select itself renders is NOT given an `innerProps` (see
+// `renderPlaceholderOrValue` in react-select's Select.js — it only passes
+// `data`/`removeProps`/`isDisabled`/etc.; `innerProps` is something the
+// *default* MultiValue component computes internally for its own
+// Container, which we're replacing). The `.d.ts` types it as required
+// anyway, but it's actually `undefined` here — destructuring/spreading it
+// throws at runtime, so it's intentionally left out below.
+function TagPillMultiValue({
+  data,
+  removeProps,
+  isDisabled,
+}: MultiValueProps<TagOption, true>) {
+  return (
+    <span
+      className={`${tagPillClassName} inline-flex items-center gap-1.5 my-0.5`}
+    >
+      #{data.label}
+      {!isDisabled && (
+        <button
+          type="button"
+          // react-select types removeProps as div props purely because its
+          // own default Remove sub-component renders a div — at runtime
+          // it's just { onClick, onTouchEnd, onMouseDown } (see
+          // react-select's Select.js), so it's safe to spread onto a
+          // <button> instead.
+          {...(removeProps as ComponentPropsWithoutRef<"button">)}
+          aria-label={`Remove ${data.label}`}
+          className="shrink-0 rounded-full px-1 leading-none hover:bg-white/20"
+        >
+          &times;
+        </button>
+      )}
+    </span>
+  );
+}
 
 export type TagsSelectAndCheatSheetProps = {
   dataType: ContentType | string;
@@ -38,13 +83,13 @@ export default function TagsSelectAndCheatSheet({
   );
 
   const customSelectStyles: StylesConfig<TagOption, true> = {
-    control: (provided) => ({
+    control: (provided, state) => ({
       ...provided,
       backgroundColor: isDisabled
         ? "var(--select-bg-disabled)"
-        : "var(--select-bg-primary)",
+        : "var(--field-background)",
       pointerEvents: isDisabled ? "auto" : "auto",
-      borderColor: "var(--select-border)",
+      borderColor: state.isFocused ? "#2563EB" : "var(--subtle-border)",
       color: "var(--select-text)",
       width: "96%",
       borderRadius: "10px",
@@ -54,9 +99,9 @@ export default function TagsSelectAndCheatSheet({
       paddingLeft: "0.5rem",
       margin: "1rem auto",
       minHeight: "2.5rem",
-      boxShadow: "none",
+      boxShadow: state.isFocused ? "0 0 0 1px #2563EB" : "none",
       "&:hover": {
-        borderColor: "rgb(221 214 254)",
+        borderColor: state.isFocused ? "#2563EB" : "rgb(221 214 254)",
       },
     }),
     dropdownIndicator: (provided) => ({
@@ -110,7 +155,8 @@ export default function TagsSelectAndCheatSheet({
       ...provided,
       backgroundColor: "var(--select-bg-primary)",
       color: "var(--select-text)",
-      borderRadius: "0.5rem",
+      border: "1px solid var(--subtle-border)",
+      borderRadius: "0.7rem",
     }),
     menuList: (provided) => ({
       ...provided,
@@ -128,28 +174,6 @@ export default function TagsSelectAndCheatSheet({
       paddingBottom: "0.25rem",
       borderRadius: "9999px",
     }),
-    multiValue: (provided) => ({
-      ...provided,
-      backgroundColor: "var(--select-bg-secondary)",
-      color: "var(--select-text)",
-      borderRadius: "20px",
-    }),
-    multiValueLabel: (provided) => ({
-      ...provided,
-      color: "var(--select-text)",
-      whiteSpace: "normal",
-      wordBreak: "break-word",
-      overflowWrap: "break-word",
-    }),
-    multiValueRemove: (provided) => ({
-      ...provided,
-      color: "rgb(221 214 254)",
-      ":hover": {
-        backgroundColor: "#2563EB",
-        color: "white",
-        borderRadius: "10px",
-      },
-    }),
     placeholder: (provided) => ({
       ...provided,
       color: "var(--select-text)",
@@ -157,10 +181,11 @@ export default function TagsSelectAndCheatSheet({
   };
 
   return (
-    <div className="h-fit w-full bg-secondary border-b-2 border-subtleWhite rounded-box py-2 mx-auto">
+    <div className="h-fit w-full rounded-box py-2 mx-auto">
       <Select<TagOption, true>
         instanceId={`tags-select-${dataType}`}
         styles={customSelectStyles}
+        components={{ MultiValue: TagPillMultiValue }}
         options={tagList}
         value={selectedOptions}
         isMulti
@@ -172,7 +197,7 @@ export default function TagsSelectAndCheatSheet({
         onChange={(selected) => handleSelectChange([...selected])}
       />
 
-      <p className="my-4 text-subtleWhite text-center">
+      <p className="my-4 text-secondaryText text-center">
         Or use the tags cheat sheet
       </p>
       <div className="flex justify-center mb-4">
@@ -184,51 +209,43 @@ export default function TagsSelectAndCheatSheet({
         />
       </div>
       {isOpen && (
-        <div className=" justify-center">
-          {categoriesWithTags.map((category) => (
-            <Disclosure
-              key={category._id}
-              as="div"
-              className="inline-block align-top mb-6 text-center "
-            >
-              {({ open }) => (
-                <>
-                  <Disclosure.Button className="flex justify-between w-[306px]  bg-primary px-2 py-2 text-base font-medium text-subtleWhite hover:bg-blue-700 focus:outline-none focus-visible:ring focus-visible:ring-blue-500 focus-visible:ring-opacity-75">
-                    <span className="mx-auto">{category.category}</span>
-                    <ChevronUpIcon
-                      className={`${
-                        open ? "rotate-180 transform" : ""
-                      } h-5 w-5 bg-blue-00`}
-                    />
-                  </Disclosure.Button>
+        <div className="justify-center rounded-box border border-buttonAccent   overflow-hidden">
+          {categoriesWithTags.map((category, index) => (
+            <Fragment key={category._id}>
+              {index > 0 && (
+                <hr className="mx-6" />
+              )}
+              <Disclosure as="div" className="block w-full text-center ">
+                {({ open }) => (
+                  <>
+                    <Disclosure.Button className="flex justify-between w-full  bg-primary px-6 py-3 text-base font-medium text-subtleWhite hover:bg-blue-700 focus:outline-none focus-visible:ring focus-visible:ring-blue-500 focus-visible:ring-opacity-75">
+                      <span className="mx-auto">{category.category}</span>
+                      <ChevronUpIcon
+                        className={`${
+                          open ? "rotate-180 transform" : ""
+                        } h-5 w-5 bg-blue-00`}
+                      />
+                    </Disclosure.Button>
 
-                  <Disclosure.Panel
-                    className={`px-4 pt-4 pb-2 text-sm text-subtleWhite  bg-primary  w-[306px] ${
-                      isDisabled &&
-                      "bg-errorBackgroundColor [&_*]:cursor-not-allowed"
-                    }`}
-                  >
-                    <div className={`space-y-6 mb-4y `}>
-                      {category.tags.map((tag) => {
-                        const checked = tagsToSubmit.some(
-                          (t) => t.value === tag._id
-                        );
-                        return (
-                          <label
-                            key={tag._id}
-                            htmlFor={tag._id}
-                            className={`flex items-center space-x-2 cursor-pointer group hover:bg-blue-700 px-1 py-1 rounded  `}
-                          >
-                            <input
-                              id={tag._id}
-                              type="checkbox"
-                              className="peer fixed top-0 left-0  m-0 h-[1px] w-[1px] overflow-hidden whitespace-nowrap border-0 p-0"
-                              style={{
-                                clip: "rect(0 0 0 0)",
-                                clipPath: "inset(50%)",
-                              }}
-                              disabled={isDisabled}
+                    <Disclosure.Panel
+                      className={`px-4 pt-6 pb-6 text-sm text-subtleWhite  bg-primary  w-full ${
+                        isDisabled &&
+                        "bg-errorBackgroundColor [&_*]:cursor-not-allowed"
+                      }`}
+                    >
+                      <div className={`flex flex-wrap gap-4 mb-4y `}>
+                        {category.tags.map((tag) => {
+                          const checked = tagsToSubmit.some(
+                            (t) => t.value === tag._id
+                          );
+                          return (
+                            <StyledCheckbox
+                              key={tag._id}
+                              value={tag._id}
+                              label={tag.tag}
+                              labelClassName="text-left"
                               checked={checked}
+                              disabled={isDisabled}
                               onChange={(e) =>
                                 handleCheckboxChange({
                                   id: tag._id,
@@ -236,33 +253,19 @@ export default function TagsSelectAndCheatSheet({
                                   checked: e.target.checked,
                                 })
                               }
+                              className="group hover:bg-blue-700 px-1 py-1 rounded"
+                              boxClassName={`group-hover:bg-blue-700 ${
+                                isDisabled ? "bg-errorBackgroundColor" : ""
+                              }`}
                             />
-
-                            <span
-                              className={`
-      border-2 border-violet-300 rounded flex items-center justify-center p-[7px]
-      transition-colors duration-200
-      bg-secondary text-subtleWhite group
-      peer-checked:bg-yellow-300 peer-checked:text-secondary group-hover:bg-blue-700
-      peer-focus:ring-2 peer-focus:ring-yellow-400 peer-focus:outline-none ${
-        isDisabled && "bg-errorBackgroundColor cursor-not-allowed"
-      }
-    `}
-                            >
-                              <FontAwesomeIcon icon={faPaw} />
-                            </span>
-
-                            <span className={`text-subtleWhite text-left`}>
-                              {tag.tag}
-                            </span>
-                          </label>
-                        );
-                      })}
-                    </div>
-                  </Disclosure.Panel>
-                </>
-              )}
-            </Disclosure>
+                          );
+                        })}
+                      </div>
+                    </Disclosure.Panel>
+                  </>
+                )}
+              </Disclosure>
+            </Fragment>
           ))}
         </div>
       )}

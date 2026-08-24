@@ -48,13 +48,13 @@ describe("CheckIfContentExists", () => {
 
   it("renders name-specific heading", () => {
     render(<Harness contentType="names" />);
-    expect(screen.getByText("Check if a name exists:")).toBeInTheDocument();
+    expect(screen.getByText("Check if the name exists:")).toBeInTheDocument();
   });
 
   it("renders description-specific heading", () => {
     render(<Harness contentType="descriptions" />);
     expect(
-      screen.getByText("Check if a description exists:"),
+      screen.getByText("Check if the description exists:")
     ).toBeInTheDocument();
   });
 
@@ -83,11 +83,11 @@ describe("CheckIfContentExists", () => {
 
     await waitFor(() => {
       expect(
-        screen.getByText(/Ruh Roh! This content already exists: fluffy/i),
+        screen.getByText(/Ruh Roh! This content already exists: fluffy/i)
       ).toBeInTheDocument();
     });
     expect(fetch).toHaveBeenCalledWith(
-      "/api/names/check-if-content-exists/fluffy",
+      "/api/names/check-if-content-exists/fluffy"
     );
   });
 
@@ -138,7 +138,9 @@ describe("CheckIfContentExists", () => {
     await user.click(screen.getByRole("button", { name: /search/i }));
 
     await waitFor(() => {
-      expect(screen.getByRole("button", { name: /show content/i })).toBeInTheDocument();
+      expect(
+        screen.getByRole("button", { name: /show content/i })
+      ).toBeInTheDocument();
     });
 
     await user.click(screen.getByRole("button", { name: /show content/i }));

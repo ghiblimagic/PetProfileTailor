@@ -288,7 +288,7 @@ export default function CoreListingPageLogic({
                   onClick={() => setIsOpen(!isOpen)}
                 >
                   <ListFilter size={15} className="mr-2" />
-                  <span>{isOpen ? "Close Filters" : "Open Filters"}</span>
+                  <span>{"Filters"}</span>
                 </GeneralButton>
               }
             />

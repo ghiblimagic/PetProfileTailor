@@ -1,5 +1,816 @@
 # CHANGES
 
+## 2026-08-23 — Landing video tests also needed the poster's Play click, not just the open button
+
+Follow-up to the entry below: fixing the `close X` → `Close video` name and
+the `?autoplay=1` locator got the assertions matching the right elements,
+but all 7 `landing-videos.spec.ts` tests still failed with the iframe never
+appearing (and the network test's `waitForRequest` timing out). Root cause
+the user correctly diagnosed: `YoutubeEmbed`'s poster/iframe split
+(`started` state) means clicking the landing page's "Fun"/"Impactful"/
+"Fitting" button only mounts the poster — the iframe (and the YouTube
+embed request) doesn't render until the poster's own
+`aria-label="Play video: {title}"` button is clicked. The button-labeled
+tests were never doing that second click.
+
+Added `playLandingVideoButton(page, title)` to
+`e2e/helpers/landing-videos.ts` and inserted it between every
+`openLandingVideoButton` call and the following
+`expectLandingVideoLoaded`/`waitForRequest` across the spec (the "toggle
+closed" test's second `openLandingVideoButton` call is unaffected — that
+one only needs to close an already-open panel).
+
+Verified with `tsc --noEmit` (clean) — still haven't run the Playwright
+suite itself locally (needs live credentials/app), so worth confirming on
+the next CI run.
+
+## 2026-08-23 — Fixed stale e2e tests broken by tag-required submit and YouTube embed changes
+
+CI had 7 failing Playwright tests across two unrelated causes — both were
+the app's product code changing out from under tests that were never
+updated to match, not app regressions:
+
+**Tag now required to submit a description.** The submit-button-disabled
+logic added in the "enhance submit button logic and styling" commit now
+requires at least one tag to be selected (matches the "Tags *required"
+label that was already on the form, and is covered by
+`addingdescription.test.tsx`). But `e2e/adddescriptions.spec.ts`'s "submits
+a unique description" and "rejects blocklisted substring" tests, and
+`e2e/helpers/delete-content-ui.ts`'s `createUniqueDescriptionViaUi`, filled
+the description and clicked submit without ever picking a tag — so the
+button stayed disabled forever and `waitForResponse`/`.click()` timed out.
+Fixed by having all three call the existing
+`openDescriptionTagsCheatSheet` / `selectDescriptionTagInCheatSheet`
+helpers (already used by `submitDescriptionWithTags`) before submitting.
+
+**Landing page video embed markup changed.** The "Refactor components for
+improved styling and consistency" commit added `?autoplay=1` to the
+YouTube iframe `src` and changed the close button from
+`text="close X"` to `ariaLabel="Close video"` (`text="✕"` is what's
+visually rendered now; the aria-label is what accessibility-tree queries
+match). `e2e/helpers/landing-videos.ts`'s `landingVideoIframe` locator did
+an exact `src` match (so it never found the iframe once the query param
+was added) and both it and `expectLandingVideoLoaded`/`closeLandingVideo`
+looked for a button named "close X" (no longer the accessible name).
+Fixed the iframe locator to use a `[src^="..."]` starts-with match (so it
+keeps working if the query string changes again), updated the button
+lookups to "Close video", and updated the one test that asserted the
+literal `src` value to include `?autoplay=1`.
+
+Verified with `tsc --noEmit`, `pnpm lint`, and
+`vitest run components/AddingNewData/addingdescription.test.tsx` (all
+clean/passing) — didn't run the Playwright suite itself locally (needs
+`PLAYWRIGHT_TEST_EMAIL`/`PASSWORD` and a running app), so worth confirming
+green on the next CI run.
+
+## 2026-08-23 — `ContentListing`'s action row (likes/share/thanks) now centers instead of right-pinning thanks
+
+On narrow screens the likes/share/thanks row (`flex flex-wrap`) couldn't
+fit all three, so `ThanksButton` wrapped to its own line — but it was
+wrapped in an `ml-auto` div meant to pin it to the far right of the *wide*
+layout, so on its wrapped line it stayed jammed against the right edge
+while the row above sat left-aligned. Looked unintentional/lopsided.
+
+Removed the `ml-auto` wrapper (redundant now — the div existed only to
+hold that class) and added `justify-center` to the row. Flexbox centers
+each wrapped line independently, so on a narrow screen where thanks wraps
+alone, it now centers on its own line instead of sticking to one side;
+the two-item line above centers too, which reads as one coherent
+(intentionally centered) row rather than a stray leftover button.
+
+Not run: per session preference, no test/typecheck run for this pure
+Tailwind class change — worth a look at a narrow viewport in the browser.
+
+## 2026-08-23 — Test coverage for the submit-button disabled-reason logic
+
+Added `components/AddingNewData/addingdescription.test.tsx` covering the
+`submitDisabledReason` logic from the previous two entries: signed-out,
+signed-in-but-too-short, signed-in-with-no-tag, and the fully-enabled case
+(typed a description, opened the cheat sheet, expanded its one category,
+and actually clicked its one tag checkbox — a real interaction, not a
+prop/state shortcut, since there's no prop to inject `tagsToSubmit`
+directly).
+
+Mocked `next-auth/react`'s `useSession` (`vi.hoisted` + `mockReturnValue`,
+same pattern as `LikesContext.test.tsx`) to flip signed-in/signed-out per
+test, `next/image` (same stub as `RegisterForm.test.tsx`), and
+`@/hooks/useCategoriesForDataType` (same approach as
+`TagsSelectAndCheatSheet.test.tsx`) with one category/tag so the select
+field's `tagList` and the cheat sheet's checkbox refer to the same tag —
+needed for the "select a tag through the UI" case to actually work.
+
+Verified the tag-requirement test is a real regression guard, not a
+false-positive pass: temporarily reverted the `tagsToSubmit.length === 0`
+check to `false` and confirmed that specific test failed (button was not
+disabled), then restored the real check and reran — 4/4 passing. `tsc
+--noEmit` clean.
+
+## 2026-08-23 — Bugfix: submit button's "(disabled)" label didn't cover all disabled reasons
+
+`addingdescription.tsx`'s submit button had `disabled={!session ||
+newDescription.length < 10}` but its label only appended `"(disabled)"`
+for the `!session` case: `` `Add description ${!session ? "(disabled)" : ""}` ``.
+So a signed-in user who'd typed fewer than 10 characters saw a
+button that looked active but did nothing when clicked, with no visible
+reason why.
+
+First fix: hoisted the condition into a single `submitDisabled` const and
+drove both the button's `disabled` prop and its label off it. Follow-up,
+after discussing whether a bare "(disabled)" suffix was worth keeping at
+all: replaced it with a reason-specific `submitDisabledReason` string
+(`" (sign in to submit)"` / `" (min. 10 characters)"`) instead of a
+generic "(disabled)" tag — `GeneralButton`'s own disabled styling and the
+native `disabled` attribute already convey *that* the button is inert
+(both to sighted users and screen readers), so a bare "(disabled)" wasn't
+adding much; naming the actual blocker in the label tells the user what to
+fix without having to go hunting for the sign-in banner or the guidelines
+text above the form.
+
+Second follow-up: the button wasn't disabled for having zero tags
+selected at all — `handleDescriptionSubmission` posts `tags: tagIds`
+either way, so a description with no tags could be submitted. Added a
+third `tagsToSubmit.length === 0` → `" (select at least 1 tag)"` branch.
+Had to move the `useTags()` call (which owns `tagsToSubmit`) above the new
+`submitDisabledReason` const — it was declared using a value not in scope
+yet ("used before its declaration").
+
+Not run: user asked not to run tests this session — worth a manual check
+in the browser (type <10 characters while signed in → "Add description
+(min. 10 characters)"; signed out → "Add description (sign in to
+submit)"; 10+ characters with zero tags picked → "Add description (select
+at least 1 tag)").
+
+## 2026-08-23 — `<hr>` border color is now a sitewide default
+
+`TagsSelectAndCheatSheet.tsx`'s category-divider `<hr className="mx-6
+border-t border-subtleBorder" />` was the only `<hr>` in the codebase with
+explicit border styling — the other (`addingName.tsx`) had none, so it
+fell through to the app's generic `* { @apply border-border }` rule (a
+near-white/gray shadcn token), not `subtleBorder`.
+
+Added `hr { @apply border-subtleBorder; }` to `styles/globals.css`'s base
+layer (next to the `p`/`h1`–`h6` defaults) so every `<hr>` gets the same
+border color by default. `hr` (specificity 0,0,1) naturally wins over the
+`* { @apply border-border }` rule (0,0,0) regardless of source order, so
+no `!important` needed. Left margins/width to each call site — spacing is
+layout-specific, not a sitewide token — so `TagsSelectAndCheatSheet.tsx`'s
+`<hr>` simplified to just `className="mx-6"` (dropped the now-redundant
+`border-t border-subtleBorder`).
+
+Side effect: `addingName.tsx`'s bare `<hr className="mt-4" />` and
+`addingdescription.tsx`'s bare `<hr />` now pick up `subtleBorder` instead
+of the generic gray — a visual change, but one that makes them consistent
+with the rest of the site rather than an oversight worth preserving.
+
+## 2026-08-23 — Bugfix: `TagPillMultiValue` crashed with "innerProps is undefined"
+
+Regression from the previous entry below — reported by the user as a
+runtime crash the moment a tag was already selected or got selected
+("innerProps is undefined"). `tsc --noEmit` and the full test suite were
+both clean because nothing exercised the crashing render path (no test
+selected a tag; `MultiValueProps['innerProps']` is typed as required, so
+`tsc` had no reason to flag reading it).
+
+Root cause: react-select's own `Select.js` (`renderPlaceholderOrValue`)
+renders the top-level `MultiValue` element with only `data`/`removeProps`/
+`isDisabled`/`isFocused`/`components`/`selectProps` — it does **not** pass
+`innerProps` there. `innerProps` only exists for the `Container`/`Label`/
+`Remove` **sub-components**, computed internally by react-select's own
+default `MultiValue` implementation (in `index-*.cjs.dev.js`) — which
+`TagPillMultiValue` replaces entirely. So `props.innerProps` is genuinely
+`undefined` at this level despite the `.d.ts` typing it as required;
+destructuring it (`const { ref, ...spanProps } = innerProps`) threw.
+
+Fix: dropped `innerProps` from `TagPillMultiValue` entirely — it was only
+being used to grab a stray `className`/`ref` that don't need preserving
+here. Also hid the remove ("×") button when the whole select is
+`isDisabled`, matching how a disabled field shouldn't offer removal.
+
+Added `TagsSelectAndCheatSheet.test.tsx` (mocks `useCategoriesForDataType`
+to avoid needing `CategoriesAndTagsContext`) asserting a pre-selected tag
+renders as a pill with a working remove button — confirmed it reproduces
+this exact crash against the broken code (`Cannot destructure property
+'ref' of 'innerProps' as it is undefined`) before verifying it passes
+against the fix. `tsc --noEmit` clean; `StyledCheckbox.test.tsx` +
+`TagsSelectAndCheatSheet.test.tsx` both green.
+
+## 2026-08-23 — Selected tags in `TagsSelectAndCheatSheet`'s select field now match `ContentListing`'s tag pills
+
+Extracted the `"#tag"` pill markup — previously duplicated verbatim in
+`ContentListing.tsx` and `addingdescription.tsx`'s tag preview
+(`bg-white/10 text-subtleWhite text-xs px-3 py-1 rounded-full min-w-0
+max-w-full break-words`, `#`-prefixed) — into a new
+`components/Shared/typography/TagPill.tsx`. Both call sites now render
+`<TagPill>{tag}</TagPill>`.
+
+For `TagsSelectAndCheatSheet.tsx`'s react-select field, the selected-tag
+chips were react-select's own boxy default (`var(--select-bg-secondary)`
+pill via the `multiValue`/`multiValueLabel`/`multiValueRemove` entries in
+`customSelectStyles`) — visually unrelated to the `TagPill` style used
+everywhere else tags are shown. Since react-select applies its per-part
+`styles` via its own emotion CSS-in-JS (not classes), matching the
+Tailwind look exactly meant fully replacing rendering, not just tweaking
+style objects — a `TagPillMultiValue` component overrides `components.
+MultiValue` on the `<Select>`, rendering the exact same `tagPillClassName`
+(now exported from `TagPill.tsx` for this reason) with a small "×" remove
+button wired to react-select's own `removeProps` handlers. Removed the
+now-dead `multiValue`/`multiValueLabel`/`multiValueRemove` style functions
+since a fully custom `MultiValue` bypasses react-select's internal
+Container/Label/Remove sub-components entirely — they'd never run.
+
+Problem encountered: react-select types `removeProps`/`innerProps` as
+plain `<div>` props (its own default `MultiValueRemove`/`MultiValueContainer`
+render divs), which don't structurally match a `<button>`'s HTML attribute
+types (mismatched event-handler element generics, e.g. `onCopy:
+ClipboardEventHandler<HTMLDivElement>`). Checked react-select's actual
+source (`Select-*.cjs.dev.js`) and confirmed `removeProps` is just `{
+onClick, onTouchEnd }` at runtime — the div typing is an artifact of its
+own default implementation, not a real constraint — so cast it to
+`ComponentPropsWithoutRef<"button">` for the spread rather than fighting
+the types or switching to a `<div role="button">`.
+
+Verified with `tsc --noEmit` (clean) and the full `vitest` suite (268/270
+passing — the 2 failures are in `CheckIfContentExists.test.tsx`, a file
+untouched by this change, and pre-date it).
+
+## 2026-08-23 — `StyledCheckbox` box shrunk slightly without shrinking the icon
+
+Shrunk the box from `w-8 h-8`/`p-[7px]` to `w-7 h-7`/`p-[5px]`. The
+`FontAwesomeIcon` itself wasn't touched — it renders at `1em`, sized off
+inherited font-size, not off the box's padding/dimensions — so trimming
+the box's padding shrinks the box without shrinking the icon; there's just
+less empty space around it. (The two knobs are independent: box size —
+`w-*`/`h-*`/`p-[*]` on the `<span>` — vs. icon size — a `className`/`size`
+prop on `<FontAwesomeIcon>` itself. Only the first was touched here.)
+Verified with `tsc --noEmit` and `StyledCheckbox.test.tsx` (4/4, no
+behavior change).
+
+## 2026-08-23 — `StyledCheckbox` box no longer resizes when the icon appears
+
+The icon box `<span>` had no fixed size — just `p-[7px]` padding — so it
+sized to its content. With the paw icon now only rendering once `checked`
+(previous entry below), the box visibly grew/shrank on every toggle:
+empty content collapsed it down to roughly the padding alone, while the
+icon's `<svg>` pushed it back out, shifting the label text next to it.
+
+Fixed by giving the box a fixed `w-8 h-8 shrink-0` (2rem square,
+`shrink-0` so the flex row can't compress it either) so its size no longer
+depends on whether the icon is present. Fixed in `StyledCheckbox.tsx`
+itself rather than per-consumer, since the same box/icon markup is shared
+by every consumer (filter sidebar, add/edit forms, cheat-sheet tags).
+Verified with `tsc --noEmit` and `StyledCheckbox.test.tsx` (still 4/4 —
+purely a visual/layout change, no behavior change).
+
+## 2026-08-23 — `TagsSelectAndCheatSheet` cheat-sheet checkboxes now reuse `StyledCheckbox`
+
+`TagsSelectAndCheatSheet.tsx`'s per-tag checkboxes were a hand-rolled copy
+of `StyledCheckbox.tsx`'s markup (same hidden-native-input technique, same
+paw-icon box) that had already drifted — it had the "icon only shows when
+checked" behavior before that was added to `StyledCheckbox` itself in the
+previous entry below.
+
+Compared the two implementations before merging. Differences found:
+hover treatment (`group`/`group-hover:bg-blue-700` on the box, `hover:` on
+the label — `StyledCheckbox` had none), disabled box background
+(`bg-errorBackgroundColor`, vs. just `cursor-not-allowed`), and label
+weight (plain vs. `StyledCheckbox`'s hardcoded `font-bold`). Everything
+else already matched: the `onChange` callback here was already a plain
+`ChangeEventHandler<HTMLInputElement>`, and `tag._id` already served the
+same role as `StyledCheckbox`'s `value`.
+
+Added two additive, opt-in props to `StyledCheckbox` rather than baking
+the cheat sheet's look in for every consumer:
+- `boxClassName` — extra classes on the icon box (`<span>`), since
+  `className` only reaches the outer `<label>`.
+- `labelClassName` — replaces the label text span's classes (default
+  `"font-bold"`, unchanged for existing consumers); cheat sheet passes
+  `"text-left"`.
+
+Then replaced the inline `<label>`/`<input>`/icon-box markup in
+`TagsSelectAndCheatSheet.tsx` with `<StyledCheckbox>`, dropped its now-
+unused `FontAwesomeIcon`/`faPaw` imports, and updated
+`docs/notes/components/form-components.md` and
+`docs/notes/components/tags-select-and-cheat-sheet.md` to describe the new
+props and the consumer. Verified with `tsc --noEmit` and the existing
+`StyledCheckbox.test.tsx` suite (4 tests, all passing) — no test file
+existed yet for `TagsSelectAndCheatSheet.tsx` itself.
+
+## 2026-08-23 — `StyledCheckbox` paw icon only shows when checked
+
+`components/FormComponents/StyledCheckbox.tsx` previously always rendered
+the `faPaw` icon and only recolored it via `peer-checked:text-secondary`
+against the box's `bg-secondary`/`peer-checked:bg-yellow-300` background —
+so the paw was always visible, just low-contrast against the unchecked
+box. Changed to `{checked && <FontAwesomeIcon icon={faPaw} />}` so the icon
+only renders once the checkbox is actually checked, using the `checked`
+prop the component already receives rather than adding CSS.
+
+Considered a CSS-only route (`peer-checked:[&>svg]:opacity-100` on the
+span, since the icon's `<svg>` isn't a direct sibling of the `peer` input
+and plain `peer-checked:` can't reach it) but picked the prop-driven
+conditional instead — it's simpler, avoids a non-obvious arbitrary-variant
+selector, and the box's border still shows the empty-checkbox shape when
+unchecked.
+
+## 2026-08-23 — `secondaryText` promoted to a CSS variable; applied to all `<p>` by default
+
+Moved the `secondaryText` color off a literal `oklch(0.88 0.005 260 / 0.7)`
+value duplicated in `tailwind.config.js` and onto a single `--secondary-text`
+CSS variable defined in `styles/globals.css` (`@layer base` `:root`, next to
+the existing `--subtle-border`/`--field-background` vars). Tailwind's
+`secondaryText` token now reads `var(--secondary-text)` instead of repeating
+the value, and `styles/globals.css` adds a base-layer `p { @apply
+text-secondaryText; }` so paragraphs get the de-emphasized color by default
+without needing `text-secondaryText` on every call site.
+
+Reasoning: the user wants multiple visual themes later. With the color only
+living in `tailwind.config.js`, a future theme would need Tailwind config
+changes (and a rebuild) to swap it. Sourcing it from a CSS variable means a
+future theme can override `--secondary-text` (and sibling tokens) per
+selector/data-attribute at runtime — Tailwind's `text-secondaryText`
+utility and the new base `p` rule keep working unchanged since both just
+resolve `var(--secondary-text)`.
+
+No visual regression expected: existing components that already set
+`text-secondaryText` explicitly on `<p>` tags (`AddSuggestion.tsx`,
+`addingdescription.tsx`, `preserveTextAfterSubmission.tsx`,
+`TagsSelectAndCheatSheet.tsx`) keep doing so redundantly but harmlessly;
+`<p>` tags elsewhere pick up the new default instead of falling through to
+`body`'s `text-foreground`. Verified by compiling `styles/globals.css`
+through the Tailwind CLI and confirming both the `--secondary-text` var and
+the `p { color: var(--secondary-text) }` rule land in the output.
+
+## 2026-08-23 — Styling: `/adddescriptions` text colors/weight — first pass
+
+Explored alternative page shells for `/adddescriptions` as a design-comparison
+Artifact first (three options: numbered steps, reference rail, quiet
+minimal), settled on the quiet-minimal direction, then checked its text
+contrast ratios against WCAG AA before touching real code. Full layout
+restructure (left-alignment, section dividers, submit-button variant swap)
+is deferred to a later pass — this first pass only touches text color and
+font-weight in `components/AddingNewData/addingdescription.tsx`:
+
+- Secondary/help copy (image caption, notes helper paragraphs, tags helper
+  text, both character-count spans) now uses `text-subtleWhite/70` instead
+  of full-opacity `subtleWhite`, to visually de-emphasize it relative to
+  primary content. Checked at ~7.5:1 contrast against the page background —
+  well clear of the 4.5:1 AA floor for that text size, not a bare pass.
+- "Ruh Roh! This description already exists!" changed from `text-red-500`
+  to `text-red-400` — `red-500` on the page's near-black background
+  measured ~5.3:1 (passing, but thin); `red-400` measures ~7.2:1.
+- "Tags *required" label changed from `font-bold` to `font-black`, matching
+  "Description *required" — both are required fields and should carry the
+  same visual weight; "Notes" (optional) stays `font-bold`.
+
+No layout, spacing, or component-structure changes in this pass, and the
+submit button's existing ad-hoc `yellow-300`/`violet-800`/`blue-500`
+classes were left alone on purpose (flagged for the follow-up pass, not
+this one).
+
+Follow-up small edit: the example tags (`senior, funny, quiet,
+well-behaved`) were plain text in that same caption. Reused the exact tag
+pill styling from `ContentListing.tsx`
+(`bg-white/10 text-subtleWhite text-xs px-3 py-1 rounded-full`, `#`-prefixed)
+so the example tags read as actual tags instead of a comma-separated list.
+
+Follow-up: promoted the ad hoc `text-subtleWhite/70` de-emphasis color used
+throughout this pass into its own `secondaryText` token in
+`tailwind.config.js` (`oklch(0.88 0.005 260 / 0.7)` — the same subtleWhite
+hue baked to a fixed 70%), since it's meant to be reused sitewide for
+help/caption text and shouldn't risk drifting to a different opacity at
+each call site. Swapped `addingdescription.tsx`'s existing
+`text-subtleWhite/70` usages over to `text-secondaryText`; no other
+component in the codebase used that pattern yet, so there was nothing else
+to migrate.
+
+## 2026-08-22 — Bugfix: dashboard content rows — name/@handle centered, not next to image
+
+### What was broken and why
+
+User-reported (screenshot: `/dashboard`, all four tabs — Fav Names, Fav
+Descriptions, Added Names, Added Descriptions): the profile image sat in
+the right place, but the name + `@profileName` text was pulled away from
+it — clearly not tucked next to the image the way it renders correctly on
+`/fetchnames`/`/fetchdescriptions`, even though all three routes render the
+exact same `ContentListing.tsx`.
+
+First hypothesis (wrong, ruled out by screenshotting both states —
+including the user's own visual check — before landing on this) was a
+missing `w-full` on a flex-wrap ancestor in `dashboard.tsx` squeezing the
+whole card's width. That didn't reproduce.
+
+Actual root cause: `components/dashboard.tsx`'s outer `<section
+className="... text-center">` sets `text-align: center`, and nothing in
+the `ToggleOneContentPage` → `CoreListingPageLogic` → `ContentListing`
+chain resets it — `text-align` inherits straight through. The name/handle
+header row is `<a className="flex-1 min-w-0 flex flex-col leading-tight">`
+— a flex-column container, so its `<span>` children stretch to the row's
+full available width by default (`align-items: stretch`). The inherited
+`text-center` then centers the _text_ inside those stretched spans,
+visually separating it from the image even though the `<a>` is still the
+very next flex item, tight against it. The content/notes block just below
+in the same component already had its own `text-left` override for
+exactly this reason (`<div className="flex flex-col gap-3 text-left
+text-subtleWhite">`) — which is why the title and description render
+correctly in the same screenshot — the header row above it never got the
+same treatment. `/fetchnames`/`/fetchdescriptions` never sit under a
+`text-center` ancestor, so this was never exposed there.
+
+### Fix
+
+Added `text-left` to `ContentListing`'s outermost root div instead of
+patching `dashboard.tsx`'s `text-center` — this component gets embedded
+under very different ancestor trees, so making the card immune to
+whatever alignment an embedding page happens to set is more robust than
+fixing the one ancestor found this time, and matches the pattern the
+content/notes block already used.
+
+### Files modified
+
+- `components/ShowingListOfContent/ContentListing.tsx` — `text-left` on the root div.
+- `docs/notes/components/content-listing.md` — documented why.
+
+### Verification
+
+- `pnpm exec tsc --noEmit` — clean.
+- Not yet visually re-confirmed by the user (no browser testing was run for this fix, per their request after the first, wrong hypothesis below) — pending their check.
+
+## 2026-08-22 — MediaObjectLeft/Right: center the button under the text block
+
+### What was changed
+
+The button wrapper in both `MediaObjectLeft.tsx` and `MediaObjectRight.tsx`
+used `flex items-center` — `items-center` only affects cross-axis (vertical)
+alignment in a flex row, so it did nothing to horizontally position the
+button; `MediaObjectLeft` additionally had a leftover `ml-4`/`max-w-2xl`
+indent. Changed both wrappers to `flex justify-center` (dropping the
+indent), which centers the button within the same parent container the
+bullet-list text block above it sits in.
+
+### Files modified
+
+- `components/Shared/layout/MediaObjectLeft.tsx`
+- `components/Shared/layout/MediaObjectRight.tsx`
+
+### Verification
+
+- `pnpm exec tsc --noEmit` — clean.
+
+## 2026-08-22 — LinkButton: add `secondary` flag; MediaObject buttonStyle mapping
+
+### What was broken and why
+
+User set `buttonStyle="secondary"` on two `MediaObjectRight`/`MediaObjectLeft`
+call sites in `app/page.tsx`, expecting the `secondary` `LinkButton` look —
+but nothing changed. Two compounding gaps:
+
+1. `LinkButton` never had a `secondary` flag at all — its flag set was
+   `defaultStyle`/`basic`/`subtle`/`warning`/`active`/`disabled` (`secondary`
+   is a `GeneralButton`-only flag; see the "Unify GeneralButton + LinkButton
+   styling" entry below for why they weren't fully unified).
+2. `MediaObjectLeft.tsx`/`MediaObjectRight.tsx` only ever checked
+   `buttonStyle === "subtle"`, hardcoded as a binary ternary — any other
+   string (`"secondary"`, a typo, anything) silently fell through to the
+   `else` branch and rendered `defaultStyle` instead. `buttonStyle="default"`
+   happened to render correctly, but only by accident (it also isn't
+   `"subtle"`, so it also fell into the same `else` branch) — the prop was
+   never actually read for anything but a `"subtle"` check.
+
+### Fix
+
+- Added `secondary` to `LinkButtonProps` / `LinkButtonVariantFlags` /
+  `resolveLinkButtonVariant()` in
+  [buttonStyles.ts](components/Shared/actions/buttonStyles.ts) — maps onto
+  the `"secondary"` entry `BUTTON_VARIANT_CLASSES` already had from
+  `GeneralButton`, so no new colors were needed.
+- New [`components/Shared/layout/mediaObjectButtonStyle.ts`](components/Shared/layout/mediaObjectButtonStyle.ts) —
+  `MediaObjectButtonStyle` (`"default" | "subtle" | "secondary"`) and
+  `mediaObjectLinkButtonFlags()`, a single mapping both `MediaObjectLeft`
+  and `MediaObjectRight` call instead of each hand-rolling its own
+  (previously binary, now 3-way) ternary — same "centralize it so the two
+  copies can't drift apart" reasoning as `buttonStyles.ts` itself.
+  `buttonStyle` is now typed as that union instead of a bare `string`, so a
+  typo or unrecognized value is a type error going forward, not a silent
+  fallback.
+- Collapsed each `{buttonText && buttonStyle === "subtle" ? <A/> : <B/>}` to
+  a single `<LinkButton {...mediaObjectLinkButtonFlags(buttonStyle)} />` —
+  behavior-preserving: `buttonText` is a required (non-optional) prop on
+  both components, so the `buttonText &&` guard could never actually
+  prevent the button from rendering; it always fell into whichever variant
+  the ternary's `else` produced.
+
+### Files modified
+
+- `components/Shared/actions/buttonStyles.ts` — `secondary` on `LinkButtonVariantFlags`/`resolveLinkButtonVariant()`.
+- `components/Shared/actions/LinkButton.tsx` — `secondary` prop.
+- `components/Shared/layout/mediaObjectButtonStyle.ts` — new.
+- `components/Shared/layout/MediaObjectLeft.tsx`, `MediaObjectRight.tsx` — typed `buttonStyle`, use the shared mapping.
+- `docs/notes/components/media-object.md`, `docs/notes/components/reusable-buttons.md` — documented.
+
+### Verification
+
+- `pnpm exec tsc --noEmit` — clean.
+- `pnpm lint` — clean (same pre-existing unrelated warnings as before).
+- `pnpm vitest run components/Shared/actions/GeneralButton.test.tsx` — 6 tests passed.
+
+### Follow-up: cover every LinkButton flag, not just the ones asked for
+
+The first pass above only added `"default" | "subtle" | "secondary"` to
+`MediaObjectButtonStyle` — just enough to fix the reported bug. Asked why it
+wasn't the full set: no good reason, so widened it to all seven `LinkButton`
+flags (`"default" | "basic" | "secondary" | "subtle" | "warning" | "active"
+| "disabled"`) via a `Record<MediaObjectButtonStyle, keyof
+LinkButtonVariantFlags>` lookup table in `mediaObjectButtonStyle.ts`, so a
+future MediaObject usage can reach any LinkButton look without this file
+needing another matching addition. `mediaObjectLinkButtonFlags()` now
+defaults an omitted `buttonStyle` to `"default"` via `?? "default"` rather
+than an unconditional final `return`. Re-verified: `tsc`/`lint`/tests all
+still clean.
+
+### Follow-up 2: derive `MediaObjectButtonStyle` instead of retyping it
+
+The widened union (above) was still hand-typed as its own literal list —
+duplicating `LinkButtonVariantFlags`'s keys in a second place, exactly the
+kind of drift this file exists to prevent. Asked why: no good reason there
+either. Changed it to `Exclude<keyof LinkButtonVariantFlags,
+"defaultStyle"> | "default"` — derived from `LinkButtonVariantFlags` itself
+with only the one deliberate rename (`defaultStyle` → the friendlier
+`default`) spelled out. `MEDIA_OBJECT_BUTTON_STYLE_FLAG`'s
+`Record<MediaObjectButtonStyle, LinkButtonFlagName>` type still requires
+every key to be mapped, so a future LinkButton flag now surfaces here as a
+type error to resolve rather than silently missing. `pnpm exec tsc --noEmit` — clean.
+
+### Follow-up 3: drop the `"default"` rename, use `defaultStyle` as-is
+
+Asked whether the `default` → `defaultStyle` rename (and the lookup table it
+required) was actually necessary — it wasn't. Simplified
+`MediaObjectButtonStyle` to `keyof LinkButtonVariantFlags` directly (no
+`Exclude`, no rename) and `mediaObjectLinkButtonFlags()` to a one-line
+`{ [buttonStyle]: true }` passthrough with `buttonStyle = "defaultStyle"` as
+the default parameter — the lookup table is gone entirely, since an
+identity mapping doesn't need one. Updated the one live call site
+(`app/page.tsx`) from `buttonStyle="default"` to `buttonStyle="defaultStyle"`
+to match. `pnpm exec tsc --noEmit` / `pnpm lint` — clean.
+
+## 2026-08-22 — Bugfix: `subtle` button hover rendering grey/white, not blue
+
+### What was broken and why
+
+User-reported (screenshot of the "Find Names" link on the landing page,
+`buttonStyle="subtle"` in `MediaObjectLeft`): the `subtle` variant's hover
+state rendered as a grey fill with a near-white border instead of blue.
+
+Root cause: [tailwind.config.js](tailwind.config.js)'s `theme.extend.colors`
+already had an (otherwise-unused, shadcn-scaffold) `accent` token —
+`accent: { DEFAULT: "hsl(var(--accent))", foreground: "hsl(var(--accent-foreground))" }`
+— and the `accent: "oklch(62% 0.16 264 / <alpha-value>)"` token added
+earlier today for the button palette used the **same key name**, placed
+_earlier_ in the same object literal. JS object literals silently let a
+later duplicate key win, so the pre-existing shadcn `accent` object
+overwrote mine — every `bg-accent`/`border-accent`/`hover:border-accent`
+class actually compiled to `hsl(var(--accent))`, and
+[`styles/globals.css`](styles/globals.css) defines `--accent: 0 0% 96.1%`
+(a near-white gray) — exactly what showed up in the screenshot. No lint,
+type, or test error catches a duplicate key in a plain JS object, so this
+went unnoticed despite `GeneralButton.test.tsx`, `pnpm lint`, and
+`pnpm exec tsc --noEmit` all passing clean at the time.
+
+### Fix
+
+Renamed the button-system token from `accent` to `buttonAccent`
+(tailwind.config.js) and updated its 5 usages in
+[`buttonStyles.ts`](components/Shared/actions/buttonStyles.ts)
+(`secondary`, `tertiary`, `subtle` ×2, `active`). Left the pre-existing
+shadcn `accent`/`accent-foreground` token alone — confirmed via grep it's
+not used anywhere else in the codebase, so untouched rather than risking a
+change to unrelated (if currently dead) scaffold code. Added a comment at
+both the token definition and the variant map warning against renaming it
+back to `accent` without removing the colliding shadcn token first.
+
+### Verification
+
+- Rebuilt (`pnpm build`) and inspected the compiled CSS directly: `hover:bg-buttonAccent/40` now compiles to `background-color:oklch(62% .16 264/.4)` and `hover:border-buttonAccent` to `border-color:oklch(62% .16 264/var(--tw-border-opacity,1))` — both genuinely blue, confirming the fix (previously these compiled to `hsl(var(--accent) / ...)`).
+- `pnpm vitest run components/Shared/actions/GeneralButton.test.tsx` — 6 tests passed.
+- The build's "Collecting page data" step hit the same pre-existing, unrelated `PageNotFoundError: Cannot find module for page: /_document` documented in an earlier entry (stale/interrupted build artifact) — CSS/type/lint stages all completed successfully before that; `rm -rf .next` was run again after to clear it.
+
+### Files modified
+
+- `tailwind.config.js` — `accent` → `buttonAccent`.
+- `components/Shared/actions/buttonStyles.ts` — updated the 5 `accent`-class usages; comments explaining the collision.
+- `docs/notes/components/reusable-buttons.md` — token list + collision note.
+
+## 2026-08-22 — Unify GeneralButton + LinkButton styling into buttonStyles.ts
+
+### What was changed
+
+`LinkButton.tsx` styled itself independently of `GeneralButton.tsx` and had
+drifted onto the old ad-hoc Tailwind colors (`yellow-200`/`yellow-600`,
+`blue-500`/`blue-700`, `red-900`, `indigo-600`, `slate-300`, `gray-400`/
+`gray-500`) that `GeneralButton` moved away from earlier today. Rather than
+just recoloring `LinkButton` a second time, extracted the shared logic into
+a new [`components/Shared/actions/buttonStyles.ts`](components/Shared/actions/buttonStyles.ts):
+`BUTTON_BASE_CLASSES`/`HERO_BUTTON_BASE_CLASSES`, a `BUTTON_VARIANT_CLASSES`
+color/class map, and a `resolve*Variant()` helper per component that
+reproduces each component's own flag-precedence order (flags are checked in
+a fixed sequence; a later true flag overrides an earlier one — preserved
+exactly from the original if-chains so combined-flag behavior doesn't
+silently change). Both components now just resolve a variant and look its
+classes up in the shared map, so a future color/variant change only has to
+happen in one place.
+
+`LinkButton`'s variants now map onto the same tokens as `GeneralButton`:
+`defaultStyle` → the same CTA look as `GeneralButton`'s default (was
+ad-hoc yellow), `subtle`/`warning`/`active`/`disabled` → the matching
+shared variant (`warning`/`active`/`disabled` were unused in production, so
+zero visual-regression risk), `basic` → a new `basicLink` entry in the
+shared map (its underline nav-link look was already token-only, so this
+just centralizes it — no visual change). Deliberately **not** changed:
+`LinkButton` still renders with zero variant classes when no flag is set
+(`GeneralButton` always applies a default look) — real call sites
+(`NavLayoutwithSettingsMenu.tsx`'s logo link, `SharingOptionsBar.tsx`,
+`ReturnToPreviousPage.tsx`) depend on that to stay fully custom-styled via
+their own `className`. Prop names also weren't unified across the two
+components — the flag sets don't actually overlap enough to unify cleanly
+(no `secondary`/`tertiary`/`plain` equivalent on `LinkButton`; no
+`basic`/`defaultStyle` equivalent on `GeneralButton`).
+
+Also adopted `cn()` (clsx + tailwind-merge, already in
+[lib/utils.ts](lib/utils.ts) but previously used by only one component,
+`skeleton.tsx`) in both components to compose `baseClasses`/variant
+classes/`className`, replacing raw template-literal concatenation. This
+fixes the exact fragility called out in the `heroStyle` entry below
+("conflicting Tailwind utilities' precedence depends on generated-CSS
+source order, not template order") for real this time, instead of just
+working around it — e.g. `LinkButton`'s `basic` variant sets `rounded-none`
+to override the shared base's `rounded-2xl`; `twMerge` resolves that
+correctly regardless of source order, where string concatenation only
+worked by accident.
+
+Also dropped `classForDiv` from `LinkButtonProps` — declared but never
+read anywhere in the codebase.
+
+### Files modified
+
+- `components/Shared/actions/buttonStyles.ts` — new; shared base classes, `BUTTON_VARIANT_CLASSES` map, `resolveGeneralButtonVariant()`, `resolveLinkButtonVariant()`.
+- `components/Shared/actions/GeneralButton.tsx` — uses the shared resolver/map + `cn()`; no rendered-output change.
+- `components/Shared/actions/LinkButton.tsx` — uses the shared resolver/map + `cn()`; recolored `defaultStyle`/`warning`/`active`/`disabled`/`basic` onto shared tokens; dropped `classForDiv`.
+- `docs/notes/components/reusable-buttons.md` — new "Shared styling: buttonStyles.ts" section; updated `LinkButton` section (variant mapping, the no-flag/unstyled asymmetry, prop-name mismatch).
+
+### Verification
+
+- `pnpm vitest run components/Shared/actions/GeneralButton.test.tsx` — 6 tests passed, unmodified (still asserts literal `bg-red-800`/`bg-secondary`/`rounded-full`, confirming `cn()` didn't strip anything unexpected).
+- `pnpm lint` — clean (only the same pre-existing unrelated warnings as before this change).
+- `pnpm exec tsc --noEmit` — clean.
+
+### Next logical step
+
+`GeneralOpenCloseButton.tsx` / `iconOpenCloseButton.tsx` are a separately
+copy-pasted tab-toggle pair still on old ad-hoc colors — a candidate for the
+same treatment later, not part of this change.
+
+## 2026-08-22 — GeneralButton: new design-system-aligned color palette
+
+### What was changed
+
+Replaced `GeneralButton`'s ad-hoc Tailwind color classes
+(`yellow-300`/`yellow-700`, `blue-500`/`blue-700`, `indigo-600`,
+`gray-400`/`gray-500`, `slate-300`) with a palette built from the existing
+design-system tokens (`primary`, `secondary`, `subtleBackground`,
+`subtleBorder`, `subtleWhite`) plus a small accent/outline/disabled set added
+alongside them in [tailwind.config.js](tailwind.config.js): `accent`,
+`accentFill`, `accentFillBorder`, `outlineBorder`, `warningHover`,
+`disabledBg`, `disabledText`. Explored as a set of visual directions in a
+design canvas first (current-state audit + 3 alternate color directions),
+then iterated on the chosen "design-system aligned" direction based on
+feedback: warning uses a conventional obvious red (`red-800` /
+`warningHover`, not a muted brand-derived brown), `plain`'s hover fills the
+background instead of only recoloring the text, `tertiary`'s hover keeps
+white text (only the underline recolors), and `disabled` text was lightened
+for legibility.
+
+Every variant now also sets an explicit border **width** (`border-[1.5px]`,
+`border-2` for `active`, `border-4` for `hero`, unchanged) — previously
+most variants set a border _color_ class without a width utility, so the
+border was invisible in practice (Tailwind's border-width defaults to 0).
+Only `secondary` (`border-t border-x`) and `heroStyle` (`border-4`)
+actually rendered a border before this change.
+
+### Why these values (not eyeballed)
+
+Every text/background pair was checked against WCAG AA (4.5:1 for button
+text, 3:1 for a border that's a button's only affordance — `secondary`,
+`tertiary`, `disabled`) using a small local script computing relative
+luminance from oklch/hex values, not by eye. Several combinations tried
+during exploration failed and were swapped for a passing one before landing
+in the component — see [docs/notes/components/reusable-buttons.md](docs/notes/components/reusable-buttons.md#generalbutton)
+for the final ratios per variant.
+
+### Files modified
+
+- `tailwind.config.js` — added `accent`, `accentFill`, `accentFillBorder`, `outlineBorder`, `warningHover`, `disabledBg`, `disabledText` color tokens.
+- `components/Shared/actions/GeneralButton.tsx` — new `bgClass` per variant (default/secondary/tertiary/plain/subtle/warning/active/disabled/heroStyle), each with an explicit border width.
+- `docs/notes/components/reusable-buttons.md` — documented the new palette, the border-width fix, and the WCAG pass.
+
+### Verification
+
+- `pnpm vitest run components/Shared/actions/GeneralButton.test.tsx` — 6 tests passed (no test changes needed; existing assertions on `bg-red-800`/`bg-secondary`/`rounded-full` still hold).
+
+### Next logical step
+
+Consider applying the same token set to `LinkButton.tsx`, which currently
+has its own separate `defaultStyle`/`basic`/`subtle`/`warning`/`active`/
+`disabled` variants using the old ad-hoc colors.
+
+## 2026-08-22 — YoutubeEmbed: poster/facade pattern to fix blurry video thumbnails
+
+### What was changed
+
+The landing-page video panels ([components/ShowingListOfContent/YoutubeEmbed.tsx](components/ShowingListOfContent/YoutubeEmbed.tsx),
+used by the "Impactful"/"Fun"/"Fitting" videos wired through
+[components/LandingPage/HeroTop.tsx](components/LandingPage/HeroTop.tsx) →
+[app/page.tsx](app/page.tsx)) showed an extremely blurry pre-play thumbnail. `YoutubeEmbed`
+previously mounted the real `youtube-nocookie.com` `<iframe>` as soon as the panel opened, just
+visually hidden behind a spinner until the iframe's own `onLoad` fired — so the thumbnail shown
+before playback was always whatever low-resolution image YouTube itself generated for that
+video, which we have no control over (no embed URL parameter exists to request a sharper one).
+
+Switched to the standard "facade"/"lite-youtube" pattern: `YoutubeEmbed` now renders a static
+poster image (new `posterSrc`/`posterAlt` props) with a play-button overlay (`Play` icon from
+`lucide-react`, already a dependency) first, and only mounts the real iframe — with
+`?autoplay=1` — once the user clicks it. If the local poster file hasn't been supplied yet (all
+three are placeholders pending real screenshots), an `onError` handler on the `next/image`
+falls back to YouTube's own `hqdefault.jpg` thumbnail so nothing breaks in the meantime. This
+is also a perf win: the iframe (and its network request) no longer loads until the user
+actually presses play, not just when the panel opens.
+
+### Files modified
+
+- `components/ShowingListOfContent/YoutubeEmbed.tsx` — `posterSrc`/`posterAlt` props, `started`/`posterFailed` state, poster/play-button facade before the iframe, `autoplay=1` + `allow="autoplay; web-share"` once started, close button no longer gated on `loaded`.
+- `app/page.tsx` — added `posterSrc`/`posterAlt` to all three `YoutubeEmbed` call sites (`/impactful-poster.jpg`, `/fun-poster.jpg`, `/fitting-poster.jpg` — files to be supplied separately).
+- `docs/notes/components/showing-list-of-content/youtube-and-social-lists.md` — updated prop table and behavior notes for the facade pattern.
+
+### Problems encountered
+
+None with this change directly. Unrelated: mid-session the file briefly ended up with a
+malformed JSX-in-template-literal heading and a stale `.next` build cache
+(`PageNotFoundError: Cannot find module for page: /_document`) from an earlier interrupted
+build — both were pre-existing/environmental, not caused by this change; the heading was fixed
+separately and `rm -rf .next` resolved the stale cache.
+
+### Verification
+
+- `pnpm lint` — clean (only pre-existing unrelated warnings in other files).
+- `pnpm build` — succeeded after clearing `.next`.
+
+### TODO
+
+- Supply the actual poster screenshots at `public/impactful-poster.jpg`, `public/fun-poster.jpg`,
+  `public/fitting-poster.jpg` (an existing unused `public/impactfulThumbnail.png` is already a
+  sharp Fishtopher/"Impactful" screenshot, though fresh images are planned for all three).
+
+## 2026-08-22 — Add `heroStyle` variant to GeneralButton; migrate HeroTop buttons
+
+### What was changed
+
+Added a `heroStyle` boolean flag to
+[components/Shared/actions/GeneralButton.tsx](components/Shared/actions/GeneralButton.tsx)
+and migrated the three landing-page hero buttons ("Fun", "Impactful",
+"Fitting") in
+[components/LandingPage/HeroTop.tsx](components/LandingPage/HeroTop.tsx)
+from raw hand-written `<button>` elements to `<GeneralButton heroStyle />`,
+so future style edits to this button style sync from one place. This also
+fixed an existing inconsistency: "Fun" and "Fitting" used
+`border-b-4 border-subtleWhite` while "Impactful" used
+`border-4 border-subtleBorder` — all three are now standardized on the
+"Impactful" look. "Fitting" also had an extra `px-0` utility the other two
+lacked; dropped it as part of standardizing all three on one identical
+style.
+
+### Problems encountered / options considered
+
+`GeneralButton`'s `baseClasses` (`font-bold my-3 py-1 px-4 rounded-2xl
+text-base`) is unconditionally applied and conflicts with the new variant's
+required shape (`rounded-full`, `h-10`, `text-sm`, `w-full`, `mt-2` vs.
+`rounded-2xl`, `py-1`, `text-base`). Plain string concatenation makes
+conflicting Tailwind utilities' precedence depend on generated-CSS source
+order, not the order classes appear in the template literal — too fragile
+for a variant needing a different base shape rather than just a color swap.
+
+Two options considered: (a) adopt the existing `cn()`/`twMerge` helper
+([lib/utils.ts](lib/utils.ts), already a dependency but unused by
+`GeneralButton`) throughout the component for principled last-wins conflict
+resolution, or (b) give `heroStyle` its own fully self-contained
+`baseClasses`/`bgClass` override that bypasses the default `baseClasses`
+entirely. Chose (b): `GeneralButton` is imported by ~24 other files, and
+(a) would have changed class-conflict resolution behavior for all of them
+to fix a problem only the new variant has. `let baseClasses` (was `const`)
+was needed to support the override.
+
+### Also updated
+
+- [components/Shared/actions/GeneralButton.test.tsx](components/Shared/actions/GeneralButton.test.tsx) — added a `heroStyle` variant test, matching the existing per-variant pattern.
+- [docs/notes/components/reusable-buttons.md](docs/notes/components/reusable-buttons.md) — documented `heroStyle` as a standalone flag not designed to combine with the others.
+
 ## 2026-08-21 — Refactor pagination selects to remove invisible-overlay/duplicated-state hack
 
 ### What was changed
@@ -67,6 +878,7 @@ on the select underneath and opens the native picker.
 ### Problem encountered
 
 Two false starts before landing on this:
+
 1. Initially assumed a Firefox-specific `appearance-none`/sizing CSS bug
    (the user first said "the dropdown doesn't respond" while testing in
    Firefox). Static code reading couldn't confirm this, and the user
@@ -154,21 +966,21 @@ This project is ~95% JavaScript, so tsconfig is tuned for **incremental migratio
 
 **Left unchanged on purpose**
 
-| Option | Value | Why |
-|--------|-------|-----|
-| `allowJs` | `true` | Most files are still `.js`/`.jsx`. Without this, TypeScript would ignore the majority of the codebase and break the gradual rename-and-type workflow. |
-| `strict` | `false` | Enabling full strict mode now would surface hundreds of errors across untouched JS files and force a big-bang fix. We flip this to `true` later, once ~70%+ of files are converted. |
-| `strictNullChecks` | `true` | Already on before wave 1. Null/undefined bugs are high-value to catch early, and the existing TS files (email templates, hooks) were written with this in mind. Keeping it avoids regressing code that already passes null checks. |
-| `include` (`**/*.js`, `**/*.jsx`) | kept | Same reason as `allowJs` — JS and TS coexist in one project until migration is done. |
-| `moduleResolution` | `"node"` | Works with the current Next.js 15 setup. `"bundler"` is a later option when we enable full strict and tighten the toolchain. |
-| `checkJs` | not enabled | Would type-check every JS file immediately and create a huge error surface before those files have types. Optional `// @ts-check` per file is the safer path for hard modules later. |
+| Option                            | Value       | Why                                                                                                                                                                                                                                |
+| --------------------------------- | ----------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `allowJs`                         | `true`      | Most files are still `.js`/`.jsx`. Without this, TypeScript would ignore the majority of the codebase and break the gradual rename-and-type workflow.                                                                              |
+| `strict`                          | `false`     | Enabling full strict mode now would surface hundreds of errors across untouched JS files and force a big-bang fix. We flip this to `true` later, once ~70%+ of files are converted.                                                |
+| `strictNullChecks`                | `true`      | Already on before wave 1. Null/undefined bugs are high-value to catch early, and the existing TS files (email templates, hooks) were written with this in mind. Keeping it avoids regressing code that already passes null checks. |
+| `include` (`**/*.js`, `**/*.jsx`) | kept        | Same reason as `allowJs` — JS and TS coexist in one project until migration is done.                                                                                                                                               |
+| `moduleResolution`                | `"node"`    | Works with the current Next.js 15 setup. `"bundler"` is a later option when we enable full strict and tighten the toolchain.                                                                                                       |
+| `checkJs`                         | not enabled | Would type-check every JS file immediately and create a huge error surface before those files have types. Optional `// @ts-check` per file is the safer path for hard modules later.                                               |
 
 **Added in wave 1**
 
-| Option | Why |
-|--------|-----|
-| `noFallthroughCasesInSwitch` | Catches accidental `switch` fall-through — a real logic bug — without requiring types on any file. Safe to turn on during migration. |
-| `noImplicitReturns` | Ensures functions with a return type (or inferred return paths) actually return on all code paths. Again, catches bugs without forcing `noImplicitAny` on legacy JS. |
+| Option                       | Why                                                                                                                                                                  |
+| ---------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `noFallthroughCasesInSwitch` | Catches accidental `switch` fall-through — a real logic bug — without requiring types on any file. Safe to turn on during migration.                                 |
+| `noImplicitReturns`          | Ensures functions with a return type (or inferred return paths) actually return on all code paths. Again, catches bugs without forcing `noImplicitAny` on legacy JS. |
 
 **Deliberately deferred**
 
@@ -2795,8 +3607,6 @@ Converted three small listing/UI helpers to TypeScript. `ToggeableAlert` typed `
 
 Convert `components/ShowingListOfContent/ContentListing.jsx`.
 
-
-
 ---
 
 ## 2026-06-07 — Cleanup: remove dead `target` from `ThanksDialog`
@@ -2855,8 +3665,6 @@ Completed thanks-flow migration: data options, submission form, API routes, and 
 
 Convert `components/ShowingListOfContent/ContentListing.jsx`.
 
-
-
 ---
 
 ## 2026-06-07 — Fix: canonical `descriptions` contentType
@@ -2883,8 +3691,6 @@ Aligned server branches with UI convention (`"descriptions"` not `"description"`
 ### Next logical step
 
 Convert `components/ShowingListOfContent/ContentListing.jsx`.
-
-
 
 ---
 
@@ -2919,8 +3725,6 @@ Converted listing row delete/edit menu buttons and edit dialog to `.tsx`. Export
 ### Next logical step
 
 Convert `components/ShowingListOfContent/ContentListing.jsx`.
-
-
 
 ---
 
@@ -4759,7 +5563,10 @@ import { checkOwnership } from "./checkOwnership";
 
 mocks.getSessionForApis.mockResolvedValue({
   ok: true,
-  session: { user: { id: "creator-42", role: "user", status: "active" }, expires: "…" },
+  session: {
+    user: { id: "creator-42", role: "user", status: "active" },
+    expires: "…",
+  },
 });
 ```
 
@@ -4877,7 +5684,12 @@ Failed approach:
 ```ts
 const onChange = vi.fn();
 render(
-  <StyledCheckbox label="Keep text" value="keep-text" checked={false} onChange={onChange} />,
+  <StyledCheckbox
+    label="Keep text"
+    value="keep-text"
+    checked={false}
+    onChange={onChange}
+  />
 );
 await user.click(screen.getByRole("checkbox", { name: /keep text/i }));
 expect(onChange.mock.calls[0][0].target.checked).toBe(true); // got false
@@ -5053,16 +5865,16 @@ Replaced size-based `ReusableSmallComponents/` and `ReusableMediumComponents/` w
 
 ### Mapping
 
-| Old | New |
-|-----|-----|
-| `ReusableSmallComponents/buttons/*` (generic) | `shared/actions/` |
-| `WarningMessage`, `ToggeableAlert`, `ui/MustLoginMessage` | `shared/feedback/` |
-| icons, `IconWithCount` | `shared/icons/` |
-| headings | `shared/typography/` |
-| `ProfileImage`, `GifHover`, `ShowTime` | `shared/media/` |
-| `ListWithPawPrintIcon` | `shared/lists/` |
-| `MediaObject*` | `shared/layout/` |
-| like/follow/share | `shared/content-actions/` |
+| Old                                                       | New                       |
+| --------------------------------------------------------- | ------------------------- |
+| `ReusableSmallComponents/buttons/*` (generic)             | `shared/actions/`         |
+| `WarningMessage`, `ToggeableAlert`, `ui/MustLoginMessage` | `shared/feedback/`        |
+| icons, `IconWithCount`                                    | `shared/icons/`           |
+| headings                                                  | `shared/typography/`      |
+| `ProfileImage`, `GifHover`, `ShowTime`                    | `shared/media/`           |
+| `ListWithPawPrintIcon`                                    | `shared/lists/`           |
+| `MediaObject*`                                            | `shared/layout/`          |
+| like/follow/share                                         | `shared/content-actions/` |
 
 ### Problems encountered
 
@@ -5506,7 +6318,6 @@ Serial `social.spec.ts` tests share the in-memory server rate limiter (3 POSTs /
 ### Verification
 
 - `pnpm test:e2e e2e/social.spec.ts`
-
 
 ### What changed
 
