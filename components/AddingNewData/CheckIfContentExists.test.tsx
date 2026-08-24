@@ -54,7 +54,7 @@ describe("CheckIfContentExists", () => {
   it("renders description-specific heading", () => {
     render(<Harness contentType="descriptions" />);
     expect(
-      screen.getByText("Check if a description exists:")
+      screen.getByText("Check if the description exists:")
     ).toBeInTheDocument();
   });
 
