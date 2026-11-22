@@ -1,4 +1,5 @@
 {
-    "editor.wordWrap": "on",
-    "files.eol": "\n"
+  "editor.wordWrap": "on",
+  "files.eol": "\n",
+  "python.terminal.useEnvFile": true
 }

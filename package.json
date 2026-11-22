@@ -25,7 +25,9 @@
     "build:e2e": "node scripts/build-e2e.mjs",
     "start:e2e": "node scripts/start-e2e.mjs",
     "seed:e2e": "node scripts/seed-e2e.mjs",
-    "seed:e2e-user": "node scripts/seed-e2e.mjs"
+    "seed:e2e-user": "node scripts/seed-e2e.mjs",
+    "seed:perf": "node load-tests/seed-perf-data.mjs",
+    "test:perf": "k6 run load-tests/listings.js"
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",

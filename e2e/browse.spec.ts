@@ -26,7 +26,7 @@ test.describe("Browse smoke", () => {
     await expect(page.getByText("Server error")).not.toBeVisible();
   });
 
-  test("names API returns string _id values without __v", async ({ request }) => {
+  test("[API-LIST-001] names API returns string _id values without __v", async ({ request }) => {
     const response = await request.post("/api/names/swr", {
       data: { page: 1 },
     });
@@ -46,7 +46,7 @@ test.describe("Browse smoke", () => {
     }
   });
 
-  test("descriptions API returns string _id values without __v", async ({
+  test("[API-LIST-002] descriptions API returns string _id values without __v", async ({
     request,
   }) => {
     const response = await request.post("/api/description/swr", {

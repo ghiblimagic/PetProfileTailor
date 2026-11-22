@@ -1,5 +1,16 @@
 # CHANGES
 
+## 2026-11-22 — Local load-test results and setup notes
+
+Recorded the five production-build k6 runs (ramping to 10, 25, 50, 75, and 100 VUs) and the observed local-machine CPU and memory readings in `load-tests/README.md`. The reported p95 latency was at or below 60 ms through 50 VUs, then rose to about 155 ms at 75 and about 394 ms at 100, while throughput increased only about 11% from 75 to 100 VUs. All five runs had zero failed requests, 100% checks passed, and passed the configured thresholds. The measurements and caveats are documented as local results, not production-capacity claims; the 100-VU CPU readings suggest saturation but do not establish the aggregation as the cause.
+
+### Problems encountered and resolutions
+
+- The installed MongoDB binary reported version 8.2.1 even though its directory was named `8.0`. On this older CPU, MongoDB exited with `0xC000001D` after initializing data and restarting. CPU instruction compatibility (AVX/AVX2/FMA3) was suspected, but the root cause was not confirmed. Switched the local performance setup to MongoDB 7.0.x with a new, empty `perf-db-7` data directory; kept the prior data directory untouched because MongoDB 7.0 cannot open MongoDB 8.x data files.
+- The k6 script initially failed during startup because its runtime does not provide the global `URL` constructor. Replaced that URL parsing with validation for the allowed local HTTP origins. A subsequent smoke run passed all response checks with no failed requests, though its latency thresholds were exceeded; the smoke run was not treated as a performance baseline.
+- Added timestamped k6 summary export instructions and gitignored `load-tests/results/` so JSON summaries can be saved locally while the normal results remain visible in the terminal.
+- pnpm warned that `pnpm.onlyBuiltDependencies` in `package.json` is ignored by the installed pnpm version. This warning did not cause the k6 failure and was left unchanged.
+
 ## 2026-08-23 — Tags cheat sheet checkboxes: grid layout instead of flex-wrap
 
 `TagsSelectAndCheatSheet.tsx`'s per-category checkbox list
